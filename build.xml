@@ -157,13 +157,18 @@
       <fileset dir="lib/ext/lwjgl"><include name="*.jar" /></fileset>
     </copy>
     <copy file="etc/ansgar-config.properties" tofile="bin/haven-config.properties" />
+    <copy file="RUN.bat" todir="bin"/>
     <chmod file="bin/hafen.jar" perm="a+x" />
   </target>
 
   <target name="deftgt" depends="jars, bin" />
 
   <target name="run" depends="bin">
-    <java jar="bin/hafen.jar" fork="true" />
+    <exec dir="bin/" executable="cmd">
+      <arg value="/c"/>
+      <arg value = "start"/>
+      <arg value="RUN.bat"/>
+    </exec>
   </target>
 
   <target name="clean">
