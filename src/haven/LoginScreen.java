@@ -26,20 +26,38 @@
 
 package haven;
 
+import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.UnsupportedAudioFileException;
+import java.awt.*;
+import java.io.File;
+import java.io.IOException;
 import java.util.*;
 import java.awt.event.KeyEvent;
+import java.util.List;
 
 public class LoginScreen extends Widget {
     public static final Text.Foundry
-	textf = new Text.Foundry(Text.sans, 16).aa(true),
-	textfs = new Text.Foundry(Text.sans, 14).aa(true);
+	textf = new Text.Foundry(Text.sans, 18).aa(true),
+	textfs = new Text.Foundry(Text.sans, 15).aa(true);
     public static final Tex bg = Resource.loadtex("gfx/loginscr");
-    public static final Position bgc = new Position(UI.scale(420, 300));
+	public static final Position bgc = new Position(UI.scale(533, 250)); // ND: This affects only the login screen username/password location
     public final Credbox login;
     public final String hostname;
     private Text error, progress;
     private Button optbtn;
-    private OptWnd opts;
+	private OptWnd opts = new OptWnd(false); // ND: This needs to be created when the login screen is created, to prevent options nullpointers once we log into a character
+	AccountList accounts;
+	private String lastUser = "";
+	private String lastPass = "";
+	public static HSlider themeSongVolumeSlider;
+	static private final File mainTheme = new File("res/customclient/sfx/maintheme.wav");
+	static private Audio.CS mainThemeClip = null;
+	static private boolean mainThemeStopped = false;
+	static public final File charSelectTheme = new File("res/customclient/sfx/charselecttheme.wav");
+	static public Audio.CS charSelectThemeClip = null;
+	static public boolean charSelectThemeStopped = false;
 
     private String getpref(String name, String def) {
 	return(Utils.getpref(name + "@" + hostname, def));
@@ -53,14 +71,30 @@ public class LoginScreen extends Widget {
 	optbtn = adda(new Button(UI.scale(100), "Options"), pos("cbl").add(10, -10), 0, 1);
 	optbtn.setgkey(GameUI.kb_opt);
 	adda(login = new Credbox(), bgc.adds(0, 10), 0.5, 0.0).hide();
+	accounts = add(new AccountList(16));
+	adda(new StatusLabel(hostname, 0.5), bgc.x, bg.sz().y, 0.5, 1.4); // ND: This adds the server status and player count
+	mainThemeStopped = false;
+	playMainTheme();
+	add(themeSongVolumeSlider = new HSlider(UI.scale(220), 0, 100, Utils.getprefi("themeSongVolume", 40)) {
+		protected void attach(UI ui) {
+			super.attach(ui);
+		}
+		public void changed() {
+			if (mainThemeClip != null)
+				((Audio.VolAdjust) mainThemeClip).vol = val/100d;
+			Utils.setprefi("themeSongVolume", val);
+		}
+	}, bg.sz().x - UI.scale(230) , bg.sz().y - UI.scale(20));
+	add(new Label("Background Music Volume"), bg.sz().x - UI.scale(184) , bg.sz().y - UI.scale(36));
     }
 
-    public static final KeyBinding kb_savtoken = KeyBinding.get("login/savtoken", KeyMatch.forchar('R', KeyMatch.M));
-    public static final KeyBinding kb_deltoken = KeyBinding.get("login/deltoken", KeyMatch.forchar('F', KeyMatch.M));
+//    public static final KeyBinding kb_savtoken = KeyBinding.get("login/savtoken", KeyMatch.forchar('R', KeyMatch.M)); // ND: Why the fuck are there keybinds for these? Someone might press one of those by mistake
+//    public static final KeyBinding kb_deltoken = KeyBinding.get("login/deltoken", KeyMatch.forchar('F', KeyMatch.M)); // ND: No drink button keybind, BUT OH BOY WE COULD REALLY USE A REMEMBER/FORGET ACCOUNT KEYBIND!
     public class Credbox extends Widget {
 	public final UserEntry user;
 	private final TextEntry pass;
-	private final CheckBox savetoken;
+	private final CheckBox saveaccount;
+//	private final CheckBox savetoken;
 	private final Button fbtn;
 	private final IButton exec;
 	private final Widget pwbox, tkbox;
@@ -74,12 +108,12 @@ public class LoginScreen extends Widget {
 
 	    private UserEntry(int w) {
 		super(w, "");
-		history.addAll(Utils.getprefsl("saved-tokens@" + hostname, new String[] {}));
+//		history.addAll(Utils.getprefsl("saved-tokens@" + hostname, new String[] {}));
 	    }
 
 	    protected void changed() {
-		checktoken();
-		savetoken.set(token != null);
+//		checktoken();
+//		savetoken.set(token != null); // ND: Don't need the "remember me" to untick whenever we write inside the username input
 	    }
 
 	    public void settext2(String text) {
@@ -116,26 +150,34 @@ public class LoginScreen extends Widget {
 	private Credbox() {
 	    super(UI.scale(200, 150));
 	    setfocustab(true);
-	    Widget prev = add(new Label("User name", textf), 0, 0);
+		Widget prev = add(new Label("Username", textf){{setstroked(Color.BLACK);}}, 0, 0);
 	    add(user = new UserEntry(this.sz.x), prev.pos("bl").adds(0, 1));
 	    setfocus(user);
 
 	    add(pwbox = new Widget(Coord.z), user.pos("bl").adds(0, 10));
-	    pwbox.add(prev = new Label("Password", textf), Coord.z);
+		pwbox.add(prev = new Label("Password", textf){{setstroked(Color.BLACK);}}, Coord.z);
 	    pwbox.add(pass = new TextEntry(this.sz.x, ""), prev.pos("bl").adds(0, 1)).pw = true;
-	    pwbox.add(savetoken = new CheckBox("Remember me", true), pass.pos("bl").adds(0, 10));
-	    savetoken.setgkey(kb_savtoken);
-	    savetoken.settip("Saving your login does not save your password, but rather " +
-			     "a randomly generated token that will be used to log in. " +
-			     "You can manage your saved tokens in your Account Settings.",
-			     true);
+		pwbox.add(saveaccount = new CheckBox("Save Account", true), pass.pos("bl").adds(0, 10));
+		saveaccount.set(true); // ND: Set this to true from the beginning. If users don't want to save the account, they will untick it
+//	    pwbox.add(savetoken = new CheckBox("Remember me", true), pass.pos("bl").adds(0, 10));
+//	    savetoken.setgkey(kb_savtoken); // ND: Stupid keybind
+//	    savetoken.settip("Saving your login does not save your password, but rather " +
+//			     "a randomly generated token that will be used to log in. " +
+//			     "You can manage your saved tokens in your Account Settings.",
+//			     true);
 	    pwbox.pack();
-	    pwbox.hide();
+//	    pwbox.hide();
 
 	    add(tkbox = new Widget(new Coord(this.sz.x, 0)), user.pos("bl").adds(0, 10));
-	    tkbox.add(prev = new Label("Login saved", textfs), UI.scale(0, 25));
-	    tkbox.adda(fbtn = new Button(UI.scale(100), "Forget me"), prev.pos("mid").x(this.sz.x), 1.0, 0.5).action(this::forget);
-	    fbtn.setgkey(kb_deltoken);
+		tkbox.add(prev = new Label("Login saved", textfs){{setstroked(Color.BLACK);}}, UI.scale(0, 25));
+		tkbox.adda(fbtn = new Button(UI.scale(100), "Forget me"), prev.pos("mid").x(this.sz.x), 1.0, 0.5).action(() -> {
+//			forget();
+			if (accounts.getAccountFromName(user.text()) != null) {
+				accounts.remove(accounts.getAccountFromName(user.text()));
+			}
+			user.rsettext("");
+		});
+//	    fbtn.setgkey(kb_deltoken); // ND: Stupid keybind
 	    tkbox.pack();
 	    tkbox.hide();
 
@@ -152,31 +194,32 @@ public class LoginScreen extends Widget {
 	    if(inited)
 		return;
 	    inited = true;
-	    user.init(getpref("loginname", ""));
+//		user.init(getpref("loginname", "")); // ND: This line sets the user text if the "remember me" is checked. I don't want that, since we have the accounts on the left side.
+//		This way, if a new account needs to be added, you don't need to clear the box.
 	}
 
-	private void checktoken() {
-	    if(this.token != null) {
-		Arrays.fill(this.token, (byte)0);
-		this.token = null;
-	    }
-	    byte[] token = Bootstrap.gettoken(user.text(), hostname);
-	    if(token == null) {
-		tkbox.hide();
-		pwbox.show();
-	    } else {
-		tkbox.show();
-		pwbox.hide();
-		this.token = token;
-	    }
-	}
+//	private void checktoken() {
+//	    if(this.token != null) {
+//		Arrays.fill(this.token, (byte)0);
+//		this.token = null;
+//	    }
+//	    byte[] token = Bootstrap.gettoken(user.text(), hostname);
+//	    if(token == null) {
+//		tkbox.hide();
+//		pwbox.show();
+//	    } else {
+//		tkbox.show();
+//		pwbox.hide();
+//		this.token = token;
+//	    }
+//	}
 
-	private void forget() {
-	    String nm = user.text();
-	    Bootstrap.settoken(nm, hostname, null);
-	    savetoken.set(false);
-	    checktoken();
-	}
+//	private void forget() {
+//	    String nm = user.text();
+//	    Bootstrap.settoken(nm, hostname, null);
+//		savetoken.set(false); // ND: commented this, so the "remember me" doesn't untick whenever you click on "forget me".
+//	    checktoken();
+//	}
 
 	private void enter() {
 	    if(user.text().equals("")) {
@@ -184,16 +227,30 @@ public class LoginScreen extends Widget {
 	    } else if(pwbox.visible && pass.text().equals("")) {
 		setfocus(pass);
 	    } else {
-		LoginScreen.this.wdgmsg("login", creds(), pwbox.visible && savetoken.state());
+		if(saveaccount.state()) {
+			lastUser = user.text();
+			lastPass = pass.text();
+		}
+		LoginScreen.this.wdgmsg("login", creds(), pwbox.visible && saveaccount.state());
 	    }
 	}
 
+	private void enter2() {
+		if(user.text().equals("")) {
+			setfocus(user);
+		} else if(pwbox.visible && pass.text().equals("")) {
+			setfocus(pass);
+		} else {
+			LoginScreen.this.wdgmsg("login", creds(), pwbox.visible && saveaccount.state());
+		}
+	}
+
 	private AuthClient.Credentials creds() {
-	    byte[] token = this.token;
+//	    byte[] token = this.token;
 	    AuthClient.Credentials ret;
-	    if(token != null) {
-		ret = new AuthClient.TokenCred(user.text(), Arrays.copyOf(token, token.length));
-	    } else {
+//	    if(token != null) {
+//		ret = new AuthClient.TokenCred(user.text(), Arrays.copyOf(token, token.length));
+//	    } else {
 		String pw = pass.text();
 		ret = null;
 		parse: if(pw.length() == 64) {
@@ -208,7 +265,7 @@ public class LoginScreen extends Widget {
 		if(ret == null)
 		    ret = new AuthClient.NativeCred(user.text(), pw);
 		pass.rsettext("");
-	    }
+//	    }
 	    return(ret);
 	}
 
@@ -224,7 +281,7 @@ public class LoginScreen extends Widget {
 	    if(!inited)
 		init();
 	    super.show();
-	    checktoken();
+//	    checktoken();
 	    if(pwbox.visible && !user.text().equals(""))
 		setfocus(pass);
 	}
@@ -246,14 +303,18 @@ public class LoginScreen extends Widget {
 		if(!stat.syn || (stat.status == ""))
 		    return;
 		if(stat.status == "up") {
-		    FastText.aprintf(g, new Coord(x, FastText.h * 0), ax, 0, "Server status: Up");
-		    FastText.aprintf(g, new Coord(x, FastText.h * 1), ax, 0, "Hearthlings playing: %,d", stat.users);
+			FastText.aprintfstroked(g, new Coord(x, FastText.h * 0), ax, 0, "Server status: Online");
+			try {
+				FastText.aprintfstroked(g, new Coord(x, FastText.h * 1), ax, 0, "Hearthlings connected: %,d", stat.users);
+			} catch (ArrayIndexOutOfBoundsException e) {
+
+			}
 		} else if(stat.status == "down") {
-		    FastText.aprintf(g, new Coord(x, FastText.h * 0), ax, 0, "Server status: Down");
+		    FastText.aprintfstroked(g, new Coord(x, FastText.h * 0), ax, 0, "Server status: Offline");
 		} else if(stat.status == "shutdown") {
-		    FastText.aprintf(g, new Coord(x, FastText.h * 0), ax, 0, "Server status: Shutting down");
+		    FastText.aprintfstroked(g, new Coord(x, FastText.h * 0), ax, 0, "Server status: Shutting down");
 		} else if(stat.status == "crashed") {
-		    FastText.aprintf(g, new Coord(x, FastText.h * 0), ax, 0, "Server status: Crashed");
+		    FastText.aprintfstroked(g, new Coord(x, FastText.h * 0), ax, 0, "Server status: Crashed");
 		}
 	    }
 	}
@@ -292,25 +353,33 @@ public class LoginScreen extends Widget {
     }
 
     public void wdgmsg(Widget sender, String msg, Object... args) {
+	if(sender == accounts) {
+		if("account".equals(msg)) {
+			String name = (String) args[0];
+			String pass = (String) args[1];
+			login.user.settext2(name);
+			login.pass.settext(pass);
+			login.enter2();
+		}
+		return;
+	}
 	if(sender == optbtn) {
-	    if(opts == null) {
-		opts = adda(new OptWnd(false) {
-			public void hide() {
-			    /* XXX */
-			    reqdestroy();
-			}
-		    }, sz.div(2), 0.5, 0.5);
-	    } else {
-		opts.reqdestroy();
-		opts = null;
-	    }
-	    return;
-	} else if(sender == opts) {
-	    opts.reqdestroy();
-	    opts = null;
+		if (!opts.attached)
+			ui.root.adda(opts, 0.5, 0.5);
+		else
+			opts.show(!opts.visible());
+		return;
+	} else if(sender == opts) { // ND: Pretty sure this part never happens, ever
+		opts.show(!opts.visible());
 	}
 	super.wdgmsg(sender, msg, args);
     }
+
+	public void tick(double dt) {
+		playMainTheme();
+		super.tick(dt);
+	}
+
 
     public void cdestroy(Widget ch) {
 	if(ch == opts) {
@@ -323,10 +392,19 @@ public class LoginScreen extends Widget {
 	    mklogin();
 	} else if(msg == "error") {
 	    error((String)args[0]);
+		lastUser = "";
+		lastPass = "";
 	} else if(msg == "prg") {
 	    error(null);
 	    clear();
 	    progress((String)args[0]);
+		if (((String)args[0]).equals("Connecting...")){
+			if(login.saveaccount.state() && !lastUser.equals("") && !lastPass.equals("")) {
+				AccountList.storeAccount(lastUser, lastPass);
+				lastUser = "";
+				lastPass = "";
+			}
+		}
 	} else {
 	    super.uimsg(msg, args);
 	}
@@ -341,11 +419,40 @@ public class LoginScreen extends Widget {
 	parent.setfocus(this);
     }
 
+	public void dispose() {
+		stopMainTheme();
+	}
+
     public void draw(GOut g) {
 	super.draw(g);
 	if(error != null)
-	    g.aimage(error.tex(), bgc.adds(0, 150), 0.5, 0.0);
+		g.aimage(PUtils.strokeTex(error), bgc.adds(0, -20), 0.5, 0.0);
 	if(progress != null)
-	    g.aimage(progress.tex(), bgc.adds(0, 50), 0.5, 0.0);
+		g.aimage(PUtils.strokeTex(progress), bgc.adds(0, 50), 0.5, 0.0);
     }
+
+	private void playMainTheme() {
+		if (!mainThemeStopped &&(mainThemeClip == null || !((Audio.Mixer) Audio.player.stream).playing(mainThemeClip))) {
+			try {
+				AudioInputStream in = AudioSystem.getAudioInputStream(mainTheme);
+				AudioFormat tgtFormat = new AudioFormat(AudioFormat.Encoding.PCM_SIGNED, 44100, 16, 2, 4, 44100, false);
+				AudioInputStream pcmStream = AudioSystem.getAudioInputStream(tgtFormat, in);
+				Audio.CS klippi = new Audio.PCMClip(pcmStream, 2, 2);
+				mainThemeClip = new Audio.VolAdjust(klippi, Utils.getprefi("themeSongVolume", 40)/100d);
+				Audio.play(mainThemeClip);
+			} catch (UnsupportedAudioFileException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	private void stopMainTheme() {
+		if(mainThemeClip != null){
+			Audio.stop(mainThemeClip);
+			mainThemeStopped = true;
+		}
+	}
+
 }

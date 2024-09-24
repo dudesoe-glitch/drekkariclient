@@ -39,7 +39,7 @@ public class Widget {
     public Widget next, prev, child, lchild, parent;
     public int childseq;
     public boolean focustab = false, focusctl = false, hasfocus = false, visible = true;
-    private boolean attached = false;
+	public boolean attached = false;
     public boolean canfocus = false, autofocus = false;
     public boolean canactivate = false, cancancel = false;
     public Widget focused;

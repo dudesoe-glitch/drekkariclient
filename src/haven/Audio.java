@@ -37,7 +37,7 @@ public class Audio {
     public static boolean enabled = true;
     public static double volume = Double.parseDouble(Utils.getpref("sfxvol", "1.0"));
     private static int bufsize = Utils.getprefi("audiobuf", Math.round(fmt.getSampleRate() * 0.05f)) * fmt.getFrameSize();
-    private static Player player;
+    public static Player player;
 
     public static void setvolume(double volume) {
 	Audio.volume = volume;
@@ -543,8 +543,8 @@ public class Audio {
 	}
     }
 
-    private static class Player extends HackThread {
-	private final CS stream;
+    public static class Player extends HackThread {
+	public final CS stream;
 	private final int nch;
 	private volatile boolean reopen = false;
 
@@ -637,7 +637,7 @@ public class Audio {
 	}
     }
 
-    private static Player ckpl(boolean creat) {
+    public static Player ckpl(boolean creat) {
 	synchronized(Audio.class) {
 	    if(enabled) {
 		if(player == null) {

@@ -26,8 +26,17 @@
 
 package haven;
 
+import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.UnsupportedAudioFileException;
 import java.awt.Color;
+import java.io.IOException;
 import java.util.*;
+
+import static haven.LoginScreen.charSelectThemeClip;
+import static haven.LoginScreen.charSelectThemeStopped;
+import static haven.LoginScreen.charSelectTheme;
 
 public class Charlist extends Widget {
     public static final Coord bsz = UI.scale(289, 96);
@@ -39,6 +48,7 @@ public class Charlist extends Widget {
     public final List<Char> chars = new ArrayList<Char>();
     public final Boxlist list;
     public Avaview avalink;
+	public static HSlider themeSongVolumeSlider;
 
     @RName("charlist")
     public static class $_ implements Factory {
@@ -49,11 +59,11 @@ public class Charlist extends Widget {
 
     public Charlist(int height) {
 	super(Coord.z);
-	this.height = height;
+	this.height = height + 1;
 	setcanfocus(true);
 	sau = adda(new IButton("gfx/hud/buttons/csau", "u", "d", "o"), bsz.x / 2, 0, 0.5, 0)
 	    .action(() -> scroll(-1));
-	list = add(new Boxlist(height), 0, sau.c.y + sau.sz.y + margin);
+	list = add(new Boxlist(height + 1), 0, sau.c.y + sau.sz.y + margin);
 	sad = adda(new IButton("gfx/hud/buttons/csad", "u", "d", "o"), bsz.x / 2, list.c.y + list.sz.y + margin, 0.5, 0)
 	    .action(() -> scroll(1));
 	sau.hide(); sad.hide();
@@ -86,17 +96,20 @@ public class Charlist extends Widget {
 	    this.chr = chr;
 	    Widget avaf = adda(Frame.with(this.ava = new Avaview(Avaview.dasz, -1, "avacam"), false), Coord.of(sz.y / 2), 0.5, 0.5);
 	    add(new Img(tf.render(chr.name).tex()), avaf.pos("ur").adds(5, 0));
-	    adda(new Button(UI.scale(100), "Play"), pos("cbr").subs(10, 2), 1.0, 1.0).action(() -> Charlist.this.wdgmsg("play", chr.name));
+	    adda(new Button(UI.scale(100), "Play"), pos("cbr").subs(10, 2), 1.0, 1.0).action(() -> {
+			Charlist.this.wdgmsg("play", chr.name);
+		});
 	}
 
 	public void tick(double dt) {
 	    if(chr.avadesc != ava.avadesc)
 		ava.pop(chr.avadesc, chr.avamap);
+		playCharSelectTheme();
 	}
 
 	public void draw(GOut g) {
 	    if(list.sel == chr)
-		g.chcolor(255, 255, 128, 255);
+		g.chcolor(255, 195, 0, 255); // ND: Character selection overlay
 	    ISBox.box.draw(g, Coord.z, sz);
 	    g.chcolor();
 	    super.draw(g);
@@ -132,9 +145,40 @@ public class Charlist extends Widget {
 	}
     }
 
+	boolean movedAvalink = false;
+
     protected void added() {
 	parent.setfocus(this);
+	parent.add(new Button(UI.scale(120), "Log out") {
+		@Override
+		public void click() {
+			Session sess = ((RemoteUI)ui.rcvr).sess;
+			synchronized(sess) {
+				sess.close();
+			}
+		}
+	}, UI.scale(20, 560));
+	this.c = new Coord(this.c.x, this.c.y - UI.scale(110));
+	parent.c = new Coord(parent.c.x - (UI.scale(267)/2), parent.c.y);
+	parent.resize(UI.scale(new Coord(1067, 600)));
+	charSelectThemeStopped = false;
+	playCharSelectTheme();
+	parent.add(themeSongVolumeSlider = new HSlider(UI.scale(220), 0, 100, Utils.getprefi("themeSongVolume", 40)) {
+		protected void attach(UI ui) {
+			super.attach(ui);
+		}
+		public void changed() {
+			if (charSelectThemeClip != null)
+				((Audio.VolAdjust) charSelectThemeClip).vol = val/100d;
+			Utils.setprefi("themeSongVolume", val);
+		}
+	}, parent.sz.x - UI.scale(230) , parent.sz.y - UI.scale(20));
+	parent.add(new Label("Background Music Volume"), parent.sz.x - UI.scale(184) , parent.sz.y - UI.scale(36));
     }
+
+	public void dispose() {
+		stopCharSelectTheme();
+	}
 
     private int scrolltgt = -1;
     private double scrollval = -1;
@@ -150,6 +194,12 @@ public class Charlist extends Widget {
 		scrollval = -1;
 	    }
 	    list.scrollval((int)Math.round(scrollval = nv));
+	}
+	if (avalink != null && !movedAvalink) {
+		avalink.parent.c = new Coord(avalink.parent.c.x + UI.scale(267), avalink.parent.c.y - UI.scale(50));
+		avalink.parent.sz = new Coord(avalink.parent.sz.x + UI.scale(50), avalink.parent.sz.y + UI.scale(50));
+		avalink.sz = new Coord(avalink.sz.x + UI.scale(30), avalink.sz.y + UI.scale(50));
+		movedAvalink = true;
 	}
 	super.tick(dt);
     }
@@ -245,4 +295,28 @@ public class Charlist extends Widget {
 	}
 	return(false);
     }
+
+	public static void playCharSelectTheme() {
+		if (!charSelectThemeStopped &&(charSelectThemeClip == null || !((Audio.Mixer) Audio.player.stream).playing(charSelectThemeClip))) {
+			try {
+				AudioInputStream in = AudioSystem.getAudioInputStream(charSelectTheme);
+				AudioFormat tgtFormat = new AudioFormat(AudioFormat.Encoding.PCM_SIGNED, 44100, 16, 2, 4, 44100, false);
+				AudioInputStream pcmStream = AudioSystem.getAudioInputStream(tgtFormat, in);
+				Audio.CS klippi = new Audio.PCMClip(pcmStream, 2, 2);
+				charSelectThemeClip = new Audio.VolAdjust(klippi, Utils.getprefi("themeSongVolume", 40)/100d);
+				Audio.play(charSelectThemeClip);
+			} catch (UnsupportedAudioFileException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	public static void stopCharSelectTheme() {
+		if(charSelectThemeClip != null){
+			Audio.stop(charSelectThemeClip);
+			charSelectThemeStopped = true;
+		}
+	}
 }

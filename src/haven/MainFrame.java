@@ -192,9 +192,9 @@ public class MainFrame extends java.awt.Frame implements Console.Directory {
 	super("Haven & Hearth");
 	Coord sz;
 	if(isz == null) {
-	    sz = Utils.getprefc("wndsz", new Coord(800, 600));
-	    if(sz.x < 640) sz.x = 640;
-	    if(sz.y < 480) sz.y = 480;
+		sz = Utils.getprefc("wndsz", new Coord(1067, 600)); // ND: This affects the game window size on startup
+	    if(sz.x < 1067) sz.x = 1067;
+	    if(sz.y < 600) sz.y = 600;
 	} else {
 	    sz = isz;
 	}
