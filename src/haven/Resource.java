@@ -69,6 +69,7 @@ public class Resource implements Serializable {
 	public Named(String name, int ver) {
 	    this.name = name;
 	    this.ver = ver;
+		//System.out.println(name); // ND: Use this to print resource names in console when they're loaded
 	}
 
 	public boolean equals(Object other) {
@@ -840,7 +841,9 @@ public class Resource implements Serializable {
 	if(_local == null) {
 	    synchronized(Resource.class) {
 		if(_local == null) {
-		    Pool local = new Pool(new JarSource("res"));
+//		    Pool local = new Pool(new JarSource("res"));
+			Pool local = new Pool(new FileSource(Utils.path("res"))); // ND: Load custom res files from the client folder
+			local.add(new JarSource("res"));
 		    try {
 			if(resdir.get() != null)
 			    local.add(new FileSource(resdir.get()));
