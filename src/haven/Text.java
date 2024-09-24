@@ -198,6 +198,36 @@ public class Text implements Disposable {
 	public Line ellipsize(String text, int w) {
 	    return(ellipsize(text, w, "\u2026"));
 	}
+
+	public Line renderstroked(String text, Color c, Color stroke) {
+		Coord sz = strsize(text);
+		if (sz.x < 1)
+			sz = sz.add(1, 0);
+		sz = sz.add(2, 0);
+		BufferedImage img = TexI.mkbuf(sz);
+		Graphics g = img.createGraphics();
+		if (aa)
+			Utils.AA(g);
+		g.setFont(font);
+		FontMetrics m = g.getFontMetrics();
+		g.setColor(stroke);
+		g.drawString(text, 0, m.getAscent());
+		g.drawString(text, 2, m.getAscent());
+		g.drawString(text, 1, m.getAscent() - 1);
+		g.drawString(text, 1, m.getAscent() + 1);
+		g.setColor(c);
+		g.drawString(text, 1, m.getAscent());
+		g.dispose();
+		return (new Line(text, img, m));
+	}
+
+	public Line renderstroked2(String text, Color c, Color s){ // ND: This is Matias' version, it's better imo
+		// ND: Future me has no clue what I meant or where this was used, yet.
+		Line line = render(text, c);
+		BufferedImage img = Utils.outline2(line.img, s, true);
+		return new Line(text, img, line.m);
+	}
+
     }
 
     public static abstract class Imager extends Furnace {
@@ -336,4 +366,8 @@ public class Text implements Disposable {
 	    }
 	}
     }
+
+	public static Text create(String text, BufferedImage img) {
+		return (new Text(text, img));
+	}
 }

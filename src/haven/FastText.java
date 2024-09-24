@@ -27,9 +27,8 @@
 package haven;
 
 import haven.render.*;
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.Graphics;
+
+import java.awt.*;
 import java.awt.image.BufferedImage;
 
 public class FastText {
@@ -113,4 +112,19 @@ public class FastText {
     public static void printf(GOut g, Coord c, String fmt, Object... args) {
 	print(g, c, String.format(fmt, args));
     }
+
+	public static void aprintfstroked(GOut g, Coord c, double ax, double ay, String fmt, Object... args) {
+		g.chcolor(Color.BLACK);
+		aprintf(g, new Coord(c.x+UI.scale(1), c.y), ax, ay, String.format(fmt, args));
+		aprintf(g, new Coord(c.x-UI.scale(1), c.y), ax, ay, String.format(fmt, args));
+		aprintf(g, new Coord(c.x, c.y+UI.scale(1)), ax, ay, String.format(fmt, args));
+		aprintf(g, new Coord(c.x, c.y-UI.scale(1)), ax, ay, String.format(fmt, args));
+		aprintf(g, new Coord(c.x+UI.scale(1), c.y+UI.scale(1)), ax, ay, String.format(fmt, args));
+		aprintf(g, new Coord(c.x-UI.scale(1), c.y-UI.scale(1)), ax, ay, String.format(fmt, args));
+		aprintf(g, new Coord(c.x-UI.scale(1), c.y+UI.scale(1)), ax, ay, String.format(fmt, args));
+		aprintf(g, new Coord(c.x+UI.scale(1), c.y-UI.scale(1)), ax, ay, String.format(fmt, args));
+		g.chcolor();
+		aprintf(g, c, ax, ay, String.format(fmt, args));
+	}
+
 }

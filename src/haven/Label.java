@@ -83,6 +83,11 @@ public class Label extends Widget {
 	sz = this.text.sz();
     }
 
+	public void setstroked(Color strokeColor) {
+		this.text = Text.create(texts, PUtils.strokeImg(f.renderstroked(texts, col, strokeColor)));
+		sz = this.text.sz();
+	}
+
     public void dispose() {
 	super.dispose();
 	this.text.dispose();
