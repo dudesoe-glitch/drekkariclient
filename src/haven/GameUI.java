@@ -1463,7 +1463,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 	}
     }
 
-    public static final KeyBinding kb_shoot = KeyBinding.get("screenshot", KeyMatch.forchar('S', KeyMatch.M));
+//    public static final KeyBinding kb_shoot = KeyBinding.get("screenshot", KeyMatch.forchar('S', KeyMatch.M));
     public static final KeyBinding kb_chat = KeyBinding.get("chat-toggle", KeyMatch.forchar('C', KeyMatch.C));
     public static final KeyBinding kb_hide = KeyBinding.get("ui-toggle", KeyMatch.nil);
     public static final KeyBinding kb_logout = KeyBinding.get("logout", KeyMatch.nil);
@@ -1472,9 +1472,9 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 	if(key == ':') {
 	    entercmd();
 	    return(true);
-	} else if(kb_shoot.key().match(ev) && (Screenshooter.screenurl.get() != null)) {
-	    Screenshooter.take(this, Screenshooter.screenurl.get());
-	    return(true);
+//	} else if(kb_shoot.key().match(ev) && (Screenshooter.screenurl.get() != null)) {
+//	    Screenshooter.take(this, Screenshooter.screenurl.get());
+//	    return(true);
 	} else if(kb_hide.key().match(ev)) {
 	    toggleui();
 	    return(true);
