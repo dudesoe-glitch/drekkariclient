@@ -37,7 +37,7 @@ public class Text implements Disposable {
     public static final Font serif = new Font("Serif", Font.PLAIN, 10);
     public static final Font sans  = new Font("Sans", Font.PLAIN, 10);
     public static final Font mono  = new Font("Monospaced", Font.PLAIN, 10);
-    public static final Font fraktur = Resource.local().loadwait("ui/fraktur").flayer(Resource.Font.class).font;
+	public static final Font fraktur = serif;
     public static final Font dfont = sans;
     public static final Foundry std;
     public final BufferedImage img;
@@ -227,8 +227,11 @@ public class Text implements Disposable {
 		BufferedImage img = Utils.outline2(line.img, s, true);
 		return new Line(text, img, line.m);
 	}
-
     }
+
+	public static Line renderstroked2(String text, Color c, Color s, Text.Foundry fnd) {
+		return fnd.renderstroked2(text, c, s);
+	}
 
     public static abstract class Imager extends Furnace {
 	private final Furnace back;
@@ -304,6 +307,33 @@ public class Text implements Disposable {
 	}
     }
 
+	public static class UTex<T> implements Indir<Tex> {
+		public final Supplier<T> value;
+		public final Function<T, Tex> conv;
+		private Tex cur = null;
+		private T cv = null;
+
+		public UTex(Supplier<T> value, Function<T, Tex> conv) {
+			this.value = value;
+			this.conv = conv;
+		}
+
+		protected String text(T value) {
+			return (String.valueOf(value));
+		}
+
+		protected Tex render(T text) {
+			return (conv.apply(text));
+		}
+
+		public Tex get() {
+			T value = this.value.get();
+			if (!Utils.eq(value, cv))
+				cur = render(cv = value);
+			return (cur);
+		}
+	}
+
     protected Text(String text, BufferedImage img) {
 	this.text = text;
 	this.img = img;
@@ -320,6 +350,25 @@ public class Text implements Disposable {
     public static Line renderf(Color c, String text, Object... args) {
 	return(std.render(String.format(text, args), c));
     }
+
+	public static Line renderstroked(String text, Color c, Color s, Text.Foundry fnd) {
+		return fnd.renderstroked(text, c, s);
+	}
+	public static Line renderstroked(String text, Color c, Color s) {
+		return renderstroked(text, c, s, std);
+	}
+	public static Line renderstroked(String text, Color c) {
+		return renderstroked(text, c, Utils.contrast(c));
+	}
+	public static Line renderstroked(String text, Color c, Text.Foundry fnd) {
+		return renderstroked(text, c, Utils.contrast(c), fnd);
+	}
+	public static Line renderstroked(String text) {
+		return renderstroked(text, Color.WHITE, Color.BLACK);
+	}
+	public static Line renderstroked(String text, Text.Foundry fnd) {
+		return renderstroked(text, Color.WHITE, Color.BLACK, fnd);
+	}
 	
     public static Line render(String text) {
 	return(render(text, Color.WHITE));

@@ -115,14 +115,14 @@ public class FastText {
 
 	public static void aprintfstroked(GOut g, Coord c, double ax, double ay, String fmt, Object... args) {
 		g.chcolor(Color.BLACK);
-		aprintf(g, new Coord(c.x+UI.scale(1), c.y), ax, ay, String.format(fmt, args));
-		aprintf(g, new Coord(c.x-UI.scale(1), c.y), ax, ay, String.format(fmt, args));
-		aprintf(g, new Coord(c.x, c.y+UI.scale(1)), ax, ay, String.format(fmt, args));
-		aprintf(g, new Coord(c.x, c.y-UI.scale(1)), ax, ay, String.format(fmt, args));
-		aprintf(g, new Coord(c.x+UI.scale(1), c.y+UI.scale(1)), ax, ay, String.format(fmt, args));
-		aprintf(g, new Coord(c.x-UI.scale(1), c.y-UI.scale(1)), ax, ay, String.format(fmt, args));
-		aprintf(g, new Coord(c.x-UI.scale(1), c.y+UI.scale(1)), ax, ay, String.format(fmt, args));
-		aprintf(g, new Coord(c.x+UI.scale(1), c.y-UI.scale(1)), ax, ay, String.format(fmt, args));
+		aprintf(g, new Coord(c.x+1, c.y), ax, ay, String.format(fmt, args));
+		aprintf(g, new Coord(c.x-1, c.y), ax, ay, String.format(fmt, args));
+		aprintf(g, new Coord(c.x, c.y+1), ax, ay, String.format(fmt, args));
+		aprintf(g, new Coord(c.x, c.y-1), ax, ay, String.format(fmt, args));
+		aprintf(g, new Coord(c.x+1, c.y+1), ax, ay, String.format(fmt, args));
+		aprintf(g, new Coord(c.x-1, c.y-1), ax, ay, String.format(fmt, args));
+		aprintf(g, new Coord(c.x-1, c.y+1), ax, ay, String.format(fmt, args));
+		aprintf(g, new Coord(c.x+1, c.y-1), ax, ay, String.format(fmt, args));
 		g.chcolor();
 		aprintf(g, c, ax, ay, String.format(fmt, args));
 	}

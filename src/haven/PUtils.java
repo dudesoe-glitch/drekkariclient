@@ -335,15 +335,15 @@ public class PUtils {
 	}
 
 	public static BufferedImage strokeImg(Text text, Color color) {
-		return (strokeImg(text.img, 1, 1, color));
+		return (strokeImg(text.img, UI.scale(1), UI.scale(1), color));
 	}
 
 	public static BufferedImage strokeImg(Text text) {
-		return (strokeImg(text.img, 1, 1, Color.BLACK));
+		return (strokeImg(text.img, UI.scale(1), UI.scale(1), Color.BLACK));
 	}
 
 	public static BufferedImage strokeImg(BufferedImage img) {
-		return (strokeImg(img, 1, 1, Color.BLACK));
+		return (strokeImg(img, UI.scale(1), UI.scale(1), Color.BLACK));
 	}
 
 	public static TexI strokeTex(Text text) {

@@ -181,7 +181,7 @@ public abstract class ItemInfo {
 	}
 
 	public BufferedImage tipimg() {
-	    return(str.img);
+		return(PUtils.strokeImg(str.img));
 	}
 
 	public int order() {return(0);}
@@ -322,7 +322,7 @@ public abstract class ItemInfo {
 	}
 	if(l.tips.size() < 1)
 	    return(null);
-	return(l.render());
+	return(PUtils.strokeImg(l.render()));
     }
 
     public static BufferedImage shorttip(List<ItemInfo> info) {
@@ -336,7 +336,7 @@ public abstract class ItemInfo {
 	}
 	if(l.tips.size() < 1)
 	    return(null);
-	return(l.render());
+	return(PUtils.strokeImg(l.render()));
     }
 
     public static <T> T find(Class<T> cl, List<ItemInfo> il) {
