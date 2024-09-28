@@ -37,7 +37,7 @@ public class Fadeout extends AWidget {
 	double a = (now - start) / len;
 	if(a > 1)
 	    a = 1;
-	g.chcolor(Utils.clipcol(255, 255, 255, (int)(255 * a)));
+		g.chcolor(Utils.clipcol(0, 0, 0, (int)(255 * a))); // ND: Burn into fire color (character creation). Changed this to black rather than white.
 	g.frect(Coord.z, g.sz());
 	mv.shake = a * 100;
     }

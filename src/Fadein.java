@@ -12,7 +12,7 @@ public class Fadein extends Widget {
 								 5, 4, new Color(96, 48, 0));
     public static final Tex loading = loadf.render("Loading...").tex();
     public static final Coord hsz = new Coord(128, 128);
-    public static final double ir = 40, or = 60;
+    public static final double ir = 10, or = 60; // ND: Affects character creation room circle animation (when you spawn in the lake as a whisp)
     public static final Tex peephole;
     public final double len;
 
@@ -70,7 +70,7 @@ public class Fadein extends Widget {
 	double now = Utils.rtime();
 	if(start == 0)
 	    start = now;
-	double a = (now - start) / len;
+	double a = (now - start) / (len/1.5); // ND: Affects character creation room circle animation (when you spawn in the lake as a whisp)
 	if(a > 1) {
 	    ui.destroy(Fadein.this);
 	    return;
