@@ -53,7 +53,7 @@ public class Window extends Widget implements DTarget {
     public static final Tex sizer = Resource.loadtex("gfx/hud/wnd/sizer");
     public static final Coord tlm = UI.scale(18, 30);
     public static final Coord brm = UI.scale(13, 22);
-    public static final Coord cpo = UI.rscale(36, 16.4);
+	public static final Coord cpo = UI.rscale(27, 13); // ND: This is the location of the window title text
     public static final int capo = 7, capio = 2;
     public static final Coord dlmrgn = UI.scale(23, 14);
     public static final Coord dsmrgn = UI.scale(9, 9);
@@ -186,6 +186,7 @@ public class Window extends Widget implements DTarget {
 	public boolean dragsize;
 	public Area aa, ca;
 	public Coord cptl = Coord.z, cpsz = Coord.z;
+	public Coord wsz; // ND: Added this to be able to make the window top bar fully draggable
 	public int cmw;
 	public Text cap = null;
 
@@ -204,11 +205,12 @@ public class Window extends Widget implements DTarget {
 	    Coord mrgn = lg ? dlmrgn : dsmrgn;
 	    Coord asz = isz;
 	    Coord csz = asz.add(mrgn.mul(2));
-	    Coord wsz = csz.add(tlm).add(brm);
+	    wsz = csz.add(tlm).add(brm); // ND: This is now a variable outside of this function to make the window top bar fully draggable
 	    resize(wsz);
 	    ca = Area.sized(tlm, csz);
 	    aa = Area.sized(ca.ul.add(mrgn), asz);
-	    cbtn.c = Coord.of(sz.x - cbtn.sz.x, 0);
+		cbtn.c = Coord.of(sz.x - cbtn.sz.x - UI.scale(9), - UI.scale(3)); // ND: UI Window close button location
+		cpsz = Coord.of((int)(wsz.x*0.95), cm.sz().y).sub(cptl); // ND: changed this to make the window top bar fully draggable WHEN RESIZED (for instance, buddy window)
 	}
 
 	public Area contarea() {
@@ -242,7 +244,7 @@ public class Window extends Widget implements DTarget {
 		cmw = (cap == null) ? 0 : cap.sz().x;
 		cmw = Math.max(cmw, this.sz.x / 4);
 		cptl = Coord.of(ca.ul.x, 0);
-		cpsz = Coord.of(cpo.x + cmw, cm.sz().y).sub(cptl);
+		cpsz = Coord.of((int)(wsz.x*0.95), cm.sz().y).sub(cptl); // ND: changed this to make the window top bar fully draggable
 		cmw = cmw - (cl.sz().x - cpo.x) - UI.scale(5);
 	    }
 	    if(dragsize)
