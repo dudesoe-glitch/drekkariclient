@@ -79,7 +79,7 @@ public class Projection extends Transform {
 	d.m[10] = -2 / (far - near);
 	d.m[12] = -(right + left) / (right - left);
 	d.m[13] = -(top + bottom) / (top - bottom);
-	d.m[14] = -(far + near) / (far - near);
+	d.m[14] = -(far + near) / (2 * far - near); // ND: Changed this to fix the corner/bottom of the view being black in ortho cam when zoomed out
 	d.m[15] = 1.0f;
 	d.m[ 1] = d.m[ 2] = d.m[ 3] =
 	d.m[ 4] = d.m[ 6] = d.m[ 7] =

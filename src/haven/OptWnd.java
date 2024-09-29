@@ -601,6 +601,10 @@ public class OptWnd extends Window {
 //	    y = addbtn(cont, "Zoom in", MapView.kb_camin, y);
 //	    y = addbtn(cont, "Zoom out", MapView.kb_camout, y);
 //	    y = addbtn(cont, "Reset", MapView.kb_camreset, y);
+		y = addbtn(cont, "Snap North", MapView.kb_camSnapNorth, y);
+		y = addbtn(cont, "Snap South", MapView.kb_camSnapSouth, y);
+		y = addbtn(cont, "Snap East", MapView.kb_camSnapEast, y);
+		y = addbtn(cont, "Snap West", MapView.kb_camSnapWest, y);
 
 
 	    y = cont.adda(new Label("Walking speed"), cont.sz.x / 2, y + UI.scale(10), 0.5, 0.0).pos("bl").adds(0, 5).y;
@@ -659,6 +663,175 @@ public class OptWnd extends Window {
 	    }
 	}
     }
+
+	private Label freeCamZoomSpeedLabel;
+	public static HSlider freeCamZoomSpeedSlider;
+	private Button freeCamZoomSpeedResetButton;
+	private Label freeCamHeightLabel;
+	public static HSlider freeCamHeightSlider;
+	private Button freeCamHeightResetButton;
+	public static CheckBox unlockedOrthoCamCheckBox;
+	private Label orthoCamZoomSpeedLabel;
+	public static HSlider orthoCamZoomSpeedSlider;
+	private Button orthoCamZoomSpeedResetButton;
+	public static CheckBox reverseOrthoCameraAxesCheckBox;
+	public static CheckBox reverseFreeCamXAxisCheckBox;
+	public static CheckBox reverseFreeCamYAxisCheckBox;
+	public static CheckBox allowLowerFreeCamTiltCheckBox;
+
+	public class CameraSettingsPanel extends Panel {
+
+		public CameraSettingsPanel(Panel back) {
+			add(new Label(""), 278, 0); // ND: added this so the window's width does not change when switching camera type and closing/reopening the panel
+			Widget TopPrev; // ND: these are always visible at the top, with either camera settings
+			Widget FreePrev; // ND: used to calculate the positions for the Free camera settings
+			Widget OrthoPrev; // ND: used to calculate the positions for the Ortho camera settings
+
+			TopPrev = add(new Label("Selected Camera Type:"), 0, 0);{
+				RadioGroup camGrp = new RadioGroup(this) {
+					public void changed(int btn, String lbl) {
+						try {
+							if(btn==0) {
+								Utils.setpref("defcam", "Free");
+								setFreeCameraSettingsVisibility(true);
+								setOrthoCameraSettingsVisibility(false);
+								MapView.currentCamera = 1;
+								if (ui != null && ui.gui != null && ui.gui.map != null) {
+									ui.gui.map.setcam("Free");
+								}
+							}
+							if(btn==1) {
+								Utils.setpref("defcam", "Ortho");
+								setFreeCameraSettingsVisibility(false);
+								setOrthoCameraSettingsVisibility(true);
+								MapView.currentCamera = 2;
+								if (ui != null && ui.gui != null && ui.gui.map != null) {
+									ui.gui.map.setcam("Ortho");
+								}
+							}
+						} catch (Exception e) {
+							throw new RuntimeException(e);
+						}
+					}
+				};
+			TopPrev = camGrp.add("Free Camera", TopPrev.pos("bl").adds(16, 2));
+			TopPrev = camGrp.add("Ortho Camera", TopPrev.pos("bl").adds(0, 1));
+			TopPrev = add(new Label("Selected Camera Settings:"), TopPrev.pos("bl").adds(0, 6).x(0));
+			// ND: The Ortho Camera Settings
+			OrthoPrev = add(reverseOrthoCameraAxesCheckBox = new CheckBox("Reverse Ortho Look Axis"){
+				{a = (Utils.getprefb("reverseOrthoCamAxis", true));}
+				public void changed(boolean val) {
+					Utils.setprefb("reverseOrthoCamAxis", val);
+				};
+			}, TopPrev.pos("bl").adds(12, 2));
+			reverseOrthoCameraAxesCheckBox.tooltip = reverseOrthoCameraAxesTooltip;
+			OrthoPrev = add(unlockedOrthoCamCheckBox = new CheckBox("Unlocked Ortho Camera"){
+				{a = Utils.getprefb("unlockedOrthoCam", true);}
+				public void changed(boolean val) {
+					Utils.setprefb("unlockedOrthoCam", val);
+				}
+			}, OrthoPrev.pos("bl").adds(0, 2));
+			unlockedOrthoCamCheckBox.tooltip = unlockedOrthoCamTooltip;
+			OrthoPrev = add(orthoCamZoomSpeedLabel = new Label("Ortho Camera Zoom Speed:"), OrthoPrev.pos("bl").adds(0, 10).x(0));
+			OrthoPrev = add(orthoCamZoomSpeedSlider = new HSlider(UI.scale(200), 2, 40, Utils.getprefi("orthoCamZoomSpeed", 10)) {
+				public void changed() {
+					Utils.setprefi("orthoCamZoomSpeed", val);
+				}
+			}, OrthoPrev.pos("bl").adds(0, 4));
+			add(orthoCamZoomSpeedResetButton = new Button(UI.scale(70), "Reset", false).action(() -> {
+				orthoCamZoomSpeedSlider.val = 10;
+				Utils.setprefi("orthoCamZoomSpeed", 10);
+			}), OrthoPrev.pos("bl").adds(210, -20));
+			orthoCamZoomSpeedResetButton.tooltip = resetButtonTooltip;
+
+			// ND: The Free Camera Settings
+			FreePrev = add(reverseFreeCamXAxisCheckBox = new CheckBox("Reverse X Axis"){
+				{a = (Utils.getprefb("reverseFreeCamXAxis", true));}
+				public void changed(boolean val) {
+					Utils.setprefb("reverseFreeCamXAxis", val);
+				}
+			}, TopPrev.pos("bl").adds(12, 2));
+			add(reverseFreeCamYAxisCheckBox = new CheckBox("Reverse Y Axis"){
+				{a = (Utils.getprefb("reverseFreeCamYAxis", true));}
+				public void changed(boolean val) {
+					Utils.setprefb("reverseFreeCamYAxis", val);
+				}
+			}, FreePrev.pos("ul").adds(110, 0));
+			FreePrev = add(allowLowerFreeCamTiltCheckBox = new CheckBox("Enable Lower Tilting Angle", Color.RED){
+				{a = (Utils.getprefb("allowLowerTiltBool", false));}
+				public void changed(boolean val) {
+					Utils.setprefb("allowLowerTiltBool", val);
+				}
+			}, FreePrev.pos("bl").adds(0, 2));
+			allowLowerFreeCamTiltCheckBox.tooltip = allowLowerFreeCamTiltTooltip;
+			allowLowerFreeCamTiltCheckBox.lbl = Text.create("Enable Lower Tilting Angle", PUtils.strokeImg(Text.std.render("Enable Lower Tilting Angle", new Color(185,0,0,255))));
+			FreePrev = add(freeCamZoomSpeedLabel = new Label("Free Camera Zoom Speed:"), FreePrev.pos("bl").adds(0, 10).x(0));
+			FreePrev = add(freeCamZoomSpeedSlider = new HSlider(UI.scale(200), 4, 40, Utils.getprefi("freeCamZoomSpeed", 25)) {
+				public void changed() {
+					Utils.setprefi("freeCamZoomSpeed", val);
+				}
+			}, FreePrev.pos("bl").adds(0, 4));
+			add(freeCamZoomSpeedResetButton = new Button(UI.scale(70), "Reset", false).action(() -> {
+				freeCamZoomSpeedSlider.val = 25;
+				Utils.setprefi("freeCamZoomSpeed", 25);
+			}), FreePrev.pos("bl").adds(210, -20));
+			freeCamZoomSpeedResetButton.tooltip = resetButtonTooltip;
+			FreePrev = add(freeCamHeightLabel = new Label("Free Camera Height:"), FreePrev.pos("bl").adds(0, 10));
+			freeCamHeightLabel.tooltip = freeCamHeightTooltip;
+			FreePrev = add(freeCamHeightSlider = new HSlider(UI.scale(200), 10, 300, (Math.round((float) Utils.getprefd("cameraHeightDistance", 15f)))*10) {
+				public void changed() {
+					Utils.setprefd("cameraHeightDistance", (float) (val/10));
+				}
+			}, FreePrev.pos("bl").adds(0, 4));
+			freeCamHeightSlider.tooltip = freeCamHeightTooltip;
+			add(freeCamHeightResetButton = new Button(UI.scale(70), "Reset", false).action(() -> {
+				freeCamHeightSlider.val = 150;
+				Utils.setprefd("cameraHeightDistance", 15f);
+			}), FreePrev.pos("bl").adds(210, -20));
+			freeCamHeightResetButton.tooltip = resetButtonTooltip;
+
+			// ND: Finally, check which camera is selected and set the right options to be visible
+			String startupSelectedCamera = Utils.getpref("defcam", "Free");
+			if (startupSelectedCamera.equals("Free") || startupSelectedCamera.equals("worse") || startupSelectedCamera.equals("follow")){
+				camGrp.check(0);
+				Utils.setpref("defcam", "Free");
+				setFreeCameraSettingsVisibility(true);
+				setOrthoCameraSettingsVisibility(false);
+				MapView.currentCamera = 1;
+			}
+			else {
+				camGrp.check(1);
+				Utils.setpref("defcam", "Ortho");
+				setFreeCameraSettingsVisibility(false);
+				setOrthoCameraSettingsVisibility(true);
+				MapView.currentCamera = 2;
+			}
+			}
+
+			Widget backButton;
+			add(backButton = new PButton(UI.scale(200), "Back", 27, back, "Advanced Settings"), FreePrev.pos("bl").adds(0, 18));
+			pack();
+			centerBackButton(backButton, this);
+		}
+		private void setFreeCameraSettingsVisibility(boolean bool){
+			freeCamZoomSpeedLabel.visible = bool;
+			freeCamZoomSpeedSlider.visible = bool;
+			freeCamZoomSpeedResetButton.visible = bool;
+			freeCamHeightLabel.visible = bool;
+			freeCamHeightSlider.visible = bool;
+			freeCamHeightResetButton.visible = bool;
+			allowLowerFreeCamTiltCheckBox.visible = bool;
+			reverseFreeCamXAxisCheckBox.visible = bool;
+			reverseFreeCamYAxisCheckBox.visible = bool;
+		}
+		private void setOrthoCameraSettingsVisibility(boolean bool){
+			unlockedOrthoCamCheckBox.visible = bool;
+			orthoCamZoomSpeedLabel.visible = bool;
+			orthoCamZoomSpeedSlider.visible = bool;
+			orthoCamZoomSpeedResetButton.visible = bool;
+			reverseOrthoCameraAxesCheckBox.visible = bool;
+		}
+	}
 
 
     public static class PointBind extends Button {
@@ -784,9 +957,12 @@ public class OptWnd extends Window {
 	advancedSettings = add(new Panel());
 	// ND: Add the sub-panel buttons for the advanced settings here
 		Panel iface = add(new InterfacePanel(advancedSettings));
+		Panel camsettings = add(new CameraSettingsPanel(advancedSettings));
 
 		int y2 = UI.scale(6);
 		y2 = advancedSettings.add(new PButton(UI.scale(200), "Interface & Display Settings", -1, iface, "Interface & Display Settings"), 0, y2).pos("bl").adds(0, 5).y;
+
+		y2 = advancedSettings.add(new PButton(UI.scale(200), "Camera Settings", -1, camsettings, "Camera Settings"), 0, y2).pos("bl").adds(0, 5).y;
 
 		y2 += UI.scale(20);
 		y2 = advancedSettings.add(new PButton(UI.scale(200), "Back", 27, main, "Options            "), 0, y2).pos("bl").adds(0, 5).y;
@@ -849,5 +1025,24 @@ public class OptWnd extends Window {
 			"\n" +
 			"\n$col[185,185,185]{Loftar claims that smaller sizes are better, but anything below 50ms always seems to stutter, so I limited it to that." +
 			"\nIncrease this if your audio is still stuttering.}", UI.scale(300));
+
+	// Camera Settings Tooltips
+	private Object reverseOrthoCameraAxesTooltip = RichText.render("Enabling this will reverse the Horizontal axis when dragging the camera to look around." +
+			"\n" +
+			"\n$col[185,185,185]{I don't know why Loftar inverts it in the first place...}", UI.scale(280));
+	private Object unlockedOrthoCamTooltip = RichText.render("Enabling this allows you to rotate the Ortho camera freely, without locking it to only 4 view angles.", UI.scale(280));
+	private Object allowLowerFreeCamTiltTooltip = RichText.render("Enabling this will allow you to tilt the camera below the character (and under the ground), to look upwards." +
+			"\n" +
+			"\n$col[200,0,0]{WARNING: Be careful when using this setting, especially in combat! You're NOT able to click on the ground when looking at the world from below.}" +
+			"\n" +
+			"\n$col[185,185,185]{Honestly just enable this when you need to take a screenshot or something, and keep it disabled the rest of the time. I added this option for fun.}", UI.scale(300));
+	private Object freeCamHeightTooltip = RichText.render("This affects the height of the point at which the free camera is pointed. By default, it is pointed right above the player's head." +
+			"\n" +
+			"\n$col[185,185,185]{This doesn't really affect gameplay that much, if at all. With this setting, you can make the camera point at the feet, torso, head, slightly above you, or whatever's in between.}", UI.scale(300));
+
+	// Misc/Other
+	private Object resetButtonTooltip = RichText.render("Reset to default", UI.scale(300));
+
+
 
 }
