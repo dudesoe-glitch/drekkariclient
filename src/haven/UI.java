@@ -64,6 +64,7 @@ public class UI {
     public final Loader loader;
     public final CommandQueue queue = new CommandQueue();
     private static final double scalef;
+	public GameUI gui = null;
     
     {
 	lastevent = lasttick = Utils.rtime();

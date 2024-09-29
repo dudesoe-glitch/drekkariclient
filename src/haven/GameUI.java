@@ -313,6 +313,17 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 	super.attached();
     }
 
+	@Override
+	protected void attach(UI ui) {
+		ui.gui = this;
+		super.attach(ui);
+	}
+	@Override
+	public void destroy() {
+		super.destroy();
+		ui.gui = null;
+	}
+
     public static final KeyBinding kb_srch = KeyBinding.get("scm-srch", KeyMatch.forchar('F', KeyMatch.C));
     private void menubuttons(Widget bg) {
 	brpanel.add(new MenuButton("csearch", kb_srch, "Search actions...") {
