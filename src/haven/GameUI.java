@@ -313,7 +313,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 	super.attached();
     }
 
-    public static final KeyBinding kb_srch = KeyBinding.get("scm-srch", KeyMatch.forchar('Z', KeyMatch.C));
+    public static final KeyBinding kb_srch = KeyBinding.get("scm-srch", KeyMatch.forchar('F', KeyMatch.C));
     private void menubuttons(Widget bg) {
 	brpanel.add(new MenuButton("csearch", kb_srch, "Search actions...") {
 		public void click() {
@@ -1396,9 +1396,9 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 	}
     }
 
-    public static final KeyBinding kb_inv = KeyBinding.get("inv", KeyMatch.forcode(KeyEvent.VK_TAB, 0));
-    public static final KeyBinding kb_equ = KeyBinding.get("equ", KeyMatch.forchar('E', KeyMatch.C));
-    public static final KeyBinding kb_chr = KeyBinding.get("chr", KeyMatch.forchar('T', KeyMatch.C));
+    public static final KeyBinding kb_inv = KeyBinding.get("inv", KeyMatch.forchar('D', KeyMatch.M));
+    public static final KeyBinding kb_equ = KeyBinding.get("equ", KeyMatch.forchar('E', KeyMatch.M));
+    public static final KeyBinding kb_chr = KeyBinding.get("chr", KeyMatch.forchar('A', KeyMatch.M));
     public static final KeyBinding kb_bud = KeyBinding.get("bud", KeyMatch.forchar('B', KeyMatch.C));
     public static final KeyBinding kb_opt = KeyBinding.get("opt", KeyMatch.forchar('O', KeyMatch.C));
     private static final Tex menubg = Resource.loadtex("gfx/hud/rbtn-bg");
@@ -1418,11 +1418,11 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 	}
     }
 
-    public static final KeyBinding kb_map = KeyBinding.get("map", KeyMatch.forchar('A', KeyMatch.C));
-    public static final KeyBinding kb_claim = KeyBinding.get("ol-claim", KeyMatch.nil);
-    public static final KeyBinding kb_vil = KeyBinding.get("ol-vil", KeyMatch.nil);
-    public static final KeyBinding kb_rlm = KeyBinding.get("ol-rlm", KeyMatch.nil);
-    public static final KeyBinding kb_ico = KeyBinding.get("map-icons", KeyMatch.nil);
+    public static final KeyBinding kb_map = KeyBinding.get("map", KeyMatch.forchar('W', KeyMatch.C));
+    public static final KeyBinding kb_claim = KeyBinding.get("ol-claim", KeyMatch.forcode(KeyEvent.VK_F9, KeyMatch.C));
+    public static final KeyBinding kb_vil = KeyBinding.get("ol-vil", KeyMatch.forcode(KeyEvent.VK_F10, KeyMatch.C));
+    public static final KeyBinding kb_rlm = KeyBinding.get("ol-rlm", KeyMatch.forcode(KeyEvent.VK_F11, KeyMatch.C));
+    public static final KeyBinding kb_ico = KeyBinding.get("map-icons", KeyMatch.forchar('I', KeyMatch.C));
     private static final Tex mapmenubg = Resource.loadtex("gfx/hud/lbtn-bg");
     public class MapMenu extends Widget {
 	private void toggleol(String tag, boolean a) {
@@ -1464,7 +1464,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
     }
 
 //    public static final KeyBinding kb_shoot = KeyBinding.get("screenshot", KeyMatch.forchar('S', KeyMatch.M));
-    public static final KeyBinding kb_chat = KeyBinding.get("chat-toggle", KeyMatch.forchar('C', KeyMatch.C));
+    public static final KeyBinding kb_chat = KeyBinding.get("chat-toggle", KeyMatch.nil);
     public static final KeyBinding kb_hide = KeyBinding.get("ui-toggle", KeyMatch.nil);
     public static final KeyBinding kb_logout = KeyBinding.get("logout", KeyMatch.nil);
     public static final KeyBinding kb_switchchr = KeyBinding.get("logout-cs", KeyMatch.nil);
@@ -1487,15 +1487,16 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 	} else if(kb_chat.key().match(ev)) {
 	    if(chat.visible() && !chat.hasfocus) {
 		setfocus(chat);
-	    } else {
-		if(chat.targetshow) {
-		    chat.sshow(false);
-		} else {
-		    chat.sshow(true);
-		    setfocus(chat);
-		}
 	    }
-	    Utils.setprefb("chatvis", chat.targetshow);
+//		else {
+//		if(chat.targetshow) {
+//		    chat.sshow(false);
+//		} else {
+//		    chat.sshow(true);
+//		    setfocus(chat);
+//		}
+//	    }
+//	    Utils.setprefb("chatvis", chat.targetshow);
 	    return(true);
 	} else if((key == 27) && (map != null) && !map.hasfocus) {
 	    setfocus(map);

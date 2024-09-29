@@ -27,10 +27,13 @@
 package haven;
 
 import haven.render.*;
+
+import java.awt.*;
 import java.awt.event.KeyEvent;
 
 public class OptWnd extends Window {
     public final Panel main;
+	public final Panel advancedSettings;
     public Panel current;
 
     public void chpanel(Panel p) {
@@ -51,15 +54,24 @@ public class OptWnd extends Window {
     public class PButton extends Button {
 	public final Panel tgt;
 	public final int key;
+	public String newCap; // ND: Used to change the title of the options window
 
-	public PButton(int w, String title, int key, Panel tgt) {
-	    super(w, title, false);
-	    this.tgt = tgt;
-	    this.key = key;
+//	public PButton(int w, String title, int key, Panel tgt) {
+//	    super(w, title, false);
+//	    this.tgt = tgt;
+//	    this.key = key;
+//	}
+
+	public PButton(int w, String title, int key, Panel tgt, String newCap) {
+		super(w, title, false);
+		this.tgt = tgt;
+		this.key = key;
+		this.newCap = newCap;
 	}
 
 	public void click() {
 	    chpanel(tgt);
+		OptWnd.this.cap = newCap;
 	}
 
 	public boolean keydown(java.awt.event.KeyEvent ev) {
@@ -90,7 +102,8 @@ public class OptWnd extends Window {
 
 	public VideoPanel(Panel prev) {
 	    super();
-	    back = add(new PButton(UI.scale(200), "Back", 27, prev));
+		back = add(new PButton(UI.scale(200), "Back", 27, prev, "Options            "));
+		pack(); // ND: Fixes top bar not being fully draggable the first time I open the video panel. Idfk.
 	}
 
 	public class CPanel extends Widget {
@@ -357,7 +370,7 @@ public class OptWnd extends Window {
 			    ui.setgprefs(GSettings.defaults());
 			    curcf.destroy();
 			    curcf = null;
-		}), prev.pos("bl").adds(0, 5));
+		}), prev.pos("bl").adds(-5, 5));
 		pack();
 	    }
 	}
@@ -416,6 +429,7 @@ public class OptWnd extends Window {
 		    }
 		}, prev.pos("bl").adds(0, 2));
 	    prev = add(new Label("Audio latency"), prev.pos("bl").adds(0, 15));
+		prev.tooltip = audioLatencyTooltip;
 	    {
 		Label dpy = new Label("");
 		addhlp(prev.pos("bl").adds(0, 2), UI.scale(5),
@@ -431,11 +445,9 @@ public class OptWnd extends Window {
 				   dpy();
 			       }
 			   }, dpy);
-		prev.settip("Sets the size of the audio buffer. " +
-				"\n$col[185,185,185]{Loftar claims that smaller sizes are better, but anything below 50ms always fucking stutters, so I limited it there." +
-				"\nIncrease this if your audio is still stuttering.}", true);
+		prev.tooltip = audioLatencyTooltip;
 	    }
-	    add(new PButton(UI.scale(200), "Back", 27, back), prev.pos("bl").adds(0, 30));
+	    add(new PButton(UI.scale(200), "Back", 27, back, "Options            "), prev.pos("bl").adds(0, 30));
 	    pack();
 	}
     }
@@ -443,12 +455,13 @@ public class OptWnd extends Window {
     public class InterfacePanel extends Panel {
 	public InterfacePanel(Panel back) {
 	    Widget prev = add(new Label("Interface scale (requires restart)"), 0, 0);
+		prev.tooltip = interfaceScaleTooltip;
 	    {
 		Label dpy = new Label("");
 		final double gran = 0.05;
 		final double smin = 1, smax = Math.floor(UI.maxscale() / gran) * gran;
 		final int steps = (int)Math.round((smax - smin) / gran);
-		addhlp(prev.pos("bl").adds(0, 2), UI.scale(5),
+		addhlp(prev.pos("bl").adds(0, 4), UI.scale(5),
 		       prev = new HSlider(UI.scale(160), 0, steps, (int)Math.round(steps * (Utils.getprefd("uiscale", 1.0) - smin) / (smax - smin))) {
 			       protected void added() {
 				   dpy();
@@ -463,11 +476,14 @@ public class OptWnd extends Window {
 			       }
 			   },
 		       dpy);
+		prev.tooltip = interfaceScaleTooltip;
 	    }
 	    prev = add(new Label("Object fine-placement granularity"), prev.pos("bl").adds(0, 5));
 	    {
-		Label pos = add(new Label("Position"), prev.pos("bl").adds(5, 2));
-		Label ang = add(new Label("Angle"), pos.pos("bl").adds(0, 2));
+		Label pos = add(new Label("Position"), prev.pos("bl").adds(5, 4));
+		pos.tooltip = granularityPositionTooltip;
+		Label ang = add(new Label("Angle"), pos.pos("bl").adds(0, 4));
+		ang.tooltip = granularityAngleTooltip;
 		int x = Math.max(pos.pos("ur").x, ang.pos("ur").x);
 		{
 		    Label dpy = new Label("");
@@ -475,15 +491,15 @@ public class OptWnd extends Window {
 		    final int steps = (int)Math.round((smax - smin) / 0.25);
 		    int ival = (int)Math.round(MapView.plobpgran);
 		    addhlp(Coord.of(x + UI.scale(5), pos.c.y), UI.scale(5),
-			   prev = new HSlider(UI.scale(155) - x, 2, 17, (ival == 0) ? 17 : ival) {
+			   prev = new HSlider(UI.scale(155) - x, 2, 65, (ival == 0) ? 65 : ival) {
 				   protected void added() {
 				       dpy();
 				   }
 				   void dpy() {
-				       dpy.settext((this.val == 17) ? "\u221e" : Integer.toString(this.val));
+				       dpy.settext((this.val == 65) ? "\u221e" : Integer.toString(this.val));
 				   }
 				   public void changed() {
-				       Utils.setprefd("plobpgran", MapView.plobpgran = ((this.val == 17) ? 0 : this.val));
+				       Utils.setprefd("plobpgran", MapView.plobpgran = ((this.val == 65) ? 0 : this.val));
 				       dpy();
 				   }
 			       },
@@ -515,27 +531,42 @@ public class OptWnd extends Window {
 			   dpy);
 		}
 	    }
-	    add(new PButton(UI.scale(200), "Back", 27, back), prev.pos("bl").adds(0, 30).x(0));
+	    add(new PButton(UI.scale(200), "Back", 27, back, "Advanced Settings"), prev.pos("bl").adds(0, 30).x(0));
 	    pack();
 	}
     }
 
     private static final Text kbtt = RichText.render("$col[255,200,0]{Escape}: Cancel input\n" +
-						     "$col[255,255,0]{Backspace}: Revert to default\n" +
-						     "$col[255,255,0]{Delete}: Disable keybinding", 0);
+						     "$col[255,200,0]{Backspace}: Revert to default\n" +
+						     "$col[255,200,0]{Delete}: Disable keybinding", 0);
     public class BindingPanel extends Panel {
 	private int addbtn(Widget cont, String nm, KeyBinding cmd, int y) {
 	    return(cont.addhl(new Coord(0, y), cont.sz.x,
-			      new Label(nm), new SetButton(UI.scale(175), cmd))
+			      new Label(nm), new SetButton(UI.scale(140), cmd))
 		   + UI.scale(2));
 	}
 
+		private int addbtnImproved(Widget cont, String nm, String tooltip, Color color, KeyBinding cmd, int y) {
+			Label theLabel = new Label(nm);
+			if (tooltip != null && !tooltip.equals(""))
+				theLabel.tooltip = RichText.render(tooltip, UI.scale(300));
+			theLabel.setcolor(color);
+			return (cont.addhl(new Coord(0, y), cont.sz.x,
+					theLabel, new SetButton(UI.scale(140), cmd))
+					+ UI.scale(2));
+		}
+
 	public BindingPanel(Panel back) {
 	    super();
-	    Scrollport scroll = add(new Scrollport(UI.scale(new Coord(300, 300))), 0, 0);
+		int y = 5;
+		Label topNote = new Label("Don't use the same keys on multiple Keybinds!");
+		topNote.setcolor(Color.RED);
+		y = adda(topNote, 310 / 2, y, 0.5, 0.0).pos("bl").adds(0, 5).y;
+		y = adda(new Label("If you do that, only one of them will work. God knows which."), 310 / 2, y, 0.5, 0.0).pos("bl").adds(0, 5).y;
+		Scrollport scroll = add(new Scrollport(UI.scale(new Coord(310, 360))), 0, 60);
 	    Widget cont = scroll.cont;
 	    Widget prev;
-	    int y = 0;
+	    y = 0;
 	    y = cont.adda(new Label("Main menu"), cont.sz.x / 2, y, 0.5, 0.0).pos("bl").adds(0, 5).y;
 	    y = addbtn(cont, "Inventory", GameUI.kb_inv, y);
 	    y = addbtn(cont, "Equipment", GameUI.kb_equ, y);
@@ -544,40 +575,50 @@ public class OptWnd extends Window {
 	    y = addbtn(cont, "Kith & Kin", GameUI.kb_bud, y);
 	    y = addbtn(cont, "Options", GameUI.kb_opt, y);
 	    y = addbtn(cont, "Search actions", GameUI.kb_srch, y);
-	    y = addbtn(cont, "Toggle chat", GameUI.kb_chat, y);
-	    y = addbtn(cont, "Quick chat", ChatUI.kb_quick, y);
+	    y = addbtn(cont, "Focus chat window", GameUI.kb_chat, y);
+//	    y = addbtn(cont, "Quick chat", ChatUI.kb_quick, y);
 //	    y = addbtn(cont, "Take screenshot", GameUI.kb_shoot, y);
 	    y = addbtn(cont, "Minimap icons", GameUI.kb_ico, y);
 	    y = addbtn(cont, "Toggle UI", GameUI.kb_hide, y);
 	    y = addbtn(cont, "Log out", GameUI.kb_logout, y);
 	    y = addbtn(cont, "Switch character", GameUI.kb_switchchr, y);
-	    y = cont.adda(new Label("Map options"), cont.sz.x / 2, y + UI.scale(10), 0.5, 0.0).pos("bl").adds(0, 5).y;
-	    y = addbtn(cont, "Display claims", GameUI.kb_claim, y);
-	    y = addbtn(cont, "Display villages", GameUI.kb_vil, y);
-	    y = addbtn(cont, "Display realms", GameUI.kb_rlm, y);
-	    y = addbtn(cont, "Display grid-lines", MapView.kb_grid, y);
+
+	    y = cont.adda(new Label("Map buttons"), cont.sz.x / 2, y + UI.scale(10), 0.5, 0.0).pos("bl").adds(0, 5).y;
+		y = addbtn(cont, "Reset view", MapWnd.kb_home, y);
+		y = addbtn(cont, "Compact mode", MapWnd.kb_compact, y);
+		y = addbtn(cont, "Hide markers", MapWnd.kb_hmark, y);
+		y = addbtn(cont, "Add marker", MapWnd.kb_mark, y);
+
+		y = cont.adda(new Label("Game World Toggles"), cont.sz.x / 2, y + UI.scale(10), 0.5, 0.0).pos("bl").adds(0, 5).y;
+	    y = addbtn(cont, "Display Personal Claims", GameUI.kb_claim, y);
+	    y = addbtn(cont, "Display Village Claims", GameUI.kb_vil, y);
+	    y = addbtn(cont, "Display Realm Provinces", GameUI.kb_rlm, y);
+	    y = addbtn(cont, "Display Tile Grid", MapView.kb_grid, y);
+
 	    y = cont.adda(new Label("Camera control"), cont.sz.x / 2, y + UI.scale(10), 0.5, 0.0).pos("bl").adds(0, 5).y;
-	    y = addbtn(cont, "Rotate left", MapView.kb_camleft, y);
-	    y = addbtn(cont, "Rotate right", MapView.kb_camright, y);
-	    y = addbtn(cont, "Zoom in", MapView.kb_camin, y);
-	    y = addbtn(cont, "Zoom out", MapView.kb_camout, y);
-	    y = addbtn(cont, "Reset", MapView.kb_camreset, y);
-	    y = cont.adda(new Label("Map window"), cont.sz.x / 2, y + UI.scale(10), 0.5, 0.0).pos("bl").adds(0, 5).y;
-	    y = addbtn(cont, "Reset view", MapWnd.kb_home, y);
-	    y = addbtn(cont, "Place marker", MapWnd.kb_mark, y);
-	    y = addbtn(cont, "Toggle markers", MapWnd.kb_hmark, y);
-	    y = addbtn(cont, "Compact mode", MapWnd.kb_compact, y);
+//	    y = addbtn(cont, "Rotate left", MapView.kb_camleft, y);
+//	    y = addbtn(cont, "Rotate right", MapView.kb_camright, y);
+//	    y = addbtn(cont, "Zoom in", MapView.kb_camin, y);
+//	    y = addbtn(cont, "Zoom out", MapView.kb_camout, y);
+//	    y = addbtn(cont, "Reset", MapView.kb_camreset, y);
+
+
 	    y = cont.adda(new Label("Walking speed"), cont.sz.x / 2, y + UI.scale(10), 0.5, 0.0).pos("bl").adds(0, 5).y;
 	    y = addbtn(cont, "Increase speed", Speedget.kb_speedup, y);
 	    y = addbtn(cont, "Decrease speed", Speedget.kb_speeddn, y);
 	    for(int i = 0; i < 4; i++)
 		y = addbtn(cont, String.format("Set speed %d", i + 1), Speedget.kb_speeds[i], y);
+
 	    y = cont.adda(new Label("Combat actions"), cont.sz.x / 2, y + UI.scale(10), 0.5, 0.0).pos("bl").adds(0, 5).y;
 	    for(int i = 0; i < Fightsess.kb_acts.length; i++)
 		y = addbtn(cont, String.format("Combat action %d", i + 1), Fightsess.kb_acts[i], y);
 	    y = addbtn(cont, "Switch targets", Fightsess.kb_relcycle, y);
+
+		y = cont.adda(new Label("Other Custom features"), cont.sz.x / 2, y + UI.scale(10), 0.5, 0.0).pos("bl").adds(0, 5).y;
+
+
 	    prev = adda(new PointBind(UI.scale(200)), scroll.pos("bl").adds(0, 10).x(scroll.sz.x / 2), 0.5, 0.0);
-	    prev = adda(new PButton(UI.scale(200), "Back", 27, back), prev.pos("bl").adds(0, 10).x(scroll.sz.x / 2), 0.5, 0.0);
+	    prev = adda(new PButton(UI.scale(200), "Back", 27, back, "Options            "), prev.pos("bl").adds(0, 10).x(scroll.sz.x / 2), 0.5, 0.0);
 	    pack();
 	}
 
@@ -727,20 +768,33 @@ public class OptWnd extends Window {
     }
 
     public OptWnd(boolean gopts) {
-	super(Coord.z, "Options", true);
+	super(Coord.z, "Options            ", true); // ND: Added a bunch of spaces to the caption(title) in order avoid text cutoff when changing it
 	main = add(new Panel());
 	Panel video = add(new VideoPanel(main));
 	Panel audio = add(new AudioPanel(main));
-	Panel iface = add(new InterfacePanel(main));
 	Panel keybind = add(new BindingPanel(main));
 
-	int y = 0;
+	int y = UI.scale(6);
 	Widget prev;
-	y = main.add(new PButton(UI.scale(200), "Interface settings", 'v', iface), 0, y).pos("bl").adds(0, 5).y;
-	y = main.add(new PButton(UI.scale(200), "Video settings", 'v', video), 0, y).pos("bl").adds(0, 5).y;
-	y = main.add(new PButton(UI.scale(200), "Audio settings", 'a', audio), 0, y).pos("bl").adds(0, 5).y;
-	y = main.add(new PButton(UI.scale(200), "Keybindings", 'k', keybind), 0, y).pos("bl").adds(0, 5).y;
-	y += UI.scale(60);
+	y = main.add(new PButton(UI.scale(200), "Video Settings", -1, video, "Video Settings"), 0, y).pos("bl").adds(0, 5).y;
+	y = main.add(new PButton(UI.scale(200), "Audio Settings", -1, audio, "Audio Settings"), 0, y).pos("bl").adds(0, 5).y;
+	y = main.add(new PButton(UI.scale(200), "Keybindings (Hotkeys)", -1, keybind, "Keybindings (Hotkeys)"), 0, y).pos("bl").adds(0, 5).y;
+	y += UI.scale(20);
+
+	advancedSettings = add(new Panel());
+	// ND: Add the sub-panel buttons for the advanced settings here
+		Panel iface = add(new InterfacePanel(advancedSettings));
+
+		int y2 = UI.scale(6);
+		y2 = advancedSettings.add(new PButton(UI.scale(200), "Interface & Display Settings", -1, iface, "Interface & Display Settings"), 0, y2).pos("bl").adds(0, 5).y;
+
+		y2 += UI.scale(20);
+		y2 = advancedSettings.add(new PButton(UI.scale(200), "Back", 27, main, "Options            "), 0, y2).pos("bl").adds(0, 5).y;
+	this.advancedSettings.pack();
+
+	// Now back to the main panel, we add the advanced settings button and continue with everything else
+	y = main.add(new PButton(UI.scale(200), "Advanced Settings", -1, advancedSettings, "Advanced Settings"), 0, y).pos("bl").adds(0, 5).y;
+	y += UI.scale(20);
 	if(gopts) {
 	    y = main.add(new Button(UI.scale(200), "Switch character", false).action(() -> {
 			getparent(GameUI.class).act("lo", "cs");
@@ -773,4 +827,27 @@ public class OptWnd extends Window {
 	chpanel(main);
 	super.show();
     }
+
+	private void centerBackButton(Widget backButton, Widget parent){ // ND: Should only be used at the very end after the panel was already packed once.
+		backButton.move(new Coord(parent.sz.x/2-backButton.sz.x/2, backButton.c.y));
+		pack();
+	}
+
+
+	// ND: Setting Tooltips
+	// Interface & Display Settings Tooltips
+	private Object interfaceScaleTooltip = RichText.render("$col[218,163,0]{Warning:} This setting is by no means perfect, and it can mess up many UI related things." +
+			"\nSome windows might just break when this is set above 1.00x." +
+			"\n" +
+			"\n$col[185,185,185]{I really try my best to support this setting, but I can't guarantee everything will work." +
+			"\nUnless you're on a 4K or 8K display, I'd keep this at 1.00x.}", UI.scale(300));
+	private Object granularityPositionTooltip = RichText.render("Equivalent of the :placegrid console command, this allows you to have more freedom when placing constructions/objects.", UI.scale(300));
+	private Object granularityAngleTooltip = RichText.render("Equivalent of the :placeangle console command, this allows you to have more freedom when rotating constructions/objects before placement.", UI.scale(300));
+
+	// Audio Settings Tooltips
+	private Object audioLatencyTooltip = RichText.render("Sets the size of the audio buffer." +
+			"\n" +
+			"\n$col[185,185,185]{Loftar claims that smaller sizes are better, but anything below 50ms always seems to stutter, so I limited it to that." +
+			"\nIncrease this if your audio is still stuttering.}", UI.scale(300));
+
 }

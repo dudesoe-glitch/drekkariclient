@@ -55,8 +55,8 @@ public class Window extends Widget implements DTarget {
     public static final Coord brm = UI.scale(13, 22);
 	public static final Coord cpo = UI.rscale(27, 13); // ND: This is the location of the window title text
     public static final int capo = 7, capio = 2;
-    public static final Coord dlmrgn = UI.scale(23, 14);
-    public static final Coord dsmrgn = UI.scale(9, 9);
+    public static final Coord dlmrgn = UI.scale(24, 18);
+    public static final Coord dsmrgn = UI.scale(12, 12);
     public static final BufferedImage ctex = Resource.loadsimg("gfx/hud/fonttex");
     public static final Text.Furnace cf = new Text.Imager(new PUtils.TexFurn(new Text.Foundry(Text.fraktur, 15).aa(true), ctex)) {
 	    protected BufferedImage proc(Text text) {

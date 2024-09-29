@@ -26,6 +26,7 @@
 
 package haven;
 
+import java.util.LinkedHashMap;
 import java.util.function.*;
 import java.io.*;
 import java.nio.file.*;
@@ -332,4 +333,23 @@ public class Config {
 		}
 	    });
     }
+
+	public static final LinkedHashMap<String, String> properKeyNames = new LinkedHashMap<String, String>(){{
+		put("None", " ");
+		put("Back Quote", "`");
+		put("Equals", "=");
+		put("Minus", "-");
+		put("Open Bracket", "[");
+		put("Close Bracket", "]");
+		put("Back Slash", "\\");
+		put("Semicolon", ";");
+		put("Quote", "'");
+		put("Period", ".");
+		put("Comma", ",");
+		put("Slash", "/");
+		put("Up", "↑");
+		put("Down", "↓");
+		put("Left", "←");
+		put("Right", "→");
+	}};
 }
