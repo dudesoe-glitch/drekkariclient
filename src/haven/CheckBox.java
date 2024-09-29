@@ -26,6 +26,8 @@
 
 package haven;
 
+import java.awt.*;
+
 public class CheckBox extends ACheckBox {
     public static final Tex lbox = Resource.loadtex("gfx/hud/chkbox");
     public static final Tex lmark = Resource.loadtex("gfx/hud/chkmark");
@@ -59,9 +61,28 @@ public class CheckBox extends ACheckBox {
 	    sz = box.sz();
     }
 
+	public CheckBox(String lbl, boolean lg, Color color) {
+		this.lbl = (lbl.length() > 0) ? Text.create(lbl, PUtils.strokeImg(Text.std.render(lbl, color))) : null;
+		if(lg) {
+			box = lbox; mark = lmark;
+			loff = UI.scale(0, 6);
+		} else {
+			box = sbox; mark = smark;
+			loff = UI.scale(5, 0);
+		}
+		if(this.lbl != null)
+			sz = Coord.of(box.sz().x + UI.scale(5) + this.lbl.sz().x, Math.max(box.sz().y, this.lbl.sz().y));
+		else
+			sz = box.sz();
+	}
+
     public CheckBox(String lbl) {
 	this(lbl, false);
     }
+
+	public CheckBox(String lbl, Color color) {
+		this(lbl, false, color);
+	}
 
     public void draw(GOut g) {
 	if(lbl != null)
@@ -78,4 +99,8 @@ public class CheckBox extends ACheckBox {
 	}
 	return(super.mousedown(c, button));
     }
+
+	public void setTextColor(String text, Color color){
+		lbl = Text.create(text, PUtils.strokeImg(Text.std.render(text, color)));
+	}
 }
