@@ -58,6 +58,9 @@ public class LoginScreen extends Widget {
 	static public final File charSelectTheme = new File("res/customclient/sfx/charselecttheme.wav");
 	static public Audio.CS charSelectThemeClip = null;
 	static public boolean charSelectThemeStopped = false;
+	private Window firstTimeUseWindow = null;
+	private Window firstTimeUseExtraBackgroundWindow = null; // ND: Do an extra window to have a solid background, no transparency.
+	private boolean firstTimeWindowCreated = false;
 
     private String getpref(String name, String def) {
 	return(Utils.getpref(name + "@" + hostname, def));
@@ -377,6 +380,9 @@ public class LoginScreen extends Widget {
 
 	public void tick(double dt) {
 		playMainTheme();
+		if (!firstTimeWindowCreated && Utils.getprefb("firstTimeOpeningClient", true)){
+			createFirstTimeUseWindow();
+		}
 		super.tick(dt);
 	}
 
@@ -453,6 +459,47 @@ public class LoginScreen extends Widget {
 			Audio.stop(mainThemeClip);
 			mainThemeStopped = true;
 		}
+	}
+
+	private void createFirstTimeUseWindow(){
+		firstTimeUseWindow = new Window(Coord.z, "Hey!", true) {
+			{
+				Widget prev;
+				prev = add(new Label("This is your first time launching Hurricane!"), UI.scale(new Coord(34, 3)));
+				prev = add(new Label("Please make sure to set up your Keybindings and Settings!"), prev.pos("bl").adds(0, 8).x(0));
+				prev = add(new Label("The default ones are what Nightdawg uses."), prev.pos("bl").adds(0, 8).x(34));
+				Button close = new Button(UI.scale(120), "Okay!", false) {
+					@Override
+					public void click() {
+						parent.reqdestroy();
+						firstTimeUseExtraBackgroundWindow.reqdestroy();
+						Utils.setprefb("firstTimeOpeningClient", false);
+					}
+				};
+				add(close, prev.pos("bl").adds(0, 10).adds(0, 6).x(76));
+				pack();
+			}
+
+			@Override
+			public void drag(Coord off) {
+				// ND: Don't do anything, so it can't be dragged
+			}
+			@Override
+			public void wdgmsg(Widget sender, String msg, Object... args) {
+				if (msg.equals("close")) {
+					firstTimeUseExtraBackgroundWindow.reqdestroy();
+					reqdestroy();
+					Utils.setprefb("firstTimeOpeningClient", false);
+				}
+				else
+					super.wdgmsg(sender, msg, args);
+			}
+		};
+		firstTimeUseExtraBackgroundWindow = new Window(Coord.z, " ", true);
+		firstTimeUseExtraBackgroundWindow.resize(firstTimeUseWindow.csz());
+		adda(firstTimeUseExtraBackgroundWindow, 0.5, 0.5);
+		adda(firstTimeUseWindow, 0.5, 0.5);
+		firstTimeWindowCreated = true;
 	}
 
 }
