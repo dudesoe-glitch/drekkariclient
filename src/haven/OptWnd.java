@@ -452,8 +452,8 @@ public class OptWnd extends Window {
 	}
     }
 
-    public class InterfacePanel extends Panel {
-	public InterfacePanel(Panel back) {
+    public class InterfaceSettingsPanel extends Panel {
+	public InterfaceSettingsPanel(Panel back) {
 	    Widget prev = add(new Label("Interface scale (requires restart)"), 0, 0);
 		prev.tooltip = interfaceScaleTooltip;
 	    {
@@ -478,63 +478,73 @@ public class OptWnd extends Window {
 		       dpy);
 		prev.tooltip = interfaceScaleTooltip;
 	    }
-	    prev = add(new Label("Object fine-placement granularity"), prev.pos("bl").adds(0, 5));
-	    {
-		Label pos = add(new Label("Position"), prev.pos("bl").adds(5, 4));
-		pos.tooltip = granularityPositionTooltip;
-		Label ang = add(new Label("Angle"), pos.pos("bl").adds(0, 4));
-		ang.tooltip = granularityAngleTooltip;
-		int x = Math.max(pos.pos("ur").x, ang.pos("ur").x);
-		{
-		    Label dpy = new Label("");
-		    final double smin = 1, smax = Math.floor(UI.maxscale() / 0.25) * 0.25;
-		    final int steps = (int)Math.round((smax - smin) / 0.25);
-		    int ival = (int)Math.round(MapView.plobpgran);
-		    addhlp(Coord.of(x + UI.scale(5), pos.c.y), UI.scale(5),
-			   prev = new HSlider(UI.scale(155) - x, 2, 65, (ival == 0) ? 65 : ival) {
-				   protected void added() {
-				       dpy();
-				   }
-				   void dpy() {
-				       dpy.settext((this.val == 65) ? "\u221e" : Integer.toString(this.val));
-				   }
-				   public void changed() {
-				       Utils.setprefd("plobpgran", MapView.plobpgran = ((this.val == 65) ? 0 : this.val));
-				       dpy();
-				   }
-			       },
-			   dpy);
-		}
-		{
-		    Label dpy = new Label("");
-		    final double smin = 1, smax = Math.floor(UI.maxscale() / 0.25) * 0.25;
-		    final int steps = (int)Math.round((smax - smin) / 0.25);
-		    int[] vals = {4, 5, 6, 8, 9, 10, 12, 15, 18, 20, 24, 30, 36, 40, 45, 60, 72, 90, 120, 180, 360};
-		    int ival = 0;
-		    for(int i = 0; i < vals.length; i++) {
-			if(Math.abs((MapView.plobagran * 2) - vals[i]) < Math.abs((MapView.plobagran * 2) - vals[ival]))
-			    ival = i;
-		    }
-		    addhlp(Coord.of(x + UI.scale(5), ang.c.y), UI.scale(5),
-			   prev = new HSlider(UI.scale(155) - x, 0, vals.length - 1, ival) {
-				   protected void added() {
-				       dpy();
-				   }
-				   void dpy() {
-				       dpy.settext(String.format("%d\u00b0", 360 / vals[this.val]));
-				   }
-				   public void changed() {
-				       Utils.setprefd("plobagran", MapView.plobagran = (vals[this.val] / 2.0));
-				       dpy();
-				   }
-			       },
-			   dpy);
-		}
-	    }
+
 	    add(new PButton(UI.scale(200), "Back", 27, back, "Advanced Settings"), prev.pos("bl").adds(0, 30).x(0));
 	    pack();
 	}
     }
+
+	public class DisplaySettingsPanel extends Panel {
+		public DisplaySettingsPanel(Panel back) {
+			Widget prev;
+			prev = add(new Label("Object fine-placement granularity"), 0, 0);
+			{
+				Label pos = add(new Label("Position"), prev.pos("bl").adds(5, 4));
+				pos.tooltip = granularityPositionTooltip;
+				Label ang = add(new Label("Angle"), pos.pos("bl").adds(0, 4));
+				ang.tooltip = granularityAngleTooltip;
+				int x = Math.max(pos.pos("ur").x, ang.pos("ur").x);
+				{
+					Label dpy = new Label("");
+					final double smin = 1, smax = Math.floor(UI.maxscale() / 0.25) * 0.25;
+					final int steps = (int)Math.round((smax - smin) / 0.25);
+					int ival = (int)Math.round(MapView.plobpgran);
+					addhlp(Coord.of(x + UI.scale(5), pos.c.y), UI.scale(5),
+							prev = new HSlider(UI.scale(155) - x, 2, 65, (ival == 0) ? 65 : ival) {
+								protected void added() {
+									dpy();
+								}
+								void dpy() {
+									dpy.settext((this.val == 65) ? "\u221e" : Integer.toString(this.val));
+								}
+								public void changed() {
+									Utils.setprefd("plobpgran", MapView.plobpgran = ((this.val == 65) ? 0 : this.val));
+									dpy();
+								}
+							},
+							dpy);
+				}
+				{
+					Label dpy = new Label("");
+					final double smin = 1, smax = Math.floor(UI.maxscale() / 0.25) * 0.25;
+					final int steps = (int)Math.round((smax - smin) / 0.25);
+					int[] vals = {4, 5, 6, 8, 9, 10, 12, 15, 18, 20, 24, 30, 36, 40, 45, 60, 72, 90, 120, 180, 360};
+					int ival = 0;
+					for(int i = 0; i < vals.length; i++) {
+						if(Math.abs((MapView.plobagran * 2) - vals[i]) < Math.abs((MapView.plobagran * 2) - vals[ival]))
+							ival = i;
+					}
+					addhlp(Coord.of(x + UI.scale(5), ang.c.y), UI.scale(5),
+							prev = new HSlider(UI.scale(155) - x, 0, vals.length - 1, ival) {
+								protected void added() {
+									dpy();
+								}
+								void dpy() {
+									dpy.settext(String.format("%d\u00b0", 360 / vals[this.val]));
+								}
+								public void changed() {
+									Utils.setprefd("plobagran", MapView.plobagran = (vals[this.val] / 2.0));
+									dpy();
+								}
+							},
+							dpy);
+				}
+			}
+			add(new PButton(UI.scale(200), "Back", 27, back, "Advanced Settings"), prev.pos("bl").adds(0, 30).x(0));
+			pack();
+		}
+	}
+
 
     private static final Text kbtt = RichText.render("$col[255,200,0]{Escape}: Cancel input\n" +
 						     "$col[255,200,0]{Backspace}: Revert to default\n" +
@@ -956,12 +966,14 @@ public class OptWnd extends Window {
 
 	advancedSettings = add(new Panel());
 	// ND: Add the sub-panel buttons for the advanced settings here
-		Panel iface = add(new InterfacePanel(advancedSettings));
+		Panel interfacesettings = add(new InterfaceSettingsPanel(advancedSettings));
+		Panel displaysettings = add(new DisplaySettingsPanel(advancedSettings));
 		Panel camsettings = add(new CameraSettingsPanel(advancedSettings));
 
 		int y2 = UI.scale(6);
-		y2 = advancedSettings.add(new PButton(UI.scale(200), "Interface & Display Settings", -1, iface, "Interface & Display Settings"), 0, y2).pos("bl").adds(0, 5).y;
-
+		y2 = advancedSettings.add(new PButton(UI.scale(200), "Interface Settings", -1, interfacesettings, "Interface Settings"), 0, y2).pos("bl").adds(0, 5).y;
+		y2 = advancedSettings.add(new PButton(UI.scale(200), "Display Settings", -1, displaysettings, "Display Settings"), 0, y2).pos("bl").adds(0, 5).y;
+		y2 += UI.scale(20);
 		y2 = advancedSettings.add(new PButton(UI.scale(200), "Camera Settings", -1, camsettings, "Camera Settings"), 0, y2).pos("bl").adds(0, 5).y;
 
 		y2 += UI.scale(20);
@@ -1011,15 +1023,16 @@ public class OptWnd extends Window {
 
 
 	// ND: Setting Tooltips
-	// Interface & Display Settings Tooltips
+	// Interface Settings Tooltips
 	private Object interfaceScaleTooltip = RichText.render("$col[218,163,0]{Warning:} This setting is by no means perfect, and it can mess up many UI related things." +
 			"\nSome windows might just break when this is set above 1.00x." +
 			"\n" +
 			"\n$col[185,185,185]{I really try my best to support this setting, but I can't guarantee everything will work." +
 			"\nUnless you're on a 4K or 8K display, I'd keep this at 1.00x.}", UI.scale(300));
+
+	// Display Settings Tooltips
 	private Object granularityPositionTooltip = RichText.render("Equivalent of the :placegrid console command, this allows you to have more freedom when placing constructions/objects.", UI.scale(300));
 	private Object granularityAngleTooltip = RichText.render("Equivalent of the :placeangle console command, this allows you to have more freedom when rotating constructions/objects before placement.", UI.scale(300));
-
 	// Audio Settings Tooltips
 	private Object audioLatencyTooltip = RichText.render("Sets the size of the audio buffer." +
 			"\n" +
