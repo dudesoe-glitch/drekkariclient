@@ -407,9 +407,9 @@ public class LoginScreen extends Widget {
 		if("account".equals(msg)) {
 			String name = (String) args[0];
 			String pass = (String) args[1];
-			login.user.settext2(name);
-			login.pass.settext(pass);
-			login.enter2();
+			((Credbox)login).user.settext2(name);
+			((Credbox)login).pass.settext(pass);
+			((Credbox)login).enter2();
 		}
 		return;
 	}
@@ -452,7 +452,7 @@ public class LoginScreen extends Widget {
 	    clear();
 	    progress((String)args[0]);
 		if (((String)args[0]).equals("Connecting...")){
-			if(login.saveaccount.state() && !lastUser.equals("") && !lastPass.equals("")) {
+			if(((Credbox)login).saveaccount.state() && !lastUser.equals("") && !lastPass.equals("")) {
 				AccountList.storeAccount(lastUser, lastPass);
 				lastUser = "";
 				lastPass = "";
