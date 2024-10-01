@@ -395,6 +395,12 @@ public class OCache implements Iterable<Gob> {
 		if(!added) {
 		    add(gob);
 		    added = true;
+			try {
+				synchronized (gob) {
+					gob.init(false);
+				}
+			} catch (Exception e) {
+			}
 		}
 		gob.updated();
 	    }

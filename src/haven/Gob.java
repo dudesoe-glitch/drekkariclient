@@ -45,6 +45,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
     private final Collection<SetupMod> setupmods = new ArrayList<>();
     private final LinkedList<Runnable> deferred = new LinkedList<>();
     private Loader.Future<?> deferral = null;
+	public Boolean isComposite = false;
 
     public static class Overlay implements RenderTree.Node {
 	public final int id;
@@ -972,4 +973,33 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
     public String toString() {
 	return(String.format("#<ob %d %s>", id, getattr(Drawable.class)));
     }
+
+	public void init(boolean throwLoading) {
+		Resource res = getres();
+		if (res != null) {
+			if (getattr(Drawable.class) instanceof Composite) {
+				try {
+					initComp((Composite)getattr(Drawable.class));
+					isComposite = true;
+				} catch (Loading e) {
+					if (!throwLoading) {
+						glob.loader.syncdefer(() -> this.init(true), null, this);
+					} else {
+						throw e;
+					}
+				}
+			} else {
+
+			}
+		}
+	}
+
+	public void updPose(HashSet<String> poses) {
+		isComposite = true;
+	}
+
+	public void initComp(Composite c) {
+		c.cmpinit(this);
+	}
+
 }

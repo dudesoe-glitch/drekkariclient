@@ -33,6 +33,8 @@ import java.awt.event.KeyEvent;
 import java.util.*;
 import java.util.function.*;
 import java.lang.reflect.*;
+import java.util.stream.Collectors;
+
 import haven.render.*;
 import haven.MCache.OverlayInfo;
 import haven.render.sl.Uniform;
@@ -57,10 +59,17 @@ public class MapView extends PView implements DTarget, Console.Directory {
     private static final Map<String, Class<? extends Camera>> camtypes = new HashMap<String, Class<? extends Camera>>();
 	private static int cameraConsoleCommandReplyMessage = 1;
 	public static int currentCamera = 1;
+	private long lastmmhittest = System.currentTimeMillis();
+	private Coord lasthittestc = Coord.z;
+	private Collection<DelayedB> delayedB = new LinkedList<DelayedB>();
     
     public interface Delayed {
 	public void run(GOut g);
     }
+
+	public interface DelayedB {
+		public void run();
+	}
 
     public interface Grabber {
 	boolean mmousedown(Coord mc, int button);
@@ -1571,6 +1580,20 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	}
     }
 
+	public void delayB(DelayedB d) {
+		synchronized(delayedB) {
+			delayedB.add(d);
+		}
+	}
+
+	protected void undelayB(Collection<DelayedB> list) {
+		synchronized(list) {
+			for(DelayedB d : list)
+				d.run();
+			list.clear();
+		}
+	}
+
     static class PolText {
 	Text text; double tm;
 	PolText(Text text, double tm) {this.text = text; this.tm = tm;}
@@ -1707,6 +1730,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	    if(camload != null)
 		throw(new Loading(camload));
 	    undelay(delayed, g);
+		undelayB(delayedB);
 	    super.draw(g);
 	    undelay(delayed2, g);
 	    poldraw(g);
@@ -1997,7 +2021,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	protected void nohit(Coord pc) {}
     }
 
-    public abstract class Hittest {
+    public abstract class Hittest implements DelayedB {
 	private final Coord pc;
 	private Coord2d mapcl;
 	private ClickData objcl;
@@ -2098,7 +2122,127 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	    if((placing.lastmc == null) || !placing.lastmc.equals(c)) {
 		placing.new Adjust(c, ui.modflags()).run();
 	    }
+	}  else if (ui.modshift && ui.modctrl) {
+		long now = System.currentTimeMillis();
+		if ((now - lastmmhittest > 500 || lasthittestc.dist(c) > tilesz.x) && ui.gui.hand.isEmpty()) {
+			lastmmhittest = now;
+			lasthittestc = c;
+
+			delayB(new Hittest(c) {
+				@Override
+				protected void hit(Coord pc, Coord2d mc, ClickData inf) {
+					if (inf != null) {
+						Long gobid = new Long((Integer) inf.clickargs()[1]);
+						Gob gob = glob.oc.getgob(gobid);
+						if (gob != null) {
+							try {
+								Resource res = gob.getres();
+
+								String overlays = null;
+								String poses = null;
+								String gattributes = null;
+								String equip = null;
+								String rbuf = null;
+								try {
+									overlays = gob.ols.stream()
+											.map(ol -> {
+												if (ol.spr.res != null) {
+													return ol.spr.res.name;
+												} else {
+													return null;
+												}
+											})
+											.filter(Objects::nonNull)
+											.collect(Collectors.joining(", "));
+								} catch (Exception ignored) {}
+								try {
+									gattributes = gob.attr.keySet().stream().map(Class::getName).collect(Collectors.joining(", ")).replace("$", ".");
+								} catch (Exception ignored) { }
+								if (gob.isComposite) {
+									try {
+										if (gob.getattr(Drawable.class) != null) {
+											poses = ((Composite)gob.getattr(Drawable.class)).poses.stream().collect(Collectors.joining(", "));
+										}
+									} catch (Exception ignored) { }
+								}
+
+								for (GAttrib g : gob.attr.values()) {
+									if (g instanceof Drawable) {
+										if (g instanceof ResDrawable) {
+											ResDrawable resDrawable = gob.getattr(ResDrawable.class);
+											rbuf = "" + resDrawable.sdt.checkrbuf(0);
+
+										} else if (g instanceof Composite) {
+											Composite c = (Composite) g;
+											StringBuilder sb = new StringBuilder();
+											if (c.comp.cequ.size() > 0) {
+												sb.append("$col[255,200,0]{Composite Equipment:} \n");
+												for (Composited.ED item : c.comp.cequ) {
+													sb.append("   "+item.res.res.get().name+" \n");
+												}
+											}
+											if (c.comp.cmod.size() > 0) {
+												sb.append("$col[255,200,0]{Composite Modifiers:} \n");
+												for (Composited.MD item : c.comp.cmod) {
+													sb.append("   "+item.mod.get().name+" \n");
+												}
+											}
+											equip = sb.toString();
+										}
+									}
+								}
+								if (res != null) {
+									String tt;
+									if (OptWnd.extendedMouseoverInfoCheckBox.a)
+										tt = "Object Resource Path: " + "$col[255,200,0]{" + res.name + "}" +
+												" \nID: " + gob.id +
+												" \nRC: " + ui.sess.glob.map.getzp(gob.rc) +
+												String.format(" \nAngle: %.2f (%.2f\u00B0)", gob.a, 360.*(gob.a/(2.*Math.PI))) +
+												(overlays != null ? " \nOverlays: $col[192,192,255]{" + overlays + "}" : "") +
+												(poses != null ? " \nPoses: $col[192,192,255]{" + poses + "}" : "") +
+												(gattributes != null ? " \nGAttribs: $col[192,192,255]{" + gattributes + "}" : "") +
+												(rbuf != null ? " \nrbuf: $col[192,192,255]{" + rbuf + "}" : "") +
+												(equip != null ? " \n$col[255,255,192]{" + equip + "}" : "");
+									else
+										tt = "Object Resource Path: " + "$col[255,200,0]{" + res.name + "}";
+									tooltip = RichText.render(tt, 400);
+									return;
+								}
+							} catch (Loading e) {
+							}
+						}
+					} else {
+						try {
+							MCache map = ui.sess.glob.map;
+							int t = map.gettile(mc.floor(tilesz));
+							Resource res = map.tilesetr(t);
+							if (res != null) {
+								if (OptWnd.extendedMouseoverInfoCheckBox.a)
+									tooltip = RichText.render("Tile Resource Path: " + "$col[255,200,0]{" + res.name + "}" +
+											" \nMC: " + mc.floor(), UI.scale(400));
+								else
+									tooltip = RichText.render("Tile Resource Path: " + "$col[255,200,0]{" + res.name + "}", UI.scale(400));
+								return;
+							}
+						} catch (Loading ignored){
+						}
+					}
+					tooltip = null;
+				}
+
+				protected void nohit(Coord pc) {
+					if (OptWnd.extendedMouseoverInfoCheckBox.a)
+						System.out.println(pc);
+					tooltip = null;
+				}
+			});
+		}
+	} else if (tooltip != null) {
+		tooltip = null;
 	}
+
+
+
     }
     
     public boolean mouseup(Coord c, int button) {

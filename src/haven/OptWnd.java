@@ -452,17 +452,18 @@ public class OptWnd extends Window {
 	}
     }
 
+	public static CheckBox extendedMouseoverInfoCheckBox;
     public class InterfaceSettingsPanel extends Panel {
 	public InterfaceSettingsPanel(Panel back) {
-	    Widget prev = add(new Label("Interface scale (requires restart)"), 0, 0);
-		prev.tooltip = interfaceScaleTooltip;
+	    Widget leftColumn = add(new Label("Interface scale (requires restart)"), 0, 0);
+		leftColumn.tooltip = interfaceScaleTooltip;
 	    {
 		Label dpy = new Label("");
 		final double gran = 0.05;
 		final double smin = 1, smax = Math.floor(UI.maxscale() / gran) * gran;
 		final int steps = (int)Math.round((smax - smin) / gran);
-		addhlp(prev.pos("bl").adds(0, 4), UI.scale(5),
-		       prev = new HSlider(UI.scale(160), 0, steps, (int)Math.round(steps * (Utils.getprefd("uiscale", 1.0) - smin) / (smax - smin))) {
+		addhlp(leftColumn.pos("bl").adds(0, 4), UI.scale(5),
+		       leftColumn = new HSlider(UI.scale(160), 0, steps, (int)Math.round(steps * (Utils.getprefd("uiscale", 1.0) - smin) / (smax - smin))) {
 			       protected void added() {
 				   dpy();
 			       }
@@ -476,10 +477,19 @@ public class OptWnd extends Window {
 			       }
 			   },
 		       dpy);
-		prev.tooltip = interfaceScaleTooltip;
+		leftColumn.tooltip = interfaceScaleTooltip;
 	    }
 
-	    add(new PButton(UI.scale(200), "Back", 27, back, "Advanced Settings"), prev.pos("bl").adds(0, 30).x(0));
+		Widget rightColumn;
+		rightColumn = add(extendedMouseoverInfoCheckBox = new CheckBox("Extended Mouseover Info (Dev)"){
+			{a = (Utils.getprefb("extendedMouseoverInfo", false));}
+			public void changed(boolean val) {
+				Utils.setprefb("extendedMouseoverInfo", val);
+			}
+		}, UI.scale(230, 2));
+		extendedMouseoverInfoCheckBox.tooltip = extendedMouseoverInfoTooltip;
+
+		add(new PButton(UI.scale(200), "Back", 27, back, "Advanced Settings"), leftColumn.pos("bl").adds(0, 30).x(0));
 	    pack();
 	}
     }
@@ -1038,6 +1048,11 @@ public class OptWnd extends Window {
 	// Display Settings Tooltips
 	private Object granularityPositionTooltip = RichText.render("Equivalent of the :placegrid console command, this allows you to have more freedom when placing constructions/objects.", UI.scale(300));
 	private Object granularityAngleTooltip = RichText.render("Equivalent of the :placeangle console command, this allows you to have more freedom when rotating constructions/objects before placement.", UI.scale(300));
+	private Object extendedMouseoverInfoTooltip = RichText.render("Holding Ctrl+Shift shows the Resource Path when mousing over Objects or Tiles. " +
+			"\nEnabling this option will add a lot of additional information on top of that." +
+			"\n" +
+			"\n$col[185,185,185]{Unless you're a client dev, you don't really need to enable this option, like ever.}", UI.scale(300));
+
 	// Audio Settings Tooltips
 	private Object audioLatencyTooltip = RichText.render("Sets the size of the audio buffer." +
 			"\n" +
