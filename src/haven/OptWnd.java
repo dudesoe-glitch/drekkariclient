@@ -461,6 +461,7 @@ public class OptWnd extends Window {
 
 	public static CheckBox simplifiedUIThemeCheckBox;
 	public static CheckBox extendedMouseoverInfoCheckBox;
+	private static CheckBox showFramerateCheckBox;
     public class InterfaceSettingsPanel extends Panel {
 	public InterfaceSettingsPanel(Panel back) {
 	    Widget leftColumn = add(new Label("Interface scale (requires restart)"), 0, 0);
@@ -487,6 +488,14 @@ public class OptWnd extends Window {
 		       dpy);
 		leftColumn.tooltip = interfaceScaleTooltip;
 	    }
+		leftColumn = add(showFramerateCheckBox = new CheckBox("Show Framerate"){
+			{a = (Utils.getprefb("showFramerate", true));}
+			public void changed(boolean val) {
+				GLPanel.Loop.showFramerate = val;
+				Utils.setprefb("showFramerate", val);
+			}
+		}, leftColumn.pos("bl").adds(0, 18));
+		showFramerateCheckBox.tooltip = showFramerateTooltip;
 
 		Widget rightColumn;
 		rightColumn = add(simplifiedUIThemeCheckBox = new CheckBox("Simplified UI Theme"){
@@ -1081,6 +1090,7 @@ public class OptWnd extends Window {
 			"\n" +
 			"\n$col[185,185,185]{I really try my best to support this setting, but I can't guarantee everything will work." +
 			"\nUnless you're on a 4K or 8K display, I'd keep this at 1.00x.}", UI.scale(300));
+	private Object showFramerateTooltip = RichText.render("Shows the current FPS in the top-right corner of the game window.", UI.scale(300));
 
 	// Display Settings Tooltips
 	private Object granularityPositionTooltip = RichText.render("Equivalent of the :placegrid console command, this allows you to have more freedom when placing constructions/objects.", UI.scale(300));

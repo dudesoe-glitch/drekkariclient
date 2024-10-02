@@ -290,6 +290,7 @@ public interface GLPanel extends UIPanel, UI.Context {
 	}
 
 	private StreamOut streamout = null;
+	public static boolean showFramerate = Utils.getprefb("showFramerate", true);
 
 	private void display(UI ui, GLRender buf) {
 	    Pipe wnd = p.basestate();
@@ -300,6 +301,9 @@ public interface GLPanel extends UIPanel, UI.Context {
 	    synchronized(ui) {
 		ui.draw(g);
 	    }
+		if (showFramerate) {
+			FastText.aprintfstroked(g, new Coord(g.sz().x - UI.scale(50), UI.scale(15)), 0, 1, "FPS: " + fps);
+		}
 	    if(dbtext.get())
 		drawstats(ui, g, buf);
 	    drawtooltip(ui, g);
