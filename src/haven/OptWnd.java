@@ -30,11 +30,18 @@ import haven.render.*;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class OptWnd extends Window {
     public final Panel main;
 	public final Panel advancedSettings;
     public Panel current;
+	private static final ScheduledExecutorService simpleUIExecutor = Executors.newSingleThreadScheduledExecutor();
+	private static Future<?> simpleUIFuture;
+	public static boolean simpleUIChanged = false;
 
     public void chpanel(Panel p) {
 	if(current != null)
@@ -452,6 +459,7 @@ public class OptWnd extends Window {
 	}
     }
 
+	public static CheckBox simplifiedUIThemeCheckBox;
 	public static CheckBox extendedMouseoverInfoCheckBox;
     public class InterfaceSettingsPanel extends Panel {
 	public InterfaceSettingsPanel(Panel back) {
@@ -481,16 +489,39 @@ public class OptWnd extends Window {
 	    }
 
 		Widget rightColumn;
+		rightColumn = add(simplifiedUIThemeCheckBox = new CheckBox("Simplified UI Theme"){
+			{a = (Utils.getprefb("simplifiedUITheme", false));}
+			public void changed(boolean val) {
+				Utils.setprefb("simplifiedUITheme", val);
+				Window.bg = (!val ? Resource.loadtex("gfx/hud/wnd/lg/bg") : Resource.loadtex("customclient/simplifiedUI/wnd/bg"));
+				Window.cl =  (!val ? Resource.loadtex("gfx/hud/wnd/lg/cl") : Resource.loadtex("customclient/simplifiedUI/wnd/cl"));
+				Window.br = (!val ? Resource.loadtex("gfx/hud/wnd/lg/br") : Resource.loadtex("customclient/simplifiedUI/wnd/br"));
+				Button.bl = (!val ? Resource.loadsimg("gfx/hud/buttons/tbtn/left") : Resource.loadsimg("customclient/simplifiedUI/buttons/tbtn/left"));
+				Button.br = (!val ? Resource.loadsimg("gfx/hud/buttons/tbtn/right") : Resource.loadsimg("customclient/simplifiedUI/buttons/tbtn/right"));
+				Button.bt = (!val ? Resource.loadsimg("gfx/hud/buttons/tbtn/top") : Resource.loadsimg("customclient/simplifiedUI/buttons/tbtn/top"));
+				Button.bb = (!val ? Resource.loadsimg("gfx/hud/buttons/tbtn/bottom") : Resource.loadsimg("customclient/simplifiedUI/buttons/tbtn/bottom"));
+				Button.dt = (!val ? Resource.loadsimg("gfx/hud/buttons/tbtn/dtex") : Resource.loadsimg("customclient/simplifiedUI/buttons/tbtn/dtex"));
+				Button.ut = (!val ? Resource.loadsimg("gfx/hud/buttons/tbtn/utex") : Resource.loadsimg("customclient/simplifiedUI/buttons/tbtn/utex"));
+				Button.bm = (!val ? Resource.loadsimg("gfx/hud/buttons/tbtn/mid") : Resource.loadsimg("customclient/simplifiedUI/buttons/tbtn/mid"));
+				if (simpleUIFuture != null)
+					simpleUIFuture.cancel(true);
+				simpleUIChanged = true;
+				simpleUIFuture = simpleUIExecutor.scheduleWithFixedDelay(OptWnd.this::resetSimpleUIChanged, 2, 3, TimeUnit.SECONDS);
+			}
+		}, UI.scale(230, 2));
+		simplifiedUIThemeCheckBox.tooltip = simplifiedUIThemeCheckBoxTooltip;
 		rightColumn = add(extendedMouseoverInfoCheckBox = new CheckBox("Extended Mouseover Info (Dev)"){
 			{a = (Utils.getprefb("extendedMouseoverInfo", false));}
 			public void changed(boolean val) {
 				Utils.setprefb("extendedMouseoverInfo", val);
 			}
-		}, UI.scale(230, 2));
+		}, rightColumn.pos("bl").adds(0, 4));
 		extendedMouseoverInfoCheckBox.tooltip = extendedMouseoverInfoTooltip;
 
-		add(new PButton(UI.scale(200), "Back", 27, back, "Advanced Settings"), leftColumn.pos("bl").adds(0, 30).x(0));
+		Widget backButton;
+		add(backButton = new PButton(UI.scale(200), "Back", 27, back, "Advanced Settings"), leftColumn.pos("bl").adds(0, 30).x(0));
 	    pack();
+		centerBackButton(backButton, this);
 	}
     }
 
@@ -962,6 +993,8 @@ public class OptWnd extends Window {
 
     public OptWnd(boolean gopts) {
 	super(Coord.z, "Options            ", true); // ND: Added a bunch of spaces to the caption(title) in order avoid text cutoff when changing it
+	if (simpleUIFuture != null)
+		simpleUIFuture.cancel(true);
 	main = add(new Panel());
 	Panel video = add(new VideoPanel(main));
 	Panel audio = add(new AudioPanel(main));
@@ -1036,6 +1069,10 @@ public class OptWnd extends Window {
 		pack();
 	}
 
+	private void resetSimpleUIChanged(){
+		simpleUIChanged = false;
+		simpleUIFuture.cancel(true);
+	}
 
 	// ND: Setting Tooltips
 	// Interface Settings Tooltips
@@ -1052,6 +1089,8 @@ public class OptWnd extends Window {
 			"\nEnabling this option will add a lot of additional information on top of that." +
 			"\n" +
 			"\n$col[185,185,185]{Unless you're a client dev, you don't really need to enable this option, like ever.}", UI.scale(300));
+	private Object simplifiedUIThemeCheckBoxTooltip = RichText.render("$col[185,185,185]{A more boring theme for the UI...}", UI.scale(300));
+
 
 	// Audio Settings Tooltips
 	private Object audioLatencyTooltip = RichText.render("Sets the size of the audio buffer." +
