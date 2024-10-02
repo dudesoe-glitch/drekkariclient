@@ -1085,45 +1085,45 @@ public class OptWnd extends Window {
 
 	// ND: Setting Tooltips
 	// Interface Settings Tooltips
-	private Object interfaceScaleTooltip = RichText.render("$col[218,163,0]{Warning:} This setting is by no means perfect, and it can mess up many UI related things." +
+	private final Object interfaceScaleTooltip = RichText.render("$col[218,163,0]{Warning:} This setting is by no means perfect, and it can mess up many UI related things." +
 			"\nSome windows might just break when this is set above 1.00x." +
 			"\n" +
 			"\n$col[185,185,185]{I really try my best to support this setting, but I can't guarantee everything will work." +
 			"\nUnless you're on a 4K or 8K display, I'd keep this at 1.00x.}", UI.scale(300));
-	private Object showFramerateTooltip = RichText.render("Shows the current FPS in the top-right corner of the game window.", UI.scale(300));
+	private final Object showFramerateTooltip = RichText.render("Shows the current FPS in the top-right corner of the game window.", UI.scale(300));
 
 	// Display Settings Tooltips
-	private Object granularityPositionTooltip = RichText.render("Equivalent of the :placegrid console command, this allows you to have more freedom when placing constructions/objects.", UI.scale(300));
-	private Object granularityAngleTooltip = RichText.render("Equivalent of the :placeangle console command, this allows you to have more freedom when rotating constructions/objects before placement.", UI.scale(300));
-	private Object extendedMouseoverInfoTooltip = RichText.render("Holding Ctrl+Shift shows the Resource Path when mousing over Objects or Tiles. " +
+	private final Object granularityPositionTooltip = RichText.render("Equivalent of the :placegrid console command, this allows you to have more freedom when placing constructions/objects.", UI.scale(300));
+	private final Object granularityAngleTooltip = RichText.render("Equivalent of the :placeangle console command, this allows you to have more freedom when rotating constructions/objects before placement.", UI.scale(300));
+	private final Object extendedMouseoverInfoTooltip = RichText.render("Holding Ctrl+Shift shows the Resource Path when mousing over Objects or Tiles. " +
 			"\nEnabling this option will add a lot of additional information on top of that." +
 			"\n" +
 			"\n$col[185,185,185]{Unless you're a client dev, you don't really need to enable this option, like ever.}", UI.scale(300));
-	private Object simplifiedUIThemeCheckBoxTooltip = RichText.render("$col[185,185,185]{A more boring theme for the UI...}", UI.scale(300));
+	private final Object simplifiedUIThemeCheckBoxTooltip = RichText.render("$col[185,185,185]{A more boring theme for the UI...}", UI.scale(300));
 
 
 	// Audio Settings Tooltips
-	private Object audioLatencyTooltip = RichText.render("Sets the size of the audio buffer." +
+	private final Object audioLatencyTooltip = RichText.render("Sets the size of the audio buffer." +
 			"\n" +
 			"\n$col[185,185,185]{Loftar claims that smaller sizes are better, but anything below 50ms always seems to stutter, so I limited it to that." +
 			"\nIncrease this if your audio is still stuttering.}", UI.scale(300));
 
 	// Camera Settings Tooltips
-	private Object reverseOrthoCameraAxesTooltip = RichText.render("Enabling this will reverse the Horizontal axis when dragging the camera to look around." +
+	private final Object reverseOrthoCameraAxesTooltip = RichText.render("Enabling this will reverse the Horizontal axis when dragging the camera to look around." +
 			"\n" +
 			"\n$col[185,185,185]{I don't know why Loftar inverts it in the first place...}", UI.scale(280));
-	private Object unlockedOrthoCamTooltip = RichText.render("Enabling this allows you to rotate the Ortho camera freely, without locking it to only 4 view angles.", UI.scale(280));
-	private Object allowLowerFreeCamTiltTooltip = RichText.render("Enabling this will allow you to tilt the camera below the character (and under the ground), to look upwards." +
+	private final Object unlockedOrthoCamTooltip = RichText.render("Enabling this allows you to rotate the Ortho camera freely, without locking it to only 4 view angles.", UI.scale(280));
+	private final Object allowLowerFreeCamTiltTooltip = RichText.render("Enabling this will allow you to tilt the camera below the character (and under the ground), to look upwards." +
 			"\n" +
 			"\n$col[200,0,0]{WARNING: Be careful when using this setting, especially in combat! You're NOT able to click on the ground when looking at the world from below.}" +
 			"\n" +
 			"\n$col[185,185,185]{Honestly just enable this when you need to take a screenshot or something, and keep it disabled the rest of the time. I added this option for fun.}", UI.scale(300));
-	private Object freeCamHeightTooltip = RichText.render("This affects the height of the point at which the free camera is pointed. By default, it is pointed right above the player's head." +
+	private final Object freeCamHeightTooltip = RichText.render("This affects the height of the point at which the free camera is pointed. By default, it is pointed right above the player's head." +
 			"\n" +
 			"\n$col[185,185,185]{This doesn't really affect gameplay that much, if at all. With this setting, you can make the camera point at the feet, torso, head, slightly above you, or whatever's in between.}", UI.scale(300));
 
 	// Misc/Other
-	private Object resetButtonTooltip = RichText.render("Reset to default", UI.scale(300));
+	private final Object resetButtonTooltip = RichText.render("Reset to default", UI.scale(300));
 
 
 
