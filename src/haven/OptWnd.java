@@ -462,6 +462,7 @@ public class OptWnd extends Window {
 	public static CheckBox simplifiedUIThemeCheckBox;
 	public static CheckBox extendedMouseoverInfoCheckBox;
 	private static CheckBox showFramerateCheckBox;
+	public static CheckBox snapWindowsBackInsideCheckBox;
     public class InterfaceSettingsPanel extends Panel {
 	public InterfaceSettingsPanel(Panel back) {
 	    Widget leftColumn = add(new Label("Interface scale (requires restart)"), 0, 0);
@@ -496,6 +497,13 @@ public class OptWnd extends Window {
 			}
 		}, leftColumn.pos("bl").adds(0, 18));
 		showFramerateCheckBox.tooltip = showFramerateTooltip;
+		leftColumn = add(snapWindowsBackInsideCheckBox = new CheckBox("Snap windows back when dragged out"){
+			{a = (Utils.getprefb("snapWindowsBackInside", true));}
+			public void changed(boolean val) {
+				Utils.setprefb("snapWindowsBackInside", val);
+			}
+		}, leftColumn.pos("bl").adds(0, 2));
+		snapWindowsBackInsideCheckBox.tooltip = snapWindowsBackInsideTooltip;
 
 		Widget rightColumn;
 		rightColumn = add(simplifiedUIThemeCheckBox = new CheckBox("Simplified UI Theme"){
@@ -1091,6 +1099,11 @@ public class OptWnd extends Window {
 			"\n$col[185,185,185]{I really try my best to support this setting, but I can't guarantee everything will work." +
 			"\nUnless you're on a 4K or 8K display, I'd keep this at 1.00x.}", UI.scale(300));
 	private final Object showFramerateTooltip = RichText.render("Shows the current FPS in the top-right corner of the game window.", UI.scale(300));
+	private final Object snapWindowsBackInsideTooltip = RichText.render("Enabling this will cause most windows, that are not too large, to be fully snapped back into your game's window." +
+			"\nBy default, when you try to drag a window outside of your game window, it will only pop 25% of it back in." +
+			"\n" +
+			"\n$col[185,185,185]{Very large windows are not affected by this setting. Only the 25% rule applies to them." +
+			"\nThe map window is always fully snapped back.}", UI.scale(300));
 
 	// Display Settings Tooltips
 	private final Object granularityPositionTooltip = RichText.render("Equivalent of the :placegrid console command, this allows you to have more freedom when placing constructions/objects.", UI.scale(300));

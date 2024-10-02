@@ -466,6 +466,7 @@ public class Window extends Widget implements DTarget {
 	if(dm != null) {
 	    dm.remove();
 	    dm = null;
+		preventDraggingOutside();
 	} else {
 	    super.mouseup(c, button);
 	}
@@ -539,6 +540,7 @@ public class Window extends Widget implements DTarget {
 	if(anim != null) {
 	    if(anim.tick(dt)) {
 		if(animst == "show") {
+			preventDraggingOutside();
 		} else if(animst == "hide") {
 		    super.hide();
 		} else if(animst == "dest") {
@@ -708,4 +710,48 @@ public class Window extends Widget implements DTarget {
 		    g.getimage(img -> Debug.dumpimage(img, args[0]));
 	    });
     }
+
+	public void preventDraggingOutside() { // ND: This code is just straight up spaghetti, I know.
+		if (ui != null && ui.gui != null) {
+			if (this.csz().x > 800 || this.csz().y > 500 || !OptWnd.snapWindowsBackInsideCheckBox.a) {
+				if (this.large) {
+					if (this.deco == null) { // ND: This is for windows that don't have the outer decoration (like compact map window)
+						if (this.c.x < 0 - (int)(this.csz().x/1.333)) this.c.x = 0 - (int)(this.csz().x/1.333);
+						if (this.c.y < 0 - (int)(this.csz().y/1.333)) this.c.y = 0 - (int)(this.csz().y/1.333);
+						if (this.c.x > (ui.gui.sz.x - (int)(this.csz().x*0.25))) this.c.x = ui.gui.sz.x - (int)(this.csz().x*0.25);
+						if (this.c.y > (ui.gui.sz.y - (int)(this.csz().y*0.25))) this.c.y = ui.gui.sz.y - (int)(this.csz().y*0.25);
+					} else {
+						if (this.c.x < -dsmrgn.x - (int)(this.csz().x/1.333)) this.c.x = -dsmrgn.x - (int)(this.csz().x/1.333);
+						if (this.c.y < -dsmrgn.y - (int)(this.csz().y/1.333)) this.c.y = -dsmrgn.y - (int)(this.csz().y/1.333);
+						if (this.c.x > (ui.gui.sz.x - (int)(this.csz().x*0.25) - (dlmrgn.x+dsmrgn.x) * 2)) this.c.x = ui.gui.sz.x - (int)(this.csz().x*0.25) - (dlmrgn.x+dsmrgn.x) * 2 ;
+						if (this.c.y > (ui.gui.sz.y - (int)(this.csz().y*0.25) - (dlmrgn.y+dsmrgn.y) * 2) - dsmrgn.x) this.c.y = ui.gui.sz.y - (int)(this.csz().y*0.25) - (dlmrgn.y+dsmrgn.y) * 2 - dsmrgn.y;
+					}
+				} else {
+					if (this.c.x < -dsmrgn.x - (int)(this.csz().x/1.333)) this.c.x = -dsmrgn.x - (int)(this.csz().x/1.333);
+					if (this.c.y < -dsmrgn.y - (int)(this.csz().y/1.333)) this.c.y = -dsmrgn.y - (int)(this.csz().y/1.333);
+					if (this.c.x > (ui.gui.sz.x - (int)(this.csz().x*0.25) - dlmrgn.x * 2)) this.c.x = ui.gui.sz.x - (int)(this.csz().x*0.25) - dlmrgn.x * 2;
+					if (this.c.y > (ui.gui.sz.y - (int)(this.csz().y*0.25) - dlmrgn.y * 2 - brm.y)) this.c.y = ui.gui.sz.y - (int)(this.csz().y*0.25) - dlmrgn.y * 2 - brm.y;
+				}
+			} else {
+				if (this.large) {
+					if (this.deco == null) { // ND: This is for windows that don't have the outer decoration (like compact map window)
+						if (this.c.x < 0) this.c.x = 0;
+						if (this.c.y < 0) this.c.y = 0;
+						if (this.c.x > (ui.gui.sz.x - this.csz().x)) this.c.x = ui.gui.sz.x - this.csz().x;
+						if (this.c.y > (ui.gui.sz.y - this.csz().y)) this.c.y = ui.gui.sz.y - this.csz().y;
+					} else {
+						if (this.c.x < -dsmrgn.x) this.c.x = -dsmrgn.x;
+						if (this.c.y < -dsmrgn.y) this.c.y = -dsmrgn.y;
+						if (this.c.x > (ui.gui.sz.x - this.csz().x - (dlmrgn.x+dsmrgn.x) * 2)) this.c.x = ui.gui.sz.x - this.csz().x - (dlmrgn.x+dsmrgn.x) * 2 ;
+						if (this.c.y > (ui.gui.sz.y - this.csz().y - (dlmrgn.y+dsmrgn.y) * 2) - dsmrgn.x) this.c.y = ui.gui.sz.y - this.csz().y - (dlmrgn.y+dsmrgn.y) * 2 - dsmrgn.y;
+					}
+				} else {
+					if (this.c.x < -dsmrgn.x) this.c.x = -dsmrgn.x;
+					if (this.c.y < -dsmrgn.y) this.c.y = -dsmrgn.y;
+					if (this.c.x > (ui.gui.sz.x - this.csz().x - dlmrgn.x * 2)) this.c.x = ui.gui.sz.x - this.csz().x - dlmrgn.x * 2;
+					if (this.c.y > (ui.gui.sz.y - this.csz().y - dlmrgn.y * 2 - brm.y)) this.c.y = ui.gui.sz.y - this.csz().y - dlmrgn.y * 2 - brm.y;
+				}
+			}
+		}
+	}
 }
