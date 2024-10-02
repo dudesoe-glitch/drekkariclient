@@ -1560,6 +1560,11 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 	if(prog != null)
 	    prog.move(sz.sub(prog.sz).mul(0.5, 0.35));
 	beltwdg.c = new Coord(blpw + UI.scale(10), sz.y - beltwdg.sz.y - UI.scale(5));
+		if (OptWnd.dragWindowsInWhenResizingCheckBox.a) {
+			for (Window wnd : getAllWindows()) {
+				wnd.preventDraggingOutside();
+			}
+		}
     }
     
     public void presize() {
@@ -1803,4 +1808,15 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
     public Map<String, Console.Command> findcmds() {
 	return(cmdmap);
     }
+
+	public List<Window> getAllWindows() {
+		List<Window> windows = new ArrayList<Window>();
+		for (Widget wdg = lchild; wdg != null; wdg = wdg.prev) {
+			if (wdg instanceof Window && !(wdg instanceof MapWnd)) {
+				windows.add((Window) wdg);
+			}
+		}
+		return windows;
+	}
+
 }

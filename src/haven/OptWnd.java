@@ -463,6 +463,7 @@ public class OptWnd extends Window {
 	public static CheckBox extendedMouseoverInfoCheckBox;
 	private static CheckBox showFramerateCheckBox;
 	public static CheckBox snapWindowsBackInsideCheckBox;
+	public static CheckBox dragWindowsInWhenResizingCheckBox;
     public class InterfaceSettingsPanel extends Panel {
 	public InterfaceSettingsPanel(Panel back) {
 	    Widget leftColumn = add(new Label("Interface scale (requires restart)"), 0, 0);
@@ -504,6 +505,13 @@ public class OptWnd extends Window {
 			}
 		}, leftColumn.pos("bl").adds(0, 2));
 		snapWindowsBackInsideCheckBox.tooltip = snapWindowsBackInsideTooltip;
+		leftColumn = add(dragWindowsInWhenResizingCheckBox = new CheckBox("Drag windows in when resizing game"){
+			{a = (Utils.getprefb("dragWindowsInWhenResizing", false));}
+			public void changed(boolean val) {
+				Utils.setprefb("dragWindowsInWhenResizing", val);
+			}
+		}, leftColumn.pos("bl").adds(0, 2));
+		dragWindowsInWhenResizingCheckBox.tooltip = dragWindowsInWhenResizingTooltip;
 
 		Widget rightColumn;
 		rightColumn = add(simplifiedUIThemeCheckBox = new CheckBox("Simplified UI Theme"){
@@ -1104,6 +1112,9 @@ public class OptWnd extends Window {
 			"\n" +
 			"\n$col[185,185,185]{Very large windows are not affected by this setting. Only the 25% rule applies to them." +
 			"\nThe map window is always fully snapped back.}", UI.scale(300));
+	private final Object dragWindowsInWhenResizingTooltip = RichText.render("Enabling this will force ALL windows to be dragged back inside the game window, whenever you resize it." +
+			"\n" +
+			"\n$col[185,185,185]{Without this setting, windows remain in the same spot when you resize your game window, even if they end up outside of it. They will only come back if closed and reopened (for example, via keybinds)", UI.scale(300));
 
 	// Display Settings Tooltips
 	private final Object granularityPositionTooltip = RichText.render("Equivalent of the :placegrid console command, this allows you to have more freedom when placing constructions/objects.", UI.scale(300));
