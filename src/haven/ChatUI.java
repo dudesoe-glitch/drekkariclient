@@ -60,7 +60,7 @@ public class ChatUI extends Widget {
     private UI.Grab qgrab;
 
     public ChatUI() {
-	super(Coord.of(0, UI.scale(Math.max(minh, Utils.getprefi("chatsize", minh)))));
+	super(Utils.getprefc("chatsize", new Coord(UI.scale(410), 150)));
 	chansel = add(new Selector(new Coord(selw, sz.y - marg.y)), marg);
 	setfocusctl(true);
 	setcanfocus(true);
@@ -1284,7 +1284,7 @@ public class ChatUI extends Widget {
 			g.aimage(icon, Coord.of(x, my), 0.0, 0.5); x += icon.sz().x;
 			g.aimage(name, Coord.of(x, my), 0.0, 0.5);
 		    }
-		    g.image(chandiv, Coord.of(0, y + chanseld.sz().y));
+		    g.image(chandiv, Coord.of(UI.scale(6), y + chanseld.sz().y));
 		}
 	    }
 	}
@@ -1476,7 +1476,7 @@ public class ChatUI extends Widget {
     private static final Tex bhb = Resource.loadtex("gfx/hud/chat-hori");
     private static final Tex bvlb = Resource.loadtex("gfx/hud/chat-verti");
     private static final Tex bvrb = bvlb;
-    private static final Tex bmf = Resource.loadtex("gfx/hud/chat-mid");
+//    private static final Tex bmf = Resource.loadtex("gfx/hud/chat-mid");
     private static final Tex bcbd = Resource.loadtex("gfx/hud/chat-close-g");
     public void draw(GOut g) {
 	g.rimage(Window.bg, marg, sz.sub(marg.x * 2, marg.y));
@@ -1486,7 +1486,7 @@ public class ChatUI extends Widget {
 	g.rimagev(bvlb, new Coord(0, bulc.sz().y), sz.y - bulc.sz().y);
 	g.rimagev(bvrb, new Coord(sz.x - bvrb.sz().x, burc.sz().y), sz.y - burc.sz().y);
 	g.rimageh(bhb, new Coord(bulc.sz().x, 0), sz.x - bulc.sz().x - burc.sz().x);
-	g.aimage(bmf, new Coord(sz.x / 2, 0), 0.5, 0);
+//	g.aimage(bmf, new Coord(sz.x / 2, 0), 0.5, 0);
 	if((sel == null) || (sel.cb == null))
 	    g.aimage(bcbd, new Coord(sz.x, 0), 1, 0);
     }
@@ -1599,12 +1599,23 @@ public class ChatUI extends Widget {
 
     private UI.Grab dm = null;
     private Coord doff;
-    private static final int minh = 111;
+    private static final int minh = 96;
+	private String resizing = "none";
     public boolean mousedown(Coord c, int button) {
-	int bmfx = (sz.x - bmf.sz().x) / 2;
-	if((button == 1) && (c.y < bmf.sz().y) && (c.x >= bmfx) && (c.x <= (bmfx + bmf.sz().x))) {
+	if ((button == 1) && (c.x + UI.scale(4) > sz.x - bvlb.sz().x) && (c.y - UI.scale(4) < bhb.sz().y)) {
+		dm = ui.grabmouse(this);
+		doff = c;
+		resizing = "both";
+		return (true);
+	} else if ((button == 1) && (c.x + UI.scale(4) > sz.x - bvlb.sz().x)) {
+		dm = ui.grabmouse(this);
+		doff = c;
+		resizing = "horizontally";
+		return (true);
+	} else if ((button == 1) && (c.y - UI.scale(4) < bhb.sz().y)) {
 	    dm = ui.grabmouse(this);
 	    doff = c;
+		resizing = "vertically";
 	    return(true);
 	} else {
 	    return(super.mousedown(c, button));
@@ -1613,7 +1624,16 @@ public class ChatUI extends Widget {
 
     public void mousemove(Coord c) {
 	if(dm != null) {
-	    resize(sz.x, Math.max(UI.scale(minh), Math.min(parent.sz.y - UI.scale(100), sz.y + doff.y - c.y)));
+		if (resizing.equals("both")) {
+			resize(Math.max(UI.scale(410), Math.min(parent.sz.x - UI.scale(226), c.x + UI.scale(5))), Math.max(UI.scale(minh), Math.min(parent.sz.y - UI.scale(120), sz.y + UI.scale(5) - c.y)));
+		} else if (resizing.equals("horizontally")) {
+			resize(Math.max(UI.scale(410), Math.min(parent.sz.x - UI.scale(226), c.x + UI.scale(5))), sz.y);
+		} else if (resizing.equals("vertically")) {
+			resize(sz.x, Math.max(UI.scale(minh), Math.min(parent.sz.y - UI.scale(120), sz.y + UI.scale(5) - c.y)));
+		}
+		if (GameUI.questObjectivesPanel != null){ // ND: IF IT EXISTS.
+			GameUI.questObjectivesPanel.presize(); // ND: move the quest objectives panel as we resize the chat
+		}
 	} else {
 	    super.mousemove(c);
 	}
@@ -1623,7 +1643,8 @@ public class ChatUI extends Widget {
 	if(dm != null) {
 	    dm.remove();
 	    dm = null;
-	    Utils.setprefi("chatsize", UI.unscale(sz.y));
+		Utils.setprefc("chatsize", UI.unscale(sz));
+		resizing = "none";
 	    return(true);
 	} else {
 	    return(super.mouseup(c, button));

@@ -40,7 +40,7 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
     public final static Tex bg = Inventory.invsq;
     public final static Coord bgsz = Inventory.sqsz;
     public final static RichText.Foundry ttfnd = new RichText.Foundry(TextAttribute.FAMILY, "SansSerif", TextAttribute.SIZE, UI.scale(10f));
-    private static Coord gsz = new Coord(4, 4);
+    private static Coord gsz = new Coord(6, 4);
     public final Set<Pagina> paginae = new HashSet<Pagina>();
     public Pagina cur;
     private final Map<Object, Pagina> pmap = new CacheMap<>(CacheMap.RefType.WEAK);
@@ -299,7 +299,7 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 	    if(pos >= 0)
 		tt = tt.substring(0, pos) + "$b{$col[255,128,0]{" + tt.charAt(pos) + "}}" + tt.substring(pos + 1);
 	    else if(key != KeyMatch.nil)
-		tt += " [$b{$col[255,128,0]{" + key.name() + "}}]";
+		tt += " [$b{$col[255,128,0]{" + key.longname() + "}}]";
 	    BufferedImage ret = PUtils.strokeImg(PUtils.strokeImg(ttfnd.render(tt, UI.scale(300)).img));
 	    if(withpg) {
 		List<ItemInfo> info = info();
