@@ -465,6 +465,7 @@ public class OptWnd extends Window {
 	private static CheckBox showFramerateCheckBox;
 	public static CheckBox snapWindowsBackInsideCheckBox;
 	public static CheckBox dragWindowsInWhenResizingCheckBox;
+	public static CheckBox showHoverInventoriesWhenHoldingShiftCheckBox;
     public class InterfaceSettingsPanel extends Panel {
 	public InterfaceSettingsPanel(Panel back) {
 	    Widget leftColumn = add(new Label("Interface scale (requires restart)"), 0, 0);
@@ -513,6 +514,12 @@ public class OptWnd extends Window {
 			}
 		}, leftColumn.pos("bl").adds(0, 2));
 		dragWindowsInWhenResizingCheckBox.tooltip = dragWindowsInWhenResizingTooltip;
+		leftColumn = add(showHoverInventoriesWhenHoldingShiftCheckBox = new CheckBox("Show Hover-Inventories (Stacks, Belt, etc.) only when holding Shift"){
+			{a = (Utils.getprefb("showHoverInventoriesWhenHoldingShift", true));}
+			public void changed(boolean val) {
+				Utils.setprefb("showHoverInventoriesWhenHoldingShift", val);
+			}
+		}, leftColumn.pos("bl").adds(0, 12));
 
 		Widget rightColumn;
 		rightColumn = add(simplifiedUIThemeCheckBox = new CheckBox("Simplified UI Theme"){
