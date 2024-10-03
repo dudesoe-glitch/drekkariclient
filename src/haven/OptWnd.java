@@ -461,6 +461,7 @@ public class OptWnd extends Window {
 
 	public static CheckBox simplifiedUIThemeCheckBox;
 	public static CheckBox extendedMouseoverInfoCheckBox;
+	public static CheckBox disableMenuGridHotkeysCheckBox;
 	private static CheckBox showFramerateCheckBox;
 	public static CheckBox snapWindowsBackInsideCheckBox;
 	public static CheckBox dragWindowsInWhenResizingCheckBox;
@@ -542,6 +543,13 @@ public class OptWnd extends Window {
 			}
 		}, rightColumn.pos("bl").adds(0, 4));
 		extendedMouseoverInfoCheckBox.tooltip = extendedMouseoverInfoTooltip;
+		rightColumn = add(disableMenuGridHotkeysCheckBox = new CheckBox("Disable All Menu Grid Hotkeys"){
+			{a = (Utils.getprefb("disableMenuGridHotkeys", false));}
+			public void changed(boolean val) {
+				Utils.setprefb("disableMenuGridHotkeys", val);
+			}
+		}, rightColumn.pos("bl").adds(0, 15));
+		disableMenuGridHotkeysCheckBox.tooltip = disableMenuGridHotkeysTooltip;
 
 		Widget backButton;
 		add(backButton = new PButton(UI.scale(200), "Back", 27, back, "Advanced Settings"), leftColumn.pos("bl").adds(0, 30).x(0));
@@ -1111,6 +1119,9 @@ public class OptWnd extends Window {
 			"\nEnabling this option will add a lot of additional information on top of that." +
 			"\n" +
 			"\n$col[185,185,185]{Unless you're a client dev, you don't really need to enable this option, like ever.}", UI.scale(300));
+	private final Object disableMenuGridHotkeysTooltip = RichText.render("This completely disables the hotkeys for the action buttons & categories in the bottom right corner menu (aka the menu grid)." +
+			"\n" +
+			"\n$col[185,185,185]{Your action bar keybinds are NOT affected by this setting.}", UI.scale(300));
 	private final Object showFramerateTooltip = RichText.render("Shows the current FPS in the top-right corner of the game window.", UI.scale(300));
 	private final Object snapWindowsBackInsideTooltip = RichText.render("Enabling this will cause most windows, that are not too large, to be fully snapped back into your game's window." +
 			"\nBy default, when you try to drag a window outside of your game window, it will only pop 25% of it back in." +
