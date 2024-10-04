@@ -68,6 +68,7 @@ public class MiniMap extends Widget {
 	private Tex biometex;
 	private final Tex invalidMapWarningTex = Text.renderstroked("Warning: Map unstable, using workaround!", Color.RED, Color.BLACK).tex(); // ND: Idk if this bug still exists, but I'm adding this fix anyway
 	public static boolean showMapViewRange = Utils.getprefb("showMapViewRange", true);
+	public static boolean showMapGridLines = Utils.getprefb("showMapGridLines", false);
 	public static boolean highlightMapTiles = Utils.getprefb("highlightMapTiles", false);
 
     public MiniMap(Coord sz, MapFile file) {
@@ -729,6 +730,7 @@ public class MiniMap extends Widget {
 	drawmap(g);
 	drawmarkers(g);
 	if(showMapViewRange) {drawview(g);}
+	if(showMapGridLines && dlvl <= 6) {drawgridlines(g);}
 	if(dlvl <= 3)
 	    drawicons(g);
 	drawparty(g);
@@ -1081,6 +1083,48 @@ public class MiniMap extends Widget {
 			}
 			g.chcolor();
 		}
+	}
+
+	private static final Color gridColor = new Color(180, 0, 0);
+	void drawgridlines(GOut g) {
+		Coord2d zmaps = new Coord2d(cmaps).div(scalef());
+		Coord2d offset = new Coord2d(sz.div(2)).sub(new Coord2d(dloc.tc).div(scalef())).mod(zmaps);
+		double width = UI.scale(2f/zoomlevel);
+		double width2 = UI.scale((2f/zoomlevel) + 2f);
+		Color col = g.getcolor();
+		Coord gridlines = sz.div(zmaps);
+		Coord2d ulgrid = dgext.ul.mul(zmaps).mod(zmaps);
+		g.chcolor(Color.BLACK);
+		for (int x = -1; x < gridlines.x+1; x++) {
+			Coord up = new Coord2d((zmaps.x*x+ulgrid.x+offset.x), 0).floor();
+			Coord dn = new Coord2d((zmaps.x*x+ulgrid.x+offset.x), sz.y).floor();
+			if(up.x >= 0 && up.x <= sz.x) {
+				g.line(up, dn, width2);
+			}
+		}
+		for (int y = -1; y < gridlines.y+1; y++) {
+			Coord le = new Coord2d(0, (zmaps.y*y+ulgrid.y+offset.y)).floor();
+			Coord ri = new Coord2d(sz.x, (zmaps.y*y+ulgrid.y+offset.y)).floor();
+			if(le.y >= 0 && le.y <= sz.y) {
+				g.line(le, ri, width2);
+			}
+		}
+		g.chcolor(gridColor);
+		for (int x = -1; x < gridlines.x+1; x++) {
+			Coord up = new Coord2d((zmaps.x*x+ulgrid.x+offset.x), 0).floor();
+			Coord dn = new Coord2d((zmaps.x*x+ulgrid.x+offset.x), sz.y).floor();
+			if(up.x >= 0 && up.x <= sz.x) {
+				g.line(up, dn, width);
+			}
+		}
+		for (int y = -1; y < gridlines.y+1; y++) {
+			Coord le = new Coord2d(0, (zmaps.y*y+ulgrid.y+offset.y)).floor();
+			Coord ri = new Coord2d(sz.x, (zmaps.y*y+ulgrid.y+offset.y)).floor();
+			if(le.y >= 0 && le.y <= sz.y) {
+				g.line(le, ri, width);
+			}
+		}
+		g.chcolor(col);
 	}
 
 }

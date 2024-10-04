@@ -115,6 +115,19 @@ public class MapWnd extends Window implements Console.Directory {
 			}
 		})
 		.settip("Show Sight Range");
+	toolbarTop.add(new ICheckBox("gfx/hud/mmap/gridlines", "", "-d", "-h", "-dh") {
+		})
+		.state(() -> Utils.getprefb("showMapGridLines", false))
+		.click(() -> {
+			if (!MiniMap.showMapGridLines) {
+				MiniMap.showMapGridLines = true;
+				Utils.setprefb("showMapGridLines", true);
+			} else{
+				MiniMap.showMapGridLines = false;
+				Utils.setprefb("showMapGridLines", false);
+			}
+		})
+		.settip("Show Grid Lines");
 	toolbarTop.add(new ICheckBox("gfx/hud/mmap/maphighlight", "", "-d", "-h", "-dh"), UI.scale(new Coord(25, 0)))
 		.state(() -> MiniMap.highlightMapTiles)
 		.click(() -> {
