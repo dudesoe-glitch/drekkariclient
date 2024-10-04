@@ -196,7 +196,7 @@ public class LWJGLPanel extends AWTGLCanvas implements GLPanel, Console.Director
     }
 
     public void background(boolean bg) {
-	main.bgmode = bg;
+	Loop.bgmode = bg;
     }
 
     private Robot awtrobot;

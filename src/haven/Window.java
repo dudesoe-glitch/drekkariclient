@@ -294,7 +294,7 @@ public class Window extends Widget implements DTarget {
 	    super.draw(g);
 	}
 
-	private UI.Grab szdrag;
+	public UI.Grab szdrag;
 	private Coord szdragc;
 	public boolean mousedown(Coord c, int button) {
 	    if(dragsize) {

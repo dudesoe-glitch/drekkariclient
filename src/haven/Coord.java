@@ -148,6 +148,18 @@ public class Coord implements Comparable<Coord>, java.io.Serializable {
         return(of((int)Math.round(x / d), (int)Math.round(y / d)));
     }
 
+	public Coord div(Coord2d d) {
+		return(of(Utils.floordiv(x, d.x), Utils.floordiv(y, d.y)));
+	}
+
+	public Coord div(float d) {
+		return(div(new Coord2d(d, d)));
+	}
+
+	public Coord divUpFloor(float d) {
+		return(new Coord(Utils.floordiv(x, d)+1, Utils.floordiv(y, d)+1));
+	}
+
     public Coord mod(Coord d) {
 	return(of(Utils.floormod(x, d.x), Utils.floormod(y, d.y)));
     }

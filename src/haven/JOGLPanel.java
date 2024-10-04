@@ -257,7 +257,7 @@ public class JOGLPanel extends GLCanvas implements GLPanel, Console.Directory {
     }
 
     public void background(boolean bg) {
-	main.bgmode = bg;
+	Loop.bgmode = bg;
     }
 
     private Robot awtrobot;

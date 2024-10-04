@@ -52,12 +52,21 @@ public class MiniMap extends Widget {
     public List<DisplayIcon> icons = Collections.emptyList();
     protected Locator setloc;
     protected boolean follow;
-    protected int zoomlevel = 0;
+    protected float zoomlevel = 1;
+	public float smallMapZoomLevel = 1;
+	public float bigMapZoomLevel = 1;
+	public float zoomMomentum = 0;
+	private boolean allowZooming = false;
     protected DisplayGrid[] display;
     protected Area dgext, dtext;
     protected Segment dseg;
     protected int dlvl;
     protected Location dloc;
+	public boolean compact;
+	private static final Color BIOME_BG = new Color(0, 0, 0, 110);
+	private String biome;
+	private Tex biometex;
+	private final Tex invalidMapWarningTex = Text.renderstroked("Warning: Map unstable, using workaround!", Color.RED, Color.BLACK).tex(); // ND: Idk if this bug still exists, but I'm adding this fix anyway
 
     public MiniMap(Coord sz, MapFile file) {
 	super(sz);
@@ -212,6 +221,33 @@ public class MiniMap extends Widget {
 	    }
 	}
 	icons = findicons(icons);
+
+		if (GLPanel.Loop.bgmode) {
+			zoomMomentum = 0.0f;
+		} else if (Math.abs(zoomMomentum) > 0.15) {
+			double delta = dt*zoomMomentum*(zoomlevel/6f);
+			int nextdlvl = Math.max(Integer.highestOneBit((int)(zoomlevel+delta)),1);
+			if (zoomMomentum > 0 && nextdlvl > dlvl && !allowzoomout()) {
+				//zoomlevel = zoomlevel*0.98f; // ND: I wonder why matias did it like this, I don't think this is necessary
+				zoomMomentum = 0;
+			} else {
+				zoomlevel += delta;
+				zoomMomentum *= 1-(5*dt);
+			}
+		}
+
+		if (zoomlevel <= 0.1f) { // ND: I had to change this from 0. I don't remember it bugging out in matias' client, but I could zoom in infinitely in mine, like it never reached 0, ever. 0.1 seems perfect
+			zoomlevel = 0.1f;
+			zoomMomentum = 0;
+		}
+
+		Coord mc = rootxlate(ui.mc);
+		if(mc.isect(Coord.z, sz)) {
+			setBiome(xlate(mc));
+		} else {
+			setBiome(null);
+		}
+		allowZooming = true;
     }
 
     public void center(Locator loc) {
@@ -273,7 +309,7 @@ public class MiniMap extends Widget {
 	}
 
 	public void dispupdate() {
-	    if((this.rc == null) || (sessloc == null) || (dloc == null) || (dloc.seg != sessloc.seg))
+	    if((this.rc == null) || (sessloc == null) || (dloc == null) /*|| (dloc.seg != sessloc.seg)*/) // ND: Commented this for the bugged segment workaround.
 		this.sc = null;
 	    else
 		this.sc = p2c(this.rc);
@@ -487,25 +523,30 @@ public class MiniMap extends Widget {
     }
 
     private float scalef() {
-	return(UI.unscale((float)(1 << dlvl)));
+	return(UI.unscale((zoomlevel)));
     }
 
     public Coord st2c(Coord tc) {
-	return(UI.scale(tc.add(sessloc.tc).sub(dloc.tc).div(1 << dlvl)).add(sz.div(2)));
+	return(UI.scale(tc.add(sessloc.tc).sub(dloc.tc).div(zoomlevel)).add(sz.div(2)));
     }
 
     public Coord p2c(Coord2d pc) {
 	return(st2c(pc.floor(tilesz)));
     }
 
+	public int calcDrawLevel() {
+	return Math.max(Integer.highestOneBit((int)zoomlevel), 1);
+	}
+
     private void redisplay(Location loc) {
 	Coord hsz = sz.div(2);
-	Coord zmaps = cmaps.mul(1 << zoomlevel);
-	Area next = Area.sized(loc.tc.sub(hsz.mul(UI.unscale((float)(1 << zoomlevel)))).div(zmaps),
-	    UI.unscale(sz).div(cmaps).add(2, 2));
-	if((display == null) || (loc.seg != dseg) || (zoomlevel != dlvl) || !next.equals(dgext)) {
+	int safezoom = calcDrawLevel();
+	Coord zmaps = cmaps.mul(safezoom);
+	Area next = Area.sized(loc.tc.sub(hsz.mul(UI.unscale((safezoom)))).div(zmaps).sub(2, 2),
+	    UI.unscale(sz).div(cmaps).add(6, 6));
+	if((display == null) || (loc.seg != dseg) || (dlvl != calcDrawLevel()) || !next.equals(dgext)) {
 	    DisplayGrid[] nd = new DisplayGrid[next.rsz()];
-	    if((display != null) && (loc.seg == dseg) && (zoomlevel == dlvl)) {
+	    if((display != null) && (loc.seg == dseg) && (dlvl == calcDrawLevel())) {
 		for(Coord c : dgext) {
 		    if(next.contains(c))
 			nd[next.ri(c)] = display[dgext.ri(c)];
@@ -513,16 +554,21 @@ public class MiniMap extends Widget {
 	    }
 	    display = nd;
 	    dseg = loc.seg;
-	    dlvl = zoomlevel;
+	    dlvl = calcDrawLevel();
 	    dgext = next;
 	    dtext = Area.sized(next.ul.mul(zmaps), next.sz().mul(zmaps));
+		zoomMomentum = 0;
 	}
 	dloc = loc;
 	if(file.lock.readLock().tryLock()) {
 	    try {
+			// the level here specifies which sized saved maps we should load
+			// if you love bitwise operations like loftar you would probably not need to read that
+			// 31-NOLZ finds a dirty reverse power of 2, I.E turns 32 -> 5, 16 -> 4, 8 -> 3, 4 -> 2, 2 -> 1, 1 -> 0
+			int lvl = dlvl < 1f ? 0 : 31-Integer.numberOfLeadingZeros(dlvl);
 		for(Coord c : dgext) {
 		    if(display[dgext.ri(c)] == null)
-			display[dgext.ri(c)] = new DisplayGrid(dloc.seg, c, dlvl, dloc.seg.grid(dlvl, c.mul(1 << dlvl)));
+			display[dgext.ri(c)] = new DisplayGrid(dloc.seg, c, lvl, dloc.seg.grid(lvl, c.mul(dlvl)));
 		}
 	    } finally {
 		file.lock.readLock().unlock();
@@ -536,7 +582,7 @@ public class MiniMap extends Widget {
 	try {
 	    Tex img = disp.img();
 	    if(img != null)
-		g.image(img, ul, UI.scale(img.sz()));
+		g.image(img, ul, UI.scale(img.sz().mul(dlvl).divUpFloor(zoomlevel)));
 	} catch(Loading l) {
 	}
     }
@@ -544,7 +590,7 @@ public class MiniMap extends Widget {
     public void drawmap(GOut g) {
 	Coord hsz = sz.div(2);
 	for(Coord c : dgext) {
-	    Coord ul = UI.scale(c.mul(cmaps)).sub(dloc.tc.div(scalef())).add(hsz);
+	    Coord ul = UI.scale(c.mul(cmaps)).mul(dlvl).div(zoomlevel).sub(dloc.tc.div(scalef())).add(hsz);
 	    DisplayGrid disp = display[dgext.ri(c)];
 	    if(disp == null)
 		continue;
@@ -605,7 +651,7 @@ public class MiniMap extends Widget {
     }
 
     public void drawicons(GOut g) {
-	if((sessloc == null) || (dloc.seg != sessloc.seg))
+	if((sessloc == null) /*|| (dloc.seg != sessloc.seg)*/) // ND: Commented this for the bugged segment workaround.
 	    return;
 	for(DisplayIcon disp : icons) {
 	    if((disp.sc == null) || filter(disp))
@@ -648,9 +694,11 @@ public class MiniMap extends Widget {
     public void drawparts(GOut g){
 	drawmap(g);
 	drawmarkers(g);
-	if(dlvl == 0)
+	if(dlvl <= 3)
 	    drawicons(g);
 	drawparty(g);
+	drawbiome(g);
+	drawInvalidWarning(g);
     }
 
     public void draw(GOut g) {
@@ -867,11 +915,9 @@ public class MiniMap extends Widget {
     }
 
     public boolean mousewheel(Coord c, int amount) {
-	if(amount > 0) {
-	    if(allowzoomout())
-		zoomlevel = Math.min(zoomlevel + 1, dlvl + 1);
-	} else {
-	    zoomlevel = Math.max(zoomlevel - 1, 0);
+	if (allowZooming){
+		zoomMomentum += (float) (1.5*Math.signum(amount));
+		allowZooming = false;
 	}
 	return(true);
     }
@@ -903,4 +949,83 @@ public class MiniMap extends Widget {
 			  0, -1);
 	}
     }
+
+	void drawInvalidWarning(GOut g) {
+		if (dloc.seg != sessloc.seg){
+			if (invalidMapWarningTex != null) {
+				Coord tsz = invalidMapWarningTex.sz();
+				Coord mid = new Coord(g.sz().x / 2, UI.scale(16));
+				g.chcolor(BIOME_BG);
+				g.frect(mid.sub(2 + tsz.x /2, 0), tsz.add(4, 2));
+				g.chcolor();
+				g.aimage(invalidMapWarningTex, mid, 0.5f, 0);
+			}
+
+		}
+	}
+
+	void drawbiome(GOut g) {
+		if(biometex != null) {
+			Coord mid = new Coord(g.sz().x / 2, 0);
+			Coord tsz = biometex.sz();
+			g.chcolor(BIOME_BG);
+			g.frect(mid.sub(2 + tsz.x /2, 0), tsz.add(4, 2));
+			g.chcolor();
+			g.aimage(biometex, mid, 0.5f, 0);
+		}
+	}
+
+	private void setBiome(Location loc) {
+		try {
+			Resource res = null;
+			String newbiome = biome;
+			if(loc == null) {
+				Gob player = ui.gui.map.player();
+				MCache mCache = ui.sess.glob.map;
+				if (player != null) { // ND: Do this to avoid Nullpointer crash when switching maps? (Like going from character creation zone to valhalla or the real world)
+					int tile = mCache.gettile(player.rc.div(tilesz).floor());
+					res = mCache.tilesetr(tile);
+				}
+				if(res != null) {
+					newbiome = res.name;
+				}
+			} else {
+				MapFile map = loc.seg.file();
+				if(map.lock.readLock().tryLock()) {
+					try {
+						MapFile.Grid grid = loc.seg.grid(loc.tc.div(cmaps)).get();
+						if(grid != null) {
+							int tile = grid.gettile(loc.tc.mod(cmaps));
+							newbiome = grid.tilesets[tile].res.name;
+						}
+					} finally {
+						map.lock.readLock().unlock();
+					}
+				}
+			}
+			if(newbiome != null && !newbiome.equals(biome)) {
+				biome = newbiome;
+				biometex = Text.renderstroked(prettybiome(biome)).tex();
+			}
+		} catch (Loading ignored) {
+		}
+	}
+
+	private static final Map<String, String> improvedTileNames = new HashMap<String, String>(){{
+		put("Water", "Shallow Water");
+		put("Deep", "Deep Water");
+		put("Owater", "Shallow Ocean");
+		put("Odeep", "Deep Ocean");
+		put("Odeeper", "Very Deep Ocean");
+	}};
+	private static String prettybiome(String biome) {
+		int k = biome.lastIndexOf("/");
+		biome = biome.substring(k + 1);
+		biome = biome.substring(0, 1).toUpperCase() + biome.substring(1);
+		if(improvedTileNames.containsKey(biome)) {
+			return improvedTileNames.get(biome);
+		}
+		return biome;
+	}
+
 }

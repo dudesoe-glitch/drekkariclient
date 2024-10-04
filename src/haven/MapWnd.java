@@ -55,6 +55,7 @@ public class MapWnd extends Window implements Console.Directory {
     public MarkerConfig markcfg = MarkerConfig.showall, cmarkers = null;
     private final Locator player;
     private final Widget toolbar;
+	private final Widget toolbarTop;
     private final Frame viewf;
     private GroupSelector colsel;
     private Button mremove;
@@ -65,6 +66,11 @@ public class MapWnd extends Window implements Console.Directory {
     private boolean domark = false;
     private int olalpha = 64;
     private final Collection<Runnable> deferred = new LinkedList<>();
+	private Coord bigmapc = Utils.getprefc("bigmapc", new Coord(0,0));
+	private Coord smallmapc = Utils.getprefc("smallmapc", new Coord(0,150));
+	private Coord bigmapsz = Utils.getprefc("bigmapsz", new Coord(980,550));
+	private Coord smallmapsz = Utils.getprefc("smallmapsz", new Coord(300,300));
+	public boolean compact = true;
 
     private final static Predicate<Marker> pmarkers = (m -> m instanceof PMarker);
     private final static Predicate<Marker> smarkers = (m -> m instanceof SMarker);
@@ -75,7 +81,9 @@ public class MapWnd extends Window implements Console.Directory {
     public static final KeyBinding kb_mark = KeyBinding.get("mapwnd/mark", KeyMatch.nil);
     public static final KeyBinding kb_hmark = KeyBinding.get("mapwnd/hmark", KeyMatch.nil);
     public static final KeyBinding kb_compact = KeyBinding.get("mapwnd/compact", KeyMatch.forchar('W', KeyMatch.M));
-    public static final KeyBinding kb_prov = KeyBinding.get("mapwnd/prov", KeyMatch.nil);
+	public static final KeyBinding kb_claim = KeyBinding.get("mapwnd/pclaim", KeyMatch.forcode(KeyEvent.VK_F9, KeyMatch.M));
+	public static final KeyBinding kb_vil = KeyBinding.get("mapwnd/vclaim", KeyMatch.forcode(KeyEvent.VK_F10, KeyMatch.M));
+    public static final KeyBinding kb_prov = KeyBinding.get("mapwnd/prov", KeyMatch.forcode(KeyEvent.VK_F11, KeyMatch.M));
     public MapWnd(MapFile file, MapView mv, Coord sz, String title) {
 	super(sz, title, true);
 	this.file = file;
@@ -84,6 +92,18 @@ public class MapWnd extends Window implements Console.Directory {
 	viewf = add(new ViewFrame());
 	view = viewf.add(new View(file));
 	recenter();
+	toolbarTop = add(new Widget(Coord.z));
+	toolbarTop.add(new Img(Resource.loadtex("gfx/hud/mmap/topfgwdg")) {
+		public boolean mousedown(Coord c, int button) {
+			if((button == 1) && checkhit(c)) {
+				MapWnd.this.drag(parentpos(MapWnd.this, c));
+				return(true);
+			}
+			return(super.mousedown(c, button));
+		}
+	}, Coord.z);
+	toolbarTop.c = new Coord(UI.scale(2), UI.scale(2));
+	toolbarTop.pack();
 	toolbar = add(new Widget(Coord.z));
 	toolbar.add(new Img(Resource.loadtex("gfx/hud/mmap/fgwdg")) {
 		public boolean mousedown(Coord c, int button) {
@@ -95,7 +115,7 @@ public class MapWnd extends Window implements Console.Directory {
 		}
 	    }, Coord.z);
 	toolbar.add(new IButton("gfx/hud/mmap/home", "", "-d", "-h") {
-		{settip("Follow"); setgkey(kb_home);}
+		{settip("Recenter on self"); setgkey(kb_home);}
 		public void click() {
 		    recenter();
 		}
@@ -113,34 +133,80 @@ public class MapWnd extends Window implements Console.Directory {
 			markcfg = MarkerConfig.hideall;
 		})
 	    .settip("Hide markers").setgkey(kb_hmark);
+	if(Utils.getprefb("pclaim-claimMapState", false)) overlays.add("cplot");
+	toolbar.add(new ICheckBox("gfx/hud/mmap/pclaim", "", "-d", "-h", "-dh"))
+		.state(() -> visol("cplot"))
+		.click(() -> {
+			if (!visol("cplot")) {
+				toggleol("cplot", true);
+				Utils.setprefb("pclaim-claimMapState", true);
+			} else{
+				toggleol("cplot", false);
+				Utils.setprefb("pclaim-claimMapState", false);
+			}
+		})
+		.settip("Show Personal Claims on Map").setgkey(kb_claim);
+	if(Utils.getprefb("vclaim-claimMapState", false)) overlays.add("vlg");
+	toolbar.add(new ICheckBox("gfx/hud/mmap/vclaim", "", "-d", "-h", "-dh"))
+		.state(() -> visol("vlg"))
+		.click(() -> {
+			if (!visol("vlg")) {
+				toggleol("vlg", true);
+				Utils.setprefb("vclaim-claimMapState", true);
+			} else{
+				toggleol("vlg", false);
+				Utils.setprefb("vclaim-claimMapState", false);
+			}
+		})
+		.settip("Show Village Claims on Map").setgkey(kb_vil);
 	toolbar.add(new ICheckBox("gfx/hud/mmap/wnd", "", "-d", "-h", "-dh"))
 	    .state(this::compact).set(a -> {
+		    fixAndSavePos(!a);
 		    compact(a);
-		    Utils.setprefb("compact-map", a);
+		    if (view != null) {
+				view.compact = a;
+				if (a) {
+					view.bigMapZoomLevel = view.zoomlevel;
+					view.zoomlevel = view.smallMapZoomLevel;
+				} else {
+					view.smallMapZoomLevel = view.zoomlevel;
+					view.zoomlevel = view.bigMapZoomLevel;
+				}
+			}
 		})
 	    .settip("Compact mode").setgkey(kb_compact);
-	toolbar.add(new ICheckBox("gfx/hud/mmap/prov", "", "-d", "-h", "-dh") {
-		public boolean mousewheel(Coord c, int amount) {
-		    if(!checkhit(c) || !ui.modshift || !a)
-			return(super.mousewheel(c, amount));
-		    olalpha = Utils.clip(olalpha + (amount * -32), 32, 256);
-		    return(true);
-		}
-	    })
-	    .changed(a -> toggleol("realm", a))
-	    .settip("Display provinces").setgkey(kb_prov);
+	if(Utils.getprefb("prov-claimMapState", false)) overlays.add("realm");
+	toolbar.add(new ICheckBox("gfx/hud/mmap/prov", "", "-d", "-h", "-dh"))
+		.state(() -> visol("realm"))
+		.click(() -> {
+			if (!visol("realm")) {
+				toggleol("realm", true);
+				Utils.setprefb("prov-claimMapState", true);
+			} else{
+				toggleol("realm", false);
+				Utils.setprefb("prov-claimMapState", false);
+			}
+		})
+		.settip("Show Realm Provinces on Map").setgkey(kb_prov);
 	toolbar.pack();
 	tool = add(new Toolbox());
-	compact(Utils.getprefb("compact-map", false));
+	compact(true);
 	resize(sz);
     }
 
-    public void toggleol(String tag, boolean a) {
+	public void toggleol(String tag, boolean a) {
 	if(a)
 	    overlays.add(tag);
 	else
 	    overlays.remove(tag);
     }
+
+	private boolean visol(String tag) {
+		if(overlays != null) {
+			return overlays.contains(tag);
+		}
+		return false;
+	}
 
     private class ViewFrame extends Frame {
 	Coord sc = Coord.z;
@@ -181,14 +247,16 @@ public class MapWnd extends Window implements Console.Directory {
 	public void mousemove(Coord c) {
 	    if(drag != null) {
 		Coord nsz = parentpos(MapWnd.this, c).add(dragc);
-		nsz.x = Math.max(nsz.x, UI.scale(150));
-		nsz.y = Math.max(nsz.y, UI.scale(150));
+		nsz.x = Math.max(nsz.x, UI.scale(230));
+		nsz.y = Math.max(nsz.y, UI.scale(230));
 		MapWnd.this.resize(nsz);
 	    }
 	    super.mousemove(c);
 	}
 
 	public boolean mouseup(Coord c, int button) {
+		fixAndSavePos(compact);
+		compact(compact);
 	    if((button == 1) && (drag != null)) {
 		drag.remove();
 		drag = null;
@@ -278,7 +346,7 @@ public class MapWnd extends Window implements Console.Directory {
 		    Tex img = disp.olimg(tag);
 		    if(img != null) {
 			g.chcolor(255, 255, 255, olalpha);
-			g.image(img, ul, UI.scale(img.sz()));
+			g.image(img, ul, UI.scale(img.sz()).mul(dlvl).div(zoomlevel));
 		    }
 		} catch(Loading l) {
 		}
@@ -670,15 +738,15 @@ public class MapWnd extends Window implements Console.Directory {
     }
 
     public void resize(Coord sz) {
-	sz = sz.max(compact() ? UI.scale(150, 150) : UI.scale(350, 240));
+	sz = sz.max(compact() ? UI.scale(230, 230) : UI.scale(440, 230));
 	super.resize(sz);
 	tool.resize(sz.y);
 	if(!compact()) {
 	    tool.c = new Coord(sz.x - tool.sz.x, 0);
-	    viewf.resize(tool.pos("bl").subs(10, 0));
+	    viewf.resize(tool.pos("bl").subs(22, 0));
 	} else {
 	    viewf.resize(sz);
-	    tool.c = viewf.pos("ur").adds(10, 0);
+	    tool.c = viewf.pos("ur").adds(22, 0);
 	}
 	view.resize(viewf.inner());
 	toolbar.c = viewf.c.add(0, viewf.sz.y - toolbar.sz.y).add(UI.scale(2), UI.scale(-2));
@@ -695,8 +763,49 @@ public class MapWnd extends Window implements Console.Directory {
 	else
 	    newfocusable(tool);
 	chdeco(a ? null : makedeco());
+	if (a) {
+		this.c = smallmapc;
+		resize(smallmapsz);
+	} else {
+		this.c = bigmapc;
+		resize(bigmapsz);
+	}
 	pack();
+	this.compact = a;
+	if (view != null) view.compact = a;
+	if (ui != null && ui.gui != null)
+		fixAndSavePos(a); // ND: Do this again to fix the window size when we resize the game window after switching the compact mode and we go back to the other mode. It's for my OCD, ok?
     }
+
+	public void fixAndSavePos(boolean compact) { // ND: Just like preventDraggingOutside() in Window.java, it's spaghetti, but it works on all interface scales guaranteed.
+		if (compact) {
+			// ND: This prevents us from resizing it larger than the game window size
+			if(this.csz().x > ui.gui.sz.x) this.resize(ui.gui.sz.x, this.csz().y);
+			if(this.csz().y > ui.gui.sz.y) this.resize(this.csz().x, ui.gui.sz.y);
+			// ND: This prevents us from dragging it outside at all
+			if (this.c.x < 0) this.c.x = 0;
+			if (this.c.y < 0) this.c.y = 0;
+			if (this.c.x > (ui.gui.sz.x - this.csz().x)) this.c.x = ui.gui.sz.x - this.csz().x;
+			if (this.c.y > (ui.gui.sz.y - this.csz().y)) this.c.y = ui.gui.sz.y - this.csz().y;
+			smallmapc = this.c;
+			smallmapsz = this.csz();
+			Utils.setprefc("smallmapc", smallmapc);
+			Utils.setprefc("smallmapsz", smallmapsz);
+		} else {
+			// ND: This prevents us from resizing it larger than the game window size
+			if(this.csz().x > ui.gui.sz.x - dlmrgn.x * 2 - dsmrgn.x) this.resize(ui.gui.sz.x - dlmrgn.x * 2 - dsmrgn.x, this.csz().y);
+			if(this.csz().y > ui.gui.sz.y - (dlmrgn.y + dsmrgn.y) * 2) this.resize(this.csz().x, ui.gui.sz.y - (dlmrgn.y+dsmrgn.y) * 2);
+			// ND: This prevents us from dragging it outside at all
+			if (this.c.x < -dsmrgn.x) this.c.x = -dsmrgn.x;
+			if (this.c.y < -dsmrgn.y) this.c.y = -dsmrgn.y;
+			if (this.c.x > (ui.gui.sz.x - this.csz().x - (dlmrgn.x + dsmrgn.x) * 2)) this.c.x = ui.gui.sz.x - this.csz().x - (dlmrgn.x + dsmrgn.x) * 2;
+			if (this.c.y > (ui.gui.sz.y - this.csz().y - (dlmrgn.y + dsmrgn.y) * 2) - dsmrgn.x) this.c.y = ui.gui.sz.y - this.csz().y - (dlmrgn.y + dsmrgn.y) * 2 - dsmrgn.y;
+			bigmapc = this.c;
+			bigmapsz = this.csz();
+			Utils.setprefc("bigmapc", bigmapc);
+			Utils.setprefc("bigmapsz", bigmapsz);
+		}
+	}
 
     public void recenter() {
 	view.follow(player);
@@ -713,8 +822,26 @@ public class MapWnd extends Window implements Console.Directory {
     }
 
     protected Deco makedeco() {
-	return(new DefaultDeco(true).dragsize(true));
+	return(new DefaultDeco(true){
+		@Override
+		public boolean mouseup(Coord c, int button) {
+			fixAndSavePos(compact);
+			compact(compact);
+			if((button == 1) && (szdrag != null)) {
+				szdrag.remove();
+				szdrag = null;
+				return(true);
+			}
+			return(super.mouseup(c, button));
+		}
+	}.dragsize(true));
     }
+
+	public boolean mouseup(Coord c, int button) {
+		fixAndSavePos(compact);
+		compact(compact);
+		return(super.mouseup(c, button));
+	}
 
     public void markobj(long gobid, long oid, Indir<Resource> resid, String nm) {
 	synchronized(deferred) {
@@ -950,4 +1077,14 @@ public class MapWnd extends Window implements Console.Directory {
     public Map<String, Console.Command> findcmds() {
 	return(cmdmap);
     }
+
+	@Override
+	public boolean keydown(java.awt.event.KeyEvent ev) { // ND: do this to override the escape key being able to close the window
+		if(key_esc.match(ev)) {
+			return(false);
+		}
+		if(super.keydown(ev))
+			return(true);
+		return(false);
+	}
 }
