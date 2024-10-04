@@ -102,6 +102,19 @@ public class MapWnd extends Window implements Console.Directory {
 			return(super.mousedown(c, button));
 		}
 	}, Coord.z);
+	toolbarTop.add(new ICheckBox("gfx/hud/mmap/viewrange", "", "-d", "-h", "-dh") {
+		})
+		.state(() -> Utils.getprefb("showMapViewRange", true))
+		.click(() -> {
+			if (!MiniMap.showMapViewRange) {
+				MiniMap.showMapViewRange = true;
+				Utils.setprefb("showMapViewRange", true);
+			} else{
+				MiniMap.showMapViewRange = false;
+				Utils.setprefb("showMapViewRange", false);
+			}
+		})
+		.settip("Show Sight Range");
 	toolbarTop.add(new ICheckBox("gfx/hud/mmap/maphighlight", "", "-d", "-h", "-dh"), UI.scale(new Coord(25, 0)))
 		.state(() -> MiniMap.highlightMapTiles)
 		.click(() -> {

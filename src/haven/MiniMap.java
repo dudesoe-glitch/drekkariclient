@@ -67,6 +67,7 @@ public class MiniMap extends Widget {
 	private String biome;
 	private Tex biometex;
 	private final Tex invalidMapWarningTex = Text.renderstroked("Warning: Map unstable, using workaround!", Color.RED, Color.BLACK).tex(); // ND: Idk if this bug still exists, but I'm adding this fix anyway
+	public static boolean showMapViewRange = Utils.getprefb("showMapViewRange", true);
 	public static boolean highlightMapTiles = Utils.getprefb("highlightMapTiles", false);
 
     public MiniMap(Coord sz, MapFile file) {
@@ -727,6 +728,7 @@ public class MiniMap extends Widget {
     public void drawparts(GOut g){
 	drawmap(g);
 	drawmarkers(g);
+	if(showMapViewRange) {drawview(g);}
 	if(dlvl <= 3)
 	    drawicons(g);
 	drawparty(g);
@@ -1059,6 +1061,26 @@ public class MiniMap extends Widget {
 			return improvedTileNames.get(biome);
 		}
 		return biome;
+	}
+
+	public static final Coord sgridsz = new Coord(100, 100);
+	public static final Coord VIEW_SZ = UI.scale(sgridsz.mul(9).div(tilesz.floor()));// view radius is 9x9 "server" grids
+	public static final Color VIEW_BG_COLOR = new Color(255, 255, 255, 60);
+	public static final Color VIEW_BORDER_COLOR = new Color(0, 0, 0, 128);
+	void drawview(GOut g) {
+		Coord2d sgridsz = new Coord2d(MiniMap.sgridsz);
+		Gob player = ui.gui.map.player();
+		if(player != null) {
+			Coord rc = p2c(player.rc.floor(sgridsz).sub(4, 4).mul(sgridsz));
+			Coord viewsz = VIEW_SZ.div(zoomlevel);
+			g.chcolor(VIEW_BG_COLOR);
+			g.frect(rc, viewsz);
+			if (zoomlevel >= 0.4 && follow) {
+				g.chcolor(VIEW_BORDER_COLOR);
+				g.rect(rc, viewsz);
+			}
+			g.chcolor();
+		}
 	}
 
 }
