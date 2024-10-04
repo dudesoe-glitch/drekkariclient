@@ -132,4 +132,14 @@ public class Scrollbar extends Widget {
     public void move(Coord c) {
 	this.c = c.add(-sflarp.sz().x, 0);
     }
+
+	public void min(int min) {
+		this.min = min;
+		ch(0);
+	}
+
+	public void max(int max) {
+		this.max = max;
+		ch(0);
+	}
 }

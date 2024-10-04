@@ -102,6 +102,17 @@ public class MapWnd extends Window implements Console.Directory {
 			return(super.mousedown(c, button));
 		}
 	}, Coord.z);
+	toolbarTop.add(new ICheckBox("gfx/hud/mmap/maphighlight", "", "-d", "-h", "-dh"), UI.scale(new Coord(25, 0)))
+		.state(() -> MiniMap.highlightMapTiles)
+		.click(() -> {
+			Utils.setprefb("highlightMapTiles", !MiniMap.highlightMapTiles);
+			toggleol(TileHighlight.TAG, !MiniMap.highlightMapTiles);
+			MiniMap.highlightMapTiles = !MiniMap.highlightMapTiles;
+		})
+		.rclick(() -> {
+			TileHighlight.toggle(ui.gui);
+		})
+		.settip("Highlight Map Tiles\n\nLeft-click to toggle Tile Highlighting\nRight-click to open Highlight Settings", true);
 	toolbarTop.c = new Coord(UI.scale(2), UI.scale(2));
 	toolbarTop.pack();
 	toolbar = add(new Widget(Coord.z));
@@ -335,6 +346,7 @@ public class MapWnd extends Window implements Console.Directory {
     }
 
     private class View extends MiniMap {
+		private double highlighterDynamicAlpha = 0;
 	View(MapFile file) {
 	    super(file);
 	}
@@ -343,9 +355,16 @@ public class MapWnd extends Window implements Console.Directory {
 	    super.drawgrid(g, ul, disp);
 	    for(String tag : overlays) {
 		try {
-		    Tex img = disp.olimg(tag);
+			int alpha = 96;
+		    Tex img;
+			if(TileHighlight.TAG.equals(tag)) {
+				alpha = (int) (100 + 155 * highlighterDynamicAlpha);
+				img = disp.tileimg();
+			} else {
+				img = disp.olimg(tag);
+			}
 		    if(img != null) {
-			g.chcolor(255, 255, 255, olalpha);
+			g.chcolor(255, 255, 255, alpha);
 			g.image(img, ul, UI.scale(img.sz()).mul(dlvl).div(zoomlevel));
 		    }
 		} catch(Loading l) {
@@ -416,6 +435,13 @@ public class MapWnd extends Window implements Console.Directory {
 		return(markcurs);
 	    return(super.getcurs(c));
 	}
+
+		@Override
+		public void tick(double dt) {
+			super.tick(dt);
+			highlighterDynamicAlpha = Math.sin(Math.PI * ((System.currentTimeMillis() % 1000) / 1000.0));
+		}
+
     }
 
     public void tick(double dt) {

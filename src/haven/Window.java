@@ -84,7 +84,7 @@ public class Window extends Widget implements DTarget {
     public TexRaw gbuf = null;
     private FragColor gout;
     private Pipe.Op gbasic;
-    private UI.Grab dm = null;
+    public UI.Grab dm = null;
     private Coord doff;
     public boolean decohide = false;
     public boolean large = false;

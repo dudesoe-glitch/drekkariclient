@@ -70,6 +70,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
     public final Map<Integer, String> polowners = new HashMap<Integer, String>();
     public Bufflist buffs;
 	public static AlignPanel questObjectivesPanel = null;
+	public TileHighlight.TileHighlightCFG tileHighlight;
 
     public static abstract class BeltSlot {
 	public final int idx;
@@ -311,6 +312,8 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 
     protected void attached() {
 	iconconf = loadiconconf();
+	TileHighlight.toggle(this);
+	tileHighlight.hide();
 	super.attached();
     }
 
