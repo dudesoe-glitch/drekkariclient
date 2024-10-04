@@ -27,12 +27,10 @@
 package haven;
 
 import java.util.*;
-import java.util.function.*;
 import java.awt.Color;
 import java.awt.event.KeyEvent;
 import java.awt.image.WritableRaster;
 import haven.render.Location;
-import static haven.Inventory.invsq;
 
 public class GameUI extends ConsoleHost implements Console.Directory, UI.MessageWidget {
     private static final int blpw = UI.scale(0), brpw = UI.scale(142);
@@ -71,6 +69,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
     public Bufflist buffs;
 	public static AlignPanel questObjectivesPanel = null;
 	public TileHighlight.TileHighlightCFG tileHighlight;
+	public QuickSlotsWdg quickslots;
 
     public static abstract class BeltSlot {
 	public final int idx;
@@ -308,6 +307,20 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 	opts.hide();
 	zerg = add(new Zergwnd(), Utils.getprefc("wndc-zerg", UI.scale(new Coord(187, 50))));
 	zerg.hide();
+	quickslots = add(new QuickSlotsWdg(){
+		@Override
+		public void draw(GOut g) {
+			super.draw(g);
+		}
+
+		@Override
+		public boolean mousedown(Coord c, int button) {
+			return super.mousedown(c, button);
+		}
+	}, Utils.getprefc("wndc-quickslots", UI.scale(new Coord(426, 10))));
+	if (!Utils.getprefb("showQuickSlotsBar", true)) {
+		quickslots.hide();
+	}
     }
 
     protected void attached() {
@@ -827,6 +840,8 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 	    Utils.setprefc("wndc-zerg", zerg.c);
 	if(mapfile != null) {
 		mapfile.fixAndSavePos(mapfile.compact);
+	if(quickslots != null)
+		Utils.setprefc("wndc-quickslots", quickslots.c);
 	}
     }
 
@@ -1526,6 +1541,8 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
     public static final KeyBinding kb_hide = KeyBinding.get("ui-toggle", KeyMatch.nil);
     public static final KeyBinding kb_logout = KeyBinding.get("logout", KeyMatch.nil);
     public static final KeyBinding kb_switchchr = KeyBinding.get("logout-cs", KeyMatch.nil);
+	public static KeyBinding kb_rightQuickSlotButton  = KeyBinding.get("rightQuickSlotButtonKB",  KeyMatch.forchar('X', KeyMatch.M));
+	public static KeyBinding kb_leftQuickSlotButton  = KeyBinding.get("leftQuickSlotButtonKB",  KeyMatch.forchar('Z', KeyMatch.M));
     public boolean globtype(char key, KeyEvent ev) {
 	if(key == ':') {
 	    entercmd();
@@ -1556,6 +1573,14 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 //	    }
 //	    Utils.setprefb("chatvis", chat.targetshow);
 	    return(true);
+	} else if(kb_rightQuickSlotButton.key().match(ev)) {
+		quickslots.drop(QuickSlotsWdg.righthandslotc, Coord.z);
+		quickslots.simulateclick(QuickSlotsWdg.righthandslotc);
+		return(true);
+	} else if(kb_leftQuickSlotButton.key().match(ev)) {
+		quickslots.drop(QuickSlotsWdg.lefthandslotc, Coord.z);
+		quickslots.simulateclick(QuickSlotsWdg.lefthandslotc);
+		return(true);
 	} else if((key == 27) && (map != null) && !map.hasfocus) {
 	    setfocus(map);
 	    return(true);
@@ -1863,6 +1888,16 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 			}
 		}
 		return windows;
+	}
+
+	public Equipory getequipory() {
+		if (equwnd != null) {
+			for (Widget w = equwnd.lchild; w != null; w = w.prev) {
+				if (w instanceof Equipory)
+					return (Equipory) w;
+			}
+		}
+		return null;
 	}
 
 	private  void toggleol(String tag, boolean a) {

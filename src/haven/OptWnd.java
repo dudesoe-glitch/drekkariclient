@@ -466,6 +466,7 @@ public class OptWnd extends Window {
 	public static CheckBox snapWindowsBackInsideCheckBox;
 	public static CheckBox dragWindowsInWhenResizingCheckBox;
 	public static CheckBox showHoverInventoriesWhenHoldingShiftCheckBox;
+	private CheckBox showQuickSlotsCheckBox;
     public class InterfaceSettingsPanel extends Panel {
 	public InterfaceSettingsPanel(Panel back) {
 	    Widget leftColumn = add(new Label("Interface scale (requires restart)"), 0, 0);
@@ -520,7 +521,16 @@ public class OptWnd extends Window {
 				Utils.setprefb("showHoverInventoriesWhenHoldingShift", val);
 			}
 		}, leftColumn.pos("bl").adds(0, 12));
-
+		leftColumn = add(showQuickSlotsCheckBox = new CheckBox("Enable Quick Slots Widget"){
+			{a = (Utils.getprefb("showQuickSlotsBar", true));}
+			public void changed(boolean val) {
+				Utils.setprefb("showQuickSlotsBar", val);
+				if (ui != null && ui.gui != null && ui.gui.quickslots != null){
+					ui.gui.quickslots.show(val);
+				}
+			}
+		}, leftColumn.pos("bl").adds(0, 2));
+		showQuickSlotsCheckBox.tooltip = showQuickSlotsTooltip;
 		Widget rightColumn;
 		rightColumn = add(simplifiedUIThemeCheckBox = new CheckBox("Simplified UI Theme"){
 			{a = (Utils.getprefb("simplifiedUITheme", false));}
@@ -710,6 +720,8 @@ public class OptWnd extends Window {
 	    y = addbtn(cont, "Switch targets", Fightsess.kb_relcycle, y);
 
 		y = cont.adda(new Label("Other Custom features"), cont.sz.x / 2, y + UI.scale(10), 0.5, 0.0).pos("bl").adds(0, 5).y;
+		y = addbtn(cont, "Left Hand (Quick-Switch)", GameUI.kb_leftQuickSlotButton, y+6);
+		y = addbtn(cont, "Right Hand (Quick-Switch)", GameUI.kb_rightQuickSlotButton, y);
 
 
 	    prev = adda(new PointBind(UI.scale(200)), scroll.pos("bl").adds(0, 10).x(scroll.sz.x / 2), 0.5, 0.0);
@@ -1138,6 +1150,10 @@ public class OptWnd extends Window {
 	private final Object dragWindowsInWhenResizingTooltip = RichText.render("Enabling this will force ALL windows to be dragged back inside the game window, whenever you resize it." +
 			"\n" +
 			"\n$col[185,185,185]{Without this setting, windows remain in the same spot when you resize your game window, even if they end up outside of it. They will only come back if closed and reopened (for example, via keybinds)", UI.scale(300));
+	private final Object showQuickSlotsTooltip = RichText.render("Just a small interactable widget that shows your hands, belt, backpack and cape slots, so you don't have to open your equipment window." +
+			"\nTo drag this widget to a new position: hold down Shift, click and drag." +
+			"\n" +
+			"\n$col[185,185,185]{Your quick-switch keybinds ('Right Hand' and 'Left Hand') are NOT affected by this setting.}", UI.scale(300));
 
 	// Display Settings Tooltips
 	private final Object granularityPositionTooltip = RichText.render("Equivalent of the :placegrid console command, this allows you to have more freedom when placing constructions/objects.", UI.scale(300));
