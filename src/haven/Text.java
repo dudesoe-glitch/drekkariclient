@@ -45,9 +45,13 @@ public class Text implements Disposable {
     private Tex tex;
     public static final Color black = Color.BLACK;
     public static final Color white = Color.WHITE;
+	public static final Font latin;
+	public static final Foundry num12boldFnd;
 	
     static {
 	std = new Foundry(sans, 10);
+	latin = new Font("Dialog", Font.PLAIN, 10);
+	num12boldFnd = new Text.Foundry(latin.deriveFont(Font.BOLD), 12).aa(true);
     }
 	
     public static class Line extends Text {
