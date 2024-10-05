@@ -1172,4 +1172,10 @@ public class MCache implements MapSource {
 	    }
 	}
     }
+
+	public void invalidateAll() {
+		Collection<Grid> copy = new ArrayList<>(grids.values());
+		for (Grid gr : copy)
+			gr.invalidate();
+	}
 }
