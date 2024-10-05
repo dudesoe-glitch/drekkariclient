@@ -38,6 +38,10 @@ public class GaussianPlant implements Sprite.Factory {
 	Random rnd = owner.mkrandoom();
 	CSprite spr = new CSprite(owner, res);
 	int num = rnd.nextInt(numh - numl + 1) + numl;
+	if (OptWnd.simplifiedForageablesCheckBox.a){
+		spr.addpart(0, 0, Pipe.Op.nil, var.get(0).iterator().next().apply(owner));
+	}
+	else
 	for(int i = 0; i < num; i++) {
 	    float x = (float)rnd.nextGaussian() * r, y = (float)rnd.nextGaussian() * r;
 	    for(Function<Owner, RenderTree.Node> mk : var.get(rnd.nextInt(var.size())))

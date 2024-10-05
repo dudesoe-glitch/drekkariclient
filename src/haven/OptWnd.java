@@ -959,6 +959,7 @@ public class OptWnd extends Window {
 	private Button nightVisionResetButton;
 	public static CheckBox disableWeatherAndEffectsCheckBox;
 	public static CheckBox simplifiedCropsCheckBox;
+	public static CheckBox simplifiedForageablesCheckBox;
 
 	public class WorldGraphicsSettingsPanel extends Panel {
 
@@ -1004,6 +1005,12 @@ public class OptWnd extends Window {
 				{a = Utils.getprefb("simplifiedCrops", false);}
 				public void changed(boolean val) {
 					Utils.setprefb("simplifiedCrops", val);
+				}
+			}, prev.pos("bl").adds(0, 2));
+			prev = add(simplifiedForageablesCheckBox = new CheckBox("Simplified Forageables (Requires Reload)"){
+				{a = Utils.getprefb("simplifiedForageables", false);}
+				public void changed(boolean val) {
+					Utils.setprefb("simplifiedForageables", val);
 				}
 			}, prev.pos("bl").adds(0, 2));
 
