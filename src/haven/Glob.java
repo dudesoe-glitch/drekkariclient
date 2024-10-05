@@ -235,6 +235,7 @@ public class Glob {
 			lightang = tlightang;
 			lightelev = tlightelev;
 			lchange = -1;
+			brighten();
 		    }
 		}
 	    } else if(t == "sky") {
@@ -352,4 +353,23 @@ public class Glob {
 
 	public String toString() {return(String.format("#<globinfo @%fs>", globtime));}
     }
+
+	// ND: This is used for the Night Mode slider
+	private final Object brightsync = new Object();
+	public Color blightamb = null, blightdif = null, blightspc = null;
+	public static double nightVisionBrightness = Utils.getprefd("nightVisionSetting", 0.0);
+	public void brighten(){
+		synchronized(brightsync) {
+			double bright = nightVisionBrightness;
+			if(lightamb != null) {
+				blightamb = Utils.blendcol(lightamb, Color.WHITE, bright);
+			}
+			if(lightdif != null) {
+				blightdif = Utils.blendcol(lightdif, Color.WHITE, bright);
+			}
+			if(lightspc != null) {
+				blightspc = Utils.blendcol(lightspc, Color.WHITE, bright);
+			}
+		}
+	}
 }

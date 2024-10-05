@@ -1543,6 +1543,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
     public static final KeyBinding kb_switchchr = KeyBinding.get("logout-cs", KeyMatch.nil);
 	public static KeyBinding kb_rightQuickSlotButton  = KeyBinding.get("rightQuickSlotButtonKB",  KeyMatch.forchar('X', KeyMatch.M));
 	public static KeyBinding kb_leftQuickSlotButton  = KeyBinding.get("leftQuickSlotButtonKB",  KeyMatch.forchar('Z', KeyMatch.M));
+	public static KeyBinding kb_nightVision  = KeyBinding.get("nightVisionKB",  KeyMatch.forchar('N', KeyMatch.C));
     public boolean globtype(char key, KeyEvent ev) {
 	if(key == ':') {
 	    entercmd();
@@ -1581,6 +1582,15 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 		quickslots.drop(QuickSlotsWdg.lefthandslotc, Coord.z);
 		quickslots.simulateclick(QuickSlotsWdg.lefthandslotc);
 		return(true);
+	} else if (kb_nightVision.key().match(ev)) {
+		if (OptWnd.nightVisionSlider.max - OptWnd.nightVisionSlider.val >= OptWnd.nightVisionSlider.val - OptWnd.nightVisionSlider.min) {
+			OptWnd.nightVisionSlider.val = OptWnd.nightVisionSlider.max;
+			OptWnd.nightVisionSlider.changed();
+		} else {
+			OptWnd.nightVisionSlider.val = OptWnd.nightVisionSlider.min;
+			OptWnd.nightVisionSlider.changed();
+		}
+		return (true);
 	} else if((key == 27) && (map != null) && !map.hasfocus) {
 	    setfocus(map);
 	    return(true);

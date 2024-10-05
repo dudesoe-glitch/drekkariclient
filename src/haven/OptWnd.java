@@ -737,9 +737,12 @@ public class OptWnd extends Window {
 		y = cont.adda(new Label("Other Custom features"), cont.sz.x / 2, y + UI.scale(10), 0.5, 0.0).pos("bl").adds(0, 5).y;
 		y = addbtn(cont, "Left Hand (Quick-Switch)", GameUI.kb_leftQuickSlotButton, y+6);
 		y = addbtn(cont, "Right Hand (Quick-Switch)", GameUI.kb_rightQuickSlotButton, y);
+		y = addbtnImproved(cont, "Night Vision / Brighter World", "This will simulate daytime lighting during the night. \n$col[185,185,185]{It slightly affects the light levels during the day too.}" +
+				"\n\n$col[218,163,0]{Note:} $col[185,185,185]{This keybind just switches the value of Night Vision / Brighter World between minimum and maximum. This can also be set more precisely using the slider in the World Graphics Settings.}", Color.WHITE, GameUI.kb_nightVision, y);
 
 
-	    prev = adda(new PointBind(UI.scale(200)), scroll.pos("bl").adds(0, 10).x(scroll.sz.x / 2), 0.5, 0.0);
+
+		prev = adda(new PointBind(UI.scale(200)), scroll.pos("bl").adds(0, 10).x(scroll.sz.x / 2), 0.5, 0.0);
 	    prev = adda(new PButton(UI.scale(200), "Back", 27, back, "Options            "), prev.pos("bl").adds(0, 10).x(scroll.sz.x / 2), 0.5, 0.0);
 	    pack();
 	}
@@ -951,6 +954,50 @@ public class OptWnd extends Window {
 		}
 	}
 
+	private Label nightVisionLabel;
+	public static HSlider nightVisionSlider;
+	private Button nightVisionResetButton;
+
+	public class WorldGraphicsSettingsPanel extends Panel {
+
+		public WorldGraphicsSettingsPanel(Panel back) {
+			Widget prev;
+			add(new Label(""), 278, 0); // To fix window width
+
+			prev = add(nightVisionLabel = new Label("Night Vision / Brighter World:"), 0, 0);
+			nightVisionLabel.tooltip = nightVisionTooltip;
+			Glob.nightVisionBrightness = Utils.getprefd("nightVisionSetting", 0.0);
+			prev = add(nightVisionSlider = new HSlider(UI.scale(200), 0, 650, (int)(Glob.nightVisionBrightness*1000)) {
+				protected void attach(UI ui) {
+					super.attach(ui);
+					val = (int)(Glob.nightVisionBrightness*1000);
+				}
+				public void changed() {
+					Glob.nightVisionBrightness = val/1000.0;
+					Utils.setprefd("nightVisionSetting", val/1000.0);
+					if(ui.sess != null && ui.sess.glob != null) {
+						ui.sess.glob.brighten();
+					}
+				}
+			}, prev.pos("bl").adds(0, 6));
+			nightVisionSlider.tooltip = nightVisionTooltip;
+			add(nightVisionResetButton = new Button(UI.scale(70), "Reset", false).action(() -> {
+				Glob.nightVisionBrightness = 0.0;
+				nightVisionSlider.val = 0;
+				Utils.setprefd("nightVisionSetting", 0.0);
+				if(ui.sess != null && ui.sess.glob != null) {
+					ui.sess.glob.brighten();
+				}
+			}), prev.pos("bl").adds(210, -20));
+			nightVisionResetButton.tooltip = resetButtonTooltip;
+
+			Widget backButton;
+			add(backButton = new PButton(UI.scale(200), "Back", 27, back, "Advanced Settings"), prev.pos("bl").adds(0, 18));
+			pack();
+			centerBackButton(backButton, this);
+		}
+	}
+
 
     public static class PointBind extends Button {
 	public static final String msg = "Bind other elements...";
@@ -1079,12 +1126,15 @@ public class OptWnd extends Window {
 		Panel interfacesettings = add(new InterfaceSettingsPanel(advancedSettings));
 		Panel displaysettings = add(new DisplaySettingsPanel(advancedSettings));
 		Panel camsettings = add(new CameraSettingsPanel(advancedSettings));
+		Panel worldgraphicssettings = add(new WorldGraphicsSettingsPanel(advancedSettings));
 
 		int y2 = UI.scale(6);
 		y2 = advancedSettings.add(new PButton(UI.scale(200), "Interface Settings", -1, interfacesettings, "Interface Settings"), 0, y2).pos("bl").adds(0, 5).y;
 		y2 = advancedSettings.add(new PButton(UI.scale(200), "Display Settings", -1, displaysettings, "Display Settings"), 0, y2).pos("bl").adds(0, 5).y;
 		y2 += UI.scale(20);
 		y2 = advancedSettings.add(new PButton(UI.scale(200), "Camera Settings", -1, camsettings, "Camera Settings"), 0, y2).pos("bl").adds(0, 5).y;
+		y2 = advancedSettings.add(new PButton(UI.scale(200), "World Graphics Settings", -1, worldgraphicssettings, "World Graphics Settings"), 0, y2).pos("bl").adds(0, 5).y;
+
 
 		y2 += UI.scale(20);
 		y2 = advancedSettings.add(new PButton(UI.scale(200), "Back", 27, main, "Options            "), 0, y2).pos("bl").adds(0, 5).y;
@@ -1199,6 +1249,12 @@ public class OptWnd extends Window {
 	private final Object freeCamHeightTooltip = RichText.render("This affects the height of the point at which the free camera is pointed. By default, it is pointed right above the player's head." +
 			"\n" +
 			"\n$col[185,185,185]{This doesn't really affect gameplay that much, if at all. With this setting, you can make the camera point at the feet, torso, head, slightly above you, or whatever's in between.}", UI.scale(300));
+
+	// World Graphics Settings Tooltips
+	private final Object nightVisionTooltip = RichText.render("Increasing this will simulate daytime lighting during the night." +
+			"\n$col[185,185,185]{It can slightly affect the light levels during the day too, but it is barely noticeable.}" +
+			"\n" +
+			"\n$col[218,163,0]{Note:} $col[185,185,185]{This slider can also be switched between minimum and maximum by using the 'Night Vision' keybind.}", UI.scale(300));
 
 	// Misc/Other
 	private final Object resetButtonTooltip = RichText.render("Reset to default", UI.scale(300));
