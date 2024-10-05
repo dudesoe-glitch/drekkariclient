@@ -26,6 +26,8 @@
 
 package haven;
 
+import haven.res.ui.tt.armor.Armor;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.annotation.*;
@@ -35,7 +37,6 @@ import java.util.regex.*;
 import java.net.*;
 import java.io.*;
 import java.nio.file.*;
-import java.security.*;
 import javax.imageio.*;
 import java.awt.image.BufferedImage;
 
@@ -1693,6 +1694,14 @@ public class Resource implements Serializable {
     }
 
     public <T> T getcode(Class<T> cl, boolean fail) {
+	try {
+		// System.out.println(name + cl.getName()); use for debug
+		Class<?> ret = customFetchedClasses.get(name + "$" + cl.getName());
+		if(ret != null)
+			return cl.cast(ret.newInstance());
+	} catch(IllegalAccessException | InstantiationException e) {
+		e.printStackTrace();
+	}
 	CodeEntry e = layer(CodeEntry.class);
 	if(e == null) {
 	    if(fail)
@@ -2219,4 +2228,9 @@ public class Resource implements Serializable {
 	    cmd_findupdates(Utils.splice(args, 1));
 	}
     }
+
+	private static HashMap<String, Class> customFetchedClasses = new HashMap<String, Class>(){{ // ND: Stole this from shubla, it overrides the stupid fetched res file code, doesn't even check for the res version.
+		put("ui/tt/armor$haven.ItemInfo$InfoFactory", Armor.Fac.class);
+	}};
+
 }

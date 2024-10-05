@@ -1,8 +1,8 @@
-/* Preprocessed source code */
+package haven.res.ui.tt.armor;/* Preprocessed source code */
 import haven.*;
 import java.awt.image.BufferedImage;
 
-/* >tt: Armor */
+/* >tt: haven.res.ui.tt.armor.Armor */
 @haven.FromResource(name = "ui/tt/armor", version = 4)
 public class Armor extends ItemInfo.Tip {
     public final int hard, soft;
@@ -19,5 +19,12 @@ public class Armor extends ItemInfo.Tip {
 
     public BufferedImage tipimg() {
 	return(Text.render(String.format("Armor class: %,d/%,d", hard, soft)).img);
+    }
+
+    public static class Fac implements ItemInfo.InfoFactory {
+        public Fac() {}
+        public ItemInfo build(Owner owner, Raw raw, Object... args) {
+            return mkinfo(owner, args);
+        }
     }
 }
