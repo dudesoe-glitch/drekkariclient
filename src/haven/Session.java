@@ -297,4 +297,18 @@ public class Session implements Resource.Resolver {
     public void sendmsg(byte[] msg) {
 	conn.send(ByteBuffer.wrap(msg));
     }
+
+	public int getresid(Resource res) {
+		synchronized (rescache) {
+			for (Map.Entry<Integer, CachedRes> entry : rescache.entrySet()) {
+				try {
+					if (entry.getValue().get().get() == res) {
+						return entry.getKey();
+					}
+				} catch (Loading e) {
+				}
+			}
+		}
+		return -1;
+	}
 }

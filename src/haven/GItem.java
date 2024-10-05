@@ -47,6 +47,7 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
     private GSprite spr;
     private ItemInfo.Raw rawinfo;
     private List<ItemInfo> info = Collections.emptyList();
+	public boolean sendttupdate = false;
 
     @RName("item")
     public static class $_ implements Factory {
@@ -210,6 +211,9 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 	} else if(name == "tt") {
 	    info = null;
 	    rawinfo = new ItemInfo.Raw(args);
+		if (sendttupdate) {
+			wdgmsg("ttupdate");
+		}
 	    infoseq++;
 	} else if(name == "meter") {
 	    meter = Utils.iv(args[0]);

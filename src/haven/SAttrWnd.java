@@ -28,6 +28,11 @@ package haven;
 
 import java.util.*;
 import java.awt.Color;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
 import haven.resutil.Curiosity;
 import static haven.CharWnd.*;
 import static haven.PUtils.*;
@@ -37,6 +42,8 @@ public class SAttrWnd extends Widget {
     private final Coord studyc;
     private CharWnd chr;
     private int scost;
+	private static ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+	private static Future<?> equiporyFuture;
 
     @RName("sattr")
     public static class $_ implements Factory {
@@ -194,6 +201,10 @@ public class SAttrWnd extends Widget {
 	    if (attr.tbv > 0) {
 		args.add(attr.attr.nm);
 		args.add(attr.attr.base + attr.tbv);
+		if (equiporyFuture != null)
+			equiporyFuture.cancel(true);
+		// ND: Hopefully 500ms is enough
+		equiporyFuture = executor.scheduleWithFixedDelay(this::resetEquiporyBottomText, 500, 5000, TimeUnit.MILLISECONDS);
 	    }
 	}
 	wdgmsg("sattr", args.toArray(new Object[0]));
@@ -251,4 +262,12 @@ public class SAttrWnd extends Widget {
 	    super.addchild(child, args);
 	}
     }
+
+	public void resetEquiporyBottomText() {
+		if (ui != null && ui.gui != null && ui.gui.getequipory() != null){
+			ui.gui.getequipory().updateBottomText = true;
+			ui.gui.getequipory().delayedUpdateTime = System.currentTimeMillis();
+		}
+		equiporyFuture.cancel(true);
+	}
 }

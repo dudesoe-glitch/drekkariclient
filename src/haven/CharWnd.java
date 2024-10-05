@@ -27,12 +27,9 @@
 package haven;
 
 import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.image.BufferedImage;
-import java.util.*;
 import java.util.function.*;
-import haven.resutil.FoodInfo;
-import haven.resutil.Curiosity;
+import java.util.stream.IntStream;
+
 import static haven.PUtils.*;
 
 public class CharWnd extends Window {
@@ -290,4 +287,37 @@ public class CharWnd extends Window {
 	    super.uimsg(nm, args);
 	}
     }
+
+	public int battrIndex(Resource res) {
+		if (battr != null && battr.attrs != null) {
+			return IntStream.range(0, battr.attrs.size())
+					.filter(i -> battr.attrs.stream().equals(res))
+					.findFirst().orElse(Integer.MAX_VALUE);
+		}
+		return Integer.MAX_VALUE;
+	}
+	public int sattrIndex(Resource res) {
+		if (sattr != null && sattr.attrs != null) {
+			return IntStream.range(0, sattr.attrs.size())
+					.filter(i -> sattr.attrs.stream().equals(res))
+					.findFirst().orElse(Integer.MAX_VALUE);
+		}
+		return Integer.MAX_VALUE;
+	}
+	public int BY_PRIORITY(Resource r1, Resource r2) {
+		int b1 = battrIndex(r1);
+		int b2 = battrIndex(r2);
+
+		if (b1 == b2) {
+			b1 = sattrIndex(r1);
+			b2 = sattrIndex(r2);
+			if (b1 == b2) {
+				return r1.name.compareTo(r2.name);
+			} else {
+				return Integer.compare(b1, b2);
+			}
+		} else {
+			return Integer.compare(b1, b2);
+		}
+	}
 }

@@ -30,6 +30,11 @@ import java.util.*;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
 import haven.resutil.FoodInfo;
 import static haven.CharWnd.*;
 import static haven.PUtils.*;
@@ -39,6 +44,8 @@ public class BAttrWnd extends Widget {
     public final FoodMeter feps;
     public final Constipations cons;
     public final GlutMeter glut;
+	private static ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+	private static Future<?> equiporyFuture;
 
     @RName("battr")
     public static class $_ implements Factory {
@@ -102,6 +109,18 @@ public class BAttrWnd extends Widget {
 
 	public void lvlup() {
 	    lvlt = 1.0;
+		if (equiporyFuture != null)
+			equiporyFuture.cancel(true);
+		// ND: Hopefully 500ms is enough
+		equiporyFuture = executor.scheduleWithFixedDelay(this::resetEquiporyBottomText, 500, 5000, TimeUnit.MILLISECONDS);
+	}
+
+	public void resetEquiporyBottomText() {
+		if (ui != null && ui.gui != null && ui.gui.getequipory() != null){
+			ui.gui.getequipory().updateBottomText = true;
+			ui.gui.getequipory().delayedUpdateTime = System.currentTimeMillis();
+		}
+		equiporyFuture.cancel(true);
 	}
     }
 

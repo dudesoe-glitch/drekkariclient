@@ -26,6 +26,10 @@
 
 package haven;
 
+import haven.res.ui.tt.wear.Wear;
+import haven.res.ui.tt.armor.Armor;
+
+import java.awt.*;
 import java.util.*;
 import static haven.Inventory.invsq;
 
@@ -79,6 +83,15 @@ public class Equipory extends Widget implements DTarget {
     Map<GItem, Collection<WItem>> wmap = new HashMap<>();
     private final Avaview ava;
 	public WItem[] slots = new WItem[ecoords.length];
+	private static final Text.Foundry acf = new Text.Foundry(Text.sans, 12);
+	public boolean updateBottomText = false;
+	long delayedUpdateTime;
+	private Tex Detection = null;
+	private Tex Subtlety = null;
+	private Tex ArmorClass = null;
+	AttrBonusesWdg bonuses;
+	public static boolean showEquipmentBonuses = Utils.getprefb("showEquipmentBonuses", false);
+	private Button expandButton = null;
 
     @RName("epry")
     public static class $_ implements Factory {
@@ -119,7 +132,21 @@ public class Equipory extends Widget implements DTarget {
 		final FColor cc = new FColor(0, 0, 0, 0);
 		protected FColor clearcolor() {return(cc);}
 	    }, bgc);
+	bonuses = add(new AttrBonusesWdg(isz.y), isz.x + UI.scale(20), 0);
+	bonuses.show(showEquipmentBonuses);
+	add(expandButton = new Button(UI.scale(24), showEquipmentBonuses ? "←" : "→", false).action(this::expandAttributes), isz.x + UI.scale(10), 0);
+	pack();
     }
+
+	public void expandAttributes(){
+		showEquipmentBonuses = !showEquipmentBonuses;
+		bonuses.show(showEquipmentBonuses);
+		Utils.setprefb("showEquipmentBonuses", showEquipmentBonuses);
+		expandButton.change(showEquipmentBonuses ? "←" : "→");
+		// ND: I don't know why, but I need to pack both for this to work, lol
+		this.pack();
+		parent.pack();
+	}
 
     public static interface SlotInfo {
 	public int slots();
@@ -135,8 +162,11 @@ public class Equipory extends Widget implements DTarget {
 		if(ep < ecoords.length)
 			 v.add(slots[ep] = add(new WItem(g), ecoords[ep].add(1, 1)));
 	    }
+		g.sendttupdate = true;
 	    v.trimToSize();
 	    wmap.put(g, v);
+		updateBottomText = true;
+		delayedUpdateTime = System.currentTimeMillis();
 	} else {
 	    super.addchild(child, args);
 	}
@@ -153,6 +183,9 @@ public class Equipory extends Widget implements DTarget {
 				slots[s] = null;
 		}
 		}
+	bonuses.update(slots);
+	updateBottomText = true;
+	delayedUpdateTime = System.currentTimeMillis();
 	}
     }
 
@@ -213,9 +246,83 @@ public class Equipory extends Widget implements DTarget {
     public void draw(GOut g) {
 	drawslots(g);
 	super.draw(g);
+		GameUI gui = ui.gui;
+		if (updateBottomText) {
+			long now = System.currentTimeMillis();
+			if ((now - delayedUpdateTime) > 200){ // ND: 100ms was not enough, bumped to 200ms
+				// ND: I genuinely don't know any other workaround to this crap not updating when you add a new item. For some reason this doesn't happen in Ardennes' (old render)
+				//     In Ardennes', it looks like the UI freezes for a second when you try to add the new item sometimes. Maybe these weird hiccups are different in new render? For now, I have no clue.
+				int prc = 0, exp = 0, det, intl = 0, ste = 0, snk, aHard = 0, aSoft = 0;
+				CharWnd chrwdg = null;
+				try {
+					chrwdg = gui.chrwdg;
+					for (BAttrWnd.Attr attr : chrwdg.battr.attrs) {
+						if (attr.attr.nm.contains("prc"))
+							prc = attr.attr.comp;
+						if (attr.attr.nm.contains("int"))
+							intl = attr.attr.comp;
+					}
+					for (SAttrWnd.SAttr attr : chrwdg.sattr.attrs) {
+						if (attr.attr.nm.contains("exp"))
+							exp = attr.attr.comp;
+						if (attr.attr.nm.contains("ste"))
+							ste = attr.attr.comp;
+					}
+					for (int i = 0; i < slots.length; i++) {
+						WItem itm = slots[i];
+						boolean isBroken = false;
+						if (itm != null) {
+							for (ItemInfo info : itm.item.info()) {
+								if (info instanceof Wear) {
+									if (((Wear) info).m-((Wear) info).d == 0)
+										isBroken = true;
+									break;
+								}
+							}
+
+							for (ItemInfo info : itm.item.info()) {
+								if (info instanceof Armor) {
+									if (!isBroken){
+										aHard += ((Armor) info).hard;
+										aSoft += ((Armor) info).soft;
+									}
+									break;
+								}
+							}
+						}
+					}
+					det = prc * exp;
+					snk = intl * ste;
+					String DetectionString = String.format("%,d", det).replace(',', '.');
+					String SubtletyString = String.format("%,d", snk).replace(',', '.');
+					if (myOwnEquipory) {
+						Detection = PUtils.strokeTex(Text.renderstroked2("Detection (Prc*Exp):  " + DetectionString, Color.WHITE, Color.BLACK, acf));
+						Subtlety = PUtils.strokeTex(Text.renderstroked2("Subtlety (Int*Ste):  " + SubtletyString, Color.WHITE, Color.BLACK, acf));
+					}
+					ArmorClass = PUtils.strokeTex(Text.renderstroked2("Armor Class:  " + (aHard + aSoft) + " (" + aHard + " + " + aSoft + ")", Color.WHITE, Color.BLACK, acf));
+					updateBottomText = false;
+				} catch (Exception e) {
+				}
+			}
+		}
+		if (Detection != null)
+			g.image(Detection, new Coord(( invsq.sz().x + bg.sz().x / 2 ) - Detection.sz().x / 2, bg.sz().y - UI.scale(56)));
+		if (Subtlety != null)
+			g.image(Subtlety, new Coord(( invsq.sz().x + bg.sz().x / 2 ) - Subtlety.sz().x / 2, bg.sz().y - UI.scale(40)));
+		if (ArmorClass != null)
+			g.image(ArmorClass, new Coord(( invsq.sz().x + bg.sz().x / 2 ) - ArmorClass.sz().x / 2, bg.sz().y - UI.scale(20)));
     }
 
     public boolean iteminteract(Coord cc, Coord ul) {
 	return(false);
     }
+
+	@Override
+	public void wdgmsg(Widget sender, String msg, Object... args) {
+		if (sender instanceof GItem && wmap.containsKey(sender) && msg.equals("ttupdate")) {
+			bonuses.update(slots);
+		} else {
+			super.wdgmsg(sender, msg, args);
+		}
+	}
 }

@@ -26,11 +26,14 @@
 
 package haven;
 
+import haven.res.ui.tt.attrmod.AttrMod;
+
 import java.util.*;
 import java.util.function.*;
 import java.lang.reflect.*;
 import java.awt.image.BufferedImage;
 import java.awt.Graphics;
+import java.util.stream.Collectors;
 
 public abstract class ItemInfo {
     public final Owner owner;
@@ -448,4 +451,70 @@ public abstract class ItemInfo {
     public static interface InfoTip {
 	public List<ItemInfo> info();
     }
+
+	@SuppressWarnings("unchecked")
+	public static Map<Resource, Integer> getBonuses(List<ItemInfo> infos) {
+		List<ItemInfo> slotInfos = ItemInfo.findall("haven.res.ui.tt.slots.ISlots", infos);
+		List<ItemInfo> gilding = ItemInfo.findall("haven.res.ui.tt.slot.Slotted", infos);
+		Map<Resource, Integer> bonuses = new HashMap<>();
+		try {
+			for (ItemInfo islots : slotInfos) {
+				List<Object> slots = (List<Object>) Reflect.getFieldValue(islots, "s");
+				for (Object slot : slots) {
+					parseAttrMods(bonuses, (List) Reflect.getFieldValue(slot, "info"));
+				}
+			}
+			for (ItemInfo info : gilding) {
+				List<Object> slots = (List<Object>) Reflect.getFieldValue(info, "sub");
+				parseAttrMods(bonuses, slots);
+			}
+			parseAttrMods(bonuses, ItemInfo.findall(AttrMod.class, infos));
+		} catch (Exception e) {
+		}
+		return bonuses;
+	}
+
+	@SuppressWarnings("unchecked")
+	public static void parseAttrMods(Map<Resource, Integer> bonuses, List infos) {
+		for (Object inf : infos) {
+			List<Object> mods = (List<Object>) Reflect.getFieldValue(inf, "mods");
+			if (mods != null) {
+				for (Object mod : mods) {
+					Resource attr = (Resource) Reflect.getFieldValue(mod, "attr");
+					int value = Reflect.getFieldValueInt(mod, "mod");
+					if (bonuses.containsKey(attr)) {
+						bonuses.put(attr, bonuses.get(attr) + value);
+					} else {
+						bonuses.put(attr, value);
+					}
+				}
+			}
+		}
+	}
+
+	public static Pair<Integer, Integer> getArmor(List<ItemInfo> infos) {
+		infos = findall("Wear", infos);
+		for (ItemInfo info : infos) {
+			if (Reflect.hasField(info, "hard") && Reflect.hasField(info, "soft")) {
+				return new Pair<>(Reflect.getFieldValueInt(info, "hard"), Reflect.getFieldValueInt(info, "soft"));
+			}
+		}
+		return null;
+	}
+
+	public static <T> List<T> findall(Class<T> cl, List<ItemInfo> il) {
+		List<T> ret = new LinkedList<>();
+		for (ItemInfo inf : il) {
+			if (cl.isInstance(inf))
+				ret.add(cl.cast(inf));
+		}
+		return ret;
+	}
+
+	public static List<ItemInfo> findall(String cl, List<ItemInfo> infos) {
+		return infos.stream()
+				.filter(inf -> Reflect.is(inf, cl))
+				.collect(Collectors.toCollection(LinkedList::new));
+	}
+
 }
