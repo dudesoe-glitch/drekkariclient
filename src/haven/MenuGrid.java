@@ -418,6 +418,7 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 
     public MenuGrid() {
 	super(bgsz.mul(gsz).add(1, 1));
+	loadCustomActionButtons();
     }
 
     private void updlayout() {
@@ -562,6 +563,13 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 	if(sub.size() > 0) {
 	    change(r.pag);
 	} else {
+		try {
+			String[] ad = r.act().ad;
+			if (ad[0].equals("@")) {
+				useCustom(ad);
+			}
+		} catch (Exception ignored) {
+		}
 	    r.pag.anew = r.pag.tnew = 0;
 	    r.use(iact);
 	    if(reset)
@@ -689,4 +697,22 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 	PagButton h = bhit(cc);
 	return((h == null) ? null : h.bind);
     }
+
+	private void makeLocal(String path) {
+		Resource.Named res = Resource.local().loadwait(path).indir();
+		Pagina pagina = new Pagina(this, null, res);
+		synchronized (pmap) { pmap.put(res, pagina); }
+		synchronized (paginae) { paginae.add(pagina); }
+	}
+
+	private void loadCustomActionButtons() {
+
+	}
+
+	public void useCustom(String[] ad) {
+		GameUI gui = ui.gui;
+		if (gui == null)
+			return;
+
+	}
 }
