@@ -462,6 +462,7 @@ public class OptWnd extends Window {
 	public static CheckBox simplifiedUIThemeCheckBox;
 	public static CheckBox extendedMouseoverInfoCheckBox;
 	public static CheckBox disableMenuGridHotkeysCheckBox;
+	public static CheckBox alwaysOpenBeltOnLoginCheckBox;
 	private static CheckBox showFramerateCheckBox;
 	public static CheckBox snapWindowsBackInsideCheckBox;
 	public static CheckBox dragWindowsInWhenResizingCheckBox;
@@ -567,6 +568,13 @@ public class OptWnd extends Window {
 			}
 		}, rightColumn.pos("bl").adds(0, 15));
 		disableMenuGridHotkeysCheckBox.tooltip = disableMenuGridHotkeysTooltip;
+		rightColumn = add(alwaysOpenBeltOnLoginCheckBox = new CheckBox("Always Open Belt on Login"){
+			{a = (Utils.getprefb("alwaysOpenBeltOnLogin", true));}
+			public void changed(boolean val) {
+				Utils.setprefb("alwaysOpenBeltOnLogin", val);
+			}
+		}, rightColumn.pos("bl").adds(0, 2));
+		alwaysOpenBeltOnLoginCheckBox.tooltip = alwaysOpenBeltOnLoginTooltip;
 
 		Widget backButton;
 		add(backButton = new PButton(UI.scale(200), "Back", 27, back, "Advanced Settings"), leftColumn.pos("bl").adds(0, 30).x(0));
@@ -1141,6 +1149,10 @@ public class OptWnd extends Window {
 	private final Object disableMenuGridHotkeysTooltip = RichText.render("This completely disables the hotkeys for the action buttons & categories in the bottom right corner menu (aka the menu grid)." +
 			"\n" +
 			"\n$col[185,185,185]{Your action bar keybinds are NOT affected by this setting.}", UI.scale(300));
+
+	private final Object alwaysOpenBeltOnLoginTooltip = RichText.render("Enabling this will cause your belt window to always open when you log in." +
+			"\n" +
+			"\n$col[185,185,185]{By default, Loftar saves the status of the belt at logout. So if you don't enable this setting, but leave the belt window open when you log out/exit the game, it will still open on login.}", UI.scale(300));
 	private final Object showFramerateTooltip = RichText.render("Shows the current FPS in the top-right corner of the game window.", UI.scale(300));
 	private final Object snapWindowsBackInsideTooltip = RichText.render("Enabling this will cause most windows, that are not too large, to be fully snapped back into your game's window." +
 			"\nBy default, when you try to drag a window outside of your game window, it will only pop 25% of it back in." +
