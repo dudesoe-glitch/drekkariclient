@@ -42,6 +42,10 @@ public class OptWnd extends Window {
 	private static final ScheduledExecutorService simpleUIExecutor = Executors.newSingleThreadScheduledExecutor();
 	private static Future<?> simpleUIFuture;
 	public static boolean simpleUIChanged = false;
+	public static final Color msgGreen = new Color(8, 211, 0);
+	public static final Color msgGray = new Color(145, 145, 145);
+	public static final Color msgRed = new Color(197, 0, 0);
+	public static final Color msgYellow = new Color(218, 163, 0);
 
     public void chpanel(Panel p) {
 	if(current != null)
