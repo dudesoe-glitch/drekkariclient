@@ -1294,7 +1294,7 @@ public class OptWnd extends Window {
 	private final Object nightVisionTooltip = RichText.render("Increasing this will simulate daytime lighting during the night." +
 			"\n$col[185,185,185]{It can slightly affect the light levels during the day too, but it is barely noticeable.}" +
 			"\n" +
-			"\n$col[218,163,0]{Note:} $col[185,185,185]{This slider can also be switched between minimum and maximum by using the 'Night Vision' keybind.}", UI.scale(300));
+			"\n$col[218,163,0]{Keybind:} $col[185,185,185]{This slider can also be switched between minimum and maximum by using the 'Night Vision' keybind.}", UI.scale(300));
 	private final Object disableWeatherAndEffectsTooltip = RichText.render("This disables *ALL* weather and camera effects, including rain, drunkenness distortion, drug high, valhalla gray overlay, camera shake, and any other similar effects.", UI.scale(300));
 	private final Object hideFlavorObjectsTooltip = RichText.render("This hides the random objects that appear in the world, which you cannot interact with." +
 			"\n$col[185,185,185]{Players usually disable flavor objects to improve visibility, especially in combat.}" +
