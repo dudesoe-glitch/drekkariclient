@@ -957,6 +957,7 @@ public class OptWnd extends Window {
 	private Label nightVisionLabel;
 	public static HSlider nightVisionSlider;
 	private Button nightVisionResetButton;
+	public static CheckBox disableWeatherAndEffectsCheckBox;
 
 	public class WorldGraphicsSettingsPanel extends Panel {
 
@@ -990,6 +991,14 @@ public class OptWnd extends Window {
 				}
 			}), prev.pos("bl").adds(210, -20));
 			nightVisionResetButton.tooltip = resetButtonTooltip;
+			prev = add(new Label("World Visuals:"), prev.pos("bl").adds(0, 12));
+			prev = add(disableWeatherAndEffectsCheckBox = new CheckBox("Disable Weather And Effects (Requires Reload)"){
+				{a = Utils.getprefb("disableWeatherAndEffects", false);}
+				public void changed(boolean val) {
+					Utils.setprefb("disableWeatherAndEffects", val);
+				}
+			}, prev.pos("bl").adds(12, 8));
+			disableWeatherAndEffectsCheckBox.tooltip = disableWeatherAndEffectsTooltip;
 
 			Widget backButton;
 			add(backButton = new PButton(UI.scale(200), "Back", 27, back, "Advanced Settings"), prev.pos("bl").adds(0, 18));
@@ -1255,6 +1264,7 @@ public class OptWnd extends Window {
 			"\n$col[185,185,185]{It can slightly affect the light levels during the day too, but it is barely noticeable.}" +
 			"\n" +
 			"\n$col[218,163,0]{Note:} $col[185,185,185]{This slider can also be switched between minimum and maximum by using the 'Night Vision' keybind.}", UI.scale(300));
+	private final Object disableWeatherAndEffectsTooltip = RichText.render("This disables *ALL* weather and camera effects, including rain, drunkenness distortion, drug high, valhalla gray overlay, camera shake, and any other similar effects.", UI.scale(300));
 
 	// Misc/Other
 	private final Object resetButtonTooltip = RichText.render("Reset to default", UI.scale(300));

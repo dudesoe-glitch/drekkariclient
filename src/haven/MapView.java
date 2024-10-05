@@ -1784,7 +1784,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	basic(Camera.class, camera);
 	amblight();
 	updsmap(amblight);
-	updweather();
+	if(!OptWnd.disableWeatherAndEffectsCheckBox.a) updweather();
 	synchronized(glob.map) {
 	    terrain.tick();
 	    oltick();
