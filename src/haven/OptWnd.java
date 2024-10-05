@@ -964,6 +964,7 @@ public class OptWnd extends Window {
 	public static CheckBox disableWeatherAndEffectsCheckBox;
 	public static CheckBox simplifiedCropsCheckBox;
 	public static CheckBox simplifiedForageablesCheckBox;
+	public static CheckBox hideFlavorObjectsCheckBox;
 
 	public class WorldGraphicsSettingsPanel extends Panel {
 
@@ -1017,6 +1018,18 @@ public class OptWnd extends Window {
 					Utils.setprefb("simplifiedForageables", val);
 				}
 			}, prev.pos("bl").adds(0, 2));
+			prev = add(hideFlavorObjectsCheckBox = new CheckBox("Hide Flavor Objects"){
+				{a = Utils.getprefb("hideFlavorObjects", false);}
+				public void changed(boolean val) {
+					Utils.setprefb("hideFlavorObjects", val);
+					if (ui.sess != null)
+						ui.sess.glob.map.invalidateAll();
+					if (ui != null && ui.gui != null) {
+						ui.gui.optionInfoMsg("Flavor Objects are now now " + (val ? "HIDDEN" : "SHOWN") + "!", (val ? msgGray : msgGreen));
+					}
+				}
+			}, prev.pos("bl").adds(0, 2));
+			hideFlavorObjectsCheckBox.tooltip = hideFlavorObjectsTooltip;
 
 			Widget backButton;
 			add(backButton = new PButton(UI.scale(200), "Back", 27, back, "Advanced Settings"), prev.pos("bl").adds(0, 18));
@@ -1283,6 +1296,10 @@ public class OptWnd extends Window {
 			"\n" +
 			"\n$col[218,163,0]{Note:} $col[185,185,185]{This slider can also be switched between minimum and maximum by using the 'Night Vision' keybind.}", UI.scale(300));
 	private final Object disableWeatherAndEffectsTooltip = RichText.render("This disables *ALL* weather and camera effects, including rain, drunkenness distortion, drug high, valhalla gray overlay, camera shake, and any other similar effects.", UI.scale(300));
+	private final Object hideFlavorObjectsTooltip = RichText.render("This hides the random objects that appear in the world, which you cannot interact with." +
+			"\n$col[185,185,185]{Players usually disable flavor objects to improve visibility, especially in combat.}" +
+			"\n" +
+			"\n$col[218,163,0]{Action Button:} $col[185,185,185]{This option can also be turned on/off using an action button from the menu grid (Custom Client Extras → Toggles).}", UI.scale(320));
 
 	// Misc/Other
 	private final Object resetButtonTooltip = RichText.render("Reset to default", UI.scale(300));

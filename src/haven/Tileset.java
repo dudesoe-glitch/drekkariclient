@@ -280,6 +280,7 @@ public class Tileset extends Resource.Layer {
 
 	public void flavor(Buffer buf, Terrain trn, Random seed) {
 	    Resource res = this.res.get();
+		if (res == null || (res != null && !res.name.startsWith("gfx/tiles/")) || (!OptWnd.hideFlavorObjectsCheckBox.a && res != null && res.name.startsWith("gfx/tiles/"))){
 	    DRandom trnd = new DRandom(new DRandom(seed).randl(res.name.hashCode(), trn.tile));
 	    Random ornd = new Random();
 	    Tileset set = trn.tileset(trn.tile);
@@ -293,6 +294,7 @@ public class Tileset extends Resource.Layer {
 		    buf.add(g, set.flavobjmat);
 		}
 	    }
+		}
 	}
     }
 
