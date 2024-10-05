@@ -46,6 +46,9 @@ public class TrellisPlant implements Sprite.Factory {
 	CSprite spr = new CSprite(owner, res);
 	float d = 11f / num;
 	float c = -5.5f + (d / 2);
+	if (OptWnd.simplifiedCropsCheckBox.a)
+		spr.addpart(0, 0, Pipe.Op.nil, var.get(0));
+	else
 	for(int i = 0; i < num; i++) {
 	    RenderTree.Node v = var.get(rnd.nextInt(var.size()));
 	    spr.addpart(c * as, c * ac, Pipe.Op.nil, v);

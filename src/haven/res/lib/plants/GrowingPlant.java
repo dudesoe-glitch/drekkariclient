@@ -38,6 +38,9 @@ public class GrowingPlant implements Sprite.Factory {
 	List<RenderTree.Node> var = this.var.get(st);
 	Random rnd = owner.mkrandoom();
 	CSprite spr = new CSprite(owner, res);
+	if (OptWnd.simplifiedCropsCheckBox.a)
+		spr.addpart(0, 0, Pipe.Op.nil, var.get(0));
+	else
 	for(int i = 0; i < num; i++) {
 	    RenderTree.Node v = var.get(rnd.nextInt(var.size()));
 	    if(num > 1)

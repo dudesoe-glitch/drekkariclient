@@ -958,6 +958,7 @@ public class OptWnd extends Window {
 	public static HSlider nightVisionSlider;
 	private Button nightVisionResetButton;
 	public static CheckBox disableWeatherAndEffectsCheckBox;
+	public static CheckBox simplifiedCropsCheckBox;
 
 	public class WorldGraphicsSettingsPanel extends Panel {
 
@@ -999,6 +1000,12 @@ public class OptWnd extends Window {
 				}
 			}, prev.pos("bl").adds(12, 8));
 			disableWeatherAndEffectsCheckBox.tooltip = disableWeatherAndEffectsTooltip;
+			prev = add(simplifiedCropsCheckBox = new CheckBox("Simplified Crops (Requires Reload)"){
+				{a = Utils.getprefb("simplifiedCrops", false);}
+				public void changed(boolean val) {
+					Utils.setprefb("simplifiedCrops", val);
+				}
+			}, prev.pos("bl").adds(0, 2));
 
 			Widget backButton;
 			add(backButton = new PButton(UI.scale(200), "Back", 27, back, "Advanced Settings"), prev.pos("bl").adds(0, 18));
