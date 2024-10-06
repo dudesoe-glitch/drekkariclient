@@ -972,6 +972,7 @@ public class OptWnd extends Window {
 	public static HSlider treeAndBushScaleSlider;
 	private Button treeAndBushScaleResetButton;
 	public static CheckBox disableTreeAndBushSwayingCheckBox;
+	public static CheckBox disableObjectAnimationsCheckBox;
 
 	public class WorldGraphicsSettingsPanel extends Panel {
 
@@ -1110,6 +1111,15 @@ public class OptWnd extends Window {
 						ui.sess.glob.oc.gobAction(Gob::reloadTreeSwaying);
 				}
 			}, prev.pos("bl").adds(12, 14));
+			// TODO: ND: This setting should allow players to select what they want to disable, from a predefined list
+			//  Additionally, they should also be able disable some Overlay Animations (like the flags for visitor gates). I think I saw that somewhere in ardennes' or cediner's code...
+			prev = add(disableObjectAnimationsCheckBox = new CheckBox("Disable Some Object Animations"){
+				{a = (Utils.getprefb("disableObjectAnimations", false));}
+				public void changed(boolean val) {
+					Utils.setprefb("disableObjectAnimations", val);
+				}
+			}, prev.pos("bl").adds(0, 2));
+			disableObjectAnimationsCheckBox.tooltip = disableObjectAnimationsTooltip;
 
 			Widget backButton;
 			add(backButton = new PButton(UI.scale(200), "Back", 27, back, "Advanced Settings"), prev.pos("bl").adds(0, 18));
@@ -1385,6 +1395,9 @@ public class OptWnd extends Window {
 			"\n$col[218,163,0]{Action Button:} $col[185,185,185]{This option can also be turned on/off using an action button from the menu grid (Custom Client Extras → Toggles).}", UI.scale(320));
 	private final Object disableTileSmoothingTooltip = RichText.render("$col[218,163,0]{Action Button:} $col[185,185,185]{This option can also be turned on/off using an action button from the menu grid (Custom Client Extras → Toggles).}", UI.scale(320));
 	private final Object disableTileTransitionsTooltip = RichText.render("$col[218,163,0]{Action Button:} $col[185,185,185]{This option can also be turned on/off using an action button from the menu grid (Custom Client Extras → Toggles).}", UI.scale(320));
+	private final Object disableObjectAnimationsTooltip = RichText.render("This stops animations for the following: fires, trash stockpiles, beehives, dreamcatchers, kilns, cauldrons." +
+			"\n" +
+			"\n$col[185,185,185]{Ideally, in the future, I'll change this to allow you to pick exactly what you want to disable, from a list.}", UI.scale(300));
 
 	// Misc/Other
 	private final Object resetButtonTooltip = RichText.render("Reset to default", UI.scale(300));
