@@ -969,6 +969,8 @@ public class OptWnd extends Window {
 	public static CheckBox disableTileSmoothingCheckBox;
 	public static CheckBox disableTileTransitionsCheckBox;
 	public static CheckBox flatCaveWallsCheckBox;
+	public static HSlider treeAndBushScaleSlider;
+	private Button treeAndBushScaleResetButton;
 
 	public class WorldGraphicsSettingsPanel extends Panel {
 
@@ -1080,6 +1082,25 @@ public class OptWnd extends Window {
 						ui.gui.optionInfoMsg("Flat Cave Walls are now " + (val ? "ENABLED" : "DISABLED") + "!", (val ? msgGreen : msgRed));
 				}
 			}, prev.pos("bl").adds(0, 2));
+			prev = add(new Label("Trees & Bushes Scale:"), prev.pos("bl").adds(0, 10).x(0));
+			prev = add(treeAndBushScaleSlider = new HSlider(UI.scale(200), 30, 100, Utils.getprefi("treeAndBushScale", 100)) {
+				protected void attach(UI ui) {
+					super.attach(ui);
+					val = Utils.getprefi("treeAndBushScale", 100);
+				}
+				public void changed() {
+					Utils.setprefi("treeAndBushScale", val);
+					if (ui != null && ui.gui != null)
+						ui.sess.glob.oc.gobAction(Gob::reloadTreeScale);
+				}
+			}, prev.pos("bl").adds(0, 6));
+			add(treeAndBushScaleResetButton = new Button(UI.scale(70), "Reset", false).action(() -> {
+				treeAndBushScaleSlider.val = 100;
+				if (ui != null && ui.gui != null)
+					ui.sess.glob.oc.gobAction(Gob::reloadTreeScale);
+				Utils.setprefi("treeAndBushScale", 100);
+			}), prev.pos("bl").adds(210, -20));
+			treeAndBushScaleResetButton.tooltip = resetButtonTooltip;
 
 			Widget backButton;
 			add(backButton = new PButton(UI.scale(200), "Back", 27, back, "Advanced Settings"), prev.pos("bl").adds(0, 18));

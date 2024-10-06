@@ -29,6 +29,7 @@ package haven;
 import java.util.*;
 import java.util.function.*;
 import haven.render.*;
+import haven.res.lib.tree.TreeScale;
 
 public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, EquipTarget, RandomSource {
     public Coord2d rc;
@@ -1000,6 +1001,20 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 
 	public void initComp(Composite c) {
 		c.cmpinit(this);
+	}
+
+	public void reloadTreeScale(){
+		TreeScale treeScale = null;
+		if (getres() != null) {
+			if ((getres().name.startsWith("gfx/terobjs/trees") && !getres().name.endsWith("log") && !getres().name.endsWith("oldtrunk")) || getres().name.startsWith("gfx/terobjs/bushes")) {
+				treeScale = getattr(TreeScale.class);
+				if (treeScale != null) {
+					float scale = treeScale.originalScale;
+					delattr(TreeScale.class);
+					setattr(new TreeScale(this, (OptWnd.treeAndBushScaleSlider.val/100f) * scale, scale));
+				}
+			}
+		}
 	}
 
 }
