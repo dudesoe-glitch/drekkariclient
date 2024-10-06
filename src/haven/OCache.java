@@ -510,4 +510,13 @@ public class OCache implements Iterable<Gob> {
 	    return(ng);
 	}
     }
+
+	public void gobAction(Consumer<Gob> action) {
+		synchronized (this) {
+			for (Gob g : this) {
+				action.accept(g);
+			}
+			local.forEach(gobs -> gobs.forEach(action));
+		}
+	}
 }
