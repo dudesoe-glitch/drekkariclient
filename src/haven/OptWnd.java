@@ -973,6 +973,7 @@ public class OptWnd extends Window {
 	private Button treeAndBushScaleResetButton;
 	public static CheckBox disableTreeAndBushSwayingCheckBox;
 	public static CheckBox disableObjectAnimationsCheckBox;
+	public static CheckBox disableIndustrialSmokeCheckBox;
 
 	public class WorldGraphicsSettingsPanel extends Panel {
 
@@ -1120,6 +1121,26 @@ public class OptWnd extends Window {
 				}
 			}, prev.pos("bl").adds(0, 2));
 			disableObjectAnimationsCheckBox.tooltip = disableObjectAnimationsTooltip;
+			prev = add(disableIndustrialSmokeCheckBox = new CheckBox("Disable Industrial Smoke (Requires Reload)"){
+				{a = (Utils.getprefb("disableIndustrialSmoke", false));}
+				public void changed(boolean val) {
+					Utils.setprefb("disableIndustrialSmoke", val);
+					if (val) synchronized (ui.sess.glob.oc){
+						for(Gob gob : ui.sess.glob.oc){
+							if(gob.getres() != null && !gob.getres().name.equals("gfx/terobjs/clue")){
+								synchronized (gob.ols){
+									for(Gob.Overlay ol : gob.ols){
+										if(ol.spr!= null && ol.spr.res != null && ol.spr.res.name.contains("ismoke")){
+											gob.removeOl(ol);
+										}
+									}
+								}
+								gob.ols.clear();
+							}
+						}
+					}
+				}
+			}, prev.pos("bl").adds(0, 2));
 
 			Widget backButton;
 			add(backButton = new PButton(UI.scale(200), "Back", 27, back, "Advanced Settings"), prev.pos("bl").adds(0, 18));

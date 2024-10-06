@@ -517,6 +517,13 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
     }
 
     public void addol(Overlay ol, boolean async) {
+	if (getres() != null) {
+		if(OptWnd.disableIndustrialSmokeCheckBox.a && !getres().name.equals("gfx/terobjs/clue")) {
+				if (ol.spr != null && ol.spr.res != null && ol.spr.res.name.contains("ismoke")) {
+					return;
+			}
+		}
+	}
 	if(async) {
 	    defer(() -> addol(ol, false));
 	    return;
@@ -1044,6 +1051,14 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 				} else if (!OptWnd.disableTreeAndBushSwayingCheckBox.a) {
 					setattr(new GobSvaj(this));
 				}
+			}
+		}
+	}
+
+	public void removeOl(Overlay ol) {
+		if (ol != null) {
+			synchronized (ols) {
+				ol.remove();
 			}
 		}
 	}
