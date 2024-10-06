@@ -965,6 +965,7 @@ public class OptWnd extends Window {
 	public static CheckBox simplifiedCropsCheckBox;
 	public static CheckBox simplifiedForageablesCheckBox;
 	public static CheckBox hideFlavorObjectsCheckBox;
+	public static CheckBox flatWorldCheckBox;
 
 	public class WorldGraphicsSettingsPanel extends Panel {
 
@@ -1030,6 +1031,18 @@ public class OptWnd extends Window {
 				}
 			}, prev.pos("bl").adds(0, 2));
 			hideFlavorObjectsCheckBox.tooltip = hideFlavorObjectsTooltip;
+			prev = add(flatWorldCheckBox = new CheckBox("Flat World"){
+				{a = Utils.getprefb("flatWorld", false);}
+				public void changed(boolean val) {
+					Utils.setprefb("flatWorld", val);
+					if (ui.sess != null)
+						ui.sess.glob.map.resetMap();
+					if (ui != null && ui.gui != null) {
+						ui.gui.optionInfoMsg("Flat World is now " + (val ? "ENABLED" : "DISABLED") + "!", (val ? msgGreen : msgRed));
+					}
+				}
+			}, prev.pos("bl").adds(0, 12));
+			flatWorldCheckBox.tooltip = flatWorldTooltip;
 
 			Widget backButton;
 			add(backButton = new PButton(UI.scale(200), "Back", 27, back, "Advanced Settings"), prev.pos("bl").adds(0, 18));
@@ -1299,6 +1312,9 @@ public class OptWnd extends Window {
 	private final Object hideFlavorObjectsTooltip = RichText.render("This hides the random objects that appear in the world, which you cannot interact with." +
 			"\n$col[185,185,185]{Players usually disable flavor objects to improve visibility, especially in combat.}" +
 			"\n" +
+			"\n$col[218,163,0]{Action Button:} $col[185,185,185]{This option can also be turned on/off using an action button from the menu grid (Custom Client Extras → Toggles).}", UI.scale(320));
+	private final Object flatWorldTooltip = RichText.render("Enabling this will make the entire game world terrain flat." +
+			"\n$col[185,185,185]{Cliffs will still be drawn with their relative height, scaled down.}" +
 			"\n$col[218,163,0]{Action Button:} $col[185,185,185]{This option can also be turned on/off using an action button from the menu grid (Custom Client Extras → Toggles).}", UI.scale(320));
 
 	// Misc/Other

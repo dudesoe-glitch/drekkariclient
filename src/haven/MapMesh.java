@@ -122,7 +122,7 @@ public class MapMesh implements RenderTree.Node, Disposable {
 	public MapSurface() {
 	    for(int y = vs.ul.y; y < vs.br.y; y++) {
 		for(int x = vs.ul.x; x < vs.br.x; x++) {
-		    surf[vs.o(x, y)] = new Vertex(x * (float)tilesz.x, y * -(float)tilesz.y, (float)map.getfz(ul.add(x, y)));
+		    surf[vs.o(x, y)] = new Vertex(x * (float)tilesz.x, y * -(float)tilesz.y, OptWnd.flatWorldCheckBox.a ? 0 : (float)map.getfz(ul.add(x, y)));
 		}
 	    }
 	    for(int y = bs.ul.y; y < bs.br.y; y++) {

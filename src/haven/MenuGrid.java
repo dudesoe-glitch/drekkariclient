@@ -708,6 +708,7 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 	private void loadCustomActionButtons() {
 		// Category: Toggles
 		makeLocal("customclient/menugrid/Toggles/FlavorObjects");
+		makeLocal("customclient/menugrid/Toggles/FlatWorld");
 	}
 
 	public void useCustom(String[] ad) {
@@ -717,6 +718,8 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 		if (ad[1].equals("Toggles")) { // Category: Toggles
 			if (ad[2].equals("FlavorObjects")) {
 				OptWnd.hideFlavorObjectsCheckBox.set(!OptWnd.hideFlavorObjectsCheckBox.a);
+			} else if (ad[2].equals("FlatWorld")) {
+				OptWnd.flatWorldCheckBox.set(!OptWnd.flatWorldCheckBox.a);
 			}
 		}
 	}
