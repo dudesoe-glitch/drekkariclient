@@ -27,13 +27,13 @@
 package haven;
 
 import java.util.*;
-import java.util.function.*;
+
 import haven.render.*;
-import java.awt.Color;
-import java.awt.Graphics;
+
 import java.awt.image.BufferedImage;
 import haven.ItemInfo.AttrCache;
-import static haven.ItemInfo.find;
+import haven.resutil.Curiosity;
+
 import static haven.Inventory.sqsz;
 
 public class WItem extends Widget implements DTarget {
@@ -41,6 +41,11 @@ public class WItem extends Widget implements DTarget {
     public final GItem item;
     private Resource cspr = null;
     private Message csdt = Message.nil;
+	private Boolean isNotInStudy = null;
+	public final AttrCache<Pair<String, String>> study = new AttrCache<Pair<String, String>>(this::info, AttrCache.map1(Curiosity.class, curio -> curio::remainingTip));
+	private String cachedStudyValue = null;
+	private String cachedTipValue = null;
+	private Tex cachedStudyTex = null;
 
     public WItem(GItem item) {
 	super(sqsz);
@@ -164,6 +169,8 @@ public class WItem extends Widget implements DTarget {
 	    resize(sz);
 	    lspr = spr;
 	}
+	if (isNotInStudy == null)
+		isNotInStudy = parentWindow() != null && !parentWindow().cap.equals("Character Sheet");
     }
 
     public void draw(GOut g) {
@@ -180,13 +187,10 @@ public class WItem extends Widget implements DTarget {
 		for(GItem.InfoOverlay<?> ol : ols)
 		    ol.draw(g);
 	    }
-	    Double meter = (item.meter > 0) ? Double.valueOf(item.meter / 100.0) : itemmeter.get();
-	    if((meter != null) && (meter > 0)) {
-		g.chcolor(255, 255, 255, 64);
-		Coord half = sz.div(2);
-		g.prect(half, half.inv(), half, meter * Math.PI * 2);
-		g.chcolor();
-	    }
+		if (isNotInStudy != null && isNotInStudy)
+			drawCircleProgress(g, sz);
+		else
+			drawTimeProgress(g, sz);
 	} else {
 	    g.image(missing.layer(Resource.imgc).tex(), Coord.z, sz);
 	}
@@ -228,4 +232,76 @@ public class WItem extends Widget implements DTarget {
 	}
 	return(ret);
     }
+
+	public Window parentWindow() {
+		Widget parent = this.parent;
+		while (parent != null) {
+			if (parent instanceof Window)
+				return (Window) parent;
+			parent = parent.parent;
+		}
+		return null;
+	}
+
+	public double meter() {
+		Double meter = (item.meter > 0) ? (Double) (item.meter / 100.0) : itemmeter.get();
+		return meter == null ? 0 : meter;
+	}
+
+	private void drawCircleProgress(GOut g, Coord sz) {
+		double meter = meter();
+		if(meter > 0) {
+			g.chcolor(255, 255, 255, 64);
+			Coord half = sz.div(2);
+			g.prect(half, half.inv(), half, meter * Math.PI * 2);
+			g.chcolor();
+			Tex tex = Text.renderstroked(String.format("%d%%", Math.round(100 * meter))).tex();
+			g.aimage(tex, sz.div(2), 0.5, 0.5);
+			tex.dispose();
+		}
+	}
+
+	private void drawTimeProgress(GOut g, Coord sz) {
+		double meter = meter();
+		if(meter > 0) {
+			Tex studyTime = getStudyTime();
+			if(studyTime == null) {
+				Tex tex = Text.renderstroked(String.format("%d%%", Math.round(100 * meter))).tex();
+				g.aimage(tex, sz.div(2), 0.5, 0.5);
+				tex.dispose();
+			}
+			if(studyTime != null) {
+				g.chcolor(0, 0, 0, 150);
+				int h = studyTime.sz().y;
+				g.frect(new Coord(0, sz.y - h+4), new Coord(sz.x+2, h));
+				g.chcolor();
+				g.aimage(studyTime, new Coord(sz.x / 2, sz.y), 0.5, 0.9);
+			}
+		}
+	}
+
+	private Tex getStudyTime() {
+		Pair<String, String> data = study.get();
+		String value = data == null ? null : data.a;
+		String tip = data == null ? null : data.b;
+		if(!Objects.equals(tip, cachedTipValue)) {
+			cachedTipValue = tip;
+			longtip = null;
+		}
+		if(value != null) {
+			if(!Objects.equals(value, cachedStudyValue)) {
+				if(cachedStudyTex != null) {
+					cachedStudyTex.dispose();
+					cachedStudyTex = null;
+				}
+			}
+
+			if(cachedStudyTex == null) {
+				cachedStudyValue = value;
+				cachedStudyTex = Text.renderstroked(value).tex();
+			}
+			return cachedStudyTex;
+		}
+		return null;
+	}
 }

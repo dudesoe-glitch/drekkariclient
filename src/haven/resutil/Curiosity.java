@@ -32,9 +32,10 @@ import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
 public class Curiosity extends ItemInfo.Tip implements GItem.ColorInfo {
-    public final Color better = new Color(0, 255, 0, 64), worse = new Color(255, 0, 0, 64);
+    public final Color better = new Color(0, 200, 0, 110), worse = new Color(175, 0, 0, 110);
     public final int exp, mw, enc, time;
     public final UI ui;
+	public transient final int lph;
 
     public Curiosity(Owner owner, int exp, int mw, int enc, int time) {
 	super(owner);
@@ -42,6 +43,7 @@ public class Curiosity extends ItemInfo.Tip implements GItem.ColorInfo {
 	this.mw = mw;
 	this.enc = enc;
 	this.time = time;
+	this.lph = (exp > 0 && time > 0) ? (int)((3600 * exp / time)*3.29f) : 0;
 	UI ui = null;
 	if(owner instanceof Widget) {
 	    Widget wdg = (Widget)owner;
@@ -54,6 +56,7 @@ public class Curiosity extends ItemInfo.Tip implements GItem.ColorInfo {
     static String[] units = {"s", "m", "h", "d"};
     static int[] div = {60, 60, 24};
     static String timefmt(int time) {
+	time =	(int) (time/3.29f);
 	int[] vals = new int[units.length];
 	vals[0] = time;
 	for(int i = 0; i < div.length; i++) {
@@ -64,8 +67,9 @@ public class Curiosity extends ItemInfo.Tip implements GItem.ColorInfo {
 	for(int i = units.length - 1; i >= 0; i--) {
 	    if(vals[i] > 0) {
 		if(buf.length() > 0)
-		    buf.append(' ');
-		buf.append(vals[i]);
+			buf.append(String.format(" %02d", vals[i]));
+		else
+			buf.append(vals[i]);
 		buf.append(units[i]);
 	    }
 	}
@@ -75,11 +79,17 @@ public class Curiosity extends ItemInfo.Tip implements GItem.ColorInfo {
     public BufferedImage tipimg() {
 	StringBuilder buf = new StringBuilder();
 	if(exp > 0)
-	    buf.append(String.format("Learning points: $col[192,192,255]{%s} ($col[192,192,255]{%s}/h)\n", Utils.thformat(exp), Utils.thformat(Math.round(exp / (time / 3600.0)))));
+	    buf.append(String.format("Learning points: $col[192,192,255]{%s}\n", Utils.thformat(exp)));
 	if(time > 0)
 	    buf.append(String.format("Study time: $col[192,255,192]{%s}\n", timefmt(time)));
-	if(mw > 0)
+	String remaining = remainingLongTip();
+	if(remaining != null)
+		buf.append(String.format("Remaining: $col[255,224,192]{%s}\n", remaining));
+	buf.append(String.format("LP/H: $col[192,255,255]{%d}\n", this.lph));
+	if(mw > 0) {
+		buf.append(String.format("LP/H/Weight: $col[192,255,255]{%d}\n", this.lph/mw));
 	    buf.append(String.format("Mental weight: $col[255,192,255]{%d}\n", mw));
+	}
 	if(enc > 0)
 	    buf.append(String.format("Experience cost: $col[255,255,192]{%d}\n", enc));
 	return(RichText.render(buf.toString(), 0).img);
@@ -103,4 +113,45 @@ public class Curiosity extends ItemInfo.Tip implements GItem.ColorInfo {
 	}
 	return(null);
     }
+
+	private String remainingLongTip() {
+		return remainingLongTip(remaining());
+	}
+	private String remainingLongTip(int remaining) {
+		if(remaining >= 0) {
+			return timefmt(remaining);
+		}
+		return null;
+	}
+
+	private String remainingShortTip(int time) {
+		if(time < 0) {return null;}
+		time = (int) (time / 3.29f); //short tip is always in real time
+		if(time >= 60) {
+			if(time > 3600) {
+				time = time / 60;
+			}
+			return String.format("%d:%02d", time / 60, time % 60);
+		} else {
+			return String.format("%02d", time);
+		}
+	}
+	public Pair<String, String> remainingTip() {
+		int time = remaining();
+		return new Pair<>(remainingShortTip(time), remainingLongTip(time));
+	}
+	public int remaining() {
+		if(owner instanceof GItem) {
+			GItem item = ((GItem) owner);
+			GItem.MeterInfo m = ItemInfo.find(GItem.MeterInfo.class, item.info());
+			double meter = (m != null) ? m.meter() : 0;
+			if(meter > 0) {
+				long now = System.currentTimeMillis();
+				long remStudy = (long) ((1.0 - meter) * time);
+				long elapsed = (long) (3.29f * (now - item.meterUpdated) / 1000);
+				return (int) (remStudy - elapsed);
+			}
+		}
+		return -1;
+	}
 }

@@ -48,6 +48,7 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
     private ItemInfo.Raw rawinfo;
     private List<ItemInfo> info = Collections.emptyList();
 	public boolean sendttupdate = false;
+	public long meterUpdated = 0; // ND: last time meter was updated, ms
 
     @RName("item")
     public static class $_ implements Factory {
@@ -215,6 +216,7 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 			wdgmsg("ttupdate");
 		}
 	    infoseq++;
+		meterUpdated = System.currentTimeMillis();
 	} else if(name == "meter") {
 	    meter = Utils.iv(args[0]);
 	} else if(name == "contopen") {
