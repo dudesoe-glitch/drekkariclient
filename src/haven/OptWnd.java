@@ -971,6 +971,7 @@ public class OptWnd extends Window {
 	public static CheckBox flatCaveWallsCheckBox;
 	public static HSlider treeAndBushScaleSlider;
 	private Button treeAndBushScaleResetButton;
+	public static CheckBox disableTreeAndBushSwayingCheckBox;
 
 	public class WorldGraphicsSettingsPanel extends Panel {
 
@@ -1101,6 +1102,14 @@ public class OptWnd extends Window {
 				Utils.setprefi("treeAndBushScale", 100);
 			}), prev.pos("bl").adds(210, -20));
 			treeAndBushScaleResetButton.tooltip = resetButtonTooltip;
+			prev = add(disableTreeAndBushSwayingCheckBox = new CheckBox("Disable Tree & Bush Swaying"){
+				{a = Utils.getprefb("disableTreeAndBushSwaying", false);}
+				public void changed(boolean val) {
+					Utils.setprefb("disableTreeAndBushSwaying", val);
+					if (ui != null && ui.gui != null)
+						ui.sess.glob.oc.gobAction(Gob::reloadTreeSwaying);
+				}
+			}, prev.pos("bl").adds(12, 14));
 
 			Widget backButton;
 			add(backButton = new PButton(UI.scale(200), "Back", 27, back, "Advanced Settings"), prev.pos("bl").adds(0, 18));

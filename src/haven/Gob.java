@@ -29,6 +29,7 @@ package haven;
 import java.util.*;
 import java.util.function.*;
 import haven.render.*;
+import haven.res.lib.svaj.GobSvaj;
 import haven.res.lib.tree.TreeScale;
 
 public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, EquipTarget, RandomSource {
@@ -1012,6 +1013,20 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 					float scale = treeScale.originalScale;
 					delattr(TreeScale.class);
 					setattr(new TreeScale(this, (OptWnd.treeAndBushScaleSlider.val/100f) * scale, scale));
+				}
+			}
+		}
+	}
+
+	public void reloadTreeSwaying(){
+		GobSvaj gobSvaj = null;
+		if (getres() != null) {
+			if ((getres().name.startsWith("gfx/terobjs/trees") && !getres().name.endsWith("log") && !getres().name.endsWith("oldtrunk") && !getres().name.endsWith("trombonechantrelle") && !getres().name.endsWith("towercap")) || getres().name.startsWith("gfx/terobjs/bushes")) {
+				gobSvaj = getattr(GobSvaj.class);
+				if (gobSvaj != null && (OptWnd.disableTreeAndBushSwayingCheckBox.a)) {
+					delattr(GobSvaj.class);
+				} else if (!OptWnd.disableTreeAndBushSwayingCheckBox.a) {
+					setattr(new GobSvaj(this));
 				}
 			}
 		}
