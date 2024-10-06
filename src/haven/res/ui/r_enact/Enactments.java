@@ -21,7 +21,7 @@ public class Enactments extends Widget {
     public Costbox cost;
 
     public Enactments() {
-	add(Frame.with(info = new LoadingTextBox(new Coord(CharWnd.attrw, UI.scale(290)), "", CharWnd.ifnd), true), 0, 0);
+	add(Frame.with(info = new LoadingTextBox(new Coord(CharWnd.attrw, UI.scale(350)), "", CharWnd.ifnd), true), 0, 0);
 	info.bg = new Color(0, 0, 0, 128);
 	int right = info.parent.sz.x + UI.scale(10);
 	adda(Frame.with(list = new EList(Coord.of(rwidth, (namef.height() + UI.scale(2)) * 7)), false), info.parent.pos("ur").adds(10, 0), 0.0, 0.0);
