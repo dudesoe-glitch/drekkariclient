@@ -966,6 +966,7 @@ public class OptWnd extends Window {
 	public static CheckBox simplifiedForageablesCheckBox;
 	public static CheckBox hideFlavorObjectsCheckBox;
 	public static CheckBox flatWorldCheckBox;
+	public static CheckBox disableTileSmoothingCheckBox;
 
 	public class WorldGraphicsSettingsPanel extends Panel {
 
@@ -1043,7 +1044,18 @@ public class OptWnd extends Window {
 				}
 			}, prev.pos("bl").adds(0, 12));
 			flatWorldCheckBox.tooltip = flatWorldTooltip;
-
+			prev = add(disableTileSmoothingCheckBox = new CheckBox("Disable Tile Smoothing"){
+				{a = Utils.getprefb("disableTileSmoothing", false);}
+				public void changed(boolean val) {
+					Utils.setprefb("disableTileSmoothing", val);
+					if (ui.sess != null)
+						ui.sess.glob.map.invalidateAll();
+					if (ui != null && ui.gui != null) {
+						ui.gui.optionInfoMsg("Tile Smoothing is now " + (val ? "DISABLED" : "ENABLED") + "!", (val ? msgRed : msgGreen));
+					}
+				}
+			}, prev.pos("bl").adds(0, 2));
+			disableTileSmoothingCheckBox.tooltip = disableTileSmoothingTooltip;
 			Widget backButton;
 			add(backButton = new PButton(UI.scale(200), "Back", 27, back, "Advanced Settings"), prev.pos("bl").adds(0, 18));
 			pack();
@@ -1316,6 +1328,7 @@ public class OptWnd extends Window {
 	private final Object flatWorldTooltip = RichText.render("Enabling this will make the entire game world terrain flat." +
 			"\n$col[185,185,185]{Cliffs will still be drawn with their relative height, scaled down.}" +
 			"\n$col[218,163,0]{Action Button:} $col[185,185,185]{This option can also be turned on/off using an action button from the menu grid (Custom Client Extras → Toggles).}", UI.scale(320));
+	private final Object disableTileSmoothingTooltip = RichText.render("$col[218,163,0]{Action Button:} $col[185,185,185]{This option can also be turned on/off using an action button from the menu grid (Custom Client Extras → Toggles).}", UI.scale(320));
 
 	// Misc/Other
 	private final Object resetButtonTooltip = RichText.render("Reset to default", UI.scale(300));

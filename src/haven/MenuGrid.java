@@ -709,6 +709,7 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 		// Category: Toggles
 		makeLocal("customclient/menugrid/Toggles/FlavorObjects");
 		makeLocal("customclient/menugrid/Toggles/FlatWorld");
+		makeLocal("customclient/menugrid/Toggles/TileSmoothing");
 	}
 
 	public void useCustom(String[] ad) {
@@ -720,6 +721,8 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 				OptWnd.hideFlavorObjectsCheckBox.set(!OptWnd.hideFlavorObjectsCheckBox.a);
 			} else if (ad[2].equals("FlatWorld")) {
 				OptWnd.flatWorldCheckBox.set(!OptWnd.flatWorldCheckBox.a);
+			} else if (ad[2].equals("TileSmoothing")) {
+				OptWnd.disableTileSmoothingCheckBox.set(!OptWnd.disableTileSmoothingCheckBox.a);
 			}
 		}
 	}
