@@ -968,6 +968,7 @@ public class OptWnd extends Window {
 	public static CheckBox flatWorldCheckBox;
 	public static CheckBox disableTileSmoothingCheckBox;
 	public static CheckBox disableTileTransitionsCheckBox;
+	public static CheckBox flatCaveWallsCheckBox;
 
 	public class WorldGraphicsSettingsPanel extends Panel {
 
@@ -1069,6 +1070,16 @@ public class OptWnd extends Window {
 				}
 			}, prev.pos("bl").adds(0, 2));
 			disableTileTransitionsCheckBox.tooltip = disableTileTransitionsTooltip;
+			prev = add(flatCaveWallsCheckBox = new CheckBox("Flat Cave Walls"){
+				{a = Utils.getprefb("flatCaveWalls", false);}
+				public void changed(boolean val) {
+					Utils.setprefb("flatCaveWalls", val);
+					if (ui.sess != null)
+						ui.sess.glob.map.invalidateAll();
+					if (ui != null && ui.gui != null)
+						ui.gui.optionInfoMsg("Flat Cave Walls are now " + (val ? "ENABLED" : "DISABLED") + "!", (val ? msgGreen : msgRed));
+				}
+			}, prev.pos("bl").adds(0, 2));
 
 			Widget backButton;
 			add(backButton = new PButton(UI.scale(200), "Back", 27, back, "Advanced Settings"), prev.pos("bl").adds(0, 18));
