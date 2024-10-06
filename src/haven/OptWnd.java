@@ -974,6 +974,7 @@ public class OptWnd extends Window {
 	public static CheckBox disableTreeAndBushSwayingCheckBox;
 	public static CheckBox disableObjectAnimationsCheckBox;
 	public static CheckBox disableIndustrialSmokeCheckBox;
+	public static CheckBox disableScentSmokeCheckBox;
 
 	public class WorldGraphicsSettingsPanel extends Panel {
 
@@ -1136,6 +1137,26 @@ public class OptWnd extends Window {
 									}
 								}
 								gob.ols.clear();
+							}
+						}
+					}
+				}
+			}, prev.pos("bl").adds(0, 2));
+			prev = add(disableScentSmokeCheckBox = new CheckBox("Disable Scent Smoke (Requires Reload)"){
+				{a = (Utils.getprefb("disableScentSmoke", false));}
+				public void changed(boolean val) {
+					Utils.setprefb("disableScentSmoke", val);
+					if (val) synchronized (ui.sess.glob.oc){
+						synchronized (ui.sess.glob.oc){
+							for(Gob gob : ui.sess.glob.oc){
+								if(gob.getres() != null && gob.getres().name.equals("gfx/terobjs/clue")){
+									synchronized (gob.ols){
+										for(Gob.Overlay ol : gob.ols){
+											gob.removeOl(ol);
+										}
+									}
+									gob.ols.clear();
+								}
 							}
 						}
 					}
