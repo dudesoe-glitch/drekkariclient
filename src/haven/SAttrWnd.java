@@ -41,7 +41,7 @@ public class SAttrWnd extends Widget {
     public final Collection<SAttr> attrs;
     private final Coord studyc;
     private CharWnd chr;
-    private int scost;
+    private long scost;
 	private static ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 	private static Future<?> equiporyFuture;
 
@@ -54,52 +54,67 @@ public class SAttrWnd extends Widget {
 
     public class SAttr extends Widget {
 	public final String nm;
-	public final Text rnm;
+	public final Tex rnm;
 	public final Glob.CAttr attr;
 	public final Tex img;
 	public final Color bg;
-	public int tbv, cost;
+	public int tbv, tcv;
+	public long cost;
 	private final IButton add, sub;
 	private Text ct;
 	private int cbv, ccv;
+	public final Resource res;
+	private Tex baseTex = null;
+	private Tex buffedTex = null;
 
 	private SAttr(Glob glob, String attr, Color bg) {
 	    super(new Coord(attrw, attrf.height() + UI.scale(2)));
-	    Resource res = Resource.local().loadwait("gfx/hud/chr/" + attr);
+	    res = Resource.local().loadwait("gfx/hud/chr/" + attr);
 	    this.nm = attr;
 	    this.img = new TexI(convolve(res.flayer(Resource.imgc).img, new Coord(this.sz.y, this.sz.y), iconfilter));
-	    this.rnm = attrf.render(res.flayer(Resource.tooltip).t);
+	    this.rnm = changedSAttrNameTex(res.flayer(Resource.tooltip).t);
 	    this.attr = glob.getcattr(attr);
 	    this.bg = bg;
 	    add = adda(new IButton("gfx/hud/buttons/add", "u", "d", "h").action(() -> adj(1)),
-		       sz.x - UI.scale(5), sz.y / 2, 1, 0.5);
+		       sz.x, sz.y / 2, 1, 0.5);
 	    sub = adda(new IButton("gfx/hud/buttons/sub", "u", "d", "h").action(() -> adj(-1)),
-		       add.c.x - UI.scale(5), sz.y / 2, 1, 0.5);
+		       add.c.x, sz.y / 2, 1, 0.5);
 	}
 
 	public void tick(double dt) {
-	    if(attr.base != cbv) {
-		tbv = 0;
-		ccv = 0;
+		if ((attr.base != cbv) || (attr.comp != ccv)) {
 		cbv = attr.base;
-	    }
-	    if(attr.comp != ccv) {
 		ccv = attr.comp;
-		Color c = Color.WHITE;
-		if(ccv > cbv) {
-		    c = buff;
+		if (tbv <= cbv) {
+			tbv = cbv;
+			tcv = ccv;
+			updcost();
+		}
+		if (ccv > cbv) {
+			if (tbv > cbv) {
+				buffedTex = PUtils.strokeTex(attrf.render(Integer.toString(ccv + (tbv - cbv)), tbuff));
+			} else {
+				buffedTex = PUtils.strokeTex(attrf.render(Integer.toString(ccv), buff));
+			}
 		    tooltip = String.format("%d + %d", cbv, ccv - cbv);
-		} else if(ccv < cbv) {
-		    c = debuff;
+		} else if (ccv < cbv) {
+			if (tbv > cbv) {
+				buffedTex = PUtils.strokeTex(attrf.render(Integer.toString(ccv + (tbv - cbv)), tbuff));
+			} else {
+				buffedTex = PUtils.strokeTex(attrf.render(Integer.toString(ccv), debuff));
+			}
 		    tooltip = String.format("%d - %d", cbv, cbv - ccv);
 		} else {
+			buffedTex = null;
 		    tooltip = null;
 		}
-		if(tbv > 0)
-		    c = tbuff;
-		ct = attrf.render(Integer.toString(ccv + tbv), c);
+		if (tbv > cbv) {
+			baseTex = PUtils.strokeTex(attrf.render(Integer.toString(tbv), tbuff));
+		} else {
+			baseTex = PUtils.strokeTex(attrf.render(Integer.toString(cbv), Color.WHITE));
+		}
+		}
 		updcost();
-	    }
 	}
 
 	public void draw(GOut g) {
@@ -109,27 +124,31 @@ public class SAttrWnd extends Widget {
 	    super.draw(g);
 	    Coord cn = new Coord(0, sz.y / 2);
 	    g.aimage(img, cn.add(5, 0), 0, 0.5);
-	    g.aimage(rnm.tex(), cn.add(img.sz().x + UI.scale(10), 1), 0, 0.5);
-	    g.aimage(ct.tex(), cn.add(sub.c.x - UI.scale(5), 1), 1, 0.5);
+	    g.aimage(rnm, cn.add(img.sz().x + UI.scale(10), 1), 0, 0.6);
+		if (buffedTex != null)
+			g.aimage(buffedTex, cn.add(sz.x - UI.scale(40), 1), 1, 0.6);
+		if (baseTex != null)
+			g.aimage(baseTex, cn.add(sz.x - UI.scale(90), 1), 1, 0.6);
 	}
 
 	private void updcost() {
-	    int cv = attr.base, nv = cv + tbv;
-	    int cost = 100 * ((nv + (nv * nv)) - (cv + (cv * cv))) / 2;
+		long cost = 100 * ((tbv + ((long) tbv * tbv)) - (attr.base + ((long) attr.base * attr.base))) / 2;
 	    scost += cost - this.cost;
 	    this.cost = cost;
 	}
 
 	public void adj(int a) {
-	    if(tbv + a < 0) a = -tbv;
+		if (tbv + a < attr.base) a = attr.base - tbv;
 	    tbv += a;
-	    ccv = 0;
+		tcv += a;
+	    cbv = ccv = 0;
 	    updcost();
 	}
 
 	public void reset() {
 	    tbv = 0;
-	    ccv = 0;
+	    tcv = 0;
+		cbv = ccv = 0;
 	    updcost();
 	}
 
@@ -137,6 +156,16 @@ public class SAttrWnd extends Widget {
 	    adj(-a);
 	    return(true);
 	}
+
+	private Tex changedSAttrNameTex(String t){
+		if (t.equals("Unarmed Combat")){
+			t = "Unarmed (UA)";
+		} else if (t.equals("Melee Combat")) {
+			t = "Melee (MC)";
+		}
+		return PUtils.strokeTex(attrf.render(t));
+	}
+
     }
 
     public RLabel<?> explabel() {
@@ -154,27 +183,27 @@ public class SAttrWnd extends Widget {
 
     public static class StudyInfo extends Widget {
 	public final Widget study;
-	public int texp, tw, tenc;
+	public int texp, tw, tenc, tlph;
 
 	private StudyInfo(Coord sz, Widget study) {
 	    super(sz);
 	    this.study = study;
 	    Widget plbl, pval;
-	    plbl = add(new Label("Attention:"), UI.scale(2, 2));
+	    plbl = add(new Label("Attention:"), UI.scale(2, 10));
 	    pval = adda(new RLabel<Pair<Integer, Integer>>(() -> new Pair<>(tw, (ui == null) ? 0 : ui.sess.glob.getcattr("int").comp),
 							   n -> String.format("%,d/%,d", n.a, n.b),
 							   new Color(255, 192, 255, 255)),
-			plbl.pos("br").adds(0, 2).x(sz.x - UI.scale(2)), 1.0, 0.0);
+				plbl.pos("ur").adds(0, 2).x(sz.x - UI.scale(2)), 1.0, 0.0);
 	    plbl = add(new Label("Experience cost:"), pval.pos("bl").adds(0, 2).xs(2));
-	    pval = adda(new RLabel<Integer>(() -> tenc, Utils::thformat, new Color(255, 255, 192, 255)),
-			plbl.pos("br").adds(0, 2).x(sz.x - UI.scale(2)), 1.0, 0.0);
-	    pval = adda(new RLabel<Integer>(() -> texp, Utils::thformat, new Color(192, 192, 255, 255)),
-			pos("cbr").subs(2, 2), 1.0, 1.0);
-	    plbl = adda(new Label("Learning points:"), pval.pos("ul").subs(0, 2).xs(2), 0.0, 1.0);
+	    pval = adda(new RLabel<Integer>(() -> tenc, Utils::thformat, new Color(255, 255, 192, 255)), plbl.pos("ur").adds(0, 2).x(sz.x - UI.scale(2)), 1.0, 0.0);
+		plbl = add(new Label("Learning points:"), pval.pos("bl").adds(0, 30).xs(2));
+	    pval = adda(new RLabel<Integer>(() -> texp, Utils::thformat, new Color(192, 192, 255, 255)), plbl.pos("ur").adds(0, 2).x(sz.x - UI.scale(2)), 1.0, 0.0);
+		plbl = add(new Label("LP/Hour:"), pval.pos("bl").adds(0, 2).xs(2));
+		pval = adda(new RLabel<Integer>(() -> tlph, Utils::thformat, new Color(192, 255, 255, 255)), plbl.pos("ur").adds(0, 2).x(sz.x - UI.scale(2)), 1.0, 0.0);
 	}
 
 	private void upd() {
-	    int texp = 0, tw = 0, tenc = 0;
+	    int texp = 0, tw = 0, tenc = 0,  tlph = 0;
 	    for(GItem item : study.children(GItem.class)) {
 		try {
 		    Curiosity ci = ItemInfo.find(Curiosity.class, item.info());
@@ -182,11 +211,12 @@ public class SAttrWnd extends Widget {
 			texp += ci.exp;
 			tw += ci.mw;
 			tenc += ci.enc;
+			tlph += ci.lph;
 		    }
 		} catch(Loading l) {
 		}
 	    }
-	    this.texp = texp; this.tw = tw; this.tenc = tenc;
+	    this.texp = texp; this.tw = tw; this.tenc = tenc; this.tlph = tlph;
 	}
 
 	public void tick(double dt) {
@@ -199,15 +229,15 @@ public class SAttrWnd extends Widget {
 	ArrayList<Object> args = new ArrayList<>();
 	for (SAttr attr : attrs) {
 	    if (attr.tbv > 0) {
-		args.add(attr.attr.nm);
-		args.add(attr.attr.base + attr.tbv);
-		if (equiporyFuture != null)
-			equiporyFuture.cancel(true);
-		// ND: Hopefully 500ms is enough
-		equiporyFuture = executor.scheduleWithFixedDelay(this::resetEquiporyBottomText, 500, 5000, TimeUnit.MILLISECONDS);
-	    }
+			args.add(attr.attr.nm);
+			args.add(attr.tbv);
+		}
 	}
 	wdgmsg("sattr", args.toArray(new Object[0]));
+	if (equiporyFuture != null)
+		equiporyFuture.cancel(true);
+	// ND: Hopefully 500ms is enough
+	equiporyFuture = executor.scheduleWithFixedDelay(this::resetEquiporyBottomText, 500, 5000, TimeUnit.MILLISECONDS);
     }
 
     private void reset() {
@@ -244,7 +274,7 @@ public class SAttrWnd extends Widget {
 	prev = add(new Label("Learning points:"), prev.pos("bl").adds(0, 2));
 	adda(explabel(), new Coord(rx, prev.pos("ul").y), 1.0, 0.0);
 	prev = add(new Label("Learning cost:"), prev.pos("bl").adds(0, 2));
-	adda(new RLabel<Integer>(() -> scost, Utils::thformat, n -> (n > chr.exp) ? debuff : Color.WHITE), new Coord(rx, prev.pos("ul").y), 1.0, 0.0);
+	adda(new RLabel<Long>(() -> scost, Utils::thformat, n -> (n > chr.exp) ? debuff : Color.WHITE), new Coord(rx, prev.pos("ul").y), 1.0, 0.0);
 	prev = adda(new Button(UI.scale(75), "Buy").action(this::buy), bframe.pos("ibr").subs(5, 5), 1.0, 1.0);
 	adda(new Button(UI.scale(75), "Reset").action(this::reset), prev.pos("bl").subs(5, 0), 1.0, 1.0);
 	pack();

@@ -56,19 +56,22 @@ public class BAttrWnd extends Widget {
 
     public static class Attr extends Widget {
 	public final String nm;
-	public final Text rnm;
+	public final Tex rnm;
 	public final Glob.CAttr attr;
 	public final Tex img;
 	public final Color bg;
 	private double lvlt = 0.0;
 	private Text ct;
 	private int cbv = -1, ccv = -1;
+	public final Resource res;
+	private Tex totalStatTex = null;
+	private Tex baseStatTex = null;
 
 	private Attr(Glob glob, String attr, Color bg) {
 	    super(new Coord(attrw, attrf.height() + UI.scale(2)));
-	    Resource res = Resource.local().loadwait("gfx/hud/chr/" + attr);
+	    res = Resource.local().loadwait("gfx/hud/chr/" + attr);
 	    this.nm = attr;
-	    this.rnm = attrf.render(res.flayer(Resource.tooltip).t);
+	    this.rnm = PUtils.strokeTex(attrf.render(res.layer(Resource.tooltip).t));
 	    this.img = new TexI(convolve(res.flayer(Resource.imgc).img, new Coord(this.sz.y, this.sz.y), iconfilter));
 	    this.attr = glob.getcattr(attr);
 	    this.bg = bg;
@@ -77,17 +80,17 @@ public class BAttrWnd extends Widget {
 	public void tick(double dt) {
 	    if((attr.base != cbv) || (attr.comp != ccv)) {
 		cbv = attr.base; ccv = attr.comp;
-		Color c = Color.WHITE;
 		if(ccv > cbv) {
-		    c = buff;
 		    tooltip = String.format("%d + %d", cbv, ccv - cbv);
+			totalStatTex = PUtils.strokeTex(attrf.render(Integer.toString(ccv), buff));
 		} else if(ccv < cbv) {
-		    c = debuff;
 		    tooltip = String.format("%d - %d", cbv, cbv - ccv);
+			totalStatTex = PUtils.strokeTex(attrf.render(Integer.toString(ccv), debuff));
 		} else {
-		    tooltip = null;
+			tooltip = null;
+			totalStatTex = null;
 		}
-		ct = attrf.render(Integer.toString(ccv), c);
+		baseStatTex = PUtils.strokeTex(attrf.render(Integer.toString(cbv), Color.WHITE));
 	    }
 	    if((lvlt > 0.0) && ((lvlt -= dt) < 0))
 		lvlt = 0.0;
@@ -102,9 +105,11 @@ public class BAttrWnd extends Widget {
 	    g.chcolor();
 	    Coord cn = new Coord(0, sz.y / 2);
 	    g.aimage(img, cn.add(5, 0), 0, 0.5);
-	    g.aimage(rnm.tex(), cn.add(img.sz().x + UI.scale(10), 1), 0, 0.5);
-	    if(ct != null)
-		g.aimage(ct.tex(), cn.add(sz.x - UI.scale(7), 1), 1, 0.5);
+	    g.aimage(rnm, cn.add(img.sz().x + UI.scale(10), 1), 0, 0.6);
+		if (totalStatTex != null)
+			g.aimage(totalStatTex, cn.add(sz.x - UI.scale(12), 1), 1, 0.6);
+		if (baseStatTex != null)
+			g.aimage(baseStatTex, cn.add(sz.x - UI.scale(70), 1), 1, 0.6);
 	}
 
 	public void lvlup() {
@@ -126,8 +131,8 @@ public class BAttrWnd extends Widget {
 
     public static class Constipations extends SListBox<Constipations.El, Widget> {
 	public static final PUtils.Convolution tflt = new PUtils.Hanning(1);
-	public static final Color hilit = new Color(255, 255, 0, 48);
-	public static final Color buffed = new Color(160, 255, 160), full = new Color(250, 230, 64), none = new Color(250, 19, 43);
+	public static final Color hilit = new Color(0, 200, 0, 96);
+	public static final Color buffed = new Color(160, 255, 160), full = new Color(255, 21, 21), none = new Color(49, 255, 39);
 	public final List<El> els = new ArrayList<El>();
 	public static final Comparator<El> ecmp = (a, b) -> {
 	    if(a.a < b.a)
@@ -142,8 +147,8 @@ public class BAttrWnd extends Widget {
 	    public double a;
 	    private boolean hl;
 
-	    public El(ResData t, double a) {this.t = t; this.a = a;}
-	    public void update(double a) {this.a = a;}
+	    public El(ResData t, double a) {this.t = t; this.a = 1.0-a;}
+	    public void update(double a) {this.a = 1.0-a;}
 	}
 
 	public Constipations(Coord sz) {
@@ -479,7 +484,7 @@ public class BAttrWnd extends Widget {
 	private Tex rtip = null;
 	public Object tooltip(Coord c, Widget prev) {
 	    if(rtip == null) {
-		rtip = RichText.render(String.format("%s: %.1f\u2030\nFood efficacy: %d%%", lbl, glut * 1000, Math.round(gmod * 100)), -1).tex();
+		rtip = RichText.render(String.format("%s: %.1f\u2030\nFEP Multiplier: %sx (%d%%)", lbl, glut * 1000, Utils.odformat2(gmod, 2), Math.round(gmod * 100)), -1).tex();
 	    }
 	    return(rtip);
 	}
@@ -487,7 +492,7 @@ public class BAttrWnd extends Widget {
 
     public BAttrWnd(Glob glob) {
 	Widget prev;
-	prev = add(CharWnd.settip(new Img(catf.render("Base Attributes").tex()), "gfx/hud/chr/tips/base"), Coord.z);
+	prev = add(CharWnd.settip(new Img(catf.render("Attributes").tex()), "gfx/hud/chr/tips/base"), Coord.z);
 	attrs = new ArrayList<>();
 	Attr aw;
 	attrs.add(aw = add(new Attr(glob, "str", every), prev.pos("bl").adds(5, 0).add(wbox.btloff())));
@@ -504,10 +509,16 @@ public class BAttrWnd extends Widget {
 	feps = add(new FoodMeter(), prev.pos("bl").adds(5, 2));
 
 	int ah = attrs.get(attrs.size() - 1).pos("bl").y - attrs.get(0).pos("ul").y;
-	prev = add(CharWnd.settip(new Img(catf.render("Food Satiations").tex()), "gfx/hud/chr/tips/constip"), width, 0);
+	prev = add(CharWnd.settip(new Img(catf.render("Food Efficiency").tex()), "gfx/hud/chr/tips/constip"), width, 0);
+	prev.tooltip = RichText.render("$col[218,163,0]{Food Efficiency} affects the percentage of $col[0,180,0]{FEPs} and $col[255,192,128]{Hunger} you gain from food." +
+			"\n$col[185,185,185]{Note that your Table + Chair, Account Verification and Subscription Status also affect FEP and Hunger gain.}" +
+			"\n" +
+			"\n$col[128,128,255]{Energy} gain is *NEVER* affected by $col[218,163,0]{Food Efficiency}, or anything else!" +
+			"\n$col[185,185,185]{You will always gain the full energy provided by all foods.}", 370);
 	cons = add(new Constipations(Coord.of(attrw, ah)), prev.pos("bl").adds(5, 0).add(wbox.btloff()));
 	prev = Frame.around(this, Collections.singletonList(cons));
 	prev = add(CharWnd.settip(new Img(catf.render("Hunger Level").tex()), "gfx/hud/chr/tips/hunger"), prev.pos("bl").x(width).adds(0, 10));
+	prev.tooltip = RichText.render("More Hunger (Satiety) = Less FEP Multiplier\nOK? ok.", 370);
 	glut = add(new GlutMeter(), prev.pos("bl").adds(5, 2));
 	pack();
     }

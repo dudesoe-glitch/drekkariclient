@@ -411,10 +411,10 @@ public class SkillWnd extends Widget {
 
 	prev = add(new Img(catf.render("Entries").tex()), width, 0);
 	Tabs lists = new Tabs(prev.pos("bl").adds(5, 0), new Coord(attrw + wbox.bisz().x, 0), this);
-	int gh = UI.scale(241);
+	int gh = UI.scale(319);
 	Tabs.Tab sktab = lists.add();
 	{
-	    Frame f = sktab.add(new Frame(new Coord(lists.sz.x, UI.scale(192)), false), 0, 0);
+	    Frame f = sktab.add(new Frame(new Coord(lists.sz.x, UI.scale(270)), false), 0, 0);
 	    int y = f.sz.y + UI.scale(5);
 	    skg = f.addin(new SkillGrid(Coord.z) {
 		    public void change(Skill sk) {
