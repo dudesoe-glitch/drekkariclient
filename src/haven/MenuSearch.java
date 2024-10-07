@@ -48,10 +48,11 @@ public class MenuSearch extends Window {
 			boolean psel = sel == item;
 			super.mousedown(c, button);
 			double now = Utils.rtime();
-			if(psel) {
+//			if(psel) {
 			    if(now - lastcl < 0.5)
 				menu.use(item.btn, new MenuGrid.Interaction(1, ui.modflags()), false);
-			}
+				setfocus(ui.gui.portrait); // ND: do this to defocus the search box after you select something. It's focusing on your portrait, which does nothing.
+//			}
 			lastcl = now;
 			return(true);
 		    }
@@ -147,8 +148,8 @@ public class MenuSearch extends Window {
     }
 
     public void tick(double dt) {
-	if(menu.cur != root)
-	    setroot(menu.cur);
+//	if(menu.cur != root) // ND: commented these 2 lines so the search checks for EVERYTHING, not just the current sub-menu in the menu-grid
+//	    setroot(menu.cur);
 	if(recons)
 	    updlist();
 	super.tick(dt);
