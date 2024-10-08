@@ -26,12 +26,18 @@
 
 package haven;
 
+import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.function.*;
 import java.io.*;
 import java.nio.file.*;
 import java.awt.image.*;
 import java.awt.Color;
+import java.util.stream.Collectors;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.*;
 
@@ -41,6 +47,7 @@ public class GobIcon extends GAttrib {
     public final Indir<Resource> res;
     public final byte[] sdt;
     private Icon icon;
+	private static LinkedHashMap<String, ArrayList<String>> mapIconPresets = new LinkedHashMap<String, ArrayList<String>>();
 
     public GobIcon(Gob g, Indir<Resource> res, byte[] sdt) {
 	super(g);
@@ -403,6 +410,8 @@ public class GobIcon extends GAttrib {
 		set.filens  = conf.filens;
 		if(set.markset = conf.markset)
 		    set.mark = conf.mark;
+		if (Config.mandatoryAlwaysEnabledMapIcons.keySet().stream().anyMatch(set.icon.name()::equals)) // ND: Do this to make sure mandatory icons are always enabled. Idk if there's a better place to put this.
+			set.defshow = set.show = true;
 	    }
 
 	    public void run() {
@@ -695,17 +704,45 @@ public class GobIcon extends GAttrib {
 	private final PackCont.LinPack cont;
 	private final IconList list;
 	private Widget setbox;
+	private final CheckBox selectAllCheckBox;
+	private GobIconCategoryList.GobCategory category = GobIconCategoryList.GobCategory.ALL;
+	private GobIconCategoryList iconCategoriesList;
+	private OldDropBox iconPresetsDropbox;
+	private String selectedPreset = null;
+	private ArrayList<String> enabledIcons = null;
+	private TextEntry newPresetName = null;
+	Window confirmOverwriteWnd = null;
+	private static ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+	private static Future<?> future;
 
 	public static class ListIcon {
 	    public final Setting conf;
 	    public final String name;
 	    public final Object[] id;
+		public Tex texName = null;
 
 	    public ListIcon(Setting conf) {
 		this.conf = conf;
 		this.name = conf.icon.name();
 		this.id = conf.icon.id();
 	    }
+
+		private Tex texImg = null;
+		public Tex texImg() {
+			if(this.texImg == null) {
+				this.texImg = tex(conf.res.get().layer(Resource.imgc).img);
+			}
+			return(this.texImg);
+		}
+
+		public static Tex tex(BufferedImage img) {
+			Coord tsz;
+			if(img.getWidth() > img.getHeight())
+				tsz = new Coord(elh, (elh * img.getHeight()) / img.getWidth());
+			else
+				tsz = new Coord((elh * img.getWidth()) / img.getHeight(), elh);
+			return(new TexI(PUtils.convolve(img, tsz, filter)));
+		}
 	}
 
 	private <T> Consumer<T> andsave(Consumer<T> main) {
@@ -717,6 +754,8 @@ public class GobIcon extends GAttrib {
 	public class IconList extends SSearchBox<ListIcon, IconList.IconLine> {
 	    private List<ListIcon> ordered = Collections.emptyList();
 	    private Map<Setting.ID, Setting> cur = null;
+		private List<ListIcon> categorized = Collections.emptyList();
+		private boolean needsReorder = false;
 
 	    private IconList(Coord sz) {
 		super(sz, elh);
@@ -728,7 +767,19 @@ public class GobIcon extends GAttrib {
 		    Widget prev;
 		    prev = adda(new CheckBox("").state(() -> icon.conf.notify).set(andsave(val -> icon.conf.notify = val)).settip("Notify"),
 				sz.x - UI.scale(2) - (sz.y / 2), sz.y / 2, 0.5, 0.5);
-		    prev = adda(new CheckBox("").state(() -> icon.conf.show).set(andsave(val -> icon.conf.show = val)).settip("Display"),
+		    prev = adda(new CheckBox(""){
+						@Override
+						public void set(boolean val) {
+							if (Config.mandatoryAlwaysEnabledMapIcons.keySet().stream().anyMatch(icon.name::equals)){
+								icon.conf.show = true;
+								ui.gui.error(Config.mandatoryAlwaysEnabledMapIcons.get(icon.name));
+							} else {
+								icon.conf.show = val;
+							}
+							SettingsWindow.this.conf.dsave();
+							updateSelectAllCheckbox();
+						}
+					}.state(() -> icon.conf.show).settip("Show icon on map"),
 				prev.c.x - UI.scale(2) - (sz.y / 2), sz.y / 2, 0.5, 0.5);
 		    add(SListWidget.IconText.of(Coord.of(prev.c.x - UI.scale(2), sz.y), item.conf.icon::image, item.conf.icon::name), Coord.z);
 		}
@@ -738,12 +789,19 @@ public class GobIcon extends GAttrib {
 		return((icon.name != null) &&
 		       (icon.name.toLowerCase().indexOf(text.toLowerCase()) >= 0));
 	    }
-	    protected List<ListIcon> allitems() {return(ordered);}
+
+		@Override
+		public void updinfo() {
+			super.updinfo();
+			updateSelectAllCheckbox();
+		}
+
+		protected List<ListIcon> allitems() {return(categorized);}
 	    protected IconLine makeitem(ListIcon icon, int idx, Coord sz) {return(new IconLine(sz, icon));}
 
 	    public void tick(double dt) {
 		Map<Setting.ID, Setting> cur = this.cur;
-		if(cur != conf.settings) {
+		if(cur != conf.settings || needsReorder) {
 		    cur = conf.settings;
 		    ArrayList<ListIcon> ordered = new ArrayList<>(cur.size());
 		    for(Setting conf : cur.values())
@@ -758,18 +816,24 @@ public class GobIcon extends GAttrib {
 				return(c);
 			    return(0);
 			});
+			categorized = list.ordered.stream()
+					.filter(category::matches)
+					.collect(Collectors.toList());
+			needsReorder = false;
+			updateSelectAllCheckbox();
+			stopsearch(); // ND: Do this here to clear the search text when switching categories.
 		}
 		super.tick(dt);
 	    }
 
 	    public boolean keydown(java.awt.event.KeyEvent ev) {
-		if(ev.getKeyCode() == java.awt.event.KeyEvent.VK_SPACE) {
-		    if(sel != null) {
-			sel.conf.show = !sel.conf.show;
-			conf.dsave();
-		    }
-		    return(true);
-		}
+//		if(ev.getKeyCode() == java.awt.event.KeyEvent.VK_SPACE) {
+//		    if(sel != null) {
+//			sel.conf.show = !sel.conf.show;
+//			conf.dsave();
+//		    }
+//		    return(true);
+//		}
 		return(super.keydown(ev));
 	    }
 
@@ -792,7 +856,19 @@ public class GobIcon extends GAttrib {
 	    public IconSettings(int w, Setting conf) {
 		super(Coord.z);
 		this.conf = conf;
-		Widget prev = add(new CheckBox("Display").state(() -> conf.show).set(andsave(val -> conf.show = val)),
+		Widget prev = add(new CheckBox("Show icon on map"){
+					@Override
+					public void set(boolean val) {
+						if (Config.mandatoryAlwaysEnabledMapIcons.keySet().stream().anyMatch(conf.icon.name()::equals)){
+							conf.show = true;
+							ui.gui.error(Config.mandatoryAlwaysEnabledMapIcons.get(conf.icon.name()));
+						} else {
+							conf.show = val;
+						}
+						SettingsWindow.this.conf.dsave();
+						updateSelectAllCheckbox();
+					}
+				}.state(() -> conf.show),
 				  0, 0);
 		add(new CheckBox("Notify").state(() -> conf.notify).set(andsave(val -> conf.notify = val)),
 		    w / 2, 0);
@@ -875,12 +951,41 @@ public class GobIcon extends GAttrib {
 	}
 
 	public SettingsWindow(Settings conf) {
-	    super(Coord.z, "Icon settings");
+	    super(Coord.z, "Map Icons Settings");
 	    this.conf = conf;
-	    add(this.cont = new PackCont.LinPack.VPack(), Coord.z).margin(UI.scale(5)).packpar(true);
-	    list = cont.last(new IconList(UI.scale(250, 500)), 0);
-	    cont.last(new HRuler(list.sz.x), 0);
-	    cont.last(new CheckBox("Notification on newly seen icons") {
+		PackCont.LinPack.VPack left = new PackCont.LinPack.VPack();
+		PackCont.LinPack root = new PackCont.LinPack.HPack();
+		add(root, Coord.z).margin(UI.scale(5)).packpar(true);
+		root.last(left, 0).margin(UI.scale(5)).packpar(true);
+		root.last(new VRuler(UI.scale(500)), 0);
+		root.last(this.cont = new PackCont.LinPack.VPack(), 0).margin(UI.scale(5)).packpar(true);
+		selectAllCheckBox = cont.last(new CheckBox("Select All") {
+			@Override
+			public void changed(boolean val) {
+				try {
+					list.items().forEach(icon -> {
+						// ND: First check if it's a mandatory icon, and keep it enabled at all times
+						if (Config.mandatoryAlwaysEnabledMapIcons.keySet().stream().anyMatch(icon.conf.res.name::equals))
+							icon.conf.show = true;
+						else
+							icon.conf.show = val;
+					});
+					conf.dsave();
+				} catch (Loading ignored){} // ND: It crashes if you click on "Select all" while some buttons are still loading. This should prevent it.
+			}}, 0);
+	    list = cont.last(new IconList(UI.scale(280, 500)), 0);
+
+		left.last(iconCategoriesList = new GobIconCategoryList(UI.scale(164), 13, elh){
+			@Override
+			public void change(GobIconCategoryList.GobCategory item) {
+				super.change(item);
+				SettingsWindow.this.category = item;
+				list.needsReorder = true;
+			}
+		}, 0).change(GobIconCategoryList.GobCategory.ALL);
+
+	    left.last(new HRuler(164), 0);
+	    left.last(new CheckBox("Notify new icon discovery") {
 		    {this.a = conf.notify;}
 
 		    public void changed(boolean val) {
@@ -888,8 +993,180 @@ public class GobIcon extends GAttrib {
 			conf.dsave();
 		    }
 		}, UI.scale(5));
+
+		Widget selectPresetLabel = left.last(new Label("Select Preset:"), UI.scale(0));
+		iconPresetsDropbox = new OldDropBox<String>(UI.scale(116), 10, UI.scale(17)) {
+			{
+				super.change(0);
+				selectedPreset = "";
+			}
+			@Override
+			protected String listitem(int i) {
+				List<String> keys = new ArrayList<String>(mapIconPresets.keySet());
+				if (keys.size() > 0)
+					return keys.get(i);
+				else return "";
+			}
+			@Override
+			protected int listitems() {
+				return mapIconPresets.keySet().size();
+			}
+			@Override
+			protected void drawitem(GOut g, String item, int i) {
+				g.aimage(Text.renderstroked(item).tex(), Coord.of(UI.scale(3), g.sz().y / 2), 0.0, 0.5);
+			}
+			@Override
+			public void change(String item) {
+				super.change(item);
+				selectedPreset = item;
+			}
+		};
+
+		left.last(new Button(UI.scale(170), "Load Selected Preset", false).action(() -> {
+			if (!selectedPreset.equals("")) {
+				iconCategoriesList.change(GobIconCategoryList.GobCategory.ALL);
+				enabledIcons = new ArrayList<String>(mapIconPresets.get(selectedPreset));
+				if (future != null)
+					future.cancel(true);
+				future = executor.scheduleWithFixedDelay(this::applyPreset, 200, 300, TimeUnit.MILLISECONDS);
+				applyPreset();
+			} else {
+				ui.gui.error("Please select a preset to load!");
+			}
+		}), UI.scale(10));
+
+		left.last(new Button(UI.scale(170), "Delete Selected Preset", false).action(() -> {
+			if (!selectedPreset.equals("")) {
+				mapIconPresets.remove(selectedPreset);
+				ui.gui.msg(selectedPreset + " map icons preset has been deleted!", Color.WHITE, UI.MessageWidget.msgsfx);
+				selectedPreset = "";
+				iconPresetsDropbox.change(0);
+				savePresetsToFile();
+			} else {
+				ui.gui.error("Please select a preset to delete!");
+			}
+		}), UI.scale(10));
+
+		left.last(new Label(""), UI.scale(0));
+		Widget newPresetWidget = left.last(new Label("New Preset:"), UI.scale(8));
+		newPresetName = new TextEntry(UI.scale(120), ""){
+
+		};
+		left.last(new Button(UI.scale(170), "Save New Preset", false).action(() -> {
+			if (newPresetName.text().equals(""))
+				ui.gui.error("Please set a name for the new map icons preset!");
+			else if (newPresetName.text().trim().length() == 0)
+				ui.gui.error("Brother don't just use a bunch of spaces as the preset name, that's stupid. Give it a nice name.");
+			else if (mapIconPresets.keySet().stream().anyMatch(newPresetName.text()::equals)) {
+//					ui.gui.error("A preset named " + "\"" + newPresetName.text() + "\"" + " already exists. Please choose a different name, or delete the old one.");
+				SettingsWindow thisSettingsWindow = this;
+				if (confirmOverwriteWnd != null){
+					confirmOverwriteWnd.remove();
+					confirmOverwriteWnd = null;
+				}
+				confirmOverwriteWnd = new Window(UI.scale(new Coord(235, 90)), "Preset already exists!") {
+					{
+						Widget prev;
+						add(new Label("Are you sure you want to overwrite the preset?"), UI.scale(new Coord(10, 10)));
+						prev = add(new Label("Preset Name: "), UI.scale(new Coord(10, 30)));
+						add(new Label(newPresetName.text()), prev.pos("ur").adds(10, 0)).setcolor(new Color(255, 205, 0,255));
+
+						Button add = new Button(UI.scale(90), "Overwrite") {
+							@Override
+							public void click() {
+								iconCategoriesList.change(GobIconCategoryList.GobCategory.ALL);
+
+								if (future != null)
+									future.cancel(true);
+								future = executor.scheduleWithFixedDelay(thisSettingsWindow::savePreset, 200, 300, TimeUnit.MILLISECONDS);
+
+								parent.reqdestroy();
+							}
+						};
+						add(add, UI.scale(new Coord(15, 60)));
+
+						Button cancel = new Button(UI.scale(90), "No! Cancel!") {
+							@Override
+							public void click() {
+								parent.reqdestroy();
+							}
+						};
+						add(cancel, UI.scale(new Coord(130, 60)));
+					}
+
+					@Override
+					public void wdgmsg(Widget sender, String msg, Object... args) {
+						if (msg.equals("close"))
+							reqdestroy();
+						else
+							super.wdgmsg(sender, msg, args);
+					}
+
+				};
+				ui.gui.add(confirmOverwriteWnd, new Coord((ui.gui.sz.x - confirmOverwriteWnd.sz.x) / 2, (ui.gui.sz.y - confirmOverwriteWnd.sz.y*3) / 2));
+				confirmOverwriteWnd.show();
+			} else {
+				iconCategoriesList.change(GobIconCategoryList.GobCategory.ALL);
+
+				if (future != null)
+					future.cancel(true);
+				future = executor.scheduleWithFixedDelay(this::savePreset, 200, 300, TimeUnit.MILLISECONDS);
+			}
+		}), UI.scale(10));
+
+
+
 	    cont.pack();
+		left.pack();
+		left.add(iconPresetsDropbox, selectPresetLabel.pos("ur").adds(3, 2));
+		left.add(newPresetName, newPresetWidget.pos("ur").adds(4, -1));
+		root.pack();
+		updateSelectAllCheckbox();
 	}
+
+	private void updateSelectAllCheckbox() {
+		if(selectAllCheckBox == null) {
+			return;
+		}
+		List<? extends ListIcon> items = list != null ? list.items() : null;
+		selectAllCheckBox.a = items != null
+				&& !items.isEmpty()
+				&& items.stream().allMatch(icon -> icon.conf.show);
+	}
+
+	private void applyPreset(){
+		if (!list.needsReorder){
+			future.cancel(true);
+			list.items().forEach(icon -> {
+				if (Config.mandatoryAlwaysEnabledMapIcons.keySet().stream().anyMatch(icon.name::equals))
+					icon.conf.show = true;
+				if (enabledIcons.stream().anyMatch(icon.name::equals))
+					icon.conf.show = true;
+				else
+					icon.conf.show = false;
+			});
+			conf.dsave();
+			ui.gui.msg(selectedPreset + " map icons preset has been set!", Color.WHITE, UI.MessageWidget.msgsfx);
+		}
+	}
+
+	private void savePreset(){
+		if (!list.needsReorder){
+			future.cancel(true);
+			String presetName = newPresetName.text();
+			mapIconPresets.put(presetName, new ArrayList<String>() {{
+				list.items().forEach(icon -> {
+					if (icon.conf.show) {
+						add(icon.name);
+					}
+				});
+			}});
+			ui.gui.msg(presetName + " map icons preset has been saved!", Color.WHITE, UI.MessageWidget.msgsfx);
+			newPresetName.settext("");
+			savePresetsToFile();
+		}
+	}
+
     }
 
     @OCache.DeltaType(OCache.OD_ICON)
@@ -908,4 +1185,58 @@ public class GobIcon extends GAttrib {
 	    }
 	}
     }
+
+	public static void initPresets() {
+		load();
+	}
+
+	public static void load() {
+		mapIconPresets.clear();
+		File config = new File("MapIconsPresets/yourSavedPresets");
+		if (!config.exists()) {
+			defaultPresets();
+		} else {
+			loadPresetsFromFile(config);
+		}
+	}
+	private static void loadPresetsFromFile(File config) {
+		try {
+			mapIconPresets.put("", null);
+			for (String s : Files.readAllLines(Paths.get(config.toURI()), StandardCharsets.UTF_8)) {
+				String[] split = s.split("(;)");
+				if (!mapIconPresets.containsKey(split[0])) {
+					mapIconPresets.put(split[0], new ArrayList<String>() {{
+						for (int x = 1; x < split.length; x++) {
+							add(split[x]);
+						}
+					}});
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public static void defaultPresets() {
+		mapIconPresets.clear();
+		loadPresetsFromFile(new File("MapIconsPresets/defaultPresets"));
+	}
+
+	public static void savePresetsToFile() {
+		try {
+			BufferedWriter bw = Files.newBufferedWriter(Paths.get(new File("MapIconsPresets/yourSavedPresets").toURI()), StandardCharsets.UTF_8);
+			for (int x = 1; x < mapIconPresets.keySet().size(); x++) { // ND: Start at 1, cause 0 is always an empty string added in the code when settings are loaded
+				String presetName = ((String) mapIconPresets.keySet().toArray()[x]);
+				StringBuilder enabledIcons = new StringBuilder();
+				for (String icon : mapIconPresets.get(presetName)){
+					enabledIcons.append(";").append(icon);
+				}
+				bw.write(presetName + enabledIcons + "\n");
+			}
+			bw.flush();
+			bw.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 }

@@ -31,7 +31,6 @@ import java.awt.event.*;
 import java.io.*;
 import java.nio.file.*;
 import java.util.*;
-import java.lang.reflect.*;
 
 public class MainFrame extends java.awt.Frame implements Console.Directory, AWTEventListener {
     public static final Config.Variable<Boolean> initfullscreen = Config.Variable.propb("haven.fullscreen", false);
@@ -483,6 +482,7 @@ public class MainFrame extends java.awt.Frame implements Console.Directory, AWTE
 	}
 	Thread main = new HackThread(g, () -> main2(args), "Haven main thread");
 	main.start();
+	GobIcon.initPresets();
     }
 	
     private static void dumplist(Collection<Resource> list, Path fn) {

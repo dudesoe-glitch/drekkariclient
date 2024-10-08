@@ -107,7 +107,7 @@ public abstract class SSearchBox<I, W extends Widget> extends SListBox<I, W> {
 	return(super.keydown(ev));
     }
 
-    private void updinfo() {
+    public void updinfo() {
 	this.info = Text.renderf(Color.WHITE, "%s (%d/%d)", searching, filtered.size(), allitems().size());
     }
 
