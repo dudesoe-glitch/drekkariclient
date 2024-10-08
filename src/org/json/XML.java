@@ -25,7 +25,6 @@ SOFTWARE.
 */
 
 import haven.Config;
-/*import haven.CrashLogger;*/
 import haven.MainFrame;
 
 import java.util.Arrays;
@@ -333,7 +332,6 @@ public class XML {
                     return value;
                 }
             }  catch (Exception e) {
-                /*CrashLogger.logCrash(e);*/
             }
         }
         return string;
