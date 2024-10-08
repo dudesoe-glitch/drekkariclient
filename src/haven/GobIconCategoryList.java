@@ -79,6 +79,7 @@ public class GobIconCategoryList extends OldListBox<GobIconCategoryList.GobCateg
                 "/kritter/",
                 "/invobjs/bunny",
                 "/invobjs/bogturtle",
+                "/invobjs/bullfinch",
                 "/invobjs/cavecentipede",
                 "/invobjs/cavemoth",
                 "/invobjs/dragonfly",
@@ -119,11 +120,12 @@ public class GobIconCategoryList extends OldListBox<GobIconCategoryList.GobCateg
                 "/invobjs/irrbloss",
                 "/invobjs/bayshrimp",
                 "/invobjs/lobster",
-                "customMapIcons/tamedHorse",
-                "customMapIcons/opiumdragon",
-                "customMapIcons/dryad",
-                "customMapIcons/treant",
-                "/invobjs/bullfinch",
+                "customclient/mapicons/tamedHorse",
+                "customclient/mapicons/opiumdragon",
+                "customclient/mapicons/dryad",
+                "customclient/mapicons/treant",
+                "customclient/mapicons/stalagoomba",
+                "customclient/mapicons/mandrakespirited",
         };
 
         private static final String[] HERB_PATHS = {
@@ -135,12 +137,10 @@ public class GobIconCategoryList extends OldListBox<GobIconCategoryList.GobCateg
                 "/invobjs/champignon-small",
                 "/invobjs/clay-gray",
                 "/invobjs/clay-cave",
-                "customMapIcons/caveclaypuddle",
+                "customclient/mapicons/caveclaypuddle",
                 "/invobjs/whirlingsnowflake",
                 "/invobjs/small/yulestar",
                 "/invobjs/small/yulelights",
-                "customMapIcons/mandrakespirited",
-                "customMapIcons/stalagoomba",
         };
 
         private static final String[] ORE_PATHS = {
@@ -228,25 +228,25 @@ public class GobIconCategoryList extends OldListBox<GobIconCategoryList.GobCateg
                 "/terobjs/mm/tidepool",
         };
         private static final String[] TRANSPORTATION_PATH = {
-                "customMapIcons/knarr",
-                "customMapIcons/snekkja",
-                "customMapIcons/rowboat",
-                "customMapIcons/dugout",
-                "customMapIcons/coracle",
-                "customMapIcons/kicksled",
-                "customMapIcons/skis",
-                "customMapIcons/wagon",
+                "customclient/mapicons/knarr",
+                "customclient/mapicons/snekkja",
+                "customclient/mapicons/rowboat",
+                "customclient/mapicons/dugout",
+                "customclient/mapicons/coracle",
+                "customclient/mapicons/kicksled",
+                "customclient/mapicons/skis",
+                "customclient/mapicons/wagon",
         };
         private static final String[] TOOLS_PATH = {
-                "customMapIcons/wheelbarrow",
-                "customMapIcons/cart",
-                "customMapIcons/woodenplow",
-                "customMapIcons/metalplow",
+                "customclient/mapicons/wheelbarrow",
+                "customclient/mapicons/cart",
+                "customclient/mapicons/woodenplow",
+                "customclient/mapicons/metalplow",
         };
         private static final String[] SIEGEENGINES_PATH = {
-                "customMapIcons/bram",
-                "customMapIcons/catapult",
-                "customMapIcons/wreckingball",
+                "customclient/mapicons/bram",
+                "customclient/mapicons/catapult",
+                "customclient/mapicons/wreckingball",
         };
 
         GobCategory(String category) {

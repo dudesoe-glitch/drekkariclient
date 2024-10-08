@@ -1022,6 +1022,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 
 			}
 		}
+		updateCustomIcons();
 	}
 
 	public void updPose(HashSet<String> poses) {
@@ -1064,6 +1065,15 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 		if (ol != null) {
 			synchronized (ols) {
 				ol.remove();
+			}
+		}
+	}
+
+	public void updateCustomIcons() {
+		if(getattr(GobIcon.class) == null) {
+			GobIcon icon = GobIconsCustom.getIcon(this);
+			if(icon != null) {
+				setattr(icon);
 			}
 		}
 	}

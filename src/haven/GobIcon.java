@@ -55,6 +55,7 @@ public class GobIcon extends GAttrib {
 	this.sdt = sdt;
     }
 
+
     public static abstract class Icon {
 	public static final Object[] nilid = new Object[0];
 	public final OwnerContext owner;
@@ -619,6 +620,7 @@ public class GobIcon extends GAttrib {
 		l.load.add(res);
 		l.resolve.put(res, sets);
 	    }
+		GobIconsCustom.addCustomSettings(l, ui);
 	    l.submit();
 	}
 
@@ -1138,12 +1140,12 @@ public class GobIcon extends GAttrib {
 		if (!list.needsReorder){
 			future.cancel(true);
 			list.items().forEach(icon -> {
-				if (Config.mandatoryAlwaysEnabledMapIcons.keySet().stream().anyMatch(icon.name::equals))
-					icon.conf.show = true;
 				if (enabledIcons.stream().anyMatch(icon.name::equals))
 					icon.conf.show = true;
 				else
 					icon.conf.show = false;
+				if (Config.mandatoryAlwaysEnabledMapIcons.keySet().stream().anyMatch(icon.name::equals))
+					icon.conf.show = true;
 			});
 			conf.dsave();
 			ui.gui.msg(selectedPreset + " map icons preset has been set!", Color.WHITE, UI.MessageWidget.msgsfx);
