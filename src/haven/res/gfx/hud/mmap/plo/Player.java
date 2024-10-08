@@ -11,7 +11,8 @@ import java.awt.image.*;
 
 @haven.FromResource(name = "gfx/hud/mmap/plo", version = 12)
 public class Player extends GobIcon.Icon {
-    public static final Resource.Image img = Resource.classres(Player.class).layer(Resource.imgc);
+	// ND: I have to replace this image manually, rather than the entire "gfx/hud/mmap/plo", cause if I do that, only one player icon is visible in the map icons list. Idk how that works, but this way it works properly.
+    public static final Resource.Image img = Resource.local().loadwait("customclient/mapicons/playerIcon").layer(Resource.imgc);
     public final Gob gob = owner.fcontext(Gob.class, false);
     public final int group;
 
