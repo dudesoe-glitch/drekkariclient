@@ -250,7 +250,9 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 	    String genus = "";
 	    if(args.length > 2)
 		genus = (String)args[2];
-	    return(new GameUI(chrid, plid, genus));
+		GameUI gui = new GameUI(chrid, plid, genus);
+		ui.setGUI(gui);
+		return gui;
 	}
     }
     
@@ -333,13 +335,13 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 
 	@Override
 	protected void attach(UI ui) {
-		ui.gui = this;
+		ui.setGUI(this);
 		super.attach(ui);
 	}
 	@Override
 	public void destroy() {
 		super.destroy();
-		ui.gui = null;
+		ui.clearGUI(this);
 	}
 
     public static final KeyBinding kb_srch = KeyBinding.get("scm-srch", KeyMatch.forchar('F', KeyMatch.C));

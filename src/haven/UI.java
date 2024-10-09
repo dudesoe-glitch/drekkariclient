@@ -65,6 +65,7 @@ public class UI {
     public final CommandQueue queue = new CommandQueue();
     private static final double scalef;
 	public GameUI gui = null;
+	private final Object guiLock = new Object();
     
     {
 	lastevent = lasttick = Utils.rtime();
@@ -916,4 +917,19 @@ public class UI {
     static {
 	scalef = loadscale();
     }
+
+	public void setGUI(GameUI gui) {
+		synchronized (guiLock) {
+			this.gui = gui;
+		}
+	}
+
+	public void clearGUI(GameUI gui) {
+		synchronized (guiLock) {
+			if(this.gui == gui) {
+				this.gui = null;
+			}
+		}
+	}
+
 }
