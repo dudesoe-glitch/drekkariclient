@@ -50,7 +50,7 @@ public class MCache implements MapSource {
     private final Waitable.Queue gridwait = new Waitable.Queue();
     Map<Coord, Request> req = new HashMap<Coord, Request>();
     Map<Coord, Grid> grids = new HashMap<Coord, Grid>();
-    Session sess;
+    public Session sess;
     Set<Overlay> ols = new HashSet<Overlay>();
     public int olseq = 0, chseq = 0;
     Map<Integer, Defrag> fragbufs = new TreeMap<Integer, Defrag>();

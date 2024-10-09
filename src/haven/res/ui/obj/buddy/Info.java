@@ -56,9 +56,15 @@ public class Info extends GAttrib implements RenderTree.Node, PView.Render2D {
 		show = Color.WHITE;
 	    }
 	    if(show != null) {
-		g.chcolor(show);
-		g.aimage(rend, sc, 0.5, 1.0);
-		g.chcolor();
+			if (gob != null && gob.glob != null && gob.glob.sess != null && gob.glob.sess.ui != null
+					&& gob.glob.sess.ui.gui != null && gob.glob.sess.ui.gui.map != null) { // ND: Literal overkill and I'm pretty sure it's impossible for these to be null, but better safe than sorry
+				final double angle = gob.glob.sess.ui.gui.map.screenangle(gob.rc, true, 15);
+				if (Double.isNaN(angle)) {
+					g.chcolor(show);
+					g.aimage(rend, sc, 0.5, 1.0);
+					g.chcolor();
+				}
+			}
 	    }
 	} else {
 	    seen = 0;

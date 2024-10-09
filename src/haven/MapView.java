@@ -2589,4 +2589,22 @@ public class MapView extends PView implements DTarget, Console.Directory {
 		camera.snap(direction);
 	}
 
+	public double screenangle(Coord2d mc, boolean clip, float extraZ) {
+		Coord3f cc;
+		try {
+			cc = getcc();
+		} catch(Loading e) {
+			return(Double.NaN);
+		}
+		Coord3f mloc = new Coord3f((float)mc.x, -(float)mc.y, cc.z + extraZ);
+		float[] sloc = camera.proj.toclip(camera.view.fin(Matrix4f.id).mul4(mloc));
+		if(clip) {
+			float w = sloc[3];
+			if((sloc[0] > -w) && (sloc[0] < w) && (sloc[1] > -w) && (sloc[1] < w))
+				return(Double.NaN);
+		}
+		float a = ((float)sz.y) / ((float)sz.x);
+		return(Math.atan2(sloc[1] * a, sloc[0]));
+	}
+
 }
