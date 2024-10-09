@@ -63,6 +63,7 @@ public class Session implements Resource.Resolver {
     public final Glob glob;
     public byte[] sesskey;
     private boolean closed = false;
+	public UI ui;
 
     @SuppressWarnings("serial")
     public static class MessageException extends RuntimeException {

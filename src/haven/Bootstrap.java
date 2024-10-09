@@ -256,6 +256,7 @@ public class Bootstrap implements UI.Receiver, UI.Runner {
 			    ui.uimsg(1, "prg", String.format("Connecting (address %d/%d)...", i + 1, addrs.length));
 			try {
 			    sess = new Session(new InetSocketAddress(addrs[i], port), acctname, cookie);
+				sess.ui = ui;
 			    break connect;
 			} catch(Connection.SessionConnError err) {
 			} catch(Connection.SessionError err) {
