@@ -311,7 +311,54 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 //	foldbuttons();
 	portrait = ulpanel.add(Frame.with(new Avaview(Avaview.dasz, plid, "avacam"), false), UI.scale(10, 10));
 	buffs = ulpanel.add(new Bufflist(), portrait.c.x + portrait.sz.x + UI.scale(10), portrait.c.y + ((IMeter.fsz.y + UI.scale(2)) * 2) + UI.scale(5 - 2));
-	umpanel.add(new Cal(), Coord.z);
+	umpanel.add(new Cal(),UI.scale(new Coord(0, 8)));
+
+	add(new Widget(new Coord(360, umpanel.sz.y)) {
+		@Override
+		public void draw(GOut g) {
+				if (c.x != umpanel.c.x - (int) (this.sz.x * 0.98))
+					c.x = umpanel.c.x - (int) (this.sz.x * 0.98);
+				Tex mtime = ui.sess.glob.mservertimetex.get().b;
+				Tex ltime = ui.sess.glob.lservertimetex.get().b;
+				Tex rtime = ui.sess.glob.rservertimetex.get().b;
+				Tex btime = ui.sess.glob.bservertimetex.get().b;
+
+				int y = UI.scale(10);
+				if (mtime != null) {
+					g.aimage(mtime, new Coord(sz.x, y), 1, 0);
+					y += mtime.sz().y;
+				}
+				if (ltime != null) {
+					g.aimage(ltime, new Coord(sz.x, y), 1, 0);
+					y += ltime.sz().y;
+				}
+				if (rtime != null) {
+					g.aimage(rtime, new Coord(sz.x, y), 1, 0);
+					y += rtime.sz().y;
+				}
+				if (btime != null) {
+					g.aimage(btime, new Coord(sz.x, y), 1, 0);
+					y += btime.sz().y;
+				}
+				if (sz.y != y) resize(sz.x, y);
+		}
+	}, new Coord(umpanel.c.x - (int)(this.sz.x*0.98), UI.scale(1)));
+
+	add(new StatusWdg(){
+		@Override
+		public void draw(GOut g) {
+				if (c.x != umpanel.c.x + umpanel.sz.x - UI.scale(10))
+					c.x = umpanel.c.x + umpanel.sz.x - UI.scale(10);
+				g.image(players, Coord.z);
+				g.image(pingtime, new Coord(0, players.sz().y));
+				int w = players.sz().x;
+				if (pingtime.sz().x > w)
+					w = pingtime.sz().x;
+				this.sz = new Coord(w, players.sz().y + pingtime.sz().y);
+		}
+	}, new Coord(umpanel.sz.x, UI.scale(11)));
+
+
 	syslog = chat.add(new ChatUI.Log("System"));
 	opts = add(new OptWnd());
 	opts.hide();
