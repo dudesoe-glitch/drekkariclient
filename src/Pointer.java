@@ -14,6 +14,8 @@ public class Pointer extends Widget {
     public long gobid = -1;
     public boolean click;
     private Tex licon;
+	private Text.Line tt = null;
+	private int dist;
 
     public Pointer(Indir<Resource> icon) {
 	super(Coord.z);
@@ -41,6 +43,45 @@ public class Pointer extends Widget {
 	return(0);
     }
 
+	private void drawarrow(GOut gOut, double a) {
+		Coord hsz = sz.div(2);
+		double ca = -Coord.z.angle(hsz);
+		Coord ac;
+		if((a > ca) && (a < -ca)) {
+			ac = new Coord(sz.x, hsz.y - (int)(Math.tan(a) * hsz.x));
+		} else if((a > -ca) && (a < Math.PI + ca)) {
+			ac = new Coord(hsz.x - (int)(Math.tan(a - Math.PI / 2) * hsz.y), 0);
+		} else if((a > -Math.PI - ca) && (a < ca)) {
+			ac = new Coord(hsz.x + (int)(Math.tan(a + Math.PI / 2) * hsz.y), sz.y);
+		} else {
+			ac = new Coord(0, hsz.y + (int)(Math.tan(a) * hsz.x));
+		}
+		Coord bc = ac.add(Coord.sc(a, 0));
+
+		Coord coord1 = bc.add(Coord.sc(a + Math.PI / 12, -35));
+		Coord coord2 = bc.add(Coord.sc(a - Math.PI / 12, -35));
+
+//		gOut.usestate(Pointer.col);
+		gOut.drawp(Model.Mode.TRIANGLES, new float[] {
+				bc.x, bc.y,
+				coord1.x, coord1.y,
+				coord2.x, coord2.y,});
+
+		if (this.icon != null) {
+			try {
+				if (this.licon == null) {
+					this.licon = ((this.icon.get()).layer(Resource.imgc)).tex();
+				}
+				Coord bcc = bc.add(Coord.sc(a, -UI.scale(30)));
+				gOut.aimage(this.licon, bcc, 0.5, 0.5);
+				gOut.aimage(Text.renderstroked(dist + "", Color.WHITE, Color.BLACK, Text.num12boldFnd).tex(), bcc, 0.5, 0.5);
+			}
+			catch (Loading e) {
+			}
+		}
+		this.lc = bc.add(Coord.sc(a, -30));
+	}
+
     private void drawarrow(GOut g, Coord tc) {
 	Coord hsz = sz.div(2);
 	tc = tc.sub(hsz);
@@ -56,46 +97,63 @@ public class Pointer extends Widget {
 		sc = new Coord(hsz.x, (sc.y * hsz.x) / sc.x).mul(signum(sc.x));
 	    }
 	}
-	Coord ad = sc.sub(tc).norm(UI.scale(30.0));
-	sc = sc.add(hsz);
+
+	final Coord norm = sc.sub(tc).norm(UI.scale(30.0));
+	final Coord add = sc.add(hsz);
 
 	// gl.glEnable(GL2.GL_POLYGON_SMOOTH); XXXRENDER
-	g.usestate(col);
+//		g.usestate(col);
 	g.drawp(Model.Mode.TRIANGLES, new float[] {
-		sc.x, sc.y,
-		sc.x + ad.x - (ad.y / 3), sc.y + ad.y + (ad.x / 3),
-		sc.x + ad.x + (ad.y / 3), sc.y + ad.y - (ad.x / 3),
+		add.x, add.y, add.x + norm.x - norm.y / 3, add.y + norm.y + norm.x / 3, add.x + norm.x + norm.y / 3, add.y + norm.y - norm.x / 3
 	    });
 
 	if(icon != null) {
 	    try {
 		if(licon == null)
 		    licon = icon.get().layer(Resource.imgc).tex();
-		g.aimage(licon, sc.add(ad), 0.5, 0.5);
+		Coord bcc = add.add(norm);
+		g.aimage(licon, bcc, 0.5, 0.5);
+		g.aimage(Text.renderstroked(dist + "", Color.WHITE, Color.BLACK, Text.num12boldFnd).tex(), bcc, 0.5, 0.5);
 	    } catch(Loading l) {
 	    }
 	}
-	this.lc = sc.add(ad);
+	this.lc = add.add(norm);
     }
 
     public void draw(GOut g) {
 	this.lc = null;
-	if(tc == null)
+	if(tc == null || ui.gui == null || ui.gui.map == null)
 	    return;
 	Gob gob = (gobid < 0) ? null : ui.sess.glob.oc.getgob(gobid);
 	Coord3f sl;
+	Coord2d gobrc;
 	if(gob != null) {
 	    try {
-		sl = getparent(GameUI.class).map.screenxf(gob.getc());
+			sl = ui.gui.map.screenxf(gob.getc());
+			gobrc = gob.rc;
 	    } catch(Loading l) {
 		return;
 	    }
 	} else {
-	    sl = getparent(GameUI.class).map.screenxf(tc);
+		sl = ui.gui.map.screenxf(tc);
+		gobrc = tc;
 	}
-	if(sl != null)
+	if (sl != null) {
+		final Double angle = ui.gui.map.screenangle(gobrc, true);
+		Gob me = this.ui.gui.map.player();
+		if (me != null) {
+			int cdist = (int) (Math.ceil(me.rc.dist(tc) / 11.0));
+			if (cdist != dist) {
+				dist = cdist;
+		}
+		}
+		if(!angle.equals(Double.NaN)) {
+			drawarrow(g, ui.gui.map.screenangle(gobrc, true));
+		} else {
 	    drawarrow(g, new Coord(sl));
     }
+	}
+	}
 
     public void update(Coord2d tc, long gobid) {
 	this.tc = tc;
@@ -135,8 +193,21 @@ public class Pointer extends Widget {
     }
 
     public Object tooltip(Coord c, Widget prev) {
-	if((lc != null) && (lc.dist(c) < 20))
-	    return(tooltip);
+		if ((lc != null) && (lc.dist(c) < 20) && this.ui.gui.map.player() != null) {
+			if (tooltip instanceof Widget.KeyboundTip) {
+				try {
+					if (tt != null && tt.tex() != null)
+						tt.tex().dispose();
+					if (dist > 990) {
+						return tt = Text.render("> " + ((Widget.KeyboundTip) tooltip).base + " <" + " | Distance: Over " + 1000 + " tiles");
+					} else {
+						return tt = Text.render("> " + ((Widget.KeyboundTip) tooltip).base + " <" + " | Distance: " + dist + " tiles");
+					}
+				} catch (NullPointerException e) {
+				}
+			}
+			return (tooltip);
+		}
 	return(null);
     }
 }
