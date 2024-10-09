@@ -594,6 +594,110 @@ public class OptWnd extends Window {
 	}
     }
 
+	public class ActionBarsSettingsPanel extends Panel {
+		private int addbtn(Widget cont, String nm, KeyBinding cmd, int y) {
+			return (cont.addhl(new Coord(0, y), cont.sz.x,
+					new Label(nm), new SetButton(UI.scale(140), cmd))
+					+ UI.scale(2));
+		}
+
+		public ActionBarsSettingsPanel(Panel back) {
+			Widget prev;
+			prev = add(new Label("Enabled Action Bars:"), 0, 0);
+			add(new Label("Action Bar Orientation:"), prev.pos("ur").adds(42, 0));
+			prev = add(new CheckBox("Action Bar 1"){
+				{a = Utils.getprefb("showActionBar1", true);}
+				public void changed(boolean val) {
+					Utils.setprefb("showActionBar1", val);
+					if (ui != null && ui.gui != null && ui.gui.actionBar1 != null){
+						ui.gui.actionBar1.show(val);
+					}
+				}
+			}, prev.pos("bl").adds(12, 6));
+			addOrientationRadio(prev, "actionBar1Horizontal", 1);
+			prev = add(new CheckBox("Action Bar 2"){
+				{a = Utils.getprefb("showActionBar2", false);}
+				public void changed(boolean val) {
+					Utils.setprefb("showActionBar2", val);
+					if (ui != null && ui.gui != null && ui.gui.actionBar2 != null){
+						ui.gui.actionBar2.show(val);
+					}
+				}
+			}, prev.pos("bl").adds(0, 2));
+			addOrientationRadio(prev, "actionBar2Horizontal", 2);
+			prev = add(new CheckBox("Action Bar 3"){
+				{a = Utils.getprefb("showActionBar3", false);}
+				public void changed(boolean val) {
+					Utils.setprefb("showActionBar3", val);
+					if (ui != null && ui.gui != null && ui.gui.actionBar3 != null){
+						ui.gui.actionBar3.show(val);
+					}
+				}
+			}, prev.pos("bl").adds(0, 2));
+			addOrientationRadio(prev, "actionBar3Horizontal", 3);
+			prev = add(new CheckBox("Action Bar 4"){
+				{a = Utils.getprefb("showActionBar4", false);}
+				public void changed(boolean val) {
+					Utils.setprefb("showActionBar4", val);
+					if (ui != null && ui.gui != null && ui.gui.actionBar4 != null){
+						ui.gui.actionBar4.show(val);
+					}
+				}
+			}, prev.pos("bl").adds(0, 2));
+			addOrientationRadio(prev, "actionBar4Horizontal", 4);
+
+			Scrollport scroll = add(new Scrollport(UI.scale(new Coord(280, 380))), prev.pos("bl").adds(0,10).x(0));
+			Widget cont = scroll.cont;
+			int y = 0;
+			y = cont.adda(new Label("Action Bar 1 Keybinds"), cont.sz.x / 2, y, 0.5, 0.0).pos("bl").adds(0, 5).y;
+			for (int i = 0; i < GameUI.kb_actbar1.length; i++)
+				y = addbtn(cont, String.format("Button - %d", i + 1), GameUI.kb_actbar1[i], y);
+			y = cont.adda(new Label("Action Bar 2 Keybinds"), cont.sz.x / 2, y + UI.scale(10), 0.5, 0.0).pos("bl").adds(0, 5).y;
+			for (int i = 0; i < GameUI.kb_actbar2.length; i++)
+				y = addbtn(cont, String.format("Button - %d", i + 1), GameUI.kb_actbar2[i], y);
+			y = cont.adda(new Label("Action Bar 3 Keybinds"), cont.sz.x / 2, y + UI.scale(10), 0.5, 0.0).pos("bl").adds(0, 5).y;
+			for (int i = 0; i < GameUI.kb_actbar3.length; i++)
+				y = addbtn(cont, String.format("Button - %d", i + 1), GameUI.kb_actbar3[i], y);
+			y = cont.adda(new Label("Action Bar 4 Keybinds"), cont.sz.x / 2, y + UI.scale(10), 0.5, 0.0).pos("bl").adds(0, 5).y;
+			for (int i = 0; i < GameUI.kb_actbar4.length; i++)
+				y = addbtn(cont, String.format("Button - %d", i + 1), GameUI.kb_actbar4[i], y);
+			adda(new PButton(UI.scale(200), "Back", 27, back, "Advanced Settings"), scroll.pos("bl").adds(0, 10).x(scroll.sz.x / 2), 0.5, 0.0);
+			pack();
+		}
+
+		private void addOrientationRadio(Widget prev, String prefName, int actionBarNumber){
+			RadioGroup radioGroup = new RadioGroup(this) {
+				public void changed(int btn, String lbl) {
+					try {
+						if(btn==0) {
+							Utils.setprefb(prefName, true);
+							if (ui != null && ui.gui != null){
+								GameUI.ActionBar actionBar = ui.gui.getActionBar(actionBarNumber);
+								actionBar.setActionBarHorizontal(true);
+							}
+						}
+						if(btn==1) {
+							Utils.setprefb(prefName, false);
+							if (ui != null && ui.gui != null){
+								GameUI.ActionBar actionBar = ui.gui.getActionBar(actionBarNumber);
+								actionBar.setActionBarHorizontal(false);
+							}
+						}
+					} catch (Exception e) {
+						throw new RuntimeException(e);
+					}
+				}
+			};
+			Widget prevOption = radioGroup.add("Horizontal", prev.pos("ur").adds(40, 0));
+			radioGroup.add("Vertical", prevOption.pos("ur").adds(10, 0));
+			if (Utils.getprefb(prefName, true)){
+				radioGroup.check(0);
+			} else {
+				radioGroup.check(1);
+			}
+		}
+	}
+
 	public class DisplaySettingsPanel extends Panel {
 		public DisplaySettingsPanel(Panel back) {
 			Widget prev;
@@ -750,6 +854,7 @@ public class OptWnd extends Window {
 	    prev = adda(new PButton(UI.scale(200), "Back", 27, back, "Options            "), prev.pos("bl").adds(0, 10).x(scroll.sz.x / 2), 0.5, 0.0);
 	    pack();
 	}
+	}
 
 	public class SetButton extends KeyMatch.Capture {
 	    public final KeyBinding cmd;
@@ -787,7 +892,6 @@ public class OptWnd extends Window {
 		return(kbtt.tex());
 	    }
 	}
-    }
 
 	private Label freeCamZoomSpeedLabel;
 	public static HSlider freeCamZoomSpeedSlider;
@@ -1296,12 +1400,14 @@ public class OptWnd extends Window {
 	advancedSettings = add(new Panel());
 	// ND: Add the sub-panel buttons for the advanced settings here
 		Panel interfacesettings = add(new InterfaceSettingsPanel(advancedSettings));
+		Panel actionbarssettings =  add(new ActionBarsSettingsPanel(advancedSettings));
 		Panel displaysettings = add(new DisplaySettingsPanel(advancedSettings));
 		Panel camsettings = add(new CameraSettingsPanel(advancedSettings));
 		Panel worldgraphicssettings = add(new WorldGraphicsSettingsPanel(advancedSettings));
 
 		int y2 = UI.scale(6);
 		y2 = advancedSettings.add(new PButton(UI.scale(200), "Interface Settings", -1, interfacesettings, "Interface Settings"), 0, y2).pos("bl").adds(0, 5).y;
+		y2 = advancedSettings.add(new PButton(UI.scale(200), "Action Bars Settings", -1, actionbarssettings, "Action Bars Settings"), 0, y2).pos("bl").adds(0, 5).y;
 		y2 = advancedSettings.add(new PButton(UI.scale(200), "Display Settings", -1, displaysettings, "Display Settings"), 0, y2).pos("bl").adds(0, 5).y;
 		y2 += UI.scale(20);
 		y2 = advancedSettings.add(new PButton(UI.scale(200), "Camera Settings", -1, camsettings, "Camera Settings"), 0, y2).pos("bl").adds(0, 5).y;

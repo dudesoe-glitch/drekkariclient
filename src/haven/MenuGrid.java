@@ -51,6 +51,7 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
     private int curoff = 0;
     private boolean recons = true, showkeys = false;
     private double fstart;
+	public static ArrayList<String> customButtonPaths = new ArrayList<String>();
 	
     @RName("scm")
     public static class $_ implements Factory {
@@ -699,6 +700,7 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
     }
 
 	private void makeLocal(String path) {
+		customButtonPaths.add(path); // ND: Add the paths to this list, to check against them when we load the action bars in GameUI -> loadLocal().
 		Resource.Named res = Resource.local().loadwait(path).indir();
 		Pagina pagina = new Pagina(this, null, res);
 		synchronized (pmap) { pmap.put(res, pagina); }

@@ -32,6 +32,8 @@ import java.awt.event.KeyEvent;
 import java.awt.image.WritableRaster;
 import haven.render.Location;
 
+import static haven.Inventory.invsq;
+
 public class GameUI extends ConsoleHost implements Console.Directory, UI.MessageWidget {
     private static final int blpw = UI.scale(0), brpw = UI.scale(142);
     public final String chrid, genus;
@@ -71,6 +73,11 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 	public TileHighlight.TileHighlightCFG tileHighlight;
 	public QuickSlotsWdg quickslots;
 	private double lastmsgsfx = 0;
+	public static final Text.Foundry actBarKeybindsFoundry = new Text.Foundry(Text.sans.deriveFont(java.awt.Font.BOLD), 12);
+	public ActionBar actionBar1 = null, actionBar2 = null, actionBar3 = null, actionBar4 = null, currentActionBar = null;
+	public boolean localActionBarsLoaded = false;
+	public boolean changeCustomSlot = false;
+	public MenuGrid.Pagina customActionPag = null;
 
     public static abstract class BeltSlot {
 	public final int idx;
@@ -324,6 +331,14 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 	if (!Utils.getprefb("showQuickSlotsBar", true)) {
 		quickslots.hide();
 	}
+	actionBar1.c = Utils.getprefc("wndc-actionBar1", UI.unscale(new Coord(0, 500)));
+	actionBar1.raise();
+	actionBar2.c = Utils.getprefc("wndc-actionBar2", UI.unscale(new Coord(0, 540)));
+	actionBar2.raise();
+	actionBar3.c = Utils.getprefc("wndc-actionBar3", UI.unscale(new Coord(0, 580)));
+	actionBar3.raise();
+	actionBar4.c = Utils.getprefc("wndc-actionBar4", UI.unscale(new Coord(0, 620)));
+	actionBar4.raise();
     }
 
     protected void attached() {
@@ -886,6 +901,13 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 	    }
 	} else if(place == "menu") {
 	    menu = (MenuGrid)brpanel.add(child, menugridc);
+		if (!localActionBarsLoaded) { // ND: These need to be loaded after the MenuGrid is added
+			actionBar1.loadLocal();
+			actionBar2.loadLocal();
+			actionBar3.loadLocal();
+			actionBar4.loadLocal();
+			localActionBarsLoaded = true;
+		}
 	} else if(place == "fight") {
 	    fv = urpanel.add((Fightview)child, 0, 0);
 	} else if(place == "fsess") {
@@ -1335,6 +1357,15 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 	    int slot = Utils.iv(args[0]);
 	    if(args.length < 2) {
 		belt[slot] = null;
+		if (changeCustomSlot){
+			if (customActionPag != null && currentActionBar != null) {
+				belt[slot] = new PagBeltSlot(slot, customActionPag);
+				currentActionBar.saveLocally();
+				customActionPag = null;
+				currentActionBar = null;
+			}
+			changeCustomSlot = false;
+		}
 	    } else {
 		switch((String)args[1]) {
 		case "p": {
@@ -1936,6 +1967,306 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 			return map.visol(tag);
 		}
 		return false;
+	}
+
+	public class ActionBar extends Belt {
+		public KeyBinding[] beltkeys;
+		public int curbelt;
+		public int barNumber;
+		final Coord pagoff = UI.scale(new Coord(2, 2));
+		public boolean isHorizontal;
+		private UI.Grab dragging;
+		private Coord dc;
+		private final String horizontalSettingName;
+
+		public ActionBar(KeyBinding[] keybindings, int beltNumber, String horizontalSettingName) {
+			super(UI.scale(Utils.getprefb(horizontalSettingName, true) ? new Coord(388, 37) : new Coord(37, 388)));
+			isHorizontal = Utils.getprefb(horizontalSettingName, true);
+			this.horizontalSettingName = horizontalSettingName;
+			beltkeys = keybindings;
+			barNumber = beltNumber;
+			if (beltNumber > 0) {
+				curbelt = beltNumber - 1;
+			} else {
+				curbelt = 0;
+			}
+		}
+
+		public void loadLocal() {
+			if (chrid != "") {
+				String[] resnames = Utils.getprefsa("actionBar" + barNumber + "_" + chrid, null);
+				if (resnames != null) {
+					for (int i = (curbelt * 12); i < (curbelt * 12)+12; i++) {
+						String resname = resnames[i];
+						if (!resname.equals("null")) {
+							try {
+								if (MenuGrid.customButtonPaths.stream().anyMatch(resname::matches)) {
+									belt[i] = new PagBeltSlot(i, menu.paginafor(Resource.local().load(resname)));
+								} else {
+									resnames[i] = "null";
+									Utils.setprefsa("actionBar" + barNumber + "_" + chrid, resnames);
+								}
+							} catch (Error e) {
+							}
+						}
+					}
+				}
+			}
+		}
+
+		private void saveLocally() {
+			String chrid = ui.gui.chrid;
+			if (chrid != "") {
+				String[] resnames = new String[144];
+				for (int i = (curbelt * 12); i < (curbelt * 12)+12; i++) {
+					try {
+						GameUI.PagBeltSlot pagBeltSlot = (PagBeltSlot) belt[i];
+						if (pagBeltSlot != null && pagBeltSlot.pag.res().name.startsWith("customclient/menugrid"))
+							resnames[i] = pagBeltSlot.pag.res().name;
+					} catch (Exception e) {
+					}
+				}
+				Utils.setprefsa("actionBar" + barNumber + "_" + chrid, resnames);
+			}
+		}
+
+		private Coord beltc(int i) {
+			if (isHorizontal)
+				return(pagoff.add(UI.scale(39 * i), 0));
+			else
+				return(pagoff.add(0, UI.scale(39 * i)));
+		}
+
+		public int beltslot(Coord c) {
+			for(int i = 0; i < 10; i++) {
+				if(c.isect(beltc(i), invsq.sz()))
+					return(i + (curbelt * 12));
+			}
+			return(-1);
+		}
+
+		public void draw(GOut g) {
+			for(int i = 0; i < 10; i++) {
+				int slot = i + (curbelt * 12);
+				Coord c = beltc(i);
+				g.image(invsq, beltc(i));
+				try {
+					if(belt[slot] != null) {
+						belt[slot].draw(g.reclip(c.add(UI.scale(1), UI.scale(1)), invsq.sz().sub(UI.scale(2), UI.scale(2))));
+					}
+				} catch(Loading e) {}
+				String keybindString = beltkeys[i].key().name();
+				g.aimage(new TexI(Utils.outline2(actBarKeybindsFoundry.render(keybindString).img, Color.BLACK, true)), c.add(invsq.sz().sub(UI.scale(2), 0)), 1, 1);
+			}
+			super.draw(g);
+		}
+
+		public boolean globtype(char key, KeyEvent ev) {
+			if (this.visible()) {
+				for (int i = 0; i < beltkeys.length; i++) {
+					if (beltkeys[i].key().match(ev)) {
+						use(i + (curbelt * 12));
+						return (true);
+					}
+				}
+			}
+			return(false);
+		}
+
+		public boolean drop(Coord c, Coord ul) {
+			int slot = beltslot(c);
+			if(slot != -1) {
+				GameUI gui = ui.gui;
+				WItem item = gui.vhand;
+				if (item != null && item.item != null) {
+					belt[slot] = new PagBeltSlot(slot, PagBeltSlot.resolve(menu, item.item.res));
+					GameUI.this.wdgmsg("setbelt", slot, 0);
+					saveLocally();
+				}
+				return(true);
+			}
+			return(false);
+		}
+
+
+		public boolean iteminteract(Coord c, Coord ul) {return(false);}
+
+		public boolean dropthing(Coord c, Object thing) {
+			int slot = beltslot(c);
+			if(slot != -1) {
+				if(thing instanceof MenuGrid.Pagina) {
+					MenuGrid.Pagina pag = (MenuGrid.Pagina)thing;
+					Resource res = pag.res();
+					if (res != null && res.name.startsWith("customclient/menugrid")) {
+						changeCustomSlot = true;
+						customActionPag = pag;
+						currentActionBar = this;
+						GameUI.this.wdgmsg("setbelt", slot, null);
+						saveLocally();
+					} else
+						try {
+							if(pag.id instanceof Indir)
+								GameUI.this.wdgmsg("setbelt", slot, "res", pag.res().name);
+							else
+								GameUI.this.wdgmsg("setbelt", slot, "pag", pag.id);
+							saveLocally();
+						} catch(Loading l) {
+						}
+					return(true);
+				}
+			}
+			return(false);
+		}
+
+		@Override
+		public boolean mousedown(Coord c, int button) {
+			if ((ui.modshift && button == 1) || button == 2) {
+				if((dragging != null)) { // ND: I need to do this extra check and remove it in case you do another click before the mouseup. Idk why it has to be done like this, but it solves the issue.
+					dragging.remove();
+					dragging = null;
+				}
+				dragging = ui.grabmouse(this);
+				dc = c;
+				return true;
+			}
+			int slot = beltslot(c);
+			if (slot != -1) {
+				if (button == 1) {
+					use(slot);
+				} else if (button == 3) {
+					GameUI.this.wdgmsg("setbelt", slot, null);
+					belt[slot] = null;
+					saveLocally();
+				}
+				return(true);
+			}
+			return(super.mousedown(c, button));
+		}
+
+		@Override
+		public boolean mouseup(Coord c, int button) {
+			checkIfOutsideOfUI(); // ND: Prevent the widget from being dragged outside the current window size
+			if((dragging != null)) {
+				dragging.remove();
+				dragging = null;
+				Utils.setprefc("wndc-actionBar" + barNumber, this.c);
+				return true;
+			}
+			return super.mouseup(c, button);
+		}
+
+		@Override
+		public void mousemove(Coord c) {
+			if (dragging != null) {
+				this.c = this.c.add(c.x, c.y).sub(dc);
+				return;
+			}
+			super.mousemove(c);
+		}
+
+		private void use(int slot) {
+			try {
+				Resource res = ((PagBeltSlot) belt[slot]).pag.res();
+				Resource.AButton act = res.layer(Resource.action);
+				if (act == null) {
+					GameUI.this.wdgmsg("belt", slot, 1, ui.modflags());
+				} else {
+					if (res.name.startsWith("customclient/menugrid")) {
+						ui.gui.menu.useCustom(act.ad);
+					} else {
+						act(slot, new MenuGrid.Interaction(1, ui.modflags()));
+					}
+				}
+			} catch (Exception e) {
+			}
+		}
+
+		public void checkIfOutsideOfUI() {
+			if (this.c.x < 0)
+				this.c.x = 0;
+			if (this.c.y < 0)
+				this.c.y = 0;
+			if (this.c.x > (GameUI.this.sz.x - this.sz.x))
+				this.c.x = GameUI.this.sz.x - this.sz.x;
+			if (this.c.y > (GameUI.this.sz.y - this.sz.y))
+				this.c.y = GameUI.this.sz.y - this.sz.y;
+		}
+
+		public void setActionBarHorizontal(boolean horizontal){
+			this.sz = UI.scale(horizontal ? new Coord(388, 37) : new Coord(37, 388));
+			isHorizontal = horizontal;
+			Utils.setprefb(horizontalSettingName, horizontal);
+			checkIfOutsideOfUI();
+		}
+	}
+
+	public static final KeyBinding[] kb_actbar1 = {
+			KeyBinding.get("actbar1/1", KeyMatch.forcode(KeyEvent.VK_1, 0)),
+			KeyBinding.get("actbar1/2", KeyMatch.forcode(KeyEvent.VK_2, 0)),
+			KeyBinding.get("actbar1/3", KeyMatch.forcode(KeyEvent.VK_3, 0)),
+			KeyBinding.get("actbar1/4", KeyMatch.forcode(KeyEvent.VK_4, 0)),
+			KeyBinding.get("actbar1/5", KeyMatch.forcode(KeyEvent.VK_5, 0)),
+			KeyBinding.get("actbar1/6", KeyMatch.forcode(KeyEvent.VK_6, 0)),
+			KeyBinding.get("actbar1/7", KeyMatch.forcode(KeyEvent.VK_7, 0)),
+			KeyBinding.get("actbar1/8", KeyMatch.forcode(KeyEvent.VK_8, 0)),
+			KeyBinding.get("actbar1/9", KeyMatch.forcode(KeyEvent.VK_9, 0)),
+			KeyBinding.get("actbar1/0", KeyMatch.forcode(KeyEvent.VK_0, 0)),
+	};
+	public static final KeyBinding[] kb_actbar2 = {
+			KeyBinding.get("actbar2/1", KeyMatch.nil),
+			KeyBinding.get("actbar2/2", KeyMatch.nil),
+			KeyBinding.get("actbar2/3", KeyMatch.nil),
+			KeyBinding.get("actbar2/4", KeyMatch.nil),
+			KeyBinding.get("actbar2/5", KeyMatch.nil),
+			KeyBinding.get("actbar2/6", KeyMatch.nil),
+			KeyBinding.get("actbar2/7", KeyMatch.nil),
+			KeyBinding.get("actbar2/8", KeyMatch.nil),
+			KeyBinding.get("actbar2/9", KeyMatch.nil),
+			KeyBinding.get("actbar2/0", KeyMatch.nil),
+	};
+	public static final KeyBinding[] kb_actbar3 = {
+			KeyBinding.get("actbar3/1", KeyMatch.nil),
+			KeyBinding.get("actbar3/2", KeyMatch.nil),
+			KeyBinding.get("actbar3/3", KeyMatch.nil),
+			KeyBinding.get("actbar3/4", KeyMatch.nil),
+			KeyBinding.get("actbar3/5", KeyMatch.nil),
+			KeyBinding.get("actbar3/6", KeyMatch.nil),
+			KeyBinding.get("actbar3/7", KeyMatch.nil),
+			KeyBinding.get("actbar3/8", KeyMatch.nil),
+			KeyBinding.get("actbar3/9", KeyMatch.nil),
+			KeyBinding.get("actbar3/0", KeyMatch.nil),
+	};
+	public static final KeyBinding[] kb_actbar4 = {
+			KeyBinding.get("actbar4/1", KeyMatch.nil),
+			KeyBinding.get("actbar4/2", KeyMatch.nil),
+			KeyBinding.get("actbar4/3", KeyMatch.nil),
+			KeyBinding.get("actbar4/4", KeyMatch.nil),
+			KeyBinding.get("actbar4/5", KeyMatch.nil),
+			KeyBinding.get("actbar4/6", KeyMatch.nil),
+			KeyBinding.get("actbar4/7", KeyMatch.nil),
+			KeyBinding.get("actbar4/8", KeyMatch.nil),
+			KeyBinding.get("actbar4/9", KeyMatch.nil),
+			KeyBinding.get("actbar4/0", KeyMatch.nil),
+	};
+
+	public ActionBar getActionBar(int number) {
+		ActionBar[] actionBars = {actionBar1, actionBar2, actionBar3, actionBar4};
+		return actionBars[number - 1];
+	}
+
+	{
+		actionBar1 = add(new ActionBar(kb_actbar1, 1, "actionBar1Horizontal"));
+		actionBar2 = add(new ActionBar(kb_actbar2, 2, "actionBar2Horizontal"));
+		actionBar3 = add(new ActionBar(kb_actbar3, 3, "actionBar3Horizontal"));
+		actionBar4 = add(new ActionBar(kb_actbar4, 4, "actionBar4Horizontal"));
+		if (!Utils.getprefb("showActionBar1", true))
+			actionBar1.hide();
+		if (!Utils.getprefb("showActionBar2", false))
+			actionBar2.hide();
+		if (!Utils.getprefb("showActionBar3", false))
+			actionBar3.hide();
+		if (!Utils.getprefb("showActionBar4", false))
+			actionBar4.hide();
 	}
 
 }
