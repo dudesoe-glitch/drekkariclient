@@ -145,7 +145,7 @@ public class WItem extends Widget implements DTarget {
 	    Pipe.Op cmp = Pipe.Op.compose(ops);
 	    return(() -> cmp);
 	});
-    public final AttrCache<GItem.InfoOverlay<?>[]> itemols = new AttrCache<>(this::info, info -> {
+    public AttrCache<GItem.InfoOverlay<?>[]> itemols = new AttrCache<>(this::info, info -> {
 	    ArrayList<GItem.InfoOverlay<?>> buf = new ArrayList<>();
 	    for(ItemInfo inf : info) {
 		if(inf instanceof GItem.OverlayInfo)
@@ -312,5 +312,17 @@ public class WItem extends Widget implements DTarget {
 			return cachedStudyTex;
 		}
 		return null;
+	}
+
+	public void reloadItemOls(){
+		itemols = new AttrCache<>(this::info, info -> {
+			ArrayList<GItem.InfoOverlay<?>> buf = new ArrayList<>();
+			for(ItemInfo inf : info) {
+				if(inf instanceof GItem.OverlayInfo)
+					buf.add(GItem.InfoOverlay.create((GItem.OverlayInfo<?>)inf));
+			}
+			GItem.InfoOverlay<?>[] ret = buf.toArray(new GItem.InfoOverlay<?>[0]);
+			return(() -> ret);
+		});
 	}
 }

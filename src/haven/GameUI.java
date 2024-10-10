@@ -31,6 +31,7 @@ import java.awt.Color;
 import java.awt.event.KeyEvent;
 import java.awt.image.WritableRaster;
 import haven.render.Location;
+import haven.res.ui.stackinv.ItemStack;
 
 import static haven.Inventory.invsq;
 
@@ -2318,6 +2319,69 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 			actionBar3.hide();
 		if (!Utils.getprefb("showActionBar4", false))
 			actionBar4.hide();
+	}
+
+	public List<WItem> getAllContentsWindows() {
+		List<WItem> itemsInStacks = new ArrayList<>();
+		for (Widget wdg = lchild; wdg != null; wdg = wdg.prev) {
+			if (wdg instanceof GItem.ContentsWindow) {
+				GItem.ContentsWindow contentsWindow = (GItem.ContentsWindow) wdg;
+				if((contentsWindow.inv instanceof ItemStack)){
+					ItemStack stack = (ItemStack) contentsWindow.inv;
+					for(Map.Entry<GItem, WItem> entry: stack.wmap.entrySet()){
+						itemsInStacks.add(entry.getValue());
+					}
+				}
+			}
+		}
+		return itemsInStacks;
+	}
+
+	public List<Inventory> getAllInventories() {
+		List<Inventory> inventories = new ArrayList<>();
+		for (Widget wdg = lchild; wdg != null; wdg = wdg.prev) {
+			if (wdg instanceof Window) {
+				for (Widget wdgi = wdg.lchild; wdgi != null; wdgi = wdgi.prev) {
+					if (wdgi instanceof Inventory) {
+						inventories.add((Inventory) wdgi);
+					}
+				}
+			}
+		}
+		return inventories;
+	}
+
+	public List<WItem> getAllItemsFromAllInventoriesAndStacks(){
+		List<WItem> items = new ArrayList<>();
+		List<Inventory> allInventories = getAllInventories();
+
+		for (Inventory inventory : allInventories) {
+			for (WItem item : inventory.getAllItems()) {
+				if (!item.item.getname().contains("stack of")) {
+					items.add(item);
+				}
+			}
+		}
+
+		items.addAll(getAllContentsWindows());
+		return items;
+	}
+
+	public void reloadAllItemOverlays(){ // ND: Used to reload the quality overlay for all items, for quality rounding or quality colors
+		for (WItem item : getAllItemsFromAllInventoriesAndStacks()) {
+			item.reloadItemOls();
+		}
+		for (Widget window : ui.gui.getAllWindows()){
+			for (Widget w = window.lchild; w != null; w = w.prev) {
+				if (w instanceof Equipory) {
+					for (WItem equitem : ((Equipory) w).slots) {
+						if (equitem != null) {
+							equitem.reloadItemOls();
+						}
+					}
+				}
+			}
+		}
 	}
 
 }
