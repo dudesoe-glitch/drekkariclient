@@ -46,6 +46,7 @@ public class WItem extends Widget implements DTarget {
 	private String cachedStudyValue = null;
 	private String cachedTipValue = null;
 	private Tex cachedStudyTex = null;
+	private boolean holdingShift = false;
 
     public WItem(GItem item) {
 	super(sqsz);
@@ -85,16 +86,16 @@ public class WItem extends Widget implements DTarget {
     private List<ItemInfo> ttinfo = null;
     public Object tooltip(Coord c, Widget prev) {
 	double now = Utils.rtime();
-	if(prev == this) {
-	} else if(prev instanceof WItem) {
-	    double ps = ((WItem)prev).hoverstart;
-	    if(now - ps < 1.0)
-		hoverstart = now;
-	    else
-		hoverstart = ps;
-	} else {
-	    hoverstart = now;
-	}
+//	if(prev == this) {
+//	} else if(prev instanceof WItem) {
+//	    double ps = ((WItem)prev).hoverstart;
+//	    if(now - ps < 1.0)
+//		hoverstart = now;
+//	    else
+//		hoverstart = ps;
+//	} else {
+//	    hoverstart = now;
+//	}
 	try {
 	    List<ItemInfo> info = item.info();
 	    if(info.size() < 1)
@@ -103,15 +104,23 @@ public class WItem extends Widget implements DTarget {
 		shorttip = longtip = null;
 		ttinfo = info;
 	    }
-	    if(now - hoverstart < 1.0) {
-		if(shorttip == null)
-		    shorttip = new ShortTip(info);
-		return(shorttip);
-	    } else {
+//	    if(now - hoverstart < 1.0) {
+//		if(shorttip == null)
+//		    shorttip = new ShortTip(info);
+//		return(shorttip);
+//	    } else {
+		if (ui.modshift && !holdingShift) {
+			holdingShift = true;
+			longtip = null;
+		}
+		if (!ui.modshift && holdingShift) {
+			holdingShift = false;
+			longtip = null;
+		}
 		if(longtip == null)
 		    longtip = new LongTip(info);
 		return(longtip);
-	    }
+//	    }
 	} catch(Loading e) {
 	    return("...");
 	}

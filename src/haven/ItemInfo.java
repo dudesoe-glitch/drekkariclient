@@ -105,7 +105,7 @@ public abstract class ItemInfo {
     }
 
     public static class Layout {
-	private final List<Tip> tips = new ArrayList<Tip>();
+	public final List<Tip> tips = new ArrayList<Tip>();
 	private final Map<ID, Tip> itab = new HashMap<ID, Tip>();
 	public final CompImage cmp = new CompImage();
 	public int width = 0;
@@ -268,6 +268,19 @@ public abstract class ItemInfo {
 		    public BufferedImage tipimg() {return(shorttip(sub));}
 		    public int order() {return(100);}
 		});
+	}
+
+	public static BufferedImage longtip(List<ItemInfo> info) { // ND: Added this here to overwrite method from ItemInfo and prevent an extra text stroke on contents tooltip
+		Layout l = new Layout();
+		for(ItemInfo ii : info) {
+			if(ii instanceof Tip) {
+				Tip tip = (Tip)ii;
+				l.add(tip);
+			}
+		}
+		if(l.tips.size() < 1)
+			return(null);
+		return(l.render());
 	}
     }
 

@@ -5,6 +5,7 @@ import haven.*;
 import static haven.PUtils.*;
 import java.util.*;
 import java.awt.image.BufferedImage;
+import java.util.stream.Collectors;
 
 /* >tt: AttrMod$Fac */
 @haven.FromResource(name = "ui/tt/attrmod", version = 10)
@@ -20,7 +21,7 @@ public class AttrMod extends ItemInfo.Tip {
 
     public AttrMod(Owner owner, Collection<Mod> mods) {
 	super(owner);
-	this.mods = mods;
+	this.mods = mods.stream().sorted(this::BY_PRIORITY).collect(Collectors.toList());
     }
 
     public static class Fac implements InfoFactory {
@@ -37,7 +38,7 @@ public class AttrMod extends ItemInfo.Tip {
 	}
     }
 
-    private static String buff = "128,255,128", debuff = "255,128,128";
+    private static String buff = "96,235,96", debuff = "235,96,96";
     public static BufferedImage modimg(Collection<Mod> mods) {
 	Collection<BufferedImage> lines = new ArrayList<BufferedImage>(mods.size());
 	for(Mod mod : mods) {
@@ -55,4 +56,20 @@ public class AttrMod extends ItemInfo.Tip {
     public BufferedImage tipimg() {
 	return(modimg(mods));
     }
+
+	private int BY_PRIORITY(Mod o1, Mod o2) {
+		Resource r1 = o1.attr;
+		Resource r2 = o2.attr;
+		return Integer.compare(Config.statsAndAttributesOrder.indexOf(r2.layer(Resource.tooltip).t), Config.statsAndAttributesOrder.indexOf(r1.layer(Resource.tooltip).t));
+	}
+
+	public void layout(Layout l) {
+		BufferedImage t = tipimg(l.width);
+		if(t != null) {
+			if (owner instanceof ItemSpec)
+				l.cmp.add(t, new Coord(0, l.cmp.sz.y));
+			else
+				l.cmp.add(t, new Coord(UI.scale(8), l.cmp.sz.y + UI.scale(5)));
+		}
+	}
 }

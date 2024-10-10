@@ -18,7 +18,7 @@ public class Grievous extends WeaponInfo {
     }
 
     public String wpntips() {
-	return(String.format("Grievous damage: %.1f%%", deg * 100));
+	return(String.format("$col[227,140,64]{Grievous damage}: %.1f%%", deg * 100));
     }
 
     public int order() {return(80);}

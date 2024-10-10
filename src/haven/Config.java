@@ -26,12 +26,10 @@
 
 package haven;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
+import java.util.*;
 import java.util.function.*;
 import java.io.*;
 import java.nio.file.*;
-import java.util.Properties;
 import java.net.URI;
 import java.net.URLConnection;
 import java.io.PrintStream;
@@ -362,5 +360,33 @@ public class Config {
 		put("Swirling Vortex", "Vortexes can be dangerous. You don't want to miss them, right?");
 		put("Boost Speed", "You need to see Speed Boosts at all times. Keep them enabled.");
 		put("Burrow", "Burrows can hide things, like someone trying to ambush you. Keep them enabled.");
+	}};
+
+	public static final List<String> statsAndAttributesOrder = new ArrayList<String>(){{
+		// ND: I ordered them backwards, in case there's some stupid stat I overlooked, like "Swimming".
+		// When they're ordered like this, the overlooked stat should show up last, rather than first.
+		add("Swimming");
+		add("Lore");
+		add("Survival");
+		add("Farming");
+		add("Cooking");
+		add("Carpentry");
+		add("Masonry");
+		add("Smithing");
+		add("Sewing");
+		add("Stealth");
+		add("Exploration");
+		add("Marksmanship");
+		add("Melee Combat");
+		add("Unarmed Combat");
+		add("Psyche");
+		add("Will");
+		add("Dexterity");
+		add("Charisma");
+		add("Perception");
+		add("Constitution");
+		add("Intelligence");
+		add("Agility");
+		add("Strength");
 	}};
 }

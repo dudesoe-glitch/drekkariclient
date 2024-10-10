@@ -18,7 +18,7 @@ public class Damage extends WeaponInfo {
     }
 
     public String wpntips() {
-	return("Damage: " + dmg);
+	return("$col[227,64,64]{Damage}: " + dmg);
     }
 
     public int order() {return(50);}

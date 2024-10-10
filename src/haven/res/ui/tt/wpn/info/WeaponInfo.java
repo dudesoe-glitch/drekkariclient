@@ -21,7 +21,7 @@ public abstract class WeaponInfo extends ItemInfo.Tip {
 	    CompImage img = new CompImage();
 	    for(WeaponInfo inf : ls)
 		inf.add(img);
-	    l.cmp.add(img, new Coord(0, l.cmp.sz.y));
+	    l.cmp.add(img, new Coord(UI.scale(2), l.cmp.sz.y + UI.scale(4)));
 	}
     }
 
@@ -32,7 +32,7 @@ public abstract class WeaponInfo extends ItemInfo.Tip {
     }
 
     public BufferedImage wpntip() {
-	return(RichText.render(wpntips()).img);
+	return(RichText.render(wpntips(), 0).img);
     }
 
     public String wpntips() {

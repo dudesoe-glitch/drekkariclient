@@ -18,7 +18,7 @@ public class Coolmod extends WeaponInfo {
     }
 
     public String wpntips() {
-	return(String.format("Attack cooldown: %d%%", Math.round(mod * 100)));
+	return(String.format("$col[85,164,237]{Attack cooldown}: %d%%", Math.round(mod * 100)));
     }
 
     public int order() {return(125);}

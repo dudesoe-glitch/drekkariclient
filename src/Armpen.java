@@ -18,7 +18,7 @@ public class Armpen extends WeaponInfo {
     }
 
     public String wpntips() {
-	return(String.format("Armor penetration: %.1f%%", deg * 100));
+	return(String.format("$col[227,200,64]{Armor penetration}: %.1f%%", deg * 100));
     }
 
     public int order() {return(100);}

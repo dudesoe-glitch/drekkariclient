@@ -18,7 +18,7 @@ public class Range extends WeaponInfo {
     }
 
     public String wpntips() {
-	return(String.format("Range: %d%%", Math.round(mod * 100)));
+	return(String.format("$col[70,194,80]{Range}: %d%%", Math.round(mod * 100)));
     }
 
     public int order() {return(110);}
