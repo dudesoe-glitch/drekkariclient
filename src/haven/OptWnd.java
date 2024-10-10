@@ -760,6 +760,182 @@ public class OptWnd extends Window {
 	}
 
 
+	public static CheckBox showQualityDisplayCheckBox;
+	public static CheckBox roundedQualityCheckBox;
+	public static CheckBox customQualityColorsCheckBox;
+
+	public static TextEntry q7ColorTextEntry, q6ColorTextEntry, q5ColorTextEntry, q4ColorTextEntry, q3ColorTextEntry, q2ColorTextEntry, q1ColorTextEntry;
+	public static ColorOptionWidget q7ColorOptionWidget, q6ColorOptionWidget, q5ColorOptionWidget, q4ColorOptionWidget, q3ColorOptionWidget, q2ColorOptionWidget, q1ColorOptionWidget;
+	public static String[] q7ColorSetting = Utils.getprefsa("q7ColorSetting_colorSetting", new String[]{"255","0","0","255"});
+	public static String[] q6ColorSetting = Utils.getprefsa("q6ColorSetting_colorSetting", new String[]{"255","114","0","255"});
+	public static String[] q5ColorSetting = Utils.getprefsa("q5ColorSetting_colorSetting", new String[]{"165","0","255","255"});
+	public static String[] q4ColorSetting = Utils.getprefsa("q4ColorSetting_colorSetting", new String[]{"0","131","255","255"});
+	public static String[] q3ColorSetting = Utils.getprefsa("q3ColorSetting_colorSetting", new String[]{"0","214","10","255"});
+	public static String[] q2ColorSetting = Utils.getprefsa("q2ColorSetting_colorSetting", new String[]{"255","255","255","255"});
+	public static String[] q1ColorSetting = Utils.getprefsa("q1ColorSetting_colorSetting", new String[]{"180","180","180","255"});
+
+	public class QualityDisplaySettingsPanel extends Panel {
+
+		public QualityDisplaySettingsPanel(Panel back) {
+			Widget prev;
+			prev = add(showQualityDisplayCheckBox = new CheckBox("Display Quality on Inventory Items"){
+				{a = (Utils.getprefb("qtoggle", true));}
+				public void set(boolean val) {
+					Utils.setprefb("qtoggle", val);
+					if (ui != null && ui.gui != null) ui.gui.reloadAllItemOverlays();
+					a = val;
+				}
+			}, 0, 6);
+			prev = add(roundedQualityCheckBox = new CheckBox("Rounded Quality Number"){
+				{a = (Utils.getprefb("roundedQuality", true));}
+				public void changed(boolean val) {
+					Utils.setprefb("roundedQuality", val);
+					if (ui != null && ui.gui != null) ui.gui.reloadAllItemOverlays();
+				}
+			}, prev.pos("bl").adds(0, 2));
+			prev = add(customQualityColorsCheckBox = new CheckBox("Enable Custom Quality Colors:"){
+				{a = (Utils.getprefb("enableCustomQualityColors", false));}
+				public void changed(boolean val) {
+					Utils.setprefb("enableCustomQualityColors", val);
+					if (ui != null && ui.gui != null) ui.gui.reloadAllItemOverlays();
+				}
+			}, prev.pos("bl").adds(0, 12));
+			prev.tooltip = customQualityColorsTooltip;
+
+			prev = add(q7ColorTextEntry = new TextEntry(UI.scale(60), Utils.getpref("q7ColorTextEntry", "400")){
+				protected void changed() {
+					this.settext(this.text().replaceAll("[^\\d]", ""));
+					Utils.setpref("q7ColorTextEntry", this.buf.line());
+					if (ui != null && ui.gui != null) ui.gui.reloadAllItemOverlays();
+					super.changed();
+				}
+			}, prev.pos("bl").adds(0, 10));
+			prev = add(q7ColorOptionWidget = new ColorOptionWidget(" Godlike Quality:", "q7ColorSetting", 120, Integer.parseInt(q7ColorSetting[0]), Integer.parseInt(q7ColorSetting[1]), Integer.parseInt(q7ColorSetting[2]), Integer.parseInt(q7ColorSetting[3]), (Color col) -> {
+				q7ColorOptionWidget.cb.colorChooser.setColor(q7ColorOptionWidget.currentColor = col);
+				if (ui != null && ui.gui != null) ui.gui.reloadAllItemOverlays();
+			}){}, prev.pos("ur").adds(5, -2));
+			prev = add(new Button(UI.scale(70), "Reset", false).action(() -> {
+				Utils.setprefsa("q7ColorSetting_colorSetting", new String[]{"255","0","0","255"});
+				q7ColorOptionWidget.cb.colorChooser.setColor(q7ColorOptionWidget.currentColor = new Color(255, 0, 0, 255));
+				if (ui != null && ui.gui != null) ui.gui.reloadAllItemOverlays();
+			}), prev.pos("ur").adds(30, 0));
+
+			prev = add(q6ColorTextEntry = new TextEntry(UI.scale(60), Utils.getpref("q6ColorTextEntry", "300")){
+				protected void changed() {
+					this.settext(this.text().replaceAll("[^\\d]", ""));
+					Utils.setpref("q6ColorTextEntry", this.buf.line());
+					if (ui != null && ui.gui != null) ui.gui.reloadAllItemOverlays();
+					super.changed();
+				}
+			}, prev.pos("bl").adds(0, 10).x(UI.scale(0)));
+			prev = add(q6ColorOptionWidget = new ColorOptionWidget("  Legendary Quality:", "q6ColorSetting", 120, Integer.parseInt(q6ColorSetting[0]), Integer.parseInt(q6ColorSetting[1]), Integer.parseInt(q6ColorSetting[2]), Integer.parseInt(q6ColorSetting[3]), (Color col) -> {
+				q6ColorOptionWidget.cb.colorChooser.setColor(q6ColorOptionWidget.currentColor = col);
+				if (ui != null && ui.gui != null) ui.gui.reloadAllItemOverlays();
+			}){}, prev.pos("ur").adds(5, -2));
+			prev = add(new Button(UI.scale(70), "Reset", false).action(() -> {
+				Utils.setprefsa("q6ColorSetting_colorSetting", new String[]{"255","114","0","255"});
+				q6ColorOptionWidget.cb.colorChooser.setColor(q6ColorOptionWidget.currentColor = new Color(255, 114, 0, 255));
+			}), prev.pos("ur").adds(30, 0));
+
+			prev = add(q5ColorTextEntry = new TextEntry(UI.scale(60), Utils.getpref("q5ColorTextEntry", "200")){
+				protected void changed() {
+					this.settext(this.text().replaceAll("[^\\d]", ""));
+					Utils.setpref("q5ColorTextEntry", this.buf.line());
+					if (ui != null && ui.gui != null) ui.gui.reloadAllItemOverlays();
+					super.changed();
+				}
+			}, prev.pos("bl").adds(0, 10).x(UI.scale(0)));
+			prev = add(q5ColorOptionWidget = new ColorOptionWidget("  Epic Quality:", "q5ColorSetting", 120, Integer.parseInt(q5ColorSetting[0]), Integer.parseInt(q5ColorSetting[1]), Integer.parseInt(q5ColorSetting[2]), Integer.parseInt(q5ColorSetting[3]), (Color col) -> {
+				q5ColorOptionWidget.cb.colorChooser.setColor(q5ColorOptionWidget.currentColor = col);
+				if (ui != null && ui.gui != null) ui.gui.reloadAllItemOverlays();
+			}){}, prev.pos("ur").adds(5, -2));
+			prev = add(new Button(UI.scale(70), "Reset", false).action(() -> {
+				Utils.setprefsa("q5ColorSetting_colorSetting", new String[]{"165","0","255","255"});
+				q5ColorOptionWidget.cb.colorChooser.setColor(q5ColorOptionWidget.currentColor = new Color(165, 0, 255, 255));
+				if (ui != null && ui.gui != null) ui.gui.reloadAllItemOverlays();
+			}), prev.pos("ur").adds(30, 0));
+
+			prev = add(q4ColorTextEntry = new TextEntry(UI.scale(60), Utils.getpref("q4ColorTextEntry", "100")){
+				protected void changed() {
+					this.settext(this.text().replaceAll("[^\\d]", ""));
+					Utils.setpref("q4ColorTextEntry", this.buf.line());
+					if (ui != null && ui.gui != null) ui.gui.reloadAllItemOverlays();
+					super.changed();
+				}
+			}, prev.pos("bl").adds(0, 10).x(UI.scale(0)));
+			prev = add(q4ColorOptionWidget = new ColorOptionWidget("  Rare Quality:", "q4ColorSetting", 120, Integer.parseInt(q4ColorSetting[0]), Integer.parseInt(q4ColorSetting[1]), Integer.parseInt(q4ColorSetting[2]), Integer.parseInt(q4ColorSetting[3]), (Color col) -> {
+				q4ColorOptionWidget.cb.colorChooser.setColor(q4ColorOptionWidget.currentColor = col);
+				if (ui != null && ui.gui != null) ui.gui.reloadAllItemOverlays();
+			}){}, prev.pos("ur").adds(5, -2));
+			prev = add(new Button(UI.scale(70), "Reset", false).action(() -> {
+				Utils.setprefsa("q4ColorSetting_colorSetting", new String[]{"0","131","255","255"});
+				q4ColorOptionWidget.cb.colorChooser.setColor(q4ColorOptionWidget.currentColor = new Color(0, 131, 255, 255));
+				if (ui != null && ui.gui != null) ui.gui.reloadAllItemOverlays();
+			}), prev.pos("ur").adds(30, 0));
+
+			prev = add(q3ColorTextEntry = new TextEntry(UI.scale(60), Utils.getpref("q3ColorTextEntry", "50")){
+				protected void changed() {
+					this.settext(this.text().replaceAll("[^\\d]", ""));
+					Utils.setpref("q3ColorTextEntry", this.buf.line());
+					if (ui != null && ui.gui != null) ui.gui.reloadAllItemOverlays();
+					super.changed();
+				}
+			}, prev.pos("bl").adds(0, 10).x(UI.scale(0)));
+			prev = add(q3ColorOptionWidget = new ColorOptionWidget("  Uncommon Quality:", "q3ColorSetting", 120, Integer.parseInt(q3ColorSetting[0]), Integer.parseInt(q3ColorSetting[1]), Integer.parseInt(q3ColorSetting[2]), Integer.parseInt(q3ColorSetting[3]), (Color col) -> {
+				q3ColorOptionWidget.cb.colorChooser.setColor(q3ColorOptionWidget.currentColor = col);
+				if (ui != null && ui.gui != null) ui.gui.reloadAllItemOverlays();
+			}){}, prev.pos("ur").adds(5, -2));
+			prev = add(new Button(UI.scale(70), "Reset", false).action(() -> {
+				Utils.setprefsa("q3ColorSetting_colorSetting", new String[]{"0","214","10","255"});
+				q3ColorOptionWidget.cb.colorChooser.setColor(q3ColorOptionWidget.currentColor = new Color(0, 214, 10, 255));
+				if (ui != null && ui.gui != null) ui.gui.reloadAllItemOverlays();
+			}), prev.pos("ur").adds(30, 0));
+
+
+			prev = add(q2ColorTextEntry = new TextEntry(UI.scale(60), Utils.getpref("q2ColorTextEntry", "10")){
+				protected void changed() {
+					this.settext(this.text().replaceAll("[^\\d]", ""));
+					Utils.setpref("q2ColorTextEntry", this.buf.line());
+					if (ui != null && ui.gui != null) ui.gui.reloadAllItemOverlays();
+					super.changed();
+				}
+			}, prev.pos("bl").adds(0, 10).x(UI.scale(0)));
+			prev = add(q2ColorOptionWidget = new ColorOptionWidget("  Common Quality:", "q2ColorSetting", 120, Integer.parseInt(q2ColorSetting[0]), Integer.parseInt(q2ColorSetting[1]), Integer.parseInt(q2ColorSetting[2]), Integer.parseInt(q2ColorSetting[3]), (Color col) -> {
+				q2ColorOptionWidget.cb.colorChooser.setColor(q2ColorOptionWidget.currentColor = col);
+				if (ui != null && ui.gui != null) ui.gui.reloadAllItemOverlays();
+			}){}, prev.pos("ur").adds(5, -2));
+			prev = add(new Button(UI.scale(70), "Reset", false).action(() -> {
+				Utils.setprefsa("q2ColorSetting_colorSetting", new String[]{"255","255","255","255"});
+				q2ColorOptionWidget.cb.colorChooser.setColor(q2ColorOptionWidget.currentColor = new Color(255, 255, 255, 255));
+				if (ui != null && ui.gui != null) ui.gui.reloadAllItemOverlays();
+			}), prev.pos("ur").adds(30, 0));
+
+			prev = add(q1ColorTextEntry = new TextEntry(UI.scale(60), Utils.getpref("q1ColorTextEntry", "1")){
+				protected void changed() {
+					this.settext(this.text().replaceAll("[^\\d]", ""));
+					Utils.setpref("q1ColorTextEntry", this.buf.line());
+					if (ui != null && ui.gui != null) ui.gui.reloadAllItemOverlays();
+					super.changed();
+				}
+			}, prev.pos("bl").adds(0, 10).x(UI.scale(0)));
+			prev = add(q1ColorOptionWidget = new ColorOptionWidget("  Junk Quality:", "q1ColorSetting", 120, Integer.parseInt(q1ColorSetting[0]), Integer.parseInt(q1ColorSetting[1]), Integer.parseInt(q1ColorSetting[2]), Integer.parseInt(q1ColorSetting[3]), (Color col) -> {
+				q1ColorOptionWidget.cb.colorChooser.setColor(q1ColorOptionWidget.currentColor = col);
+				if (ui != null && ui.gui != null) ui.gui.reloadAllItemOverlays();
+			}){}, prev.pos("ur").adds(5, -2));
+			prev = add(new Button(UI.scale(70), "Reset", false).action(() -> {
+				Utils.setprefsa("q1ColorSetting_colorSetting", new String[]{"180","180","180","255"});
+				q1ColorOptionWidget.cb.colorChooser.setColor(q1ColorOptionWidget.currentColor = new Color(180, 180, 180, 255));
+				if (ui != null && ui.gui != null) ui.gui.reloadAllItemOverlays();
+			}), prev.pos("ur").adds(30, 0));
+
+			Widget backButton;
+			add(backButton = new PButton(UI.scale(200), "Back", 27, back, "Advanced Settings"), prev.pos("bl").adds(0, 18).x(0));
+			pack();
+			centerBackButton(backButton, this);
+		}
+	}
+
+
     private static final Text kbtt = RichText.render("$col[255,200,0]{Escape}: Cancel input\n" +
 						     "$col[255,200,0]{Backspace}: Revert to default\n" +
 						     "$col[255,200,0]{Delete}: Disable keybinding", 0);
@@ -1403,6 +1579,7 @@ public class OptWnd extends Window {
 		Panel interfacesettings = add(new InterfaceSettingsPanel(advancedSettings));
 		Panel actionbarssettings =  add(new ActionBarsSettingsPanel(advancedSettings));
 		Panel displaysettings = add(new DisplaySettingsPanel(advancedSettings));
+		Panel qualitydisplaysettings = add(new QualityDisplaySettingsPanel(advancedSettings));
 		Panel camsettings = add(new CameraSettingsPanel(advancedSettings));
 		Panel worldgraphicssettings = add(new WorldGraphicsSettingsPanel(advancedSettings));
 
@@ -1410,6 +1587,7 @@ public class OptWnd extends Window {
 		y2 = advancedSettings.add(new PButton(UI.scale(200), "Interface Settings", -1, interfacesettings, "Interface Settings"), 0, y2).pos("bl").adds(0, 5).y;
 		y2 = advancedSettings.add(new PButton(UI.scale(200), "Action Bars Settings", -1, actionbarssettings, "Action Bars Settings"), 0, y2).pos("bl").adds(0, 5).y;
 		y2 = advancedSettings.add(new PButton(UI.scale(200), "Display Settings", -1, displaysettings, "Display Settings"), 0, y2).pos("bl").adds(0, 5).y;
+		y2 = advancedSettings.add(new PButton(UI.scale(200), "Quality Display Settings", -1, qualitydisplaysettings, "Quality Display Settings"), 0, y2).pos("bl").adds(0, 5).y;
 		y2 += UI.scale(20);
 		y2 = advancedSettings.add(new PButton(UI.scale(200), "Camera Settings", -1, camsettings, "Camera Settings"), 0, y2).pos("bl").adds(0, 5).y;
 		y2 = advancedSettings.add(new PButton(UI.scale(200), "World Graphics Settings", -1, worldgraphicssettings, "World Graphics Settings"), 0, y2).pos("bl").adds(0, 5).y;
@@ -1508,6 +1686,11 @@ public class OptWnd extends Window {
 	// Display Settings Tooltips
 	private final Object granularityPositionTooltip = RichText.render("Equivalent of the :placegrid console command, this allows you to have more freedom when placing constructions/objects.", UI.scale(300));
 	private final Object granularityAngleTooltip = RichText.render("Equivalent of the :placeangle console command, this allows you to have more freedom when rotating constructions/objects before placement.", UI.scale(300));
+
+	// Quality Display Settings Tooltips
+	private final Object customQualityColorsTooltip = RichText.render("These numbers and colors are completely arbitrary, and you can change them to whatever you like." +
+			"\n" +
+			"\n$col[218,163,0]{Note:} $col[185,185,185]{The quality color for container liquids is not affected by this setting.}", UI.scale(300));
 
 	// Audio Settings Tooltips
 	private final Object audioLatencyTooltip = RichText.render("Sets the size of the audio buffer." +

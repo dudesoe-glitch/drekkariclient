@@ -27,13 +27,13 @@ public class ShowQuality extends MenuGrid.PagButton {
     */
 
     public void use(MenuGrid.Interaction iact) {
-	Utils.setprefb("qtoggle", Quality.show = !Quality.show);
-	pag.scm.ui.msg("Quality display is now turned " + (Quality.show ? "on" : "off") + ".", null,
-		       Audio.resclip(Quality.show ? Toggle.sfxon : Toggle.sfxoff));
+		OptWnd.showQualityDisplayCheckBox.set(!OptWnd.showQualityDisplayCheckBox.a);
+	pag.scm.ui.msg("Quality display is now turned " + (OptWnd.showQualityDisplayCheckBox.a ? "on" : "off") + ".", null,
+		       Audio.resclip(OptWnd.showQualityDisplayCheckBox.a ? Toggle.sfxon : Toggle.sfxoff));
     }
 
     public void drawmain(GOut g, GSprite spr) {
 	super.drawmain(g, spr);
-	g.image(Quality.show ? Toggle.on : Toggle.off, Coord.z);
+	g.image(OptWnd.showQualityDisplayCheckBox.a ? Toggle.on : Toggle.off, Coord.z);
     }
 }

@@ -118,6 +118,12 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 	public static BufferedImage numrenderStroked(int num, Color col, boolean thick) {
 		return(Utils.outline2(Text.render(Integer.toString(num), col).img, Color.BLACK, thick));
 	}
+	public static BufferedImage numrenderStrokedDecimal(double num, Color col, boolean thick) {
+		return(Utils.outline2(Text.render(String.format( "%.1f", num), col).img, Color.BLACK, thick));
+	}
+	public static BufferedImage textrenderStroked(String string, Color col, boolean thick) {
+		return(Utils.outline2(Text.render(string, col).img, Color.BLACK, thick));
+	}
     }
 
     public interface MeterInfo {
