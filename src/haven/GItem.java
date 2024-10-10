@@ -105,15 +105,18 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 	}
 
 	public default Tex overlay() {
-	    return(new TexI(GItem.NumberInfo.numrender(itemnum(), numcolor())));
+	    return(new TexI(PUtils.strokeImg(GItem.NumberInfo.numrenderStroked(itemnum(), numcolor(), true))));
 	}
 
 	public default void drawoverlay(GOut g, Tex tex) {
-	    g.aimage(tex, g.sz(), 1, 1);
+	    g.aimage(tex, g.sz(), 0.95, 0.85);
 	}
 
 	public static BufferedImage numrender(int num, Color col) {
 	    return(Utils.outline2(Text.render(Integer.toString(num), col).img, Utils.contrast(col)));
+	}
+	public static BufferedImage numrenderStroked(int num, Color col, boolean thick) {
+		return(Utils.outline2(Text.render(Integer.toString(num), col).img, Color.BLACK, thick));
 	}
     }
 
