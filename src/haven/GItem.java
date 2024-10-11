@@ -46,9 +46,10 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
     private boolean hoverset;
     private GSprite spr;
     private ItemInfo.Raw rawinfo;
-    private List<ItemInfo> info = Collections.emptyList();
+    public List<ItemInfo> info = Collections.emptyList();
 	public boolean sendttupdate = false;
 	public long meterUpdated = 0; // ND: last time meter was updated, ms
+	public Tex stackQualityTex = null;
 
     @RName("item")
     public static class $_ implements Factory {
@@ -141,7 +142,12 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 	public int itemnum() {
 	    return(num);
 	}
-    }
+
+	@Override
+	public Color numcolor() {
+		return(new Color(255, 206, 45, 255));
+	}
+	}
 
     public GItem(Indir<Resource> res, Message sdt) {
 	this.res = res;

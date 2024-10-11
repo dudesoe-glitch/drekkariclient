@@ -32,6 +32,7 @@ import haven.render.*;
 
 import java.awt.image.BufferedImage;
 import haven.ItemInfo.AttrCache;
+import haven.res.ui.stackinv.ItemStack;
 import haven.resutil.Curiosity;
 
 import static haven.Inventory.sqsz;
@@ -200,6 +201,9 @@ public class WItem extends Widget implements DTarget {
 			drawCircleProgress(g, sz);
 		else
 			drawTimeProgress(g, sz);
+		if (item.stackQualityTex != null && OptWnd.showQualityDisplayCheckBox.a) {
+			g.aimage(item.stackQualityTex, new Coord(g.sz().x, 0), 0.95, 0.2);
+		}
 	} else {
 	    g.image(missing.layer(Resource.imgc).tex(), Coord.z, sz);
 	}
@@ -324,5 +328,17 @@ public class WItem extends Widget implements DTarget {
 			GItem.InfoOverlay<?>[] ret = buf.toArray(new GItem.InfoOverlay<?>[0]);
 			return(() -> ret);
 		});
+		if (item != null && item.parent != null) {
+			if (item.parent instanceof ItemStack) {
+				ItemStack itemStack = (ItemStack) item.parent;
+				if (itemStack.parent != null) {
+					GItem stackItem = ((GItem.ContentsWindow) itemStack.parent).cont;
+					if (stackItem != null) {
+						stackItem.stackQualityTex = null;
+						itemStack.stackQualityNeedsUpdate = true;
+					}
+				}
+			}
+		}
 	}
 }
