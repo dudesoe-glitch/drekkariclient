@@ -79,6 +79,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 	public boolean localActionBarsLoaded = false;
 	public boolean changeCustomSlot = false;
 	public MenuGrid.Pagina customActionPag = null;
+	public static long playerId = -1;
 
     public static abstract class BeltSlot {
 	public final int idx;
@@ -255,6 +256,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 	public Widget create(UI ui, Object[] args) {
 	    String chrid = (String)args[0];
 	    long plid = Utils.uiv(args[1]);
+		playerId = plid;
 	    String genus = "";
 	    if(args.length > 2)
 		genus = (String)args[2];

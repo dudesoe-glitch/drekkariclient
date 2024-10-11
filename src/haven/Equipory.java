@@ -90,8 +90,9 @@ public class Equipory extends Widget implements DTarget {
 	private Tex Subtlety = null;
 	private Tex ArmorClass = null;
 	AttrBonusesWdg bonuses;
-	public static boolean showEquipmentBonuses = Utils.getprefb("showEquipmentBonuses", false);
+	private boolean showEquipmentBonuses = Utils.getprefb("showEquipmentBonuses", false);
 	private Button expandButton = null;
+	public boolean myOwnEquipory = false;
 
     @RName("epry")
     public static class $_ implements Factory {
@@ -115,6 +116,8 @@ public class Equipory extends Widget implements DTarget {
 
     public Equipory(long gobid) {
 	super(isz);
+	if (gobid == GameUI.playerId)
+		myOwnEquipory = true;
 	ava = add(new Avaview(bg.sz(), gobid, "equcam") {
 		public boolean mousedown(Coord c, int button) {
 		    return(false);
