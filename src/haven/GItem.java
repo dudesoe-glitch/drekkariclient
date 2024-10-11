@@ -50,6 +50,7 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 	public boolean sendttupdate = false;
 	public long meterUpdated = 0; // ND: last time meter was updated, ms
 	public Tex stackQualityTex = null;
+	public double studytime = 0.0;
 
     @RName("item")
     public static class $_ implements Factory {

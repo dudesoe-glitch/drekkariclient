@@ -40,6 +40,7 @@ import java.io.Serializable;
 import static haven.Utils.el;
 import haven.render.Environment;
 import haven.render.Render;
+import haven.res.ui.tt.wear.Wear;
 
 public class UI {
     public static int MOD_SHIFT = KeyMatch.S, MOD_CTRL = KeyMatch.C, MOD_META = KeyMatch.M, MOD_SUPER = KeyMatch.SUPER;
@@ -464,6 +465,9 @@ public class UI {
 		if(pwdg == null)
 		    throw(new UIException(String.format("Null parent widget %d for %d (%s)", parent, id, wdg), null, pargs));
 		pwdg.addchild(wdg, pargs);
+		if (pwdg instanceof Window) {
+			processWindowContent((Window) pwdg, wdg);
+		}
 	    }
 	}
 
@@ -930,6 +934,19 @@ public class UI {
 				this.gui = null;
 			}
 		}
+	}
+
+	private void processWindowContent(Window pwdg, Widget wdg) {
+		String cap = pwdg.cap;
+		if (wdg instanceof Inventory && cap.equals("Study Desk")) {
+			initStudydeskUi(pwdg, (Inventory) wdg);
+		}
+	}
+
+	public static void initStudydeskUi(Window pwdg, Inventory inv) {
+		StudydeskInfo studyDeskInfo = new StudydeskInfo(inv.sz.x, UI.scale(100), inv);
+		pwdg.add(studyDeskInfo, new Coord(UI.scale(10), inv.sz.y+UI.scale(20)));
+		pwdg.pack();
 	}
 
 }
