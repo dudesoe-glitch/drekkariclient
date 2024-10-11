@@ -468,6 +468,7 @@ public class OptWnd extends Window {
 	public static CheckBox disableMenuGridHotkeysCheckBox;
 	public static CheckBox alwaysOpenBeltOnLoginCheckBox;
 	public static CheckBox showMapMarkerNamesCheckBox;
+	public static CheckBox verticalContainerIndicatorsCheckBox;
 	private static CheckBox showFramerateCheckBox;
 	public static CheckBox snapWindowsBackInsideCheckBox;
 	public static CheckBox dragWindowsInWhenResizingCheckBox;
@@ -587,6 +588,13 @@ public class OptWnd extends Window {
 			}
 		}, rightColumn.pos("bl").adds(0, 2));
 		showMapMarkerNamesCheckBox.tooltip = showMapMarkerNamesTooltip;
+		rightColumn = add(verticalContainerIndicatorsCheckBox = new CheckBox("Vertical Container Indicators"){
+			{a = (Utils.getprefb("verticalContainerIndicators", true));}
+			public void changed(boolean val) {
+				Utils.setprefb("verticalContainerIndicators", val);
+			}
+		}, rightColumn.pos("bl").adds(0, 32));
+		verticalContainerIndicatorsCheckBox.tooltip = verticalContainerIndicatorsTooltip;
 		Widget backButton;
 		add(backButton = new PButton(UI.scale(200), "Back", 27, back, "Advanced Settings"), leftColumn.pos("bl").adds(0, 30).x(0));
 	    pack();
@@ -1668,6 +1676,9 @@ public class OptWnd extends Window {
 			"\n" +
 			"\n$col[185,185,185]{By default, Loftar saves the status of the belt at logout. So if you don't enable this setting, but leave the belt window open when you log out/exit the game, it will still open on login.}", UI.scale(300));
 	private final Object showMapMarkerNamesTooltip = RichText.render("$col[185,185,185]{The marker names are NOT visible in compact mode.}", UI.scale(320));
+	private final Object verticalContainerIndicatorsTooltip = RichText.render("Orientation for inventory container indicators." +
+			"\n" +
+			"\n$col[185,185,185]{For example, the amount of water in waterskins, seeds in a bucket, etc.}", UI.scale(230));
 
 	private final Object showFramerateTooltip = RichText.render("Shows the current FPS in the top-right corner of the game window.", UI.scale(300));
 	private final Object snapWindowsBackInsideTooltip = RichText.render("Enabling this will cause most windows, that are not too large, to be fully snapped back into your game's window." +

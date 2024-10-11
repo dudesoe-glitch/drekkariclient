@@ -8,7 +8,7 @@ import java.awt.Color;
 @haven.FromResource(name = "ui/tt/level", version = 21)
 public class Level extends ItemInfo implements GItem.OverlayInfo<Double> {
     public static final Color defcolor = Color.WHITE;
-    public static final int h = UI.scale(2);
+    public static final int h = UI.scale(3);
     public static final int m = UI.scale(1);
     public final double max, cur;
     public final Color color;
@@ -22,12 +22,19 @@ public class Level extends ItemInfo implements GItem.OverlayInfo<Double> {
 
     public static void drawmeter(GOut g, double l, Color color, Color ocolor) {
 	Coord sz = g.sz();
-	g.chcolor(ocolor);
-	g.frect2(new Coord(1 + m, sz.y - 3 - m - h), new Coord(sz.x - 2 - m, sz.y - 1 - m));
-	g.line(new Coord(m, sz.y - 2 - m - h), new Coord(m, sz.y - 2 - m), 1);
-	g.line(new Coord(sz.x - 2 - m, sz.y - 2 - m - h), new Coord(sz.x - 2 - m, sz.y - 2 - m), 1);
-	g.chcolor(color);
-	g.frect2(new Coord(1 + m, sz.y - 2 - m - h), new Coord(m + (int)Math.floor(l * (sz.x - 2 -  (m * 2))), sz.y - 2 - m));
+	if (!OptWnd.verticalContainerIndicatorsCheckBox.a) {
+		int w = (int) (sz.x * l);
+		g.chcolor(ocolor);
+		g.frect(new Coord(0, sz.y - UI.scale(6)), new Coord(sz.x - UI.scale(1), UI.scale(5)));
+		g.chcolor(color);
+		g.frect(new Coord(UI.scale(1), sz.y - UI.scale(5)), new Coord(w - UI.scale(3), UI.scale(3)));
+	} else {
+		int h = (int) (sz.y * l);
+		g.chcolor(ocolor);
+		g.frect(new Coord(UI.scale(1), 0), new Coord(UI.scale(5), sz.y - UI.scale(1)));
+		g.chcolor(color);
+		g.frect(new Coord(UI.scale(2), sz.y - h + UI.scale(1)), new Coord(UI.scale(3), h - UI.scale(3)));
+	}
 	g.chcolor();
     }
 

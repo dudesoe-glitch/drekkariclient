@@ -194,8 +194,10 @@ public class WItem extends Widget implements DTarget {
 	    g.defstate();
 	    GItem.InfoOverlay<?>[] ols = itemols.get();
 	    if(ols != null) {
-		for(GItem.InfoOverlay<?> ol : ols)
-		    ol.draw(g);
+		for (int i = ols.length - 1; i >= 0; i--) { // ND: Reversed the order in which overlays are drawn, so the quality stays above the level bar (container liquid meter)
+			GItem.InfoOverlay<?> overlay = ols[i];
+			overlay.draw(g);
+		}
 	    }
 		if (isNotInStudy != null && isNotInStudy)
 			drawCircleProgress(g, sz);
