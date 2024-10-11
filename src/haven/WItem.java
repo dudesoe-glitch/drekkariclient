@@ -26,11 +26,14 @@
 
 package haven;
 
+import java.awt.*;
 import java.util.*;
 
 import haven.render.*;
 
 import java.awt.image.BufferedImage;
+import java.util.List;
+
 import haven.ItemInfo.AttrCache;
 import haven.res.ui.stackinv.ItemStack;
 import haven.resutil.Curiosity;
@@ -48,6 +51,17 @@ public class WItem extends Widget implements DTarget {
 	private String cachedTipValue = null;
 	private Tex cachedStudyTex = null;
 	private boolean holdingShift = false;
+
+	public static Color redDurability = new Color(255, 0, 0, 180);
+	public static Color orangeDurability = new Color(255, 153, 0, 180);
+	public static Color yellowDurability = new Color(255, 234, 0, 180);
+	public static Color greenDurability = new Color(0, 255, 4, 180);
+	public final AttrCache<Pair<Double, Color>> wear = new AttrCache<>(this::info, AttrCache.cache(info->{
+		Pair<Integer, Integer> wear = ItemInfo.getWear(info);
+		if(wear == null) return (null);
+		double bar = (float) (wear.b - wear.a) / wear.b;
+		return new Pair<>(bar, Utils.blendcol(bar, redDurability, orangeDurability, yellowDurability, greenDurability));
+	}));
 
     public WItem(GItem item) {
 	super(sqsz);
@@ -206,6 +220,7 @@ public class WItem extends Widget implements DTarget {
 		if (item.stackQualityTex != null && OptWnd.showQualityDisplayCheckBox.a) {
 			g.aimage(item.stackQualityTex, new Coord(g.sz().x, 0), 0.95, 0.2);
 		}
+		drawDurabilityBars(g, sz);
 	} else {
 	    g.image(missing.layer(Resource.imgc).tex(), Coord.z, sz);
 	}
@@ -340,6 +355,20 @@ public class WItem extends Widget implements DTarget {
 						itemStack.stackQualityNeedsUpdate = true;
 					}
 				}
+			}
+		}
+	}
+
+	private void drawDurabilityBars(GOut g, Coord sz) {
+		if(true) {
+			Pair<Double, Color> wear = this.wear.get();
+			if(wear != null) {
+				int h = (int) (sz.y * wear.a);
+				g.chcolor(Color.BLACK);
+				g.frect(new Coord(UI.scale(1), 0), new Coord(UI.scale(5), sz.y));
+				g.chcolor(wear.b);
+				g.frect(new Coord(UI.scale(2), sz.y - h + UI.scale(1)), new Coord(UI.scale(3), h - UI.scale(2)));
+				g.chcolor();
 			}
 		}
 	}

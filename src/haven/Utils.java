@@ -2445,4 +2445,23 @@ public class Utils {
 		resname = resname.substring(0, 1).toUpperCase() + resname.substring(1);
 		return resname;
 	}
+
+	public static Color blendcol(double a, Color... cols) {
+		a = clip(a, 0, 1);
+		if(cols.length > 2) {
+			int n = cols.length - 1;
+			double d = 1.0 / n;
+			int section = (int) (a / d);
+			if(section >= n){
+				return cols[n];
+			} else {
+				return blendcol(cols[section], cols[section + 1], (a - section * d) / d);
+			}
+		} else if(cols.length == 2) {
+			return blendcol(cols[0], cols[1], a);
+		} else if(cols.length == 1) {
+			return cols[0];
+		}
+		return null;
+	}
 }

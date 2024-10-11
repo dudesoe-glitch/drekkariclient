@@ -508,6 +508,13 @@ public abstract class ItemInfo {
 		    return(() -> ret);
 		});
 	}
+
+	public static <R> Function<List<ItemInfo>, Supplier<R>> cache(Function<List<ItemInfo>, R> data) {
+		return (info -> {
+			R result = data.apply(info);
+			return (() -> result);
+		});
+	}
     }
 
     public static interface InfoTip {
@@ -577,6 +584,16 @@ public abstract class ItemInfo {
 		return infos.stream()
 				.filter(inf -> Reflect.is(inf, cl))
 				.collect(Collectors.toCollection(LinkedList::new));
+	}
+
+	public static Pair<Integer, Integer> getWear(List<ItemInfo> infos) {
+		infos = findall("haven.res.ui.tt.wear.Wear", infos);
+		for (ItemInfo info : infos) {
+			if (Reflect.hasField(info, "m") && Reflect.hasField(info, "d")) {
+				return new Pair<>(Reflect.getFieldValueInt(info, "d"), Reflect.getFieldValueInt(info, "m"));
+			}
+		}
+		return null;
 	}
 
 }
