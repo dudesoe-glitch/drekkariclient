@@ -305,7 +305,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	}
 
 	public void drag(Coord c) {
-	    telev = elevorig - (OptWnd.reverseFreeCamYAxisCheckBox.a ? -1 : 1) * ((float)(c.y - dragorig.y) / 100.0f);
+	    telev = elevorig - (OptWnd.reverseFreeCamYAxisCheckBox.a ? -1 : 1) * ((float)(c.y - dragorig.y) * 0.00001f * OptWnd.freeCamRotationSensitivitySlider.val);
 		if (OptWnd.allowLowerFreeCamTiltCheckBox.a){
 			if(telev < -0.5f) telev = -0.5f;
 		}
@@ -313,7 +313,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
 			if(telev < 0.0f) telev = 0.0f;
 		}
 	    if(telev > (Math.PI / 2.0)) telev = (float)Math.PI / 2.0f;
-		tangl = anglorig + (OptWnd.reverseFreeCamXAxisCheckBox.a ? -1 : 1) * ((float)(c.x - dragorig.x) / 100.0f);
+		tangl = anglorig + (OptWnd.reverseFreeCamXAxisCheckBox.a ? -1 : 1) * ((float)(c.x - dragorig.x) * 0.00001f * OptWnd.freeCamRotationSensitivitySlider.val);
 	}
 
 	public boolean wheel(Coord c, int amount) {
@@ -489,7 +489,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	}
 
 	public void drag(Coord c) {
-	    tangl = anglorig + (OptWnd.reverseOrthoCameraAxesCheckBox.a ? -1 : 1) * ((float)(c.x - dragorig.x) / 100.0f);
+	    tangl = anglorig + (OptWnd.reverseOrthoCameraAxesCheckBox.a ? -1 : 1) * ((float)(c.x - dragorig.x) * 0.00001f * OptWnd.orthoCamRotationSensitivitySlider.val);
 	}
 
 	public void release() {

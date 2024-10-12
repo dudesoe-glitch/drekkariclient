@@ -1138,6 +1138,9 @@ public class OptWnd extends Window {
 	private Label freeCamZoomSpeedLabel;
 	public static HSlider freeCamZoomSpeedSlider;
 	private Button freeCamZoomSpeedResetButton;
+	private Label freeCamRotationSensitivityLabel;
+	public static HSlider freeCamRotationSensitivitySlider;
+	private Button freeCamRotationSensitivityResetButton;
 	private Label freeCamHeightLabel;
 	public static HSlider freeCamHeightSlider;
 	private Button freeCamHeightResetButton;
@@ -1145,6 +1148,9 @@ public class OptWnd extends Window {
 	private Label orthoCamZoomSpeedLabel;
 	public static HSlider orthoCamZoomSpeedSlider;
 	private Button orthoCamZoomSpeedResetButton;
+	private Label orthoCamRotationSensitivityLabel;
+	public static HSlider orthoCamRotationSensitivitySlider;
+	private Button orthoCamRotationSensitivityResetButton;
 	public static CheckBox reverseOrthoCameraAxesCheckBox;
 	public static CheckBox reverseFreeCamXAxisCheckBox;
 	public static CheckBox reverseFreeCamYAxisCheckBox;
@@ -1214,6 +1220,17 @@ public class OptWnd extends Window {
 				Utils.setprefi("orthoCamZoomSpeed", 10);
 			}), OrthoPrev.pos("bl").adds(210, -20));
 			orthoCamZoomSpeedResetButton.tooltip = resetButtonTooltip;
+				OrthoPrev = add(orthoCamRotationSensitivityLabel = new Label("Ortho Camera Rotation Sensitivity:"), OrthoPrev.pos("bl").adds(0, 10).x(0));
+				OrthoPrev = add(orthoCamRotationSensitivitySlider = new HSlider(UI.scale(200), 100, 1000, Utils.getprefi("orthoCamRotationSensitivity", 1000)) {
+					public void changed() {
+						Utils.setprefi("orthoCamRotationSensitivity", val);
+					}
+				}, OrthoPrev.pos("bl").adds(0, 4));
+				add(orthoCamRotationSensitivityResetButton = new Button(UI.scale(70), "Reset", false).action(() -> {
+					orthoCamRotationSensitivitySlider.val = 1000;
+					Utils.setprefi("orthoCamRotationSensitivity", 1000);
+				}), OrthoPrev.pos("bl").adds(210, -20));
+				orthoCamRotationSensitivityResetButton.tooltip = resetButtonTooltip;
 
 			// ND: The Free Camera Settings
 			FreePrev = add(reverseFreeCamXAxisCheckBox = new CheckBox("Reverse X Axis"){
@@ -1247,6 +1264,17 @@ public class OptWnd extends Window {
 				Utils.setprefi("freeCamZoomSpeed", 25);
 			}), FreePrev.pos("bl").adds(210, -20));
 			freeCamZoomSpeedResetButton.tooltip = resetButtonTooltip;
+			FreePrev = add(freeCamRotationSensitivityLabel = new Label("Free Camera Rotation Sensitivity:"), FreePrev.pos("bl").adds(0, 10).x(0));
+			FreePrev = add(freeCamRotationSensitivitySlider = new HSlider(UI.scale(200), 100, 1000, Utils.getprefi("freeCamRotationSensitivity", 1000)) {
+				public void changed() {
+					Utils.setprefi("freeCamRotationSensitivity", val);
+				}
+			}, FreePrev.pos("bl").adds(0, 4));
+			add(freeCamRotationSensitivityResetButton = new Button(UI.scale(70), "Reset", false).action(() -> {
+				freeCamRotationSensitivitySlider.val = 1000;
+				Utils.setprefi("freeCamRotationSensitivity", 1000);
+			}), FreePrev.pos("bl").adds(210, -20));
+			freeCamRotationSensitivityResetButton.tooltip = resetButtonTooltip;
 			FreePrev = add(freeCamHeightLabel = new Label("Free Camera Height:"), FreePrev.pos("bl").adds(0, 10));
 			freeCamHeightLabel.tooltip = freeCamHeightTooltip;
 			FreePrev = add(freeCamHeightSlider = new HSlider(UI.scale(200), 10, 300, (Math.round((float) Utils.getprefd("cameraHeightDistance", 15f)))*10) {
@@ -1288,6 +1316,9 @@ public class OptWnd extends Window {
 			freeCamZoomSpeedLabel.visible = bool;
 			freeCamZoomSpeedSlider.visible = bool;
 			freeCamZoomSpeedResetButton.visible = bool;
+			freeCamRotationSensitivityLabel.visible = bool;
+			freeCamRotationSensitivitySlider.visible = bool;
+			freeCamRotationSensitivityResetButton.visible = bool;
 			freeCamHeightLabel.visible = bool;
 			freeCamHeightSlider.visible = bool;
 			freeCamHeightResetButton.visible = bool;
@@ -1300,6 +1331,9 @@ public class OptWnd extends Window {
 			orthoCamZoomSpeedLabel.visible = bool;
 			orthoCamZoomSpeedSlider.visible = bool;
 			orthoCamZoomSpeedResetButton.visible = bool;
+			orthoCamRotationSensitivityLabel.visible = bool;
+			orthoCamRotationSensitivitySlider.visible = bool;
+			orthoCamRotationSensitivityResetButton.visible = bool;
 			reverseOrthoCameraAxesCheckBox.visible = bool;
 		}
 	}
