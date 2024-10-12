@@ -525,6 +525,9 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 	}
 
 	public void wdgmsg(Widget sender, String msg, Object... args) {
+		if(msg.equals("take") && this.parent != null && this.parent instanceof StudyInventory && OptWnd.lockStudyReportCheckBox.a) {
+			return;
+		}
 	    if((sender == this) && (msg == "close")) {
 		chstate("hide");
 	    } else {

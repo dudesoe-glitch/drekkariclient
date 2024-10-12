@@ -500,6 +500,9 @@ public class UI {
     }
 
     public void newwidgetp(int id, String type, int parent, Object[] pargs, Object... cargs) throws InterruptedException {
+	if(type.equals("inv") && pargs[0].toString().equals("study")) {
+		type = "inv-study";
+	}
 	newwidget(id, type, cargs);
 	if(parent != -1)
 	    addwidget(id, parent, pargs);

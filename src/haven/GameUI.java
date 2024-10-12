@@ -2386,4 +2386,15 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 		}
 	}
 
+	public Window getwnd(String cap) {
+		for (Widget w = lchild; w != null; w = w.prev) {
+			if (w instanceof Window) {
+				Window wnd = (Window) w;
+				if (wnd.cap != null && cap.equals(wnd.cap))
+					return wnd;
+			}
+		}
+		return null;
+	}
+
 }

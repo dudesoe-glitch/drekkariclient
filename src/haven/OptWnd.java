@@ -474,6 +474,9 @@ public class OptWnd extends Window {
 	public static CheckBox dragWindowsInWhenResizingCheckBox;
 	public static CheckBox showHoverInventoriesWhenHoldingShiftCheckBox;
 	private CheckBox showQuickSlotsCheckBox;
+	public static CheckBox showStudyReportHistoryCheckBox;
+	public static CheckBox lockStudyReportCheckBox;
+	public static CheckBox soundAlertForFinishedCuriositiesCheckBox;
     public class InterfaceSettingsPanel extends Panel {
 	public InterfaceSettingsPanel(Panel back) {
 	    Widget leftColumn = add(new Label("Interface scale (requires restart)"), 0, 0);
@@ -538,6 +541,33 @@ public class OptWnd extends Window {
 			}
 		}, leftColumn.pos("bl").adds(0, 2));
 		showQuickSlotsCheckBox.tooltip = showQuickSlotsTooltip;
+		leftColumn = add(showStudyReportHistoryCheckBox = new CheckBox("Show Study Report History"){
+			{a = (Utils.getprefb("showStudyReportHistory", true));}
+			public void set(boolean val) {
+				SAttrWnd.showStudyReportHistoryCheckBox.a = val;
+				Utils.setprefb("showStudyReportHistory", val);
+				a = val;
+			}
+		}, leftColumn.pos("bl").adds(0, 12));
+		showStudyReportHistoryCheckBox.tooltip = showStudyReportHistoryTooltip;
+		leftColumn = add(lockStudyReportCheckBox = new CheckBox("Lock Study Report"){
+			{a = (Utils.getprefb("lockStudyReport", false));}
+			public void set(boolean val) {
+				SAttrWnd.lockStudyReportCheckBox.a = val;
+				Utils.setprefb("lockStudyReport", val);
+				a = val;
+			}
+		}, leftColumn.pos("bl").adds(0, 2));
+		lockStudyReportCheckBox.tooltip = lockStudyReportTooltip;
+		leftColumn = add(soundAlertForFinishedCuriositiesCheckBox = new CheckBox("Sound Alert for Finished Curiosities"){
+			{a = (Utils.getprefb("soundAlertForFinishedCuriosities", false));}
+			public void set(boolean val) {
+				SAttrWnd.soundAlertForFinishedCuriositiesCheckBox.a = val;
+				Utils.setprefb("soundAlertForFinishedCuriosities", val);
+				a = val;
+			}
+		}, leftColumn.pos("bl").adds(0, 2));
+
 		Widget rightColumn;
 		rightColumn = add(simplifiedUIThemeCheckBox = new CheckBox("Simplified UI Theme"){
 			{a = (Utils.getprefb("simplifiedUITheme", false));}
@@ -1078,6 +1108,33 @@ public class OptWnd extends Window {
 	    }
 	}
 
+	public static CheckBox autoReloadCuriositiesFromInventoryCheckBox;
+
+	public class GameplayAutomationSettingsPanel extends Panel {
+
+		public GameplayAutomationSettingsPanel(Panel back) {
+			Widget prev;
+
+			prev = add(new Label("Other gameplay automations:"), 0, 0);
+			prev = add(autoReloadCuriositiesFromInventoryCheckBox = new CheckBox("Auto-Reload Curiosities from Inventory"){
+				{a = Utils.getprefb("autoStudyFromInventory", false);}
+				public void set(boolean val) {
+					SAttrWnd.autoReloadCuriositiesFromInventoryCheckBox.a = val;
+					Utils.setprefb("autoStudyFromInventory", val);
+					a = val;
+				}
+			}, prev.pos("bl").adds(0, 2));
+			autoReloadCuriositiesFromInventoryCheckBox.tooltip = autoReloadCuriositiesFromInventoryTooltip;
+
+			Widget backButton;
+			add(backButton = new PButton(UI.scale(200), "Back", 27, back, "Advanced Settings"), prev.pos("bl").adds(0, 18));
+			pack();
+			centerBackButton(backButton, this);
+		}
+	}
+
+
+
 	private Label freeCamZoomSpeedLabel;
 	public static HSlider freeCamZoomSpeedSlider;
 	private Button freeCamZoomSpeedResetButton;
@@ -1588,6 +1645,7 @@ public class OptWnd extends Window {
 		Panel actionbarssettings =  add(new ActionBarsSettingsPanel(advancedSettings));
 		Panel displaysettings = add(new DisplaySettingsPanel(advancedSettings));
 		Panel qualitydisplaysettings = add(new QualityDisplaySettingsPanel(advancedSettings));
+		Panel gameplayautomationsettings = add(new GameplayAutomationSettingsPanel(advancedSettings));
 		Panel camsettings = add(new CameraSettingsPanel(advancedSettings));
 		Panel worldgraphicssettings = add(new WorldGraphicsSettingsPanel(advancedSettings));
 
@@ -1597,9 +1655,9 @@ public class OptWnd extends Window {
 		y2 = advancedSettings.add(new PButton(UI.scale(200), "Display Settings", -1, displaysettings, "Display Settings"), 0, y2).pos("bl").adds(0, 5).y;
 		y2 = advancedSettings.add(new PButton(UI.scale(200), "Quality Display Settings", -1, qualitydisplaysettings, "Quality Display Settings"), 0, y2).pos("bl").adds(0, 5).y;
 		y2 += UI.scale(20);
+		y2 = advancedSettings.add(new PButton(UI.scale(200), "Gameplay Automation Settings", -1, gameplayautomationsettings, "Gameplay Automation Settings"), 0, y2).pos("bl").adds(0, 5).y;
 		y2 = advancedSettings.add(new PButton(UI.scale(200), "Camera Settings", -1, camsettings, "Camera Settings"), 0, y2).pos("bl").adds(0, 5).y;
 		y2 = advancedSettings.add(new PButton(UI.scale(200), "World Graphics Settings", -1, worldgraphicssettings, "World Graphics Settings"), 0, y2).pos("bl").adds(0, 5).y;
-
 
 		y2 += UI.scale(20);
 		y2 = advancedSettings.add(new PButton(UI.scale(200), "Back", 27, main, "Options            "), 0, y2).pos("bl").adds(0, 5).y;
@@ -1693,6 +1751,10 @@ public class OptWnd extends Window {
 			"\nTo drag this widget to a new position: hold down Shift, click and drag." +
 			"\n" +
 			"\n$col[185,185,185]{Your quick-switch keybinds ('Right Hand' and 'Left Hand') are NOT affected by this setting.}", UI.scale(300));
+	private final Object showStudyReportHistoryTooltip = RichText.render("Shows what curiosity was formerly placed in each slot. The history is saved separately for every character and account." +
+			"\n" +
+			"\n$col[185,185,185]{It doesn't work with Gems. Don't ask me why.}", UI.scale(300));
+	private final Object lockStudyReportTooltip = RichText.render("Enabling this will prevent moving or dropping items from the Study Report", UI.scale(300));
 
 	// Display Settings Tooltips
 	private final Object granularityPositionTooltip = RichText.render("Equivalent of the :placegrid console command, this allows you to have more freedom when placing constructions/objects.", UI.scale(300));
@@ -1708,6 +1770,12 @@ public class OptWnd extends Window {
 			"\n" +
 			"\n$col[185,185,185]{Loftar claims that smaller sizes are better, but anything below 50ms always seems to stutter, so I limited it to that." +
 			"\nIncrease this if your audio is still stuttering.}", UI.scale(300));
+
+	// Gameplay Automation Settings Tooltips
+	private final Object autoReloadCuriositiesFromInventoryTooltip = RichText.render("If enabled, curiosities will be automatically reloaded into the Study Report once they finish being studied." +
+			"\nThis picks items only from your Inventory and currently open Cupboards. No other containers." +
+			"\n" +
+			"\n$col[185,185,185]{It only reloads curiosities that are currently being studied. It can't add new curiosities.}", UI.scale(300));
 
 	// Camera Settings Tooltips
 	private final Object reverseOrthoCameraAxesTooltip = RichText.render("Enabling this will reverse the Horizontal axis when dragging the camera to look around." +

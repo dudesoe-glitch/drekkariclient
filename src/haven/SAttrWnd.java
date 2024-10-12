@@ -285,6 +285,14 @@ public class SAttrWnd extends Widget {
 	if(place == "study") {
 	    add(child, studyc.add(wbox.btloff()));
 	    Widget f = Frame.around(this, Collections.singletonList(child));
+		Widget prevStudyCheckbox;
+		prevStudyCheckbox = add(showStudyReportHistoryCheckBox, child.pos("bl").adds(0, 11));
+		prevStudyCheckbox.tooltip = OptWnd.showStudyReportHistoryCheckBox.tooltip;
+		prevStudyCheckbox = add(lockStudyReportCheckBox, prevStudyCheckbox.pos("bl").adds(0, 2));
+		prevStudyCheckbox.tooltip = OptWnd.lockStudyReportCheckBox.tooltip;
+		prevStudyCheckbox = add(soundAlertForFinishedCuriositiesCheckBox, prevStudyCheckbox.pos("bl").adds(0, 2));
+		prevStudyCheckbox = add(autoReloadCuriositiesFromInventoryCheckBox, prevStudyCheckbox.pos("bl").adds(0, 2));
+		prevStudyCheckbox.tooltip = OptWnd.autoReloadCuriositiesFromInventoryCheckBox.tooltip;
 	    Widget inf = add(new StudyInfo(new Coord(attrw - child.sz.x - wbox.bisz().x - UI.scale(5), child.sz.y), child), child.pos("ur").add(wbox.bisz().x + UI.scale(5), 0));
 	    Frame.around(this, Collections.singletonList(inf));
 	    pack();
@@ -300,4 +308,33 @@ public class SAttrWnd extends Widget {
 		}
 		equiporyFuture.cancel(true);
 	}
+
+	public static CheckBox showStudyReportHistoryCheckBox = new CheckBox("Show Study Report History"){
+		{a = OptWnd.showStudyReportHistoryCheckBox.a;}
+		public void set(boolean val) {
+			OptWnd.showStudyReportHistoryCheckBox.set(val);
+			a = val;
+		}
+	};
+	public static CheckBox lockStudyReportCheckBox = new CheckBox("Lock Study Report"){
+		{a = OptWnd.lockStudyReportCheckBox.a;}
+		public void set(boolean val) {
+			OptWnd.lockStudyReportCheckBox.set(val);
+			a = val;
+		}
+	};
+	public static CheckBox soundAlertForFinishedCuriositiesCheckBox = new CheckBox("Sound Alert for Finished Curiosities"){
+		{a = OptWnd.soundAlertForFinishedCuriositiesCheckBox.a;}
+		public void set(boolean val) {
+			OptWnd.soundAlertForFinishedCuriositiesCheckBox.set(val);
+			a = val;
+		}
+	};
+	public static CheckBox autoReloadCuriositiesFromInventoryCheckBox = new CheckBox("Auto-Reload Curiosities from Inventory"){
+		{a = OptWnd.autoReloadCuriositiesFromInventoryCheckBox.a;}
+		public void set(boolean val) {
+			OptWnd.autoReloadCuriositiesFromInventoryCheckBox.set(val);
+			a = val;
+		}
+	};
 }
