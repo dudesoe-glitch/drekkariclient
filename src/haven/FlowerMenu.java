@@ -32,13 +32,17 @@ import static java.lang.Math.PI;
 
 public class FlowerMenu extends Widget {
     public static final Color pink = new Color(255, 0, 128);
-    public static final Color ptc = Color.YELLOW;
+    public static final Color ptc = Color.WHITE;
     public static final Text.Foundry ptf = new Text.Foundry(Text.dfont, 12);
     public static final IBox pbox = Window.wbox;
     public static final Tex pbg = Window.bg;
     public static final int ph = UI.scale(30), ppl = 8;
     public Petal[] opts;
     private UI.Grab mg, kg;
+	public static final Color ptcRed = new Color(255, 50, 50);
+	public static final Color ptcGreen = new Color(0, 200, 50);
+	public static final Color ptcYellow = new Color(252, 186, 3);
+	public static final Color ptcStroke = Color.BLACK;
 
     @RName("sm")
     public static class $_ implements Factory {
@@ -57,10 +61,19 @@ public class FlowerMenu extends Widget {
 	private Text text;
 	private double a = 1;
 
-	public Petal(String name) {
+	public Petal(String name, int i) {
 	    super(Coord.z);
+		i = i+1;
 	    this.name = name;
-	    text = ptf.render(name, ptc);
+		if (name.equals("Steal")) {
+			text = ptf.renderstroked(i + ". " + ">> STEAL <<", ptcRed, ptcStroke);
+		} else if (name.equals("Invite")) {
+			text = ptf.renderstroked(i +". " + "Invite to Party", ptcGreen, ptcStroke);
+		} else if (name.equals("Memorize")) {
+			text = ptf.renderstroked(i +". " + name, ptcYellow, ptcStroke);
+		} else {
+			text = ptf.renderstroked(i + ". " + name, ptc, ptcStroke);
+		}
 	    resize(text.sz().x + UI.scale(25), ph);
 	}
 
@@ -98,7 +111,7 @@ public class FlowerMenu extends Widget {
     }
 
     public class Opening extends NormAnim {
-	Opening() {super(0.25);}
+	Opening() {super(0.0);}
 	
 	public void ntick(double s) {
 	    double ival = 0.8;
@@ -117,7 +130,7 @@ public class FlowerMenu extends Widget {
 	Petal chosen;
 		
 	Chosen(Petal c) {
-	    super(0.75);
+	    super(0.0);
 	    chosen = c;
 	}
 		
@@ -149,7 +162,7 @@ public class FlowerMenu extends Widget {
     }
 
     public class Cancel extends NormAnim {
-	Cancel() {super(0.25);}
+	Cancel() {super(0.0);}
 
 	public void ntick(double s) {
 	    double ival = 0.8;
@@ -200,11 +213,34 @@ public class FlowerMenu extends Widget {
 	}
     }
 
+	private void organizeVertical(Petal[] options) {
+		int maxWidth = 0;
+		for (Petal opt : options) {
+			if (opt.sz.x > maxWidth)
+				maxWidth = opt.sz.x;
+		}
+		int y = 0;
+		for (Petal opt : options) {
+			opt.sz.x = maxWidth;
+			opt.c = new Coord(UI.scale(3), UI.scale(3) + y);
+			y += opt.sz.y;
+		}
+		// ND: Prevent flower menu from going outside the screen
+		if (ui != null && ui.gui != null) {
+			if (this.c.x + maxWidth > ui.gui.sz.x){
+				this.c.x = ui.gui.sz.x - maxWidth;
+			}
+			if (this.c.y + y > ui.gui.sz.y){
+				this.c.y = ui.gui.sz.y - y;
+			}
+		}
+	}
+
     public FlowerMenu(String... options) {
 	super(Coord.z);
 	opts = new Petal[options.length];
 	for(int i = 0; i < options.length; i++) {
-	    add(opts[i] = new Petal(options[i]));
+	    add(opts[i] = new Petal(options[i], i));
 	    opts[i].num = i;
 	}
     }
@@ -214,8 +250,9 @@ public class FlowerMenu extends Widget {
 	    c = parent.ui.lcc;
 	mg = ui.grabmouse(this);
 	kg = ui.grabkeys(this);
-	organize(opts);
-	new Opening().ntick(0);
+	organizeVertical(opts);
+//	new Opening().ntick(0);
+	resize(contentsz().add(new Coord(UI.scale(3), UI.scale(3))));
     }
 
     public boolean mousedown(Coord c, int button) {
