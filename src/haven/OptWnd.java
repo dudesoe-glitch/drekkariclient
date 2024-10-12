@@ -1109,6 +1109,7 @@ public class OptWnd extends Window {
 	}
 
 	public static CheckBox autoReloadCuriositiesFromInventoryCheckBox;
+	public static CheckBox preventCutleryFromBreakingCheckBox = null;
 
 	public class GameplayAutomationSettingsPanel extends Panel {
 
@@ -1125,6 +1126,15 @@ public class OptWnd extends Window {
 				}
 			}, prev.pos("bl").adds(0, 2));
 			autoReloadCuriositiesFromInventoryCheckBox.tooltip = autoReloadCuriositiesFromInventoryTooltip;
+			prev = add(preventCutleryFromBreakingCheckBox = new CheckBox("Prevent Cutlery from Breaking"){
+				{a = Utils.getprefb("preventCutleryFromBreaking", true);}
+				public void set(boolean val) {
+					Utils.setprefb("preventCutleryFromBreaking", val);
+					a = val;
+					TableInfo.preventCutleryFromBreakingCheckBox.a = val;
+				}
+			}, prev.pos("bl").adds(0, 2));
+			preventCutleryFromBreakingCheckBox.tooltip = preventCutleryFromBreakingTooltip;
 
 			Widget backButton;
 			add(backButton = new PButton(UI.scale(200), "Back", 27, back, "Advanced Settings"), prev.pos("bl").adds(0, 18));
@@ -1810,6 +1820,10 @@ public class OptWnd extends Window {
 			"\nThis picks items only from your Inventory and currently open Cupboards. No other containers." +
 			"\n" +
 			"\n$col[185,185,185]{It only reloads curiosities that are currently being studied. It can't add new curiosities.}", UI.scale(300));
+	private final Object preventCutleryFromBreakingTooltip = RichText.render("Saves cutlery by moving it to your inventory the moment it reaches 1 durability left." +
+			"\n" +
+			"\n$col[185,185,185]{A system warning message will be shown, to let you know that the item has been saved.}", UI.scale(300));
+
 
 	// Camera Settings Tooltips
 	private final Object reverseOrthoCameraAxesTooltip = RichText.render("Enabling this will reverse the Horizontal axis when dragging the camera to look around." +
