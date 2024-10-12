@@ -26,6 +26,7 @@
 
 package haven;
 
+import java.awt.image.BufferedImage;
 import java.util.*;
 import java.awt.Color;
 import java.awt.event.KeyEvent;
@@ -1186,6 +1187,11 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 	    WritableRaster buf = PUtils.imgraster(progt.f[fr][0].ssz);
 	    PUtils.blit(buf, progt.f[fr][0].scaled().getRaster(), Coord.z);
 	    PUtils.blendblit(buf, progt.f[fr + 1][0].scaled().getRaster(), Coord.z, bf);
+
+		BufferedImage img = PUtils.rasterimg(buf);
+		BufferedImage txt = Text.renderstroked(String.format("%d%%", (int) (100 * prog))).img;
+		img.getGraphics().drawImage(txt, (img.getWidth() - txt.getWidth()) / 2, UI.scale(8) - txt.getHeight() / 2, null);
+
 	    if(this.curi != null)
 		this.curi.dispose();
 	    this.curi = new TexI(PUtils.rasterimg(buf));
