@@ -611,6 +611,7 @@ public class UI {
 	}
 	if(rcvr != null)
 	    rcvr.rcvmsg(id, msg, args);
+//	System.out.println("id: " + id + ", msg: " + msg + ", args: " + Arrays.toString(args) + " - " + getwidget(id).getClass().getName()); // ND: Use this to print widget messages
     }
 	
     public class UiMessage implements Runnable, Serializable {
