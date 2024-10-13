@@ -469,6 +469,7 @@ public class OptWnd extends Window {
 	public static CheckBox alwaysOpenBeltOnLoginCheckBox;
 	public static CheckBox showMapMarkerNamesCheckBox;
 	public static CheckBox verticalContainerIndicatorsCheckBox;
+	public static boolean expWindowLocationIsTop = Utils.getprefb("expWindowLocationIsTop", true);
 	private static CheckBox showFramerateCheckBox;
 	public static CheckBox snapWindowsBackInsideCheckBox;
 	public static CheckBox dragWindowsInWhenResizingCheckBox;
@@ -625,6 +626,34 @@ public class OptWnd extends Window {
 			}
 		}, rightColumn.pos("bl").adds(0, 32));
 		verticalContainerIndicatorsCheckBox.tooltip = verticalContainerIndicatorsTooltip;
+		Label expWindowLocationLabel;
+		rightColumn = add(expWindowLocationLabel = new Label("Experience Event Window Location:"), rightColumn.pos("bl").adds(0, 11));{
+			RadioGroup expWindowGrp = new RadioGroup(this) {
+				public void changed(int btn, String lbl) {
+					try {
+						if(btn==0) {
+							Utils.setprefb("expWindowLocationIsTop", true);
+							expWindowLocationIsTop = true;
+						}
+						if(btn==1) {
+							Utils.setprefb("expWindowLocationIsTop", false);
+							expWindowLocationIsTop = false;
+						}
+					} catch (Exception e) {
+						throw new RuntimeException(e);
+					}
+				}
+			};
+			rightColumn = expWindowGrp.add("Top", rightColumn.pos("bl").adds(26, 3));
+			rightColumn = expWindowGrp.add("Bottom", rightColumn.pos("ur").adds(30, 0));
+			if (Utils.getprefb("expWindowLocationIsTop", true)){
+				expWindowGrp.check(0);
+			} else {
+				expWindowGrp.check(1);
+			}
+		}
+		expWindowLocationLabel.tooltip = experienceWindowLocationTooltip;
+
 		Widget backButton;
 		add(backButton = new PButton(UI.scale(200), "Back", 27, back, "Advanced Settings"), leftColumn.pos("bl").adds(0, 30).x(0));
 	    pack();
@@ -1781,6 +1810,9 @@ public class OptWnd extends Window {
 	private final Object verticalContainerIndicatorsTooltip = RichText.render("Orientation for inventory container indicators." +
 			"\n" +
 			"\n$col[185,185,185]{For example, the amount of water in waterskins, seeds in a bucket, etc.}", UI.scale(230));
+	private final Object experienceWindowLocationTooltip = RichText.render("Select where you want the experience event pop-up window to show up." +
+			"\n" +
+			"\n$col[185,185,185]{The default client pops it up in the middle of your screen, which can be annoying.}", UI.scale(300));
 
 	private final Object showFramerateTooltip = RichText.render("Shows the current FPS in the top-right corner of the game window.", UI.scale(300));
 	private final Object snapWindowsBackInsideTooltip = RichText.render("Enabling this will cause most windows, that are not too large, to be fully snapped back into your game's window." +
