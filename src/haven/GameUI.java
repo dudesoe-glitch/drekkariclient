@@ -94,6 +94,9 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 	private boolean partyPermsOnLoginToggleSet = false;
 	private boolean itemStackingOnLoginToggleSet = false;
 
+	// Script Threads
+	public Thread autoRepeatFlowerMenuScriptThread;
+
     public static abstract class BeltSlot {
 	public final int idx;
 

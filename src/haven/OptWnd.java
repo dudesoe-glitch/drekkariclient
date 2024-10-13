@@ -1146,6 +1146,8 @@ public class OptWnd extends Window {
 	public static CheckBox togglePartyPermissionsOnLoginCheckBox;
 	public static CheckBox toggleItemStackingOnLoginCheckBox;
 	public static CheckBox autoSelect1stFlowerMenuCheckBox;
+	public static CheckBox alsoUseContainersWithRepeaterCheckBox;
+	public static CheckBox autoRepeatFlowerMenuCheckBox;
 	public static CheckBox autoReloadCuriositiesFromInventoryCheckBox;
 	public static CheckBox preventCutleryFromBreakingCheckBox = null;
 
@@ -1231,6 +1233,20 @@ public class OptWnd extends Window {
 				}
 			}, prev.pos("bl").adds(0, 6));
 			autoSelect1stFlowerMenuCheckBox.tooltip = autoSelect1stFlowerMenuTooltip;
+			prev = add(autoRepeatFlowerMenuCheckBox = new CheckBox("Auto-Repeat Flower-Menu (hold Ctrl+Shift)"){
+				{a = Utils.getprefb("autoRepeatFlowerMenu", false);}
+				public void changed(boolean val) {
+					Utils.setprefb("autoRepeatFlowerMenu", val);
+				}
+			}, prev.pos("bl").adds(0, 2));
+			autoRepeatFlowerMenuCheckBox.tooltip = autoRepeatFlowerMenuTooltip;
+			prev = add(alsoUseContainersWithRepeaterCheckBox = new CheckBox("Also use containers with Auto-Repeat"){
+				{a = Utils.getprefb("alsoUseContainersWithRepeater", false);}
+				public void changed(boolean val) {
+					Utils.setprefb("alsoUseContainersWithRepeater", val);
+				}
+			}, prev.pos("bl").adds(16, 2));
+			alsoUseContainersWithRepeaterCheckBox.tooltip = alsoUseContainersWithRepeaterTooltip;
 			prev = add(autoReloadCuriositiesFromInventoryCheckBox = new CheckBox("Auto-Reload Curiosities from Inventory"){
 				{a = Utils.getprefb("autoStudyFromInventory", false);}
 				public void set(boolean val) {
@@ -1238,7 +1254,7 @@ public class OptWnd extends Window {
 					Utils.setprefb("autoStudyFromInventory", val);
 					a = val;
 				}
-			}, prev.pos("bl").adds(0, 2));
+			}, prev.pos("bl").adds(0, 12).x(0));
 			autoReloadCuriositiesFromInventoryCheckBox.tooltip = autoReloadCuriositiesFromInventoryTooltip;
 			prev = add(preventCutleryFromBreakingCheckBox = new CheckBox("Prevent Cutlery from Breaking"){
 				{a = Utils.getprefb("preventCutleryFromBreaking", true);}
@@ -1943,6 +1959,13 @@ public class OptWnd extends Window {
     private final Object autoSelect1stFlowerMenuTooltip = RichText.render("Holding Ctrl before right clicking an item or object will auto-select the first available option from the flower menu." +
 			"\n" +
 			"\n$col[185,185,185]{Except for the Head of Lettuce. It will select the 2nd option there, so you split it rather than eat it.}", UI.scale(300));
+	private final Object autoRepeatFlowerMenuTooltip = RichText.render("Enabling this will trigger the Auto-Repeat Flower-Menu Script to run when you Right Click an item while holding Ctrl + Shift." +
+			"\n\n$col[185,185,185]{You have} $col[218,163,0]{2 seconds} $col[185,185,185]{to select a Flower Menu option, after which the script will automatically click the selected option for ALL items that have the same name in your inventory.}" +
+			"\n$col[200,0,0]{If you don't select an option within} $col[218,163,0]{2 seconds}$col[200,0,0]{, the script won't run.}" +
+			"\n\nYou can stop the script before it finishes by pressing ESC." +
+			"\n\n$col[218,163,0]{Example:} You have 10 Oak Blocks in your inventory. You hold Ctrl + Shift and right click one of the Oak Blocks and select \"Split\" in the flower menu. The script starts running and it splits all 10 Oak Blocks." +
+			"\n\n$col[218,163,0]{Note:} $col[185,185,185]{This script only runs on items that have the same name inside your inventory. It does not take into consideration items of the same \"type\" (for example, if you run the script on Oak Blocks, it won't also run on Spruce Blocks).} ", UI.scale(310));
+	private final Object alsoUseContainersWithRepeaterTooltip = RichText.render("Allow the Auto-Repeat Flower-Menu Script to run through all inventories, such as open cupboards, chests, crates, or any other containers.", UI.scale(300));
 
 
 	// Camera Settings Tooltips

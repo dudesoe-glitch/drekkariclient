@@ -696,6 +696,13 @@ public class UI {
 
     public void keydown(KeyEvent ev) {
 	setmods(ev);
+	if (ev.getKeyCode() == KeyEvent.VK_ESCAPE && gui != null) {
+		if (gui.autoRepeatFlowerMenuScriptThread != null) {
+			gui.autoRepeatFlowerMenuScriptThread.interrupt();
+			gui.autoRepeatFlowerMenuScriptThread = null;
+			msg("Auto-Repeat Flower-Menu Script has been manually stopped.");
+		}
+	}
 	for(Grab g : c(keygrab)) {
 	    if(g.wdg.keydown(ev))
 		return;

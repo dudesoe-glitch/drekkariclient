@@ -29,6 +29,7 @@ package haven;
 import java.awt.*;
 import java.util.*;
 
+import haven.automated.AutoRepeatFlowerMenuScript;
 import haven.render.*;
 
 import java.awt.image.BufferedImage;
@@ -247,6 +248,19 @@ public class WItem extends Widget implements DTarget {
 			}
 			item.wdgmsg("iact", c, ui.modflags());
 			ui.rcvr.rcvmsg(ui.lastWidgetID + 1, "cl", option, 0);
+		}
+		if(ui.modctrl && ui.modshift && OptWnd.autoRepeatFlowerMenuCheckBox.a){
+			try {
+				if (ui.gui.autoRepeatFlowerMenuScriptThread == null) {
+					ui.gui.autoRepeatFlowerMenuScriptThread = new Thread(new AutoRepeatFlowerMenuScript(ui.gui, this.item.getres().name), "autoRepeatFlowerMenu");
+					ui.gui.autoRepeatFlowerMenuScriptThread.start();
+				} else {
+					ui.gui.autoRepeatFlowerMenuScriptThread.interrupt();
+					ui.gui.autoRepeatFlowerMenuScriptThread = null;
+					ui.gui.autoRepeatFlowerMenuScriptThread = new Thread(new AutoRepeatFlowerMenuScript(ui.gui, this.item.getres().name), "autoRepeatFlowerMenu");
+					ui.gui.autoRepeatFlowerMenuScriptThread.start();
+				}
+			} catch (Loading ignored){}
 		}
 	    item.wdgmsg("iact", c, ui.modflags());
 	    return(true);

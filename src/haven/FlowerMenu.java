@@ -26,8 +26,12 @@
 
 package haven;
 
+import haven.automated.AutoRepeatFlowerMenuScript;
+
 import java.awt.Color;
 import java.awt.Font;
+import java.util.Arrays;
+
 import static java.lang.Math.PI;
 
 public class FlowerMenu extends Widget {
@@ -43,6 +47,8 @@ public class FlowerMenu extends Widget {
 	public static final Color ptcGreen = new Color(0, 200, 50);
 	public static final Color ptcYellow = new Color(252, 186, 3);
 	public static final Color ptcStroke = Color.BLACK;
+	private static String nextAutoSel;
+	public final String[] options;
 
     @RName("sm")
     public static class $_ implements Factory {
@@ -238,6 +244,7 @@ public class FlowerMenu extends Widget {
 
     public FlowerMenu(String... options) {
 	super(Coord.z);
+	this.options = options;
 	opts = new Petal[options.length];
 	for(int i = 0; i < options.length; i++) {
 	    add(opts[i] = new Petal(options[i], i));
@@ -253,6 +260,7 @@ public class FlowerMenu extends Widget {
 	organizeVertical(opts);
 //	new Opening().ntick(0);
 	resize(contentsz().add(new Coord(UI.scale(3), UI.scale(3))));
+	tryAutoSelect();
     }
 
     public boolean mousedown(Coord c, int button) {
@@ -300,7 +308,38 @@ public class FlowerMenu extends Widget {
 	if(option == null) {
 	    wdgmsg("cl", -1);
 	} else {
+		if(AutoRepeatFlowerMenuScript.option != null){
+			AutoRepeatFlowerMenuScript.option = option.name;
+		}
 	    wdgmsg("cl", option.num, ui.modflags());
 	}
     }
+
+	public static void setNextSelection(String name) {
+		nextAutoSel = name;
+	}
+
+	public void tryAutoSelect() {
+		if (nextAutoSel != null) {
+			for (String option : options) {
+				if (option.equals(nextAutoSel)) {
+					choose(getPetalFromName(option));
+					nextAutoSel = null;
+					return;
+				}
+			}
+			choose(null);
+			nextAutoSel = null;
+		}
+	}
+
+	public Petal getPetalFromName(String name){
+        for (Petal opt : opts) {
+            if (opt.name.equals(name)){
+                return opt;
+            }
+        }
+		return null;
+	}
+
 }
