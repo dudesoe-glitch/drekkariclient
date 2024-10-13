@@ -26,14 +26,24 @@
 
 package haven;
 
+import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
 import java.awt.Color;
+import java.io.File;
 import java.util.*;
 
 public class IMeter extends LayerMeter {
-    public static final Coord off = UI.scale(22, 7);
-    public static final Coord fsz = UI.scale(101, 24);
-    public static final Coord msz = UI.scale(75, 10);
+    public static final Coord off = UI.scale(22, 6); // Meter start position
+    public static final Coord fsz = UI.scale(101, 34); // Full(?) size
+    public static final Coord msz = UI.scale(75, 14); // Meter Size
     public final Indir<Resource> bg;
+	public final String meterType;
+	public final Tex bgTex;
+	private static final Text.Foundry tipF = new Text.Foundry(Text.sans, 10);
+	private Tex tipTex;
+	public static String characterCurrentHealth;
+	public static double characterSoftHealthPercent;
 
     @RName("im")
     public static class $_ implements Factory {
@@ -47,12 +57,14 @@ public class IMeter extends LayerMeter {
     public IMeter(Indir<Resource> bg, List<Meter> meters) {
 	super(fsz);
 	this.bg = bg;
+	meterType = bg.get().name;
+	bgTex = this.bg.get().flayer(Resource.imgc).tex();
 	set(meters);
     }
 
     public void draw(GOut g) {
 	try {
-	    Tex bg = this.bg.get().flayer(Resource.imgc).tex();
+//	    Tex bg = this.bg.get().flayer(Resource.imgc).tex();
 	    g.chcolor(0, 0, 0, 255);
 	    g.frect(off, msz);
 	    g.chcolor();
@@ -63,8 +75,33 @@ public class IMeter extends LayerMeter {
 		g.frect(off, new Coord(w, msz.y));
 	    }
 	    g.chcolor();
-	    g.image(bg, Coord.z);
+	    g.image(bgTex, Coord.z);
+		if (tipTex != null) {
+			g.chcolor();
+			g.image(tipTex, bgTex.sz().div(2).sub(tipTex.sz().div(2)).add(UI.scale(10), 0));
+		}
 	} catch(Loading l) {
 	}
     }
+
+	public void uimsg(String msg, Object... args) {
+		if (msg == "tip") {
+			String value = ((String)args[0]).split(":")[1].replaceAll("(\\(.+\\))", "");
+			if (value.contains("/")) { // ND: this part removes the HHP, so I only show the SHP and MHP
+				String[] hps = value.split("/");
+				String SHP = hps[0].trim();
+				if (Double.parseDouble(SHP) > 0){
+					String MHP = hps[2].trim();
+					characterSoftHealthPercent = (Double.parseDouble(SHP)/((Double.parseDouble(MHP)/100)));
+				} else {
+					characterSoftHealthPercent = 0;
+				}
+				value = hps[0] + " / " + hps[hps.length - 1]; // ND: hps[0] is SHP, hps[1] is HHP, hps[2] (or hps[hps.length - 1]) is MHP
+				characterCurrentHealth = value;
+			}
+			tipTex = PUtils.strokeTex(tipF.render(value.trim()));
+		}
+		super.uimsg(msg, args);
+	}
+
 }
