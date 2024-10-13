@@ -30,6 +30,8 @@ import haven.render.*;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
@@ -1190,6 +1192,35 @@ public class OptWnd extends Window {
 					Utils.setprefb("toggleItemStackingOnLogin", val);
 				}
 			}, rightColumn.pos("bl").adds(0, 2));
+
+			prev = add(new Label("Default Speed on Login:"), prev.pos("bl").adds(0, 16).x(0));
+			List<String> runSpeeds = Arrays.asList("Crawl", "Walk", "Run", "Sprint");
+			add(new OldDropBox<String>(runSpeeds.size(), runSpeeds) {
+				{
+					super.change(runSpeeds.get(Utils.getprefi("defaultSetSpeed", 2)));
+				}
+				@Override
+				protected String listitem(int i) {
+					return runSpeeds.get(i);
+				}
+				@Override
+				protected int listitems() {
+					return runSpeeds.size();
+				}
+				@Override
+				protected void drawitem(GOut g, String item, int i) {
+					g.aimage(Text.renderstroked(item).tex(), Coord.of(UI.scale(3), g.sz().y / 2), 0.0, 0.5);
+				}
+				@Override
+				public void change(String item) {
+					super.change(item);
+					for (int i = 0; i < runSpeeds.size(); i++){
+						if (item.equals(runSpeeds.get(i))){
+							Utils.setprefi("defaultSetSpeed", i);
+						}
+					}
+				}
+			}, prev.pos("bl").adds(130, -16));
 
 			prev = add(new Label("Other gameplay automations:"), prev.pos("bl").adds(0, 14).x(0));
 			prev = add(autoReloadCuriositiesFromInventoryCheckBox = new CheckBox("Auto-Reload Curiosities from Inventory"){

@@ -144,4 +144,10 @@ public class Speedget extends Widget {
 	}
 	return(super.globtype(key, ev));
     }
+
+	@Override
+	protected void added() {
+		set(Utils.getprefi("defaultSetSpeed", 2));
+		super.added();
+	}
 }
