@@ -81,6 +81,11 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 	public boolean changeCustomSlot = false;
 	public MenuGrid.Pagina customActionPag = null;
 	public static long playerId = -1;
+	public static boolean swimmingToggled = false;
+	public static boolean crimesToggled = false;
+	public static boolean trackingToggled = false;
+	private boolean partyPermsOnLoginToggleSet = false;
+	private boolean itemStackingOnLoginToggleSet = false;
 
     public static abstract class BeltSlot {
 	public final int idx;
@@ -950,6 +955,15 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 		mapfile.show(true);
 		add(mapfile, Utils.getprefc("smallmapc", new Coord(0, 150)));
 	    }
+		if (trackingToggled) {
+			buffs.addchild(new Buff(Bufflist.bufftrack.indir()));
+		}
+		if (crimesToggled) {
+			buffs.addchild(new Buff(Bufflist.buffcrime.indir()));
+		}
+		if (swimmingToggled) {
+			buffs.addchild(new Buff(Bufflist.buffswim.indir()));
+		}
 	} else if(place == "menu") {
 	    menu = (MenuGrid)brpanel.add(child, menugridc);
 		if (!localActionBarsLoaded) { // ND: These need to be loaded after the MenuGrid is added
@@ -1758,8 +1772,41 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
     }
 
     public void msg(String msg, Color color, Audio.Clip sfx) {
-	msg(msg, color);
-	ui.sfxrl(sfx);
+	if (msg.contains("There are no claims under siege"))
+		color = Color.green;
+	boolean noMsgTho = false;
+	if (msg.startsWith("Swimming is now turned")) {
+		togglebuff(msg, Bufflist.buffswim);
+	} else if (msg.startsWith("Tracking is now turned")) {
+		togglebuff(msg, Bufflist.bufftrack);
+	} else if (msg.startsWith("Criminal acts are now turned")) {
+		togglebuff(msg, Bufflist.buffcrime);
+	} else if (msg.startsWith("Party permissions are now")) {
+		togglebuff(msg, Bufflist.partyperm);
+		if (!partyPermsOnLoginToggleSet){
+			noMsgTho = true;
+			if((OptWnd.togglePartyPermissionsOnLoginCheckBox.a && msg.endsWith("off.")) || (!OptWnd.togglePartyPermissionsOnLoginCheckBox.a && msg.endsWith("on."))){
+				wdgmsg("act", "permshare"); // ND: set it again
+			} else {
+				partyPermsOnLoginToggleSet = true;
+			}
+		}
+	} else if (msg.startsWith("Stacking is now")) {
+		togglebuff(msg, Bufflist.itemstacking);
+		if (!itemStackingOnLoginToggleSet){
+			noMsgTho = true;
+			if((OptWnd.toggleItemStackingOnLoginCheckBox.a && msg.endsWith("off.")) || (!OptWnd.toggleItemStackingOnLoginCheckBox.a && msg.endsWith("on."))){
+				wdgmsg("act", "itemcomb"); // ND: set it again
+			} else {
+				itemStackingOnLoginToggleSet = true;
+			}
+		}
+	}
+	if ((!noMsgTho && partyPermsOnLoginToggleSet && itemStackingOnLoginToggleSet) || msg.contains("siege")){
+		msg(msg, color);
+		if (!msg.contains("There are no claims under siege"))
+			ui.sfxrl(sfx);
+	}
     }
 
 	public void optionInfoMsg(String msg, Color color) {
@@ -2401,6 +2448,29 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 			}
 		}
 		return null;
+	}
+
+	private void togglebuff(String err, Resource res) {
+		String name = res.basename();
+		if (err.endsWith("on.") && buffs.gettoggle(name) == null) {
+			buffs.addchild(new Buff(res.indir()));
+			if (name.equals("swim"))
+				swimmingToggled = true;
+			else if (name.equals("crime"))
+				crimesToggled = true;
+			else if (name.equals("tracking"))
+				trackingToggled = true;
+		} else if (err.endsWith("off.")) {
+			Buff tgl = buffs.gettoggle(name);
+			if (tgl != null)
+				tgl.reqdestroy();
+			if (name.equals("swim"))
+				swimmingToggled = false;
+			else if (name.equals("crime"))
+				crimesToggled = false;
+			else if (name.equals("tracking"))
+				trackingToggled = false;
+		}
 	}
 
 }

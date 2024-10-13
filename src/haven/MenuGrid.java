@@ -578,9 +578,34 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 	}
     }
 
+	public static boolean loginTogglesNeedUpdate = true;
+	public boolean complicatedLoginTogglesNeedUpdate = true;
     public void tick(double dt) {
 	if(recons)
 	    updlayout();
+	if (loginTogglesNeedUpdate) {
+		GameUI gui = getparent(GameUI.class);
+		if (gui != null) {
+			if (OptWnd.toggleTrackingOnLoginCheckBox.a && !GameUI.trackingToggled){
+				wdgmsg("act", "tracking");
+			}
+			if (OptWnd.toggleSwimmingOnLoginCheckBox.a && !GameUI.swimmingToggled){
+				wdgmsg("act", "swim");
+			}
+			if (OptWnd.toggleCriminalActsOnLoginCheckBox.a && !GameUI.crimesToggled){
+				wdgmsg("act", "crime");
+			}
+			loginTogglesNeedUpdate = false;
+			if (OptWnd.toggleSiegeEnginesOnLoginCheckBox.a){
+				wdgmsg("act", "siegeptr");
+			}
+		}
+	}
+	if (complicatedLoginTogglesNeedUpdate) { // ND: Unlike swim/crime/tracking, these are saved serverside. I toggle them automatically here once, then I fix them in GameUI
+		wdgmsg("act", "permshare");
+		wdgmsg("act", "itemcomb");
+		complicatedLoginTogglesNeedUpdate = false;
+	}
 	for(int y = 0; y < gsz.y; y++) {
 	    for(int x = 0; x < gsz.x; x++) {
 		if(layout[x][y] != null)

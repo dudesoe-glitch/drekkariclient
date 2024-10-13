@@ -1137,6 +1137,12 @@ public class OptWnd extends Window {
 	    }
 	}
 
+	public static CheckBox toggleTrackingOnLoginCheckBox;
+	public static CheckBox toggleSwimmingOnLoginCheckBox;
+	public static CheckBox toggleCriminalActsOnLoginCheckBox;
+	public static CheckBox toggleSiegeEnginesOnLoginCheckBox;
+	public static CheckBox togglePartyPermissionsOnLoginCheckBox;
+	public static CheckBox toggleItemStackingOnLoginCheckBox;
 	public static CheckBox autoReloadCuriositiesFromInventoryCheckBox;
 	public static CheckBox preventCutleryFromBreakingCheckBox = null;
 
@@ -1144,8 +1150,48 @@ public class OptWnd extends Window {
 
 		public GameplayAutomationSettingsPanel(Panel back) {
 			Widget prev;
+			Widget rightColumn;
 
-			prev = add(new Label("Other gameplay automations:"), 0, 0);
+			Widget toggleLabel = add(new Label("Toggle on Login:"), 0, 0);
+			prev = add(toggleTrackingOnLoginCheckBox = new CheckBox("Tracking"){
+				{a = Utils.getprefb("toggleTrackingOnLogin", false);}
+				public void changed(boolean val) {
+					Utils.setprefb("toggleTrackingOnLogin", val);
+				}
+			}, toggleLabel.pos("bl").adds(0, 6).x(UI.scale(0)));
+			prev = add(toggleSwimmingOnLoginCheckBox = new CheckBox("Swimming"){
+				{a = Utils.getprefb("toggleSwimmingOnLogin", false);}
+				public void changed(boolean val) {
+					Utils.setprefb("toggleSwimmingOnLogin", val);
+				}
+			}, prev.pos("bl").adds(0, 2));
+			prev = add(toggleCriminalActsOnLoginCheckBox = new CheckBox("Criminal Acts"){
+				{a = Utils.getprefb("toggleCriminalActsOnLogin", false);}
+				public void changed(boolean val) {
+					Utils.setprefb("toggleCriminalActsOnLogin", val);
+				}
+			}, prev.pos("bl").adds(0, 2));
+
+			rightColumn = add(toggleSiegeEnginesOnLoginCheckBox = new CheckBox("Check for Siege Engines"){
+				{a = Utils.getprefb("toggleSiegeEnginesOnLogin", false);}
+				public void changed(boolean val) {
+					Utils.setprefb("toggleSiegeEnginesOnLogin", val);
+				}
+			}, toggleLabel.pos("bl").adds(110, 6));
+			rightColumn = add(togglePartyPermissionsOnLoginCheckBox = new CheckBox("Party Permissions"){
+				{a = Utils.getprefb("togglePartyPermissionsOnLogin", false);}
+				public void changed(boolean val) {
+					Utils.setprefb("togglePartyPermissionsOnLogin", val);
+				}
+			}, rightColumn.pos("bl").adds(0, 2));
+			rightColumn = add(toggleItemStackingOnLoginCheckBox = new CheckBox("Automatic Item Stacking"){
+				{a = Utils.getprefb("toggleItemStackingOnLogin", false);}
+				public void changed(boolean val) {
+					Utils.setprefb("toggleItemStackingOnLogin", val);
+				}
+			}, rightColumn.pos("bl").adds(0, 2));
+
+			prev = add(new Label("Other gameplay automations:"), prev.pos("bl").adds(0, 14).x(0));
 			prev = add(autoReloadCuriositiesFromInventoryCheckBox = new CheckBox("Auto-Reload Curiosities from Inventory"){
 				{a = Utils.getprefb("autoStudyFromInventory", false);}
 				public void set(boolean val) {

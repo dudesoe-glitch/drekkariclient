@@ -100,6 +100,10 @@ public class LoginScreen extends Widget {
 		}
 	}, bg.sz().x - UI.scale(230) , bg.sz().y - UI.scale(20));
 	add(new Label("Background Music Volume"), bg.sz().x - UI.scale(184) , bg.sz().y - UI.scale(36));
+	GameUI.swimmingToggled = false;
+	GameUI.trackingToggled = false;
+	GameUI.crimesToggled = false;
+	MenuGrid.loginTogglesNeedUpdate = true;
     }
 
 //    public static final KeyBinding kb_savtoken = KeyBinding.get("login/savtoken", KeyMatch.forchar('R', KeyMatch.M)); // ND: Why the fuck are there keybinds for these? Someone might press one of those by mistake
