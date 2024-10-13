@@ -18,6 +18,8 @@ public class Buddy extends GAttrib implements InfoPart {
     private BuddyWnd.Buddy b = null;
     private int rgrp;
     private String rnm;
+	private String customName = null;
+	private Color customNameColor = Color.WHITE;
 
     public Buddy(Gob gob, int id) {
 	super(gob);
@@ -25,12 +27,22 @@ public class Buddy extends GAttrib implements InfoPart {
 	info = Info.add(gob, this);
     }
 
+	public Buddy(Gob gob, int id, String customName, Color customNameColor) {
+		super(gob);
+		this.id = id;
+		info = Info.add(gob, this);
+		this.customName = customName;
+		this.customNameColor = customNameColor;
+	}
+
     public static void parse(Gob gob, Message dat) {
 	int fl = dat.uint8();
 	if((fl & 1) != 0)
 	    gob.setattr(new Buddy(gob, dat.int32()));
-	else
-	    gob.delattr(Buddy.class);
+	else {
+		gob.delattr(Buddy.class);
+		gob.playerNameChecked = false;
+	}
     }
 
     public void dispose() {
@@ -43,6 +55,9 @@ public class Buddy extends GAttrib implements InfoPart {
     }
 
     public void draw(CompImage cmp, RenderContext ctx) {
+	if (customName != null) {
+		cmp.add(InfoPart.rendertext(customName, customNameColor), Coord.z);
+	} else {
 	BuddyWnd.Buddy b = null;
 	if(bw == null) {
 	    if(ctx instanceof PView.WidgetContext) {
@@ -61,6 +76,7 @@ public class Buddy extends GAttrib implements InfoPart {
 	    cmp.add(InfoPart.rendertext(rnm = b.name, col), Coord.z);
 	}
 	this.b = b;
+	}
     }
 
     public void ctick(double dt) {

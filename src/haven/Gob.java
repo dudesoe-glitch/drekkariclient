@@ -26,11 +26,15 @@
 
 package haven;
 
+import java.awt.*;
 import java.util.*;
+import java.util.List;
 import java.util.function.*;
 import haven.render.*;
 import haven.res.lib.svaj.GobSvaj;
 import haven.res.lib.tree.TreeScale;
+import haven.res.ui.obj.buddy.Buddy;
+import haven.res.ui.obj.buddy_v.Vilmate;
 
 public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, EquipTarget, RandomSource {
     public Coord2d rc;
@@ -50,6 +54,10 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	public Boolean isComposite = false;
 	private final Set<String> animatedGobsToDisable = new HashSet<>(Arrays.asList("dreca", "pow", "kiln", "cauldron", "beehive", "stockpile-trash"));
 	private boolean thisGobAnimationsCanBeDisabled = false;
+	public Boolean isMe = null;
+	public Boolean isMannequin = null;
+	private boolean isLoftar = false;
+	public boolean playerNameChecked = false;
 
     public static class Overlay implements RenderTree.Node {
 	public final int id;
@@ -443,6 +451,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
     }
 
     public void ctick(double dt) {
+	Map<Class<? extends GAttrib>, GAttrib> attr = cloneattrs();
 	for(GAttrib a : attr.values()){
 		if(a instanceof ResDrawable){
 			if(!(OptWnd.disableObjectAnimationsCheckBox.a && thisGobAnimationsCanBeDisabled)){
@@ -469,6 +478,12 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	updstate();
 	if(virtual && ols.isEmpty() && (getattr(Drawable.class) == null))
 	    glob.oc.remove(this);
+	if (isMe == null) {
+		isMe = isItMe();
+	}
+	if (isMe != null) {
+		setCustomPlayerName();
+	}
     }
 
     public void gtick(Render g) {
@@ -565,6 +580,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
     }
 
     public void dispose() {
+	Map<Class<? extends GAttrib>, GAttrib> attr = cloneattrs();
 	for(GAttrib a : attr.values())
 	    a.dispose();
     }
@@ -761,6 +777,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	    if(ol.slots != null)
 		slot.add(ol);
 	}
+	Map<Class<? extends GAttrib>, GAttrib> attr = cloneattrs();
 	for(GAttrib a : attr.values()) {
 	    if(a instanceof RenderTree.Node)
 		slot.add((RenderTree.Node)a);
@@ -1027,6 +1044,19 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 
 	public void updPose(HashSet<String> poses) {
 		isComposite = true;
+		Iterator<String> iter = poses.iterator();
+		while (iter.hasNext()) {
+			String s = iter.next();
+			if (s.contains("mannequin")){
+				isMannequin = true;
+				break;
+			} else {
+				isMannequin = false;
+			}
+		}
+	}
+	public void updModAndEqu(List<Composited.MD> mod, List<Composited.ED> equ) {
+
 	}
 
 	public void initComp(Composite c) {
@@ -1075,6 +1105,81 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 			if(icon != null) {
 				setattr(icon);
 			}
+		}
+	}
+
+	public Boolean isItMe() {
+		if(isMe == null) {
+			if(glob.sess.ui.gui == null || glob.sess.ui.gui.map == null || glob.sess.ui.gui.map.plgob < 0) {
+				return null;
+			} else {
+				return id == glob.sess.ui.gui.map.plgob;
+			}
+		}
+		return isMe;
+	}
+
+	public void setCustomPlayerName() {
+		if (!playerNameChecked) {
+			if (getattr(Buddy.class) == null && isMannequin != null && !isMannequin && glob.sess.ui.gui != null && glob.sess.ui.gui.map != null) {
+				if (getres() != null) {
+					if (getres().name.equals("gfx/borka/body")) {
+						long plgobid = glob.sess.ui.gui.map.plgob;
+						if (plgobid != -1 && plgobid != id) {
+							if (isLoftar)
+								setattr(new Buddy(this, -1, "Loftar", Color.WHITE));
+							else if ((getattr(Vilmate.class) != null))
+								setattr(new Buddy(this, -1, "Village/Realm Member", Color.WHITE));
+							else
+								setattr(new Buddy(this, -1, "Unknown", Color.GRAY));
+						}
+					}
+				}
+			}
+		}
+		playerNameChecked = true;
+	}
+
+	public void isItLoftar(List<Composited.MD> mod, List<Composited.ED> equ) {
+		if (getres() != null) {
+			if (getres().name.equals("gfx/borka/body")) {
+				if (mod != null && equ != null) {
+					if (!mod.isEmpty() && !equ.isEmpty()) {
+						boolean isMale = false;
+						for (Composited.MD item : mod) {
+							if (item.mod.get().basename().equals("male")) {
+								isMale = true;
+								break;
+							}
+						}
+						if (isMale){
+							boolean isgandalfhat = false;
+							boolean isravens = false;
+							for (Composited.ED item : equ) {
+								if (item.res.res.get().basename().equals("gandalfhat")){
+									isgandalfhat = true;
+								} else if (item.res.res.get().basename().equals("ravens")){
+									isravens = true;
+								}
+								if (isgandalfhat && isravens){
+									if (getattr(Buddy.class) != null)
+										delattr(Buddy.class);
+									isLoftar = true;
+									playerNameChecked = false;
+									break;
+								}
+							}
+						}
+					}
+
+				}
+			}
+		}
+	}
+
+	private Map<Class<? extends GAttrib>, GAttrib> cloneattrs() { // ND: To prevent concurrent modification exceptions
+		synchronized (this.attr) {
+			return new HashMap<>(this.attr);
 		}
 	}
 

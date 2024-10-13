@@ -127,6 +127,13 @@ public class Composite extends Drawable implements EquipTarget {
 			poses.add(pose.res.get().basename());
 		}
 		gob.updPose(poses);
+		if (nmod != null && nequ != null) {
+			if (!nmod.isEmpty() && !nequ.isEmpty()) {
+				List<Composited.MD> mod = new LinkedList<Composited.MD>(nmod);
+				List<Composited.ED> equ = new LinkedList<Composited.ED>(nequ);
+				gob.isItLoftar(mod, equ);
+			}
+		}
 
 		nposes = null;
 		updequ();
