@@ -1145,6 +1145,7 @@ public class OptWnd extends Window {
 	public static CheckBox toggleSiegeEnginesOnLoginCheckBox;
 	public static CheckBox togglePartyPermissionsOnLoginCheckBox;
 	public static CheckBox toggleItemStackingOnLoginCheckBox;
+	public static CheckBox autoSelect1stFlowerMenuCheckBox;
 	public static CheckBox autoReloadCuriositiesFromInventoryCheckBox;
 	public static CheckBox preventCutleryFromBreakingCheckBox = null;
 
@@ -1223,6 +1224,13 @@ public class OptWnd extends Window {
 			}, prev.pos("bl").adds(130, -16));
 
 			prev = add(new Label("Other gameplay automations:"), prev.pos("bl").adds(0, 14).x(0));
+			prev = add(autoSelect1stFlowerMenuCheckBox = new CheckBox("Auto-Select 1st Flower-Menu Option (hold Ctrl)"){
+				{a = Utils.getprefb("autoSelect1stFlowerMenu", true);}
+				public void changed(boolean val) {
+					Utils.setprefb("autoSelect1stFlowerMenu", val);
+				}
+			}, prev.pos("bl").adds(0, 6));
+			autoSelect1stFlowerMenuCheckBox.tooltip = autoSelect1stFlowerMenuTooltip;
 			prev = add(autoReloadCuriositiesFromInventoryCheckBox = new CheckBox("Auto-Reload Curiosities from Inventory"){
 				{a = Utils.getprefb("autoStudyFromInventory", false);}
 				public void set(boolean val) {
@@ -1932,6 +1940,9 @@ public class OptWnd extends Window {
 	private final Object preventCutleryFromBreakingTooltip = RichText.render("Saves cutlery by moving it to your inventory the moment it reaches 1 durability left." +
 			"\n" +
 			"\n$col[185,185,185]{A system warning message will be shown, to let you know that the item has been saved.}", UI.scale(300));
+    private final Object autoSelect1stFlowerMenuTooltip = RichText.render("Holding Ctrl before right clicking an item or object will auto-select the first available option from the flower menu." +
+			"\n" +
+			"\n$col[185,185,185]{Except for the Head of Lettuce. It will select the 2nd option there, so you split it rather than eat it.}", UI.scale(300));
 
 
 	// Camera Settings Tooltips

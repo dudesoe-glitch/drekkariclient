@@ -239,6 +239,15 @@ public class WItem extends Widget implements DTarget {
 	    }
 	    return(true);
 	} else if(btn == 3) {
+		if (ui.modctrl && OptWnd.autoSelect1stFlowerMenuCheckBox.a && !ui.modshift && !ui.modmeta) {
+			String itemname = item.getname();
+			int option = 0;
+			if (itemname.equals("Head of Lettuce")) { // ND: Don't eat it, rather split it.
+				option = 1;
+			}
+			item.wdgmsg("iact", c, ui.modflags());
+			ui.rcvr.rcvmsg(ui.lastWidgetID + 1, "cl", option, 0);
+		}
 	    item.wdgmsg("iact", c, ui.modflags());
 	    return(true);
 	}

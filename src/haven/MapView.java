@@ -2078,8 +2078,22 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	
 	protected void hit(Coord pc, Coord2d mc, ClickData inf) {
 	    Object[] args = {pc, mc.floor(posres), clickb, ui.modflags()};
-	    if(inf != null)
+	    if(inf != null) {
 		args = Utils.extend(args, inf.clickargs());
+		Long gobid = new Long((Integer) inf.clickargs()[1]);
+		Gob gob = glob.oc.getgob(gobid);
+			if(gob != null) {
+				if (clickb == 3) {
+					wdgmsg("click", args);
+					if (OptWnd.autoSelect1stFlowerMenuCheckBox.a) {
+						if (ui.modctrl) {
+							ui.rcvr.rcvmsg(ui.lastWidgetID + 1, "cl", 0, ui.modflags());
+						}
+					}
+					return;
+				}
+			}
+		}
 	    wdgmsg("click", args);
 	}
     }

@@ -35,9 +35,8 @@ import java.awt.Color;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.InputEvent;
-import java.awt.image.BufferedImage;
 import java.io.Serializable;
-import static haven.Utils.el;
+
 import haven.render.Environment;
 import haven.render.Render;
 import haven.res.ui.tt.wear.Wear;
@@ -67,6 +66,7 @@ public class UI {
     private static final double scalef;
 	public GameUI gui = null;
 	private final Object guiLock = new Object();
+	public int lastWidgetID = 0;
     
     {
 	lastevent = lasttick = Utils.rtime();
@@ -500,6 +500,9 @@ public class UI {
     }
 
     public void newwidgetp(int id, String type, int parent, Object[] pargs, Object... cargs) throws InterruptedException {
+		if (id > lastWidgetID) {
+			lastWidgetID = id;
+		}
 	if(type.equals("inv") && pargs[0].toString().equals("study")) {
 		type = "inv-study";
 	}
