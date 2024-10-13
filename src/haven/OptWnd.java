@@ -1150,6 +1150,7 @@ public class OptWnd extends Window {
 	public static CheckBox autoRepeatFlowerMenuCheckBox;
 	public static CheckBox autoReloadCuriositiesFromInventoryCheckBox;
 	public static CheckBox preventCutleryFromBreakingCheckBox = null;
+	public static CheckBox autoDropLeechesCheckBox;
 
 	public class GameplayAutomationSettingsPanel extends Panel {
 
@@ -1265,6 +1266,20 @@ public class OptWnd extends Window {
 				}
 			}, prev.pos("bl").adds(0, 2));
 			preventCutleryFromBreakingCheckBox.tooltip = preventCutleryFromBreakingTooltip;
+			prev = add(autoDropLeechesCheckBox = new CheckBox("Auto-Drop Leeches"){
+				{a = Utils.getprefb("autoDropLeeches", false);}
+				public void set(boolean val) {
+					Utils.setprefb("autoDropLeeches", val);
+					a = val;
+					Equipory.autoDropLeechesCheckBox.a = val;
+					if (ui != null && ui.gui != null) {
+						Equipory eq = ui.gui.getequipory();
+						if (eq != null && eq.myOwnEquipory) {
+							eq.checkForLeeches = true;
+						}
+					}
+				}
+			}, prev.pos("bl").adds(0, 2));
 
 			Widget backButton;
 			add(backButton = new PButton(UI.scale(200), "Back", 27, back, "Advanced Settings"), prev.pos("bl").adds(0, 18));

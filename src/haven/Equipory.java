@@ -93,6 +93,8 @@ public class Equipory extends Widget implements DTarget {
 	private boolean showEquipmentBonuses = Utils.getprefb("showEquipmentBonuses", false);
 	private Button expandButton = null;
 	public boolean myOwnEquipory = false;
+	public static CheckBox autoDropLeechesCheckBox;
+	boolean checkForLeeches = false;
 
     @RName("epry")
     public static class $_ implements Factory {
@@ -138,6 +140,16 @@ public class Equipory extends Widget implements DTarget {
 	bonuses = add(new AttrBonusesWdg(isz.y), isz.x + UI.scale(20), 0);
 	bonuses.show(showEquipmentBonuses);
 	add(expandButton = new Button(UI.scale(24), showEquipmentBonuses ? "←" : "→", false).action(this::expandAttributes), isz.x + UI.scale(10), 0);
+	if (myOwnEquipory){
+		add(autoDropLeechesCheckBox = new CheckBox("Auto-Drop Leeches"){
+			{a = Utils.getprefb("autoDropLeeches", false);}
+			public void set(boolean val) {
+				if (OptWnd.autoDropLeechesCheckBox != null)
+					OptWnd.autoDropLeechesCheckBox.set(val);
+				a = val;
+			}
+		}, UI.scale(10), isz.y + UI.scale(12));
+	}
 	pack();
     }
 
@@ -170,6 +182,7 @@ public class Equipory extends Widget implements DTarget {
 	    wmap.put(g, v);
 		updateBottomText = true;
 		delayedUpdateTime = System.currentTimeMillis();
+		checkForLeeches = true;
 	} else {
 	    super.addchild(child, args);
 	}
@@ -189,6 +202,7 @@ public class Equipory extends Widget implements DTarget {
 	bonuses.update(slots);
 	updateBottomText = true;
 	delayedUpdateTime = System.currentTimeMillis();
+	checkForLeeches = true;
 	}
     }
 
@@ -328,4 +342,20 @@ public class Equipory extends Widget implements DTarget {
 			super.wdgmsg(sender, msg, args);
 		}
 	}
+
+	public void tick(double dt) {
+		super.tick(dt);
+		if (OptWnd.autoDropLeechesCheckBox.a && myOwnEquipory && checkForLeeches) {
+			long now = System.currentTimeMillis();
+			if ((now - delayedUpdateTime) > 200){
+				for (WItem equippedItem : slots) {
+					if (equippedItem != null && equippedItem.item != null && equippedItem.item.getname() != null && equippedItem.item.getname().contains("Leech")){
+						equippedItem.item.wdgmsg("drop", new Coord(equippedItem.sz.x / 2, equippedItem.sz.y / 2));
+					}
+				}
+				checkForLeeches = false;
+			}
+		}
+	}
+
 }
