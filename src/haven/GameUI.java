@@ -93,6 +93,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 	public static boolean trackingToggled = false;
 	private boolean partyPermsOnLoginToggleSet = false;
 	private boolean itemStackingOnLoginToggleSet = false;
+	public static boolean flowerMenuAutoSelect = Utils.getprefb("flowerMenuAutoSelect", false);
 
 	// Script Threads
 	public Thread autoRepeatFlowerMenuScriptThread;
@@ -405,6 +406,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 	actionBar3.raise();
 	actionBar4.c = Utils.getprefc("wndc-actionBar4", UI.unscale(new Coord(0, 620)));
 	actionBar4.raise();
+	OptWnd.flowerMenuAutoSelectManagerWindow = null;
     }
 
     protected void attached() {

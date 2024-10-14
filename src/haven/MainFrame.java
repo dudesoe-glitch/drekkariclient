@@ -30,6 +30,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.nio.file.*;
+import java.sql.SQLException;
 import java.util.*;
 
 public class MainFrame extends java.awt.Frame implements Console.Directory, AWTEventListener {
@@ -53,6 +54,15 @@ public class MainFrame extends java.awt.Frame implements Console.Directory, AWTE
     static {
 	initawt();
     }
+
+	static {
+		try {
+			FlowerMenu.createDatabaseIfNotExist();
+			FlowerMenu.fillAutoChooseMap();
+		} catch (SQLException e) {
+			throw new RuntimeException(e);
+		}
+	}
 	
     DisplayMode findmode(int w, int h) {
 	GraphicsDevice dev = getGraphicsConfiguration().getDevice();

@@ -48,6 +48,7 @@ public class OptWnd extends Window {
 	public static final Color msgGray = new Color(145, 145, 145);
 	public static final Color msgRed = new Color(197, 0, 0);
 	public static final Color msgYellow = new Color(218, 163, 0);
+	public static FlowerMenuAutoSelectManagerWindow flowerMenuAutoSelectManagerWindow;
 
     public void chpanel(Panel p) {
 	if(current != null)
@@ -1248,6 +1249,16 @@ public class OptWnd extends Window {
 				}
 			}, prev.pos("bl").adds(16, 2));
 			alsoUseContainersWithRepeaterCheckBox.tooltip = alsoUseContainersWithRepeaterTooltip;
+			prev = add(new Button(UI.scale(250), "Flower-Menu Auto-Select Manager", false, () -> {
+				if(flowerMenuAutoSelectManagerWindow == null) {
+					flowerMenuAutoSelectManagerWindow = this.parent.parent.add(new FlowerMenuAutoSelectManagerWindow()); // ND: this.parent.parent is root widget in login screen or gui in game.
+					flowerMenuAutoSelectManagerWindow.show();
+				} else {
+					flowerMenuAutoSelectManagerWindow.show(!flowerMenuAutoSelectManagerWindow.visible);
+					flowerMenuAutoSelectManagerWindow.refresh();
+				}
+			}),prev.pos("bl").adds(0, 4).x(0));
+			prev.tooltip = flowerMenuAutoSelectManagerTooltip;
 			prev = add(autoReloadCuriositiesFromInventoryCheckBox = new CheckBox("Auto-Reload Curiosities from Inventory"){
 				{a = Utils.getprefb("autoStudyFromInventory", false);}
 				public void set(boolean val) {
@@ -1981,6 +1992,9 @@ public class OptWnd extends Window {
 			"\n\n$col[218,163,0]{Example:} You have 10 Oak Blocks in your inventory. You hold Ctrl + Shift and right click one of the Oak Blocks and select \"Split\" in the flower menu. The script starts running and it splits all 10 Oak Blocks." +
 			"\n\n$col[218,163,0]{Note:} $col[185,185,185]{This script only runs on items that have the same name inside your inventory. It does not take into consideration items of the same \"type\" (for example, if you run the script on Oak Blocks, it won't also run on Spruce Blocks).} ", UI.scale(310));
 	private final Object alsoUseContainersWithRepeaterTooltip = RichText.render("Allow the Auto-Repeat Flower-Menu Script to run through all inventories, such as open cupboards, chests, crates, or any other containers.", UI.scale(300));
+	private final Object flowerMenuAutoSelectManagerTooltip = RichText.render("An advanced menu to automatically select specific flower menu options all the time. New options are added to the list as you discover them." +
+			"\n" +
+			"\n$col[185,185,185]{I don't recommend using this, but nevertheless it exists due to popular demand.}", UI.scale(300));
 
 
 	// Camera Settings Tooltips

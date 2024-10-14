@@ -30,7 +30,11 @@ import haven.automated.AutoRepeatFlowerMenuScript;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.sql.*;
+import java.sql.Connection;
 import java.util.Arrays;
+import java.util.Map;
+import java.util.TreeMap;
 
 import static java.lang.Math.PI;
 
@@ -49,6 +53,8 @@ public class FlowerMenu extends Widget {
 	public static final Color ptcStroke = Color.BLACK;
 	private static String nextAutoSel;
 	public final String[] options;
+	private static final String DATABASE = "jdbc:sqlite:static_data.db";
+	public static Map<String, Boolean> autoSelectMap = new TreeMap<>();
 
     @RName("sm")
     public static class $_ implements Factory {
@@ -245,6 +251,7 @@ public class FlowerMenu extends Widget {
     public FlowerMenu(String... options) {
 	super(Coord.z);
 	this.options = options;
+	addOptionsToDatabase(options);
 	opts = new Petal[options.length];
 	for(int i = 0; i < options.length; i++) {
 	    add(opts[i] = new Petal(options[i], i));
@@ -330,6 +337,14 @@ public class FlowerMenu extends Widget {
 			}
 			choose(null);
 			nextAutoSel = null;
+		} else {
+			if(GameUI.flowerMenuAutoSelect){
+				for (String option : options) {
+					if (autoSelectMap.get(option)) {
+						choose(getPetalFromName(option));
+					}
+				}
+			}
 		}
 	}
 
@@ -340,6 +355,105 @@ public class FlowerMenu extends Widget {
             }
         }
 		return null;
+	}
+
+	public static void updateValue(String name, boolean value) {
+		autoSelectMap.put(name, value);
+		updateDbValue(name, value);
+	}
+
+	private void addOptionsToDatabase(String[] options) {
+		try {
+			for (String option : options) {
+				if (autoSelectMap.get(option) == null) {
+					autoSelectMap.put(option, false);
+					checkAndInsertFlowerMenuOption(option);
+					if (OptWnd.flowerMenuAutoSelectManagerWindow != null) {
+						OptWnd.flowerMenuAutoSelectManagerWindow.refresh();
+					}
+				}
+			}
+		} catch (Exception e) {
+		}
+	}
+
+
+
+	public static void updateDbValue(String flowerMenuOptionName, boolean newValue) {
+		try (java.sql.Connection conn = DriverManager.getConnection(DATABASE)) {
+			String updateSql = "UPDATE flower_menu_options SET auto_use = ? WHERE name = ?";
+			try (PreparedStatement updatePstmt = conn.prepareStatement(updateSql)) {
+				updatePstmt.setBoolean(1, newValue);
+				updatePstmt.setString(2, flowerMenuOptionName);
+				updatePstmt.executeUpdate();
+			}
+		} catch (SQLException e) {
+			System.out.println("Problem with updating flower menu option in the database.");
+		}
+	}
+
+	private static void checkAndInsertFlowerMenuOption(String flowerMenuOptionName) {
+		try (java.sql.Connection conn = DriverManager.getConnection(DATABASE)) {
+			String checkSql = "SELECT count(*) FROM flower_menu_options WHERE name = ?";
+			try (PreparedStatement pstmt = conn.prepareStatement(checkSql)) {
+				pstmt.setString(1, flowerMenuOptionName);
+				ResultSet rs = pstmt.executeQuery();
+				if (rs.getInt(1) == 0) { // if record doesn't exist
+					String insertSql = "INSERT INTO flower_menu_options(name) VALUES(?)";
+					try (PreparedStatement insertPstmt = conn.prepareStatement(insertSql)) {
+						insertPstmt.setString(1, flowerMenuOptionName);
+						insertPstmt.executeUpdate();
+					}
+				}
+			}
+		} catch (SQLException ignored) {
+			System.out.println("Problem with inserting flower menu option to database.");
+		}
+	}
+
+	public static void fillAutoChooseMap() {
+		String sql = "SELECT name, auto_use FROM flower_menu_options order by name";
+		try (java.sql.Connection conn = DriverManager.getConnection(DATABASE);
+			 PreparedStatement pstmt = conn.prepareStatement(sql)) {
+			ResultSet rs = pstmt.executeQuery();
+			while (rs.next()) {
+				String name = rs.getString("name");
+				boolean autoUse = rs.getBoolean("auto_use");
+				autoSelectMap.put(name, autoUse);
+			}
+		} catch (SQLException e) {
+			System.out.println("Problem with fetching flower menu options from database.");
+		}
+	}
+
+	public static void createDatabaseIfNotExist() throws SQLException {
+		try (java.sql.Connection conn = DriverManager.getConnection(DATABASE)) {
+			if (conn != null) {
+				createSchemaElementIfNotExist(conn, "flower_menu_options",
+						"id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+								"name VARCHAR(255) UNIQUE NOT NULL, " +
+								"auto_use BOOLEAN DEFAULT FALSE NOT NULL",
+						"table");
+			}
+		}
+	}
+
+	private static void createSchemaElementIfNotExist(java.sql.Connection conn, String name, String definitions, String type) throws SQLException {
+		if (!schemaElementExists(conn, name, type)) {
+			String sql = type.equals("table") ? "CREATE TABLE " + name + " (\n" + definitions + "\n);" : "CREATE INDEX " + name + " ON " + definitions + ";";
+			try (Statement stmt = conn.createStatement()) {
+				stmt.execute(sql);
+			}
+			System.out.println("A new " + type + " (" + name + ") has been created in the database.");
+		}
+	}
+
+	private static boolean schemaElementExists(Connection conn, String name, String type) throws SQLException {
+		String checkExistsQuery = "SELECT name FROM sqlite_master WHERE type='" + type + "' AND name='" + name + "';";
+		try (Statement stmt = conn.createStatement();
+			 ResultSet rs = stmt.executeQuery(checkExistsQuery)) {
+			return rs.next();
+		}
 	}
 
 }
