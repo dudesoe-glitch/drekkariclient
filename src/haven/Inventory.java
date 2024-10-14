@@ -163,4 +163,20 @@ public class Inventory extends Widget implements DTarget {
 		}
 		return items;
 	}
+
+	public List<WItem> getItemsExact(String... names) {
+		List<WItem> items = new ArrayList<WItem>();
+		for (Widget wdg = child; wdg != null; wdg = wdg.next) {
+			if (wdg instanceof WItem) {
+				String wdgname = ((WItem)wdg).item.getname();
+				for (String name : names) {
+					if (wdgname.equals(name)) {
+						items.add((WItem) wdg);
+						break;
+					}
+				}
+			}
+		}
+		return items;
+	}
 }
