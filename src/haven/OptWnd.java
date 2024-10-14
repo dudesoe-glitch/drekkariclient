@@ -1975,9 +1975,9 @@ public class OptWnd extends Window {
 			"\nUnless you're on a 4K or 8K display, I'd keep this at 1.00x.}", UI.scale(300));
 	private final Object simplifiedUIThemeCheckBoxTooltip = RichText.render("$col[185,185,185]{A more boring theme for the UI...}", UI.scale(300));
 	private final Object extendedMouseoverInfoTooltip = RichText.render("Holding Ctrl+Shift shows the Resource Path when mousing over Objects or Tiles. " +
-			"\nEnabling this option will add a lot of additional information on top of that." +
+			"\nEnabling this setting will add a lot of additional information on top of that." +
 			"\n" +
-			"\n$col[185,185,185]{Unless you're a client dev, you don't really need to enable this option, like ever.}", UI.scale(300));
+			"\n$col[185,185,185]{Unless you're a client dev, you don't really need to enable this setting, like ever.}", UI.scale(300));
 	private final Object disableMenuGridHotkeysTooltip = RichText.render("This completely disables the hotkeys for the action buttons & categories in the bottom right corner menu (aka the menu grid)." +
 			"\n" +
 			"\n$col[185,185,185]{Your action bar keybinds are NOT affected by this setting.}", UI.scale(300));
@@ -2075,7 +2075,7 @@ public class OptWnd extends Window {
 			"\n" +
 			"\n$col[200,0,0]{WARNING: Be careful when using this setting, especially in combat! You're NOT able to click on the ground when looking at the world from below.}" +
 			"\n" +
-			"\n$col[185,185,185]{Honestly just enable this when you need to take a screenshot or something, and keep it disabled the rest of the time. I added this option for fun.}", UI.scale(300));
+			"\n$col[185,185,185]{Honestly just enable this when you need to take a screenshot or something, and keep it disabled the rest of the time. I added this setting for fun.}", UI.scale(300));
 	private final Object freeCamHeightTooltip = RichText.render("This affects the height of the point at which the free camera is pointed. By default, it is pointed right above the player's head." +
 			"\n" +
 			"\n$col[185,185,185]{This doesn't really affect gameplay that much, if at all. With this setting, you can make the camera point at the feet, torso, head, slightly above you, or whatever's in between.}", UI.scale(300));
@@ -2089,12 +2089,12 @@ public class OptWnd extends Window {
 	private final Object hideFlavorObjectsTooltip = RichText.render("This hides the random objects that appear in the world, which you cannot interact with." +
 			"\n$col[185,185,185]{Players usually disable flavor objects to improve visibility, especially in combat.}" +
 			"\n" +
-			"\n$col[218,163,0]{Action Button:} $col[185,185,185]{This option can also be turned on/off using an action button from the menu grid (Custom Client Extras → Toggles).}", UI.scale(320));
+			"\n$col[218,163,0]{Action Button:} $col[185,185,185]{This setting can also be turned on/off using an action button from the menu grid (Custom Client Extras → Toggles).}", UI.scale(320));
 	private final Object flatWorldTooltip = RichText.render("Enabling this will make the entire game world terrain flat." +
 			"\n$col[185,185,185]{Cliffs will still be drawn with their relative height, scaled down.}" +
-			"\n$col[218,163,0]{Action Button:} $col[185,185,185]{This option can also be turned on/off using an action button from the menu grid (Custom Client Extras → Toggles).}", UI.scale(320));
-	private final Object disableTileSmoothingTooltip = RichText.render("$col[218,163,0]{Action Button:} $col[185,185,185]{This option can also be turned on/off using an action button from the menu grid (Custom Client Extras → Toggles).}", UI.scale(320));
-	private final Object disableTileTransitionsTooltip = RichText.render("$col[218,163,0]{Action Button:} $col[185,185,185]{This option can also be turned on/off using an action button from the menu grid (Custom Client Extras → Toggles).}", UI.scale(320));
+			"\n$col[218,163,0]{Action Button:} $col[185,185,185]{This setting can also be turned on/off using an action button from the menu grid (Custom Client Extras → Toggles).}", UI.scale(320));
+	private final Object disableTileSmoothingTooltip = RichText.render("$col[218,163,0]{Action Button:} $col[185,185,185]{This setting can also be turned on/off using an action button from the menu grid (Custom Client Extras → Toggles).}", UI.scale(320));
+	private final Object disableTileTransitionsTooltip = RichText.render("$col[218,163,0]{Action Button:} $col[185,185,185]{This setting can also be turned on/off using an action button from the menu grid (Custom Client Extras → Toggles).}", UI.scale(320));
 	private final Object disableObjectAnimationsTooltip = RichText.render("This stops animations for the following: fires, trash stockpiles, beehives, dreamcatchers, kilns, cauldrons." +
 			"\n" +
 			"\n$col[185,185,185]{Ideally, in the future, I'll change this to allow you to pick exactly what you want to disable, from a list.}", UI.scale(300));
