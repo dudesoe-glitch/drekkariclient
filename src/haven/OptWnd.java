@@ -1301,6 +1301,9 @@ public class OptWnd extends Window {
 
 
 	public static CheckBox overrideCursorItemWhenHoldingAltCheckBox;
+	public static CheckBox noCursorItemDroppingAnywhereCheckBox;
+	public static CheckBox noCursorItemDroppingInWaterCheckBox;
+
 	public class AlteredGameplaySettingsPanel extends Panel {
 
 		public AlteredGameplaySettingsPanel(Panel back) {
@@ -1313,6 +1316,32 @@ public class OptWnd extends Window {
 				}
 			}, UI.scale(0, 2));
 			overrideCursorItemWhenHoldingAltCheckBox.tooltip = overrideCursorItemWhenHoldingAltTooltip;
+			prev = add(noCursorItemDroppingAnywhereCheckBox = new CheckBox("No Cursor Item Dropping (Anywhere)"){
+				{a = Utils.getprefb("noCursorItemDroppingAnywhere", false);}
+				public void set(boolean val) {
+					Utils.setprefb("noCursorItemDroppingAnywhere", val);
+					a = val;
+					if (ui != null && ui.gui != null) {
+						ui.gui.optionInfoMsg("No Item Dropping (Anywhere) is now " + (val ? "ENABLED" : "DISABLED") + "!", (val ? msgGreen : msgRed));
+					}
+				}
+			}, prev.pos("bl").adds(0, 12));
+			noCursorItemDroppingAnywhereCheckBox.tooltip = noCursorItemDroppingAnywhereTooltip;
+			prev = add(noCursorItemDroppingInWaterCheckBox = new CheckBox("No Cursor Item Dropping (Water Only)"){
+				{a = Utils.getprefb("noCursorItemDroppingInWater", false);}
+				public void set(boolean val) {
+					Utils.setprefb("noCursorItemDroppingInWater", val);
+					a = val;
+					if (ui != null && ui.gui != null) {
+						if (!noCursorItemDroppingAnywhereCheckBox.a) {
+							ui.gui.optionInfoMsg("No Item Dropping (in Water) is now " + (val ? "ENABLED" : "DISABLED") + "!", (val ? msgGreen : msgRed));
+						} else {
+							ui.gui.optionInfoMsg("No Item Dropping (in Water) is now " + (val ? "ENABLED" : "DISABLED") + "!" + (val ? "" : " (WARNING!!!: No Item Dropping (Anywhere) IS STILL ENABLED, and it overwrites this option!)"), (val ? msgGreen : msgYellow));
+						}
+					}
+				}
+			}, prev.pos("bl").adds(0, 2));
+			noCursorItemDroppingInWaterCheckBox.tooltip = noCursorItemDroppingInWaterTooltip;
 
 			Widget backButton;
 			add(backButton = new PButton(UI.scale(200), "Back", 27, back, "Advanced Settings"), prev.pos("bl").adds(0, 18));
@@ -2023,6 +2052,19 @@ public class OptWnd extends Window {
 	private final Object overrideCursorItemWhenHoldingAltTooltip = RichText.render("Holding Alt while having an item on your cursor will allow you to left click to walk, or right click to interact with objects, rather than drop it on the ground." +
 			"\n" +
 			"\n$col[185,185,185]{Left click ignores the UI when you do this, so don't try to click on the map to walk while holding an item.}", UI.scale(300));
+	private final Object noCursorItemDroppingAnywhereTooltip = RichText.render("This will allow you to have an item on your cursor and still be able to left click to walk, or right click to interact with objects." +
+			"\n$col[185,185,185]{You can drop the item from your cursor if you hold Ctrl.}" +
+			"\n" +
+			"\n$col[200,0,0]{WARNING: If you're holding something on your cursor, you're NOT ABLE to enter Deep Water to Swim. The game prevents you from doing it.}" +
+			"\n" +
+			"\n$col[218,163,0]{Action Button:} $col[185,185,185]{This setting can also be turned on/off using an action button from the menu grid (Custom Client Extras → Toggles).}", UI.scale(320));
+	private final Object noCursorItemDroppingInWaterTooltip =  RichText.render("This will allow you to have an item on your cursor and still be able to left click to walk, or right click to interact with objects, while you are in water. " +
+			"\nIf the previous setting is Enabled, this one will be ignored." +
+			"\n$col[185,185,185]{You can drop the item from your cursor if you hold Ctrl.}" +
+			"\n" +
+			"\n$col[200,0,0]{WARNING: If you're holding something on your cursor, you're NOT ABLE to enter Deep Water to Swim. The game prevents you from doing it.}" +
+			"\n" +
+			"\n$col[218,163,0]{Action Button:} $col[185,185,185]{This setting can also be turned on/off using an action button from the menu grid (Custom Client Extras → Toggles).}", UI.scale(320));
 
 	// Camera Settings Tooltips
 	private final Object reverseOrthoCameraAxesTooltip = RichText.render("Enabling this will reverse the Horizontal axis when dragging the camera to look around." +

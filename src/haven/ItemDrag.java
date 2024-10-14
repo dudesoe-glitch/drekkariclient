@@ -26,6 +26,8 @@
 
 package haven;
 
+import static haven.MCache.tilesz;
+
 public class ItemDrag extends WItem {
     public Coord doff;
     
@@ -87,6 +89,23 @@ public class ItemDrag extends WItem {
 	    if((gui != null) && (gui.map != null)) {
 		return(gui.map.mousedown(gui.map.rootxlate(c.add(rootpos())), button));
 	    }
+	}
+	if (OptWnd.noCursorItemDroppingAnywhereCheckBox.a && !ui.modctrl){
+		return(ui.gui.map.mousedown(ui.gui.map.rootxlate(c.add(rootpos())), button));
+	}
+	if (OptWnd.noCursorItemDroppingInWaterCheckBox.a && !ui.modctrl){
+		if (ui.gui.map.player() != null){
+			int t = ui.gui.map.glob.map.gettile(ui.gui.map.player().rc.floor(tilesz));
+			Resource res = ui.gui.map.glob.map.tilesetr(t);
+			if (res != null && (
+					res.name.equals("gfx/tiles/water")
+					|| res.name.equals("gfx/tiles/deep")
+					|| res.name.equals("gfx/tiles/owater")
+					|| res.name.equals("gfx/tiles/odeep")
+					|| res.name.equals("gfx/tiles/odeeper"))) {
+				return(ui.gui.map.mousedown(ui.gui.map.rootxlate(c.add(rootpos())), button));
+			}
+		}
 	}
 	if(button == 1) {
 	    dropon(parent, c.add(this.c));
