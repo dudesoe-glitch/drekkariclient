@@ -1300,6 +1300,27 @@ public class OptWnd extends Window {
 	}
 
 
+	public static CheckBox overrideCursorItemWhenHoldingAltCheckBox;
+	public class AlteredGameplaySettingsPanel extends Panel {
+
+		public AlteredGameplaySettingsPanel(Panel back) {
+			Widget prev;
+
+			prev = add(overrideCursorItemWhenHoldingAltCheckBox = new CheckBox("Override cursor item and prevent dropping it (hold Alt)"){
+				{a = Utils.getprefb("overrideCursorItemWhenHoldingAlt", true);}
+				public void changed(boolean val) {
+					Utils.setprefb("overrideCursorItemWhenHoldingAlt", val);
+				}
+			}, UI.scale(0, 2));
+			overrideCursorItemWhenHoldingAltCheckBox.tooltip = overrideCursorItemWhenHoldingAltTooltip;
+
+			Widget backButton;
+			add(backButton = new PButton(UI.scale(200), "Back", 27, back, "Advanced Settings"), prev.pos("bl").adds(0, 18));
+			pack();
+			centerBackButton(backButton, this);
+		}
+	}
+
 
 	private Label freeCamZoomSpeedLabel;
 	public static HSlider freeCamZoomSpeedSlider;
@@ -1846,6 +1867,7 @@ public class OptWnd extends Window {
 		Panel displaysettings = add(new DisplaySettingsPanel(advancedSettings));
 		Panel qualitydisplaysettings = add(new QualityDisplaySettingsPanel(advancedSettings));
 		Panel gameplayautomationsettings = add(new GameplayAutomationSettingsPanel(advancedSettings));
+		Panel alteredgameplaysettings =  add(new AlteredGameplaySettingsPanel(advancedSettings));
 		Panel camsettings = add(new CameraSettingsPanel(advancedSettings));
 		Panel worldgraphicssettings = add(new WorldGraphicsSettingsPanel(advancedSettings));
 
@@ -1856,6 +1878,7 @@ public class OptWnd extends Window {
 		y2 = advancedSettings.add(new PButton(UI.scale(200), "Quality Display Settings", -1, qualitydisplaysettings, "Quality Display Settings"), 0, y2).pos("bl").adds(0, 5).y;
 		y2 += UI.scale(20);
 		y2 = advancedSettings.add(new PButton(UI.scale(200), "Gameplay Automation Settings", -1, gameplayautomationsettings, "Gameplay Automation Settings"), 0, y2).pos("bl").adds(0, 5).y;
+		y2 = advancedSettings.add(new PButton(UI.scale(200), "Altered Gameplay Settings", -1, alteredgameplaysettings, "Altered Gameplay Settings"), 0, y2).pos("bl").adds(0, 5).y;
 		y2 = advancedSettings.add(new PButton(UI.scale(200), "Camera Settings", -1, camsettings, "Camera Settings"), 0, y2).pos("bl").adds(0, 5).y;
 		y2 = advancedSettings.add(new PButton(UI.scale(200), "World Graphics Settings", -1, worldgraphicssettings, "World Graphics Settings"), 0, y2).pos("bl").adds(0, 5).y;
 
@@ -1996,6 +2019,10 @@ public class OptWnd extends Window {
 			"\n" +
 			"\n$col[185,185,185]{I don't recommend using this, but nevertheless it exists due to popular demand.}", UI.scale(300));
 
+	// Altered Gameplay Settings Tooltips
+	private final Object overrideCursorItemWhenHoldingAltTooltip = RichText.render("Holding Alt while having an item on your cursor will allow you to left click to walk, or right click to interact with objects, rather than drop it on the ground." +
+			"\n" +
+			"\n$col[185,185,185]{Left click ignores the UI when you do this, so don't try to click on the map to walk while holding an item.}", UI.scale(300));
 
 	// Camera Settings Tooltips
 	private final Object reverseOrthoCameraAxesTooltip = RichText.render("Enabling this will reverse the Horizontal axis when dragging the camera to look around." +

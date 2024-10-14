@@ -2077,7 +2077,10 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	}
 	
 	protected void hit(Coord pc, Coord2d mc, ClickData inf) {
-	    Object[] args = {pc, mc.floor(posres), clickb, ui.modflags()};
+		int modflags = ui.modflags();
+		if (OptWnd.overrideCursorItemWhenHoldingAltCheckBox.a && ui.gui != null && ui.gui.vhand != null && clickb == 1)
+			modflags = modflags & ~ 4;
+	    Object[] args = {pc, mc.floor(posres), clickb, modflags};
 	    if(inf != null) {
 		args = Utils.extend(args, inf.clickargs());
 		Long gobid = new Long((Integer) inf.clickargs()[1]);
