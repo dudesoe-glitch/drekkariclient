@@ -94,6 +94,7 @@ public class Equipory extends Widget implements DTarget {
 	private Button expandButton = null;
 	public boolean myOwnEquipory = false;
 	public static CheckBox autoDropLeechesCheckBox;
+	public static CheckBox autoSwitchBunnySlippersCheckBox;
 	boolean checkForLeeches = false;
 
     @RName("epry")
@@ -141,7 +142,8 @@ public class Equipory extends Widget implements DTarget {
 	bonuses.show(showEquipmentBonuses);
 	add(expandButton = new Button(UI.scale(24), showEquipmentBonuses ? "←" : "→", false).action(this::expandAttributes), isz.x + UI.scale(10), 0);
 	if (myOwnEquipory){
-		add(autoDropLeechesCheckBox = new CheckBox("Auto-Drop Leeches"){
+		Widget prev;
+		prev = add(autoDropLeechesCheckBox = new CheckBox("Auto-Drop Leeches"){
 			{a = Utils.getprefb("autoDropLeeches", false);}
 			public void set(boolean val) {
 				if (OptWnd.autoDropLeechesCheckBox != null)
@@ -149,6 +151,15 @@ public class Equipory extends Widget implements DTarget {
 				a = val;
 			}
 		}, UI.scale(10), isz.y + UI.scale(12));
+		prev = add(autoSwitchBunnySlippersCheckBox = new CheckBox("Auto-Switch Bunny Slippers"){
+			{a = OptWnd.autoSwitchBunnySlippersCheckBox.a;}
+			public void set(boolean val) {
+				if (OptWnd.autoSwitchBunnySlippersCheckBox != null)
+					OptWnd.autoSwitchBunnySlippersCheckBox.set(val);
+				a = val;
+			}
+		}, prev.pos("ur").adds(10, 0));
+		autoSwitchBunnySlippersCheckBox.tooltip = OptWnd.autoSwitchBunnySlippersCheckBox.tooltip;
 	}
 	pack();
     }

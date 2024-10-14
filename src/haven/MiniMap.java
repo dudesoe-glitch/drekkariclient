@@ -981,8 +981,17 @@ public class MiniMap extends Widget {
 	if(mc == null) mc = ui.mc;
 	if((sessloc != null) && (sessloc.seg == loc.seg)) {
 	    if(gob == null) {
+			if (OptWnd.autoSwitchBunnySlippersCheckBox.a) {
+				ui.gui.map.switchToPlateBoots();
+			}
 		mv.wdgmsg("click", mc, loc.tc.sub(sessloc.tc).mul(tilesz).add(tilesz.div(2)).floor(posres),	button, ui.modflags());
 		} else {
+			if (OptWnd.autoSwitchBunnySlippersCheckBox.a) {
+				if (button == 3)
+					ui.gui.map.switchBunnySlippersAndPlateBoots(gob);
+				if (button == 1)
+					ui.gui.map.switchToPlateBoots();
+			}
 		Object[] args = {mc, loc.tc.sub(sessloc.tc).mul(tilesz).add(tilesz.div(2)).floor(posres), button, ui.modflags(), 0, (int) gob.id, gob.rc.floor(posres), 0, -1};
 			if (button == 3 && OptWnd.autoSelect1stFlowerMenuCheckBox.a) {
 				mv.wdgmsg("click", args);

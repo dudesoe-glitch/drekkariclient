@@ -2086,7 +2086,15 @@ public class MapView extends PView implements DTarget, Console.Directory {
 		Long gobid = new Long((Integer) inf.clickargs()[1]);
 		Gob gob = glob.oc.getgob(gobid);
 			if(gob != null) {
-				if (clickb == 3) {
+				if (clickb == 1) { // Left Click
+					if (OptWnd.autoSwitchBunnySlippersCheckBox.a) {
+						switchToPlateBoots();
+					}
+				}
+				if (clickb == 3) { // Right Click
+					if (OptWnd.autoSwitchBunnySlippersCheckBox.a) {
+						switchBunnySlippersAndPlateBoots(gob);
+					}
 					wdgmsg("click", args);
 					if (OptWnd.autoSelect1stFlowerMenuCheckBox.a) {
 						if (ui.modctrl) {
@@ -2094,6 +2102,12 @@ public class MapView extends PView implements DTarget, Console.Directory {
 						}
 					}
 					return;
+				}
+			}
+		} else { // ND: This means no object was clicked. We clicked the ground.
+			if (clickb == 1) { // Left Click
+				if (OptWnd.autoSwitchBunnySlippersCheckBox.a) {
+					switchToPlateBoots();
 				}
 			}
 		}
@@ -2622,6 +2636,41 @@ public class MapView extends PView implements DTarget, Console.Directory {
 		}
 		float a = ((float)sz.y) / ((float)sz.x);
 		return(Math.atan2(sloc[1] * a, sloc[0]));
+	}
+
+	public void switchBunnySlippersAndPlateBoots(Gob gob){
+		try {
+			if (gob.getres().name.contains("/rabbit/")) {
+				switchToBunnySlippers();
+			} else {
+				switchToPlateBoots();
+			}
+		} catch (Exception ignored) {
+		}
+	}
+
+	public void switchToBunnySlippers(){
+		WItem eqboots = ui.gui.getequipory().slots[15];
+		List<WItem> invboots = ui.gui.maininv.getItemsExact("Bunny Slippers");
+		if (!invboots.isEmpty()) {
+			if (eqboots != null && !eqboots.item.getname().equals("Bunny Slippers")) {
+				eqboots.item.wdgmsg("transfer", new Coord(eqboots.sz.x / 2, eqboots.sz.y / 2));
+			}
+			WItem slipper = invboots.get(0);
+			slipper.item.wdgmsg("transfer", new Coord(slipper.sz.x / 2, slipper.sz.y / 2));
+		}
+	}
+
+	public void switchToPlateBoots(){
+		WItem eqboots = ui.gui.getequipory().slots[15];
+		List<WItem> invboots = ui.gui.maininv.getItemsExact("Plate Boots");
+		if (eqboots != null && eqboots.item.getname().equals("Bunny Slippers")) {
+			if (!invboots.isEmpty()) {
+				eqboots.item.wdgmsg("transfer", new Coord(eqboots.sz.x / 2, eqboots.sz.y / 2));
+				WItem boots = invboots.get(0);
+				boots.item.wdgmsg("transfer", new Coord(boots.sz.x / 2, boots.sz.y / 2));
+			}
+		}
 	}
 
 }

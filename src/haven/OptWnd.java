@@ -1152,6 +1152,7 @@ public class OptWnd extends Window {
 	public static CheckBox autoReloadCuriositiesFromInventoryCheckBox;
 	public static CheckBox preventCutleryFromBreakingCheckBox = null;
 	public static CheckBox autoDropLeechesCheckBox;
+	public static CheckBox autoSwitchBunnySlippersCheckBox;
 
 	public class GameplayAutomationSettingsPanel extends Panel {
 
@@ -1291,6 +1292,14 @@ public class OptWnd extends Window {
 					}
 				}
 			}, prev.pos("bl").adds(0, 2));
+			prev = add(autoSwitchBunnySlippersCheckBox = new CheckBox("Auto-Switch Bunny Slippers"){
+				{a = Utils.getprefb("autoSwitchBunnySlippers", true);}
+				public void set(boolean val) {
+					Utils.setprefb("autoSwitchBunnySlippers", val);
+					a = val;
+				}
+			}, prev.pos("bl").adds(0, 12));
+			autoSwitchBunnySlippersCheckBox.tooltip = autoSwitchBunnySlippersTooltip;
 
 			Widget backButton;
 			add(backButton = new PButton(UI.scale(200), "Back", 27, back, "Advanced Settings"), prev.pos("bl").adds(0, 18));
@@ -2047,6 +2056,11 @@ public class OptWnd extends Window {
 	private final Object flowerMenuAutoSelectManagerTooltip = RichText.render("An advanced menu to automatically select specific flower menu options all the time. New options are added to the list as you discover them." +
 			"\n" +
 			"\n$col[185,185,185]{I don't recommend using this, but nevertheless it exists due to popular demand.}", UI.scale(300));
+	private final Object autoSwitchBunnySlippersTooltip = RichText.render("Switches your equipped Plate Boots with a pair of Bunny Slippers from your inventory, whenever you right click to chase a rabbit, and vice versa if you click on anything else." +
+			"\n" +
+			"\n$col[200,0,0]{It only works with Plate Boots! It won't switch other boots!}" +
+			"\n" +
+			"\n$col[185,185,185]{I suggest always using this setting in PVP.}", UI.scale(300));
 
 	// Altered Gameplay Settings Tooltips
 	private final Object overrideCursorItemWhenHoldingAltTooltip = RichText.render("Holding Alt while having an item on your cursor will allow you to left click to walk, or right click to interact with objects, rather than drop it on the ground." +
