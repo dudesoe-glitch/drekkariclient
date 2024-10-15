@@ -99,6 +99,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 	// Script Threads
 	public Thread autoRepeatFlowerMenuScriptThread;
 	public Thread interactWithNearestObjectThread;
+	public Thread enterNearestVehicleThread;
 
     public static abstract class BeltSlot {
 	public final int idx;
@@ -1665,6 +1666,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 	public static KeyBinding kb_leftQuickSlotButton  = KeyBinding.get("leftQuickSlotButtonKB",  KeyMatch.forchar('Z', KeyMatch.M));
 	public static KeyBinding kb_nightVision  = KeyBinding.get("nightVisionKB",  KeyMatch.forchar('N', KeyMatch.C));
 	public static KeyBinding kb_clickNearestObject  = KeyBinding.get("clickNearestObjectKB",  KeyMatch.forchar('Q', 0));
+	public static KeyBinding kb_enterNearestVehicle  = KeyBinding.get("enderNearestVehicle",  KeyMatch.forchar('Q', KeyMatch.C));
     public boolean globtype(char key, KeyEvent ev) {
 	if(key == ':') {
 	    entercmd();
@@ -1724,6 +1726,17 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 			interactWithNearestObjectThread = null;
 			interactWithNearestObjectThread = new Thread(new InteractWithNearestObject(this), "InteractWithNearestObject");
 			interactWithNearestObjectThread.start();
+		}
+		return (true);
+	} else if (kb_enterNearestVehicle.key().match(ev)) {
+		if (enterNearestVehicleThread == null) {
+			enterNearestVehicleThread = new Thread(new EnterNearestVehicle(this), "EnterNearestVehicle");
+			enterNearestVehicleThread.start();
+		} else {
+			enterNearestVehicleThread.interrupt();
+			enterNearestVehicleThread = null;
+			enterNearestVehicleThread = new Thread(new EnterNearestVehicle(this), "EnterNearestVehicle");
+			enterNearestVehicleThread.start();
 		}
 		return (true);
 	} else if((key == 27) && (map != null) && !map.hasfocus) {
