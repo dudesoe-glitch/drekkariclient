@@ -389,4 +389,83 @@ public class Config {
 		add("Agility");
 		add("Strength");
 	}};
+
+	public static final String[] critterResPaths = {
+			"gfx/kritter/bayshrimp/bayshrimp",
+			"gfx/kritter/bogturtle/bogturtle",
+			"gfx/kritter/brimstonebutterfly/brimstonebutterfly",
+			"gfx/kritter/cavecentipede/cavecentipede",
+			"gfx/kritter/cavemoth/cavemoth",
+			"gfx/kritter/chicken/chick",
+			"gfx/kritter/chicken/chicken", // ND: This seems to be the model for wild chickens, both hens and roosters.
+			"gfx/kritter/chicken/hen", // ND: This might be pointless?
+			"gfx/kritter/chicken/rooster", // ND: This might be pointless?
+			"gfx/kritter/crab/crab",
+			"gfx/kritter/dragonfly/dragonfly",
+			"gfx/kritter/earthworm/earthworm",
+			"gfx/kritter/firefly/firefly",
+			"gfx/kritter/forestlizard/forestlizard",
+			"gfx/kritter/forestsnail/forestsnail",
+			"gfx/kritter/frog/frog",
+			"gfx/kritter/grasshopper/grasshopper",
+			"gfx/kritter/hedgehog/hedgehog",
+			"gfx/kritter/irrbloss/irrbloss",
+			"gfx/kritter/jellyfish/jellyfish",
+			"gfx/kritter/ladybug/ladybug",
+			"gfx/kritter/lobster/lobster",
+			"gfx/kritter/magpie/magpie",
+			"gfx/kritter/mallard/mallard", // ND: I haven't checked yet, but I assume it could be the same case as with the chickens
+			"gfx/kritter/mallard/mallard-f", // ND: This might be pointless?
+			"gfx/kritter/mallard/mallard-m", // ND: This might be pointless?
+			"gfx/kritter/mole/mole",
+			"gfx/kritter/monarchbutterfly/monarchbutterfly",
+			"gfx/kritter/moonmoth/moonmoth",
+			"gfx/kritter/opiumdragon/opiumdragon",
+			"gfx/kritter/ptarmigan/ptarmigan",
+			"gfx/kritter/quail/quail",
+			"gfx/kritter/rat/rat",
+			"gfx/kritter/rockdove/rockdove",
+			"gfx/kritter/sandflea/sandflea",
+			"gfx/kritter/seagull/seagull",
+			"gfx/kritter/silkmoth/silkmoth",
+			"gfx/kritter/springbumblebee/springbumblebee",
+			"gfx/kritter/squirrel/squirrel",
+			"gfx/kritter/stagbeetle/stagbeetle",
+			"gfx/kritter/stalagoomba/stalagoomba",
+			"gfx/kritter/toad/toad",
+			"gfx/kritter/waterstrider/waterstrider",
+			"gfx/kritter/woodgrouse/woodgrouse-f", // ND: Only female can be chased, males will fight you
+			"gfx/kritter/woodworm/woodworm",
+			"gfx/kritter/whirlingsnowflake/whirlingsnowflake",
+			"gfx/kritter/bullfinch/bullfinch",
+
+			"gfx/terobjs/items/grub", // ND: lmao
+			"gfx/terobjs/items/hoppedcow",
+			"gfx/terobjs/items/mandrakespirited",
+	};
+
+	public static final String[] beastResPaths = {
+			"gfx/kritter/bear/bear",
+			"gfx/kritter/lynx/lynx",
+			"gfx/kritter/walrus/walrus",
+			"gfx/kritter/mammoth/mammoth",
+			"gfx/kritter/troll/troll",
+			"gfx/kritter/spermwhale/spermwhale",
+			"gfx/kritter/orca/orca",
+			"gfx/kritter/moose/moose",
+			"gfx/kritter/wolf/wolf",
+			"gfx/kritter/bat/bat",
+			"gfx/kritter/goldeneagle/goldeneagle",
+			"gfx/kritter/eagleowl/eagleowl",
+			"gfx/kritter/caveangler/caveangler",
+			"gfx/kritter/boar/boar",
+			"gfx/kritter/badger/badger",
+			"gfx/kritter/wolverine/wolverine",
+			"gfx/kritter/boreworm/boreworm",
+			"gfx/kritter/ooze/greenooze",
+			"gfx/kritter/adder/adder",
+			"gfx/kritter/rat/caverat",
+			"gfx/kritter/goat/wildgoat",
+			"gfx/kritter/cavelouse/cavelouse"
+	};
 }
