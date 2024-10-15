@@ -58,6 +58,8 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	public Boolean isMannequin = null;
 	private boolean isLoftar = false;
 	public boolean playerNameChecked = false;
+	public final ArrayList<Gob> occupants = new ArrayList<Gob>(); // ND: The "passengers" of this gob
+	public Long occupiedGobID = null; // ND: The id of the "vehicle" this gob is currently in
 
     public static class Overlay implements RenderTree.Node {
 	public final int id;
@@ -484,6 +486,20 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	if (isMe != null) {
 		setCustomPlayerName();
 	}
+	if (getattr(Moving.class) instanceof Following){
+		Following following = (Following) getattr(Moving.class);
+		occupiedGobID = following.tgt;
+		if (occupiedGobID != null) {
+			Gob OccupiedGob = glob.oc.getgob(occupiedGobID);
+			if (OccupiedGob != null) {
+				synchronized (OccupiedGob.occupants) {
+					if (!OccupiedGob.occupants.contains(this)) {
+						OccupiedGob.occupants.add(this);
+					}
+				}
+			}
+		}
+	}
     }
 
     public void gtick(Render g) {
@@ -665,6 +681,18 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	}
 	if(prev != null)
 	    prev.dispose();
+
+	if(ac == Moving.class && a == null) {
+		if (occupiedGobID != null){
+			Gob OccupiedGob = glob.oc.getgob(occupiedGobID);
+			if (OccupiedGob != null){
+				synchronized (OccupiedGob.occupants) {
+					OccupiedGob.occupants.remove(this);
+				}
+				occupiedGobID = null;
+			}
+		}
+	}
     }
 
     public void setattr(GAttrib a) {
