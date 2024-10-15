@@ -768,6 +768,8 @@ public class OptWnd extends Window {
 		}
 	}
 
+	public static CheckBox toggleGobCollisionBoxesCheckBox;
+
 	public class DisplaySettingsPanel extends Panel {
 		public DisplaySettingsPanel(Panel back) {
 			Widget prev;
@@ -824,8 +826,23 @@ public class OptWnd extends Window {
 							dpy);
 				}
 			}
-			add(new PButton(UI.scale(200), "Back", 27, back, "Advanced Settings"), prev.pos("bl").adds(0, 30).x(0));
+
+			prev = add(toggleGobCollisionBoxesCheckBox = new CheckBox("Show Object Collision Boxes"){
+				{a = (Utils.getprefb("gobCollisionBoxesDisplayToggle", false));}
+				public void set(boolean val) {
+					Utils.setprefb("gobCollisionBoxesDisplayToggle", val);
+					a = val;
+					if (ui != null && ui.gui != null) {
+						ui.sess.glob.oc.gobAction(Gob::updateCollisionBoxes);
+						ui.gui.map.updatePlobCollisionBox();
+					}
+				}
+			}, prev.pos("bl").adds(0, 18).x(0));
+
+			Widget backButton;
+			add(backButton = new PButton(UI.scale(200), "Back", 27, back, "Advanced Settings"), prev.pos("bl").adds(0, 18).x(0));
 			pack();
+			centerBackButton(backButton, this);
 		}
 	}
 
@@ -1116,7 +1133,9 @@ public class OptWnd extends Window {
 				"\n\n$col[218,163,0]{Works with:} Knarr, Snekkja, Rowboat, Dugout, Kicksled, Coracle, Wagon, Wilderness Skis, Tamed Horse" +
 				"\n\n$col[218,163,0]{Range:} $col[185,185,185]{36 tiles (approximately)}", new Color(255, 191, 0,255), GameUI.kb_enterNearestVehicle, y);
 		y+=20;
+		y = addbtn(cont, "Toggle Collision Boxes", GameUI.kb_toggleCollisionBoxes, y);
 		y = addbtn(cont, "Toggle Object Hiding", GameUI.kb_toggleHidingBoxes, y);
+
 		prev = adda(new PointBind(UI.scale(200)), scroll.pos("bl").adds(0, 10).x(scroll.sz.x / 2), 0.5, 0.0);
 	    prev = adda(new PButton(UI.scale(200), "Back", 27, back, "Options            "), prev.pos("bl").adds(0, 10).x(scroll.sz.x / 2), 0.5, 0.0);
 	    pack();
@@ -1722,6 +1741,7 @@ public class OptWnd extends Window {
 					if (ui != null && ui.gui != null) {
 						ui.sess.glob.oc.gobAction(Gob::reloadTreeScale);
 						ui.sess.glob.oc.gobAction(Gob::updateHidingBoxes);
+						ui.sess.glob.oc.gobAction(Gob::updateCollisionBoxes);
 					}
 				}
 			}, prev.pos("bl").adds(0, 6));

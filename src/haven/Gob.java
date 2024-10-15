@@ -63,6 +63,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	public Long occupiedGobID = null; // ND: The id of the "vehicle" this gob is currently in
 	private HitBoxGobSprite<HidingBox> hidingBoxHollow = null;
 	private HitBoxGobSprite<HidingBox> hidingBoxFilled = null;
+	private HitBoxGobSprite<CollisionBox> collisionBox = null;
 
     public static class Overlay implements RenderTree.Node {
 	public final int id;
@@ -450,6 +451,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	if(id < 0)
 	    virtual = true;
 	updwait(this::updateHidingBoxes, waiting -> {});
+	updwait(this::updateCollisionBoxes, waiting -> {});
     }
 
     public Gob(Glob glob, Coord2d c) {
@@ -685,6 +687,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	}
 	if (ac == Drawable.class) {
 		if (a != prev) updateHidingBoxes();
+		if (a != prev) updateCollisionBoxes();
 	}
 	if(prev != null)
 	    prev.dispose();
@@ -1312,6 +1315,30 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 				}
 			} else if(hidingBoxFilled != null) {
 				hidingBoxFilled.show(false);
+			}
+		}
+	}
+
+	public void updateCollisionBoxes() {
+		if (updateseq == 0) {
+			return;
+		}
+		Resource res = Gob.this.getres();
+		if (res != null) {
+			if ((OptWnd.toggleGobCollisionBoxesCheckBox.a)) {
+				if (collisionBox != null) {
+					if (!collisionBox.show(true)) {
+						collisionBox.fx.updateState();
+					}
+				} else if (!virtual || this instanceof MapView.Plob) {
+					CollisionBox collisionBox = CollisionBox.forGob(this);
+					if (collisionBox != null) {
+						this.collisionBox = new HitBoxGobSprite<>(this, collisionBox);
+						addol(this.collisionBox);
+					}
+				}
+			} else if (collisionBox != null) {
+				collisionBox.show(false);
 			}
 		}
 	}

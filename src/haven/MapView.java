@@ -587,6 +587,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	clmaptree.add(clickmap);
 	setcanfocus(true);
 	if (OptWnd.toggleGobHidingCheckBox.a) updatePlobHidingBox();
+	if (OptWnd.toggleGobCollisionBoxesCheckBox.a) updatePlobCollisionBox();
     }
     
     protected void envdispose() {
@@ -2682,6 +2683,12 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	public void updatePlobHidingBox() {
 		if(placing != null && placing.done()) {
 			placing.get().updateHidingBoxes();
+		}
+	}
+
+	public void updatePlobCollisionBox() {
+		if(placing != null && placing.done()) {
+			placing.get().updateCollisionBoxes();
 		}
 	}
 
