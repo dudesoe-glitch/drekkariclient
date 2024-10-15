@@ -275,4 +275,14 @@ public class RUtils {
     public static Node compose(Collection<? extends Node> children) {
 	return(compose(children.toArray(new Node[0])));
     }
+
+	public static void multiremSafe(Collection<Slot> slots) {
+		if(slots == null)
+			return;
+		for (Slot slot : slots) {
+			try {
+				slot.remove();
+			} catch (Exception ignored) {}
+		}
+	}
 }

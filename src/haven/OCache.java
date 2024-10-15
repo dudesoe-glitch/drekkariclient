@@ -70,6 +70,7 @@ public class OCache implements Iterable<Gob> {
 
     public OCache(Glob glob) {
 	this.glob = glob;
+	if (OptWnd.toggleGobHidingCheckBox.a) gobAction(Gob::updateHidingBoxes);
     }
 
     public synchronized void callback(ChangeCallback cb) {
@@ -335,6 +336,7 @@ public class OCache implements Iterable<Gob> {
 			ol.remove(false);
 		}
 	    }
+		g.updateHidingBoxes();
 	}
     }
 
@@ -345,6 +347,7 @@ public class OCache implements Iterable<Gob> {
 	    int len = msg.uint8();
 	    Message dat = (len > 0) ? new MessageBuf(msg.bytes(len)) : null;
 	    resid.get().getcode(GAttrib.Parser.class, true).apply(g, dat);
+		g.updateHidingBoxes();
 	}
     }
 

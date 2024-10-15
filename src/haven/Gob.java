@@ -31,6 +31,7 @@ import java.util.*;
 import java.util.List;
 import java.util.function.*;
 import haven.render.*;
+import haven.render.gl.GLObject;
 import haven.res.lib.svaj.GobSvaj;
 import haven.res.lib.tree.TreeScale;
 import haven.res.ui.obj.buddy.Buddy;
@@ -60,6 +61,8 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	public boolean playerNameChecked = false;
 	public final ArrayList<Gob> occupants = new ArrayList<Gob>(); // ND: The "passengers" of this gob
 	public Long occupiedGobID = null; // ND: The id of the "vehicle" this gob is currently in
+	private HitBoxGobSprite<HidingBox> hidingBoxHollow = null;
+	private HitBoxGobSprite<HidingBox> hidingBoxFilled = null;
 
     public static class Overlay implements RenderTree.Node {
 	public final int id;
@@ -446,6 +449,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	this.id = id;
 	if(id < 0)
 	    virtual = true;
+	updwait(this::updateHidingBoxes, waiting -> {});
     }
 
     public Gob(Glob glob, Coord2d c) {
@@ -662,11 +666,11 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 		setupmods.remove(prev);
 	}
 	if(a != null) {
-	    if(a instanceof RenderTree.Node) {
+	    if(a instanceof RenderTree.Node && !a.skipRender) {
 		try {
 		    RUtils.multiadd(this.slots, (RenderTree.Node)a);
 		} catch(Loading l) {
-		    if(prev instanceof RenderTree.Node) {
+		    if(prev instanceof RenderTree.Node && !prev.skipRender) {
 			RUtils.multiadd(this.slots, (RenderTree.Node)prev);
 			attr.put(ac, prev);
 		    }
@@ -678,6 +682,9 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	    if(a instanceof SetupMod)
 		setupmods.add((SetupMod)a);
 	    attr.put(ac, a);
+	}
+	if (ac == Drawable.class) {
+		if (a != prev) updateHidingBoxes();
 	}
 	if(prev != null)
 	    prev.dispose();
@@ -807,8 +814,11 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	}
 	Map<Class<? extends GAttrib>, GAttrib> attr = cloneattrs();
 	for(GAttrib a : attr.values()) {
-	    if(a instanceof RenderTree.Node)
-		slot.add((RenderTree.Node)a);
+	    if(a instanceof RenderTree.Node && !a.skipRender)
+			try {
+				slot.add((RenderTree.Node) a);
+			} catch (GLObject.UseAfterFreeException ignored) {
+			}
 	}
 	slots.add(slot);
     }
@@ -1208,6 +1218,101 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	private Map<Class<? extends GAttrib>, GAttrib> cloneattrs() { // ND: To prevent concurrent modification exceptions
 		synchronized (this.attr) {
 			return new HashMap<>(this.attr);
+		}
+	}
+
+	public void updateHidingBoxes() {
+		if (updateseq == 0) {
+			return;
+		}
+		boolean doHide = false;
+		boolean doShowHidingBox = false;
+		Resource res = Gob.this.getres();
+		if (res != null) {
+			String resName = res.name;
+			if (OptWnd.hideTreesCheckbox.a && resName.startsWith("gfx/terobjs/trees") && !resName.endsWith("log") && !resName.endsWith("oldtrunk")) {
+				doHide = OptWnd.toggleGobHidingCheckBox.a;
+				doShowHidingBox = true;
+			} else if (OptWnd.hideBushesCheckbox.a && resName.startsWith("gfx/terobjs/bushes")) {
+				doHide = OptWnd.toggleGobHidingCheckBox.a;
+				doShowHidingBox = true;
+			} else if (OptWnd.hideBouldersCheckbox.a && resName.startsWith("gfx/terobjs/bumlings")) {
+				doHide = OptWnd.toggleGobHidingCheckBox.a;
+				doShowHidingBox = true;
+			} else if (OptWnd.hideTreeLogsCheckbox.a && resName.startsWith("gfx/terobjs/trees") && (resName.endsWith("log") || resName.endsWith("oldtrunk"))) {
+				doHide = OptWnd.toggleGobHidingCheckBox.a;
+				doShowHidingBox = true;
+			} else if (OptWnd.hideWallsCheckbox.a && (resName.startsWith("gfx/terobjs/arch/palisade") || resName.startsWith("gfx/terobjs/arch/brickwall")) && !resName.endsWith("gate")) {
+				doHide = OptWnd.toggleGobHidingCheckBox.a;
+				doShowHidingBox = true;
+			} else if (OptWnd.hideHousesCheckbox.a && Arrays.asList(Config.housesResPaths).contains(resName)) {
+				doHide = OptWnd.toggleGobHidingCheckBox.a;
+				doShowHidingBox = true;
+			} else if (OptWnd.hideStockpilesCheckbox.a && resName.startsWith("gfx/terobjs/stockpile")) {
+				doHide = OptWnd.toggleGobHidingCheckBox.a;
+				doShowHidingBox = true;
+			} else if (OptWnd.hideCropsCheckbox.a && resName.startsWith("gfx/terobjs/plants") && !resName.endsWith("trellis")) {
+				doHide = OptWnd.toggleGobHidingCheckBox.a;
+				doShowHidingBox = false; // ND: You can walk through them anyway, so it doesn't matter. Their resource doesn't have an actual hitbox layer and we'll have an endless lag loop of trying to draw one.
+			}
+			Drawable d = getattr(Drawable.class);
+			if (d != null && d.skipRender != doHide) {
+				d.skipRender = doHide;
+				if (doHide) {
+					if (d.slots != null) {
+						ArrayList<RenderTree.Slot> tmpSlots = new ArrayList<>(d.slots);
+						try {
+							glob.loader.defer(() -> {
+								synchronized(Gob.this) {
+									RUtils.multiremSafe(tmpSlots);
+								}
+							}, null);
+						} catch (Exception ignored) {
+						}
+					}
+				} else {
+					ArrayList<RenderTree.Slot> tmpSlots = new ArrayList<>(slots);
+					try {
+						glob.loader.defer(() -> {
+							synchronized(Gob.this) {
+								RUtils.multiadd(tmpSlots, d);
+							}
+						}, null);
+					} catch (Exception ignored) {
+					}
+				}
+			}
+			if ((OptWnd.toggleGobHidingCheckBox.a && doShowHidingBox)) {
+				if (hidingBoxHollow != null) {
+					if (!hidingBoxHollow.show(true)) {
+						hidingBoxHollow.fx.updateState();
+					}
+				} else if (!virtual || this instanceof MapView.Plob) {
+					HidingBox hidingBoxHollow = HidingBox.forGob(this, false);
+					if (hidingBoxHollow != null) {
+						this.hidingBoxHollow = new HitBoxGobSprite<>(this, hidingBoxHollow);
+						addol(this.hidingBoxHollow);
+					}
+				}
+			} else if (hidingBoxHollow != null) {
+				hidingBoxHollow.show(false);
+			}
+
+			if ((OptWnd.toggleGobHidingCheckBox.a && OptWnd.alsoFillTheHidingBoxesCheckBox.a && doShowHidingBox)) {
+				if (hidingBoxFilled != null) {
+					if (!hidingBoxFilled.show(true)) {
+						hidingBoxFilled.fx.updateState();
+					}
+				} else if (!virtual || this instanceof MapView.Plob) {
+					HidingBox hidingBoxFilled = HidingBox.forGob(this, true);
+					if (hidingBoxFilled != null) {
+						this.hidingBoxFilled = new HitBoxGobSprite<>(this, hidingBoxFilled);
+						addol(this.hidingBoxFilled);
+					}
+				}
+			} else if(hidingBoxFilled != null) {
+				hidingBoxFilled.show(false);
+			}
 		}
 	}
 

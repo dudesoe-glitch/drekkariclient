@@ -468,4 +468,16 @@ public class Config {
 			"gfx/kritter/goat/wildgoat",
 			"gfx/kritter/cavelouse/cavelouse"
 	};
+
+	public static final String[] housesResPaths = {
+			"gfx/terobjs/arch/logcabin",
+			"gfx/terobjs/arch/timberhouse",
+			"gfx/terobjs/arch/stonestead",
+			"gfx/terobjs/arch/stonemansion",
+			"gfx/terobjs/arch/greathall",
+			"gfx/terobjs/arch/stonetower",
+			"gfx/terobjs/arch/windmill",
+			"gfx/terobjs/arch/primitivetent",
+			"gfx/terobjs/arch/greenhouse",
+	};
 }

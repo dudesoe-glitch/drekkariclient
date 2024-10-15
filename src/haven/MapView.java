@@ -586,6 +586,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	this.clickmap = new ClickMap();
 	clmaptree.add(clickmap);
 	setcanfocus(true);
+	if (OptWnd.toggleGobHidingCheckBox.a) updatePlobHidingBox();
     }
     
     protected void envdispose() {
@@ -2675,6 +2676,12 @@ public class MapView extends PView implements DTarget, Console.Directory {
 				WItem boots = invboots.get(0);
 				boots.item.wdgmsg("transfer", new Coord(boots.sz.x / 2, boots.sz.y / 2));
 			}
+		}
+	}
+
+	public void updatePlobHidingBox() {
+		if(placing != null && placing.done()) {
+			placing.get().updateHidingBoxes();
 		}
 	}
 

@@ -1667,6 +1667,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 	public static KeyBinding kb_nightVision  = KeyBinding.get("nightVisionKB",  KeyMatch.forchar('N', KeyMatch.C));
 	public static KeyBinding kb_clickNearestObject  = KeyBinding.get("clickNearestObjectKB",  KeyMatch.forchar('Q', 0));
 	public static KeyBinding kb_enterNearestVehicle  = KeyBinding.get("enderNearestVehicle",  KeyMatch.forchar('Q', KeyMatch.C));
+	public static KeyBinding kb_toggleHidingBoxes  = KeyBinding.get("toggleHidingBoxesKB",  KeyMatch.forchar('H', KeyMatch.C));
     public boolean globtype(char key, KeyEvent ev) {
 	if(key == ':') {
 	    entercmd();
@@ -1739,6 +1740,9 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 			enterNearestVehicleThread.start();
 		}
 		return (true);
+	} else if(kb_toggleHidingBoxes.key().match(ev)) {
+		OptWnd.toggleGobHidingCheckBox.set(!OptWnd.toggleGobHidingCheckBox.a);
+		return(true);
 	} else if((key == 27) && (map != null) && !map.hasfocus) {
 	    setfocus(map);
 	    return(true);

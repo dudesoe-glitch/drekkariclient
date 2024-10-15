@@ -26,7 +26,6 @@
 
 package haven;
 
-import java.util.*;
 import java.util.function.*;
 import haven.render.*;
 
@@ -114,6 +113,7 @@ public class ResDrawable extends Drawable implements EquipTarget {
 		d.sdt = sdt;
 	    } else if((d == null) || (d.res != res) || !d.sdt.equals(sdt)) {
 		g.setattr(new ResDrawable(g, res, sdt, msg.old));
+		g.updateHidingBoxes();
 	    }
 	}
     }
