@@ -838,6 +838,7 @@ public class OptWnd extends Window {
 					}
 				}
 			}, prev.pos("bl").adds(0, 18).x(0));
+			toggleGobCollisionBoxesCheckBox.tooltip = genericHasKeybindTooltip;
 
 			Widget backButton;
 			add(backButton = new PButton(UI.scale(200), "Back", 27, back, "Advanced Settings"), prev.pos("bl").adds(0, 18).x(0));
@@ -1851,6 +1852,7 @@ public class OptWnd extends Window {
 					}
 				}
 			}, 0, 10);
+			toggleGobHidingCheckBox.tooltip = genericHasKeybindTooltip;
 
 			add(alsoFillTheHidingBoxesCheckBox = new CheckBox("Also fill the Hiding Boxes"){
 				{a = (Utils.getprefb("alsoFillTheHidingBoxes", true));}
@@ -2329,6 +2331,7 @@ public class OptWnd extends Window {
 
 	// Misc/Other
 	private final Object resetButtonTooltip = RichText.render("Reset to default", UI.scale(300));
+	private final Object genericHasKeybindTooltip = RichText.render("$col[218,163,0]{Keybind:} $col[185,185,185]{This can also be toggled using a keybind.}", UI.scale(300));
 
 
 
