@@ -2113,6 +2113,11 @@ public class MapView extends PView implements DTarget, Console.Directory {
 		}
 	    wdgmsg("click", args);
 	}
+
+	public void clickedGob(Coord pc, Coord2d mc, ClickData inf){
+		hit(pc, mc, inf);
+	}
+
     }
     
     public void grab(Grabber grab) {

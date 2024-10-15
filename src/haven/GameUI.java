@@ -38,6 +38,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import haven.automated.*;
 import haven.render.Location;
 import haven.res.ui.stackinv.ItemStack;
 
@@ -97,6 +98,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 
 	// Script Threads
 	public Thread autoRepeatFlowerMenuScriptThread;
+	public Thread interactWithNearestObjectThread;
 
     public static abstract class BeltSlot {
 	public final int idx;
@@ -1662,6 +1664,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 	public static KeyBinding kb_rightQuickSlotButton  = KeyBinding.get("rightQuickSlotButtonKB",  KeyMatch.forchar('X', KeyMatch.M));
 	public static KeyBinding kb_leftQuickSlotButton  = KeyBinding.get("leftQuickSlotButtonKB",  KeyMatch.forchar('Z', KeyMatch.M));
 	public static KeyBinding kb_nightVision  = KeyBinding.get("nightVisionKB",  KeyMatch.forchar('N', KeyMatch.C));
+	public static KeyBinding kb_clickNearestObject  = KeyBinding.get("clickNearestObjectKB",  KeyMatch.forchar('Q', 0));
     public boolean globtype(char key, KeyEvent ev) {
 	if(key == ':') {
 	    entercmd();
@@ -1710,6 +1713,17 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 		} else {
 			OptWnd.nightVisionSlider.val = OptWnd.nightVisionSlider.min;
 			OptWnd.nightVisionSlider.changed();
+		}
+		return (true);
+	} else if (kb_clickNearestObject.key().match(ev)) {
+		if (interactWithNearestObjectThread == null) {
+			interactWithNearestObjectThread = new Thread(new InteractWithNearestObject(this), "InteractWithNearestObject");
+			interactWithNearestObjectThread.start();
+		} else {
+			interactWithNearestObjectThread.interrupt();
+			interactWithNearestObjectThread = null;
+			interactWithNearestObjectThread = new Thread(new InteractWithNearestObject(this), "InteractWithNearestObject");
+			interactWithNearestObjectThread.start();
 		}
 		return (true);
 	} else if((key == 27) && (map != null) && !map.hasfocus) {
