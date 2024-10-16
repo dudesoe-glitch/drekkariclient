@@ -72,6 +72,7 @@ public class OCache implements Iterable<Gob> {
 	this.glob = glob;
 	if (OptWnd.toggleGobHidingCheckBox.a) gobAction(Gob::updateHidingBoxes);
 	if (OptWnd.toggleGobCollisionBoxesCheckBox.a) gobAction(Gob::updateCollisionBoxes);
+	if (OptWnd.showContainerFullnessCheckBox.a) gobAction(Gob::updateContainerFullnessHighlight);
     }
 
     public synchronized void callback(ChangeCallback cb) {
@@ -339,6 +340,7 @@ public class OCache implements Iterable<Gob> {
 	    }
 		g.updateHidingBoxes();
 		g.updateCollisionBoxes();
+		g.updateContainerFullnessHighlight();
 	}
     }
 
@@ -351,6 +353,7 @@ public class OCache implements Iterable<Gob> {
 	    resid.get().getcode(GAttrib.Parser.class, true).apply(g, dat);
 		g.updateHidingBoxes();
 		g.updateCollisionBoxes();
+		g.updateContainerFullnessHighlight();
 	}
     }
 

@@ -480,4 +480,22 @@ public class Config {
 			"gfx/terobjs/arch/primitivetent",
 			"gfx/terobjs/arch/greenhouse",
 	};
+
+	public static final String[] containersResPaths = {
+			// ND: Each container might have different peekrbufs for each state. This needs to be checked for each new container, in each state (Empty & Closed || Empty & Open, Full & Closed || Full & Open).
+			"gfx/terobjs/cupboard",
+			"gfx/terobjs/chest",
+			"gfx/terobjs/crate",
+			"gfx/terobjs/largechest",
+			"gfx/terobjs/coffer",
+			"gfx/terobjs/exquisitechest",
+			//"gfx/terobjs/wbasket", // ND: This one only has open/closed peekrbufs, no other fullness indicators lmao
+			"gfx/terobjs/birchbasket",
+			"gfx/terobjs/metalcabinet",
+			"gfx/terobjs/stonecasket",
+			"gfx/terobjs/bonechest",
+			"gfx/terobjs/leatherbasket",
+			"gfx/terobjs/woodbox",
+			"gfx/terobjs/linencrate",
+	};
 }

@@ -776,6 +776,16 @@ public class OptWnd extends Window {
 	public static CheckBox highlightCliffsCheckBox;
 	public static ColorOptionWidget highlightCliffsColorOptionWidget;
 	public static String[] highlightCliffsColorSetting = Utils.getprefsa("highlightCliffs" + "_colorSetting", new String[]{"255", "0", "0", "200"});
+	public static CheckBox showContainerFullnessCheckBox;
+	public static CheckBox showContainerFullnessFullCheckBox;
+	public static ColorOptionWidget showContainerFullnessFullColorOptionWidget;
+	public static String[] containerFullnessFullColorSetting = Utils.getprefsa("containerFullnessFull" + "_colorSetting", new String[]{"170", "0", "0", "170"});
+	public static CheckBox showContainerFullnessPartialCheckBox;
+	public static ColorOptionWidget showContainerFullnessPartialColorOptionWidget;
+	public static String[] containerFullnessPartialColorSetting = Utils.getprefsa("containerFullnessPartial" + "_colorSetting", new String[]{"194", "155", "2", "140"});
+	public static CheckBox showContainerFullnessEmptyCheckBox;
+	public static ColorOptionWidget showContainerFullnessEmptyColorOptionWidget;
+	public static String[] containerFullnessEmptyColorSetting = Utils.getprefsa("containerFullnessEmpty" + "_colorSetting", new String[]{"0", "120", "0", "180"});
 
 	public class DisplaySettingsPanel extends Panel {
 		public DisplaySettingsPanel(Panel back) {
@@ -860,6 +870,90 @@ public class OptWnd extends Window {
 				if (ui.sess != null)
 					ui.sess.glob.map.invalidateAll();
 			}), leftColumn.pos("ur").adds(10, 0));
+			leftColumn = add(showContainerFullnessCheckBox = new CheckBox("Highlight Container Fullness:"){
+				{a = (Utils.getprefb("showContainerFullness", true));}
+				public void changed(boolean val) {
+					Utils.setprefb("showContainerFullness", val);
+					if (ui != null && ui.gui != null) {
+						ui.sess.glob.oc.gobAction(Gob::updateContainerFullnessHighlight);
+						ui.gui.map.updatePlobContainerHighlight();
+					}
+				}
+			}, leftColumn.pos("bl").adds(0, 12).x(0));
+			showContainerFullnessCheckBox.tooltip = showContainerFullnessTooltip;
+			leftColumn = add(showContainerFullnessFullCheckBox = new CheckBox("Full"){
+				{a = (Utils.getprefb("showContainerFullnessFull", true));}
+				public void changed(boolean val) {
+					Utils.setprefb("showContainerFullnessFull", val);
+					if (ui != null && ui.gui != null) {
+						ui.sess.glob.oc.gobAction(Gob::updateContainerFullnessHighlight);
+						ui.gui.map.updatePlobContainerHighlight();
+					}
+				}
+			}, leftColumn.pos("bl").adds(20, 4));
+			add(showContainerFullnessFullColorOptionWidget = new ColorOptionWidget("", "containerFullnessFull", 0, Integer.parseInt(containerFullnessFullColorSetting[0]), Integer.parseInt(containerFullnessFullColorSetting[1]), Integer.parseInt(containerFullnessFullColorSetting[2]), Integer.parseInt(containerFullnessFullColorSetting[3]), (Color col) -> {
+				if (ui != null && ui.gui != null) {
+					ui.sess.glob.oc.gobAction(Gob::updateContainerFullnessHighlight);
+					ui.gui.map.updatePlobContainerHighlight();
+				}
+			}){}, leftColumn.pos("ur").adds(54, -3));
+			add(new Button(UI.scale(70), "Reset", false).action(() -> {
+				Utils.setprefsa("containerFullnessFull" + "_colorSetting", new String[]{"170", "0", "0", "170"});
+				showContainerFullnessFullColorOptionWidget.cb.colorChooser.setColor(showContainerFullnessFullColorOptionWidget.currentColor = new Color(170, 0, 0, 170));
+				if (ui != null && ui.gui != null) {
+					ui.sess.glob.oc.gobAction(Gob::updateContainerFullnessHighlight);
+					ui.gui.map.updatePlobContainerHighlight();
+				}
+			}), showContainerFullnessFullColorOptionWidget.pos("ur").adds(10, 0));
+			leftColumn = add(showContainerFullnessPartialCheckBox = new CheckBox("Partial"){
+				{a = (Utils.getprefb("showContainerFullnessPartial", true));}
+				public void changed(boolean val) {
+					Utils.setprefb("showContainerFullnessPartial", val);
+					if (ui != null && ui.gui != null) {
+						ui.sess.glob.oc.gobAction(Gob::updateContainerFullnessHighlight);
+						ui.gui.map.updatePlobContainerHighlight();
+					}
+				}
+			}, leftColumn.pos("bl").adds(0, 8));
+			add(showContainerFullnessPartialColorOptionWidget = new ColorOptionWidget("", "containerFullnessPartial", 0, Integer.parseInt(containerFullnessPartialColorSetting[0]), Integer.parseInt(containerFullnessPartialColorSetting[1]), Integer.parseInt(containerFullnessPartialColorSetting[2]), Integer.parseInt(containerFullnessPartialColorSetting[3]), (Color col) -> {
+				if (ui != null && ui.gui != null) {
+					ui.sess.glob.oc.gobAction(Gob::updateContainerFullnessHighlight);
+					ui.gui.map.updatePlobContainerHighlight();
+				}
+			}){}, leftColumn.pos("ur").adds(41, -3));
+			add(new Button(UI.scale(70), "Reset", false).action(() -> {
+				Utils.setprefsa("containerFullnessPartial" + "_colorSetting", new String[]{"194", "155", "2", "140"});
+				showContainerFullnessPartialColorOptionWidget.cb.colorChooser.setColor(showContainerFullnessPartialColorOptionWidget.currentColor = new Color(194, 155, 2, 140));
+				if (ui != null && ui.gui != null) {
+					ui.sess.glob.oc.gobAction(Gob::updateContainerFullnessHighlight);
+					ui.gui.map.updatePlobContainerHighlight();
+				}
+			}), showContainerFullnessPartialColorOptionWidget.pos("ur").adds(10, 0));
+			leftColumn = add(showContainerFullnessEmptyCheckBox = new CheckBox("Empty"){
+				{a = (Utils.getprefb("showContainerFullnessEmpty", true));}
+				public void changed(boolean val) {
+					Utils.setprefb("showContainerFullnessEmpty", val);
+					if (ui != null && ui.gui != null) {
+						ui.sess.glob.oc.gobAction(Gob::updateContainerFullnessHighlight);
+						ui.gui.map.updatePlobContainerHighlight();
+					}
+				}
+			}, leftColumn.pos("bl").adds(0, 8));
+			add(showContainerFullnessEmptyColorOptionWidget = new ColorOptionWidget("", "containerFullnessEmpty", 0, Integer.parseInt(containerFullnessEmptyColorSetting[0]), Integer.parseInt(containerFullnessEmptyColorSetting[1]), Integer.parseInt(containerFullnessEmptyColorSetting[2]), Integer.parseInt(containerFullnessEmptyColorSetting[3]), (Color col) -> {
+				if (ui != null && ui.gui != null) {
+					ui.sess.glob.oc.gobAction(Gob::updateContainerFullnessHighlight);
+					ui.gui.map.updatePlobContainerHighlight();
+				}
+			}){}, leftColumn.pos("ur").adds(42, -3));
+
+			add(new Button(UI.scale(70), "Reset", false).action(() -> {
+				Utils.setprefsa("containerFullnessEmpty" + "_colorSetting", new String[]{"0", "120", "0", "180"});
+				showContainerFullnessEmptyColorOptionWidget.cb.colorChooser.setColor(showContainerFullnessEmptyColorOptionWidget.currentColor = new Color(0, 120, 0, 180));
+				if (ui != null && ui.gui != null) {
+					ui.sess.glob.oc.gobAction(Gob::updateContainerFullnessHighlight);
+					ui.gui.map.updatePlobContainerHighlight();
+				}
+			}), showContainerFullnessEmptyColorOptionWidget.pos("ur").adds(10, 0));
 
 			rightColumn = add(toggleGobCollisionBoxesCheckBox = new CheckBox("Show Object Collision Boxes"){
 				{a = (Utils.getprefb("gobCollisionBoxesDisplayToggle", false));}
@@ -2306,6 +2400,9 @@ public class OptWnd extends Window {
 			"\n" +
 			"\n$col[218,163,0]{Keybind:} $col[185,185,185]{This can also be toggled using a keybind.}", UI.scale(330));
 	private final Object highlightCliffsTooltip = RichText.render("$col[218,163,0]{Action Button:} $col[185,185,185]{This setting can also be turned on/off using an action button from the menu grid (Custom Client Extras → Toggles).}", UI.scale(320));
+	private final Object showContainerFullnessTooltip = RichText.render("Colors containers (like )Cupboards, Chests, Crates, etc.), depending on how much stuff is in them." +
+			"\n" +
+			"\n$col[185,185,185]{Select from below what states you want to be highlighted, and what colors you want each of them to show.}", UI.scale(330));
 
 	// Quality Display Settings Tooltips
 	private final Object customQualityColorsTooltip = RichText.render("These numbers and colors are completely arbitrary, and you can change them to whatever you like." +

@@ -115,6 +115,7 @@ public class ResDrawable extends Drawable implements EquipTarget {
 		g.setattr(new ResDrawable(g, res, sdt, msg.old));
 		g.updateHidingBoxes();
 		g.updateCollisionBoxes();
+		g.updateContainerFullnessHighlight();
 	    }
 	}
     }

@@ -29,6 +29,7 @@ package haven;
 import java.awt.*;
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.*;
 import haven.render.*;
 import haven.render.gl.GLObject;
@@ -47,7 +48,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
     public final Glob glob;
     public Map<Class<? extends GAttrib>, GAttrib> attr = new HashMap<Class<? extends GAttrib>, GAttrib>();
     public final Collection<Overlay> ols = new ArrayList<Overlay>();
-    public final Collection<RenderTree.Slot> slots = new ArrayList<>(1);
+    public final Collection<RenderTree.Slot> slots = new CopyOnWriteArrayList<>(); // ND: Make this COW to prevent concurrent modification exceptions. It doesn't seem to affect performance
     public int updateseq = 0;
     private final Collection<SetupMod> setupmods = new ArrayList<>();
     private final LinkedList<Runnable> deferred = new LinkedList<>();
@@ -455,6 +456,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	    virtual = true;
 	updwait(this::updateHidingBoxes, waiting -> {});
 	updwait(this::updateCollisionBoxes, waiting -> {});
+	updwait(this::updateContainerFullnessHighlight, waiting -> {});
 	qualityInfo = new GobQualityInfo(this);
 	setattr(GobQualityInfo.class, qualityInfo);
 	growthInfo = new GobGrowthInfo(this);
@@ -695,6 +697,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	if (ac == Drawable.class) {
 		if (a != prev) updateHidingBoxes();
 		if (a != prev) updateCollisionBoxes();
+		if (a != prev) updateContainerFullnessHighlight();
 	}
 	if(prev != null)
 	    prev.dispose();
@@ -1355,5 +1358,121 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 		qualityInfo.clear();
 		qualityInfo.setQ(quality);
 	}
+
+
+	public void updateContainerFullnessHighlight() {
+		if (getres() != null) {
+			String resName = getres().name;
+			if (Arrays.stream(Config.containersResPaths).anyMatch(resName::matches)) {
+				Drawable dr = getattr(Drawable.class);
+				ResDrawable d = (dr instanceof ResDrawable) ? (ResDrawable) dr : null;
+				if (d != null) {
+					setContainerHighlight(resName, d.sdt);
+				}
+			}
+		}
+	}
+
+	private void setContainerHighlight(String resName, MessageBuf sdt){
+		int peekrbuf = sdt.checkrbuf(0);
+		if (OptWnd.showContainerFullnessCheckBox.a) {
+			switch (resName) {
+				case "gfx/terobjs/cupboard":
+				case "gfx/terobjs/chest":
+				case "gfx/terobjs/exquisitechest":
+					if (peekrbuf == 30 || peekrbuf == 29) {
+						if (OptWnd.showContainerFullnessFullCheckBox.a) setGobStateHighlight(OptWnd.showContainerFullnessFullColorOptionWidget.currentColor);
+						else delattr(GobStateHighlight.class);
+					} else if (peekrbuf == 2 || peekrbuf == 1) {
+						if (OptWnd.showContainerFullnessEmptyCheckBox.a) setGobStateHighlight(OptWnd.showContainerFullnessEmptyColorOptionWidget.currentColor);
+						else delattr(GobStateHighlight.class);
+					} else {
+						if (OptWnd.showContainerFullnessPartialCheckBox.a) setGobStateHighlight(OptWnd.showContainerFullnessPartialColorOptionWidget.currentColor);
+						else delattr(GobStateHighlight.class);
+					}
+					break;
+				case "gfx/terobjs/crate":
+				case "gfx/terobjs/linencrate":
+					if (peekrbuf == 16) {
+						if (OptWnd.showContainerFullnessFullCheckBox.a) setGobStateHighlight(OptWnd.showContainerFullnessFullColorOptionWidget.currentColor);
+						else delattr(GobStateHighlight.class);
+					} else if (peekrbuf == 0) {
+						if (OptWnd.showContainerFullnessEmptyCheckBox.a) setGobStateHighlight(OptWnd.showContainerFullnessEmptyColorOptionWidget.currentColor);
+						else delattr(GobStateHighlight.class);
+					} else {
+						if (OptWnd.showContainerFullnessPartialCheckBox.a) setGobStateHighlight(OptWnd.showContainerFullnessPartialColorOptionWidget.currentColor);
+						else delattr(GobStateHighlight.class);
+					}
+					break;
+				case "gfx/terobjs/leatherbasket":
+					if (peekrbuf == 4) {
+						if (OptWnd.showContainerFullnessFullCheckBox.a) setGobStateHighlight(OptWnd.showContainerFullnessFullColorOptionWidget.currentColor);
+						else delattr(GobStateHighlight.class);
+					} else if (peekrbuf == 0) {
+						if (OptWnd.showContainerFullnessEmptyCheckBox.a) setGobStateHighlight(OptWnd.showContainerFullnessEmptyColorOptionWidget.currentColor);
+						else delattr(GobStateHighlight.class);
+					} else {
+						if (OptWnd.showContainerFullnessPartialCheckBox.a) setGobStateHighlight(OptWnd.showContainerFullnessPartialColorOptionWidget.currentColor);
+						else delattr(GobStateHighlight.class);
+					}
+					break;
+				case "gfx/terobjs/woodbox":
+					if (peekrbuf == 8) {
+						if (OptWnd.showContainerFullnessFullCheckBox.a) setGobStateHighlight(OptWnd.showContainerFullnessFullColorOptionWidget.currentColor);
+						else delattr(GobStateHighlight.class);
+					} else if (peekrbuf == 0) {
+						if (OptWnd.showContainerFullnessEmptyCheckBox.a) setGobStateHighlight(OptWnd.showContainerFullnessEmptyColorOptionWidget.currentColor);
+						else delattr(GobStateHighlight.class);
+					} else {
+						if (OptWnd.showContainerFullnessPartialCheckBox.a) setGobStateHighlight(OptWnd.showContainerFullnessPartialColorOptionWidget.currentColor);
+						else delattr(GobStateHighlight.class);
+					}
+					break;
+				case "gfx/terobjs/largechest":
+				case "gfx/terobjs/birchbasket":
+				case "gfx/terobjs/stonecasket":
+				case "gfx/terobjs/bonechest":
+					if (peekrbuf == 17 || peekrbuf == 18) {
+						if (OptWnd.showContainerFullnessFullCheckBox.a) setGobStateHighlight(OptWnd.showContainerFullnessFullColorOptionWidget.currentColor);
+						else delattr(GobStateHighlight.class);
+					} else if (peekrbuf == 2 || peekrbuf == 1) {
+						if (OptWnd.showContainerFullnessEmptyCheckBox.a) setGobStateHighlight(OptWnd.showContainerFullnessEmptyColorOptionWidget.currentColor);
+						else delattr(GobStateHighlight.class);
+					} else {
+						if (OptWnd.showContainerFullnessPartialCheckBox.a) setGobStateHighlight(OptWnd.showContainerFullnessPartialColorOptionWidget.currentColor);
+						else delattr(GobStateHighlight.class);
+					}
+					break;
+				case "gfx/terobjs/coffer":
+				case "gfx/terobjs/metalcabinet":
+					if (peekrbuf == 65 || peekrbuf == 66) {
+						if (OptWnd.showContainerFullnessFullCheckBox.a) setGobStateHighlight(OptWnd.showContainerFullnessFullColorOptionWidget.currentColor);
+						else delattr(GobStateHighlight.class);
+					} else if (peekrbuf == 2 || peekrbuf == 1) {
+						if (OptWnd.showContainerFullnessEmptyCheckBox.a) setGobStateHighlight(OptWnd.showContainerFullnessEmptyColorOptionWidget.currentColor);
+						else delattr(GobStateHighlight.class);
+					} else {
+						if (OptWnd.showContainerFullnessPartialCheckBox.a) setGobStateHighlight(OptWnd.showContainerFullnessPartialColorOptionWidget.currentColor);
+						else delattr(GobStateHighlight.class);
+					}
+					break;
+				default:
+					break;
+			}
+		} else {
+			delattr(GobStateHighlight.class);
+		}
+	}
+
+	private void setGobStateHighlight(Color color) {
+		GobStateHighlight current = getattr(GobStateHighlight.class);
+		if (current != null) {
+			current.color = color;
+		} else  {
+			setattr(new GobStateHighlight(this, color));
+		}
+	}
+
+
 
 }
