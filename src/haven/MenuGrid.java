@@ -740,6 +740,7 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 		makeLocal("customclient/menugrid/Toggles/TileTransitions");
 		makeLocal("customclient/menugrid/Toggles/ItemDroppingAnywhere");
 		makeLocal("customclient/menugrid/Toggles/ItemDroppingInWater");
+		makeLocal("customclient/menugrid/Toggles/HighlightCliffs");
 	}
 
 	public void useCustom(String[] ad) {
@@ -759,6 +760,8 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 				OptWnd.noCursorItemDroppingAnywhereCheckBox.set(!OptWnd.noCursorItemDroppingAnywhereCheckBox.a);
 			} else if (ad[2].equals("ItemDroppingInWater")) {
 				OptWnd.noCursorItemDroppingInWaterCheckBox.set(!OptWnd.noCursorItemDroppingInWaterCheckBox.a);
+			} else if (ad[2].equals("HighlightCliffs")) {
+				OptWnd.highlightCliffsCheckBox.set(!OptWnd.highlightCliffsCheckBox.a);
 			}
 		}
 	}

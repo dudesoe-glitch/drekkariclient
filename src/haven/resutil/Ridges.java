@@ -33,8 +33,6 @@ import haven.MapMesh.Scan;
 import haven.MapMesh.Model;
 import haven.Surface.Vertex;
 import haven.Tiler.MPart;
-import haven.Tiler.SModel;
-import haven.Tiler.VertFactory;
 import haven.Surface.MeshVertex;
 import static haven.Utils.clip;
 
@@ -49,6 +47,7 @@ public class Ridges implements MapMesh.ConsHooks {
     private Vertex[][] edges, edgec;
     private float[] edgeo;
     private final MPart[] gnd, ridge;
+	public static Pipe.Op cliffHighlightMat = Pipe.Op.compose(new MixColor(OptWnd.highlightCliffsColorOptionWidget.currentColor), new HueMod(0, 0, 1));
 
     public interface RidgeTile {
 	public double breakz();
@@ -348,6 +347,9 @@ public class Ridges implements MapMesh.ConsHooks {
 	}
 	mkfaces(gv, srfi);
 	gnd[ms.ts.o(tc)] = new MPart(tc, tc.add(m.ul), gv, tcx, tcy, srfi);
+	if (OptWnd.highlightCliffsCheckBox.a){
+		gnd[ms.ts.o(tc)].mat = cliffHighlightMat;
+	}
 
 	Vertex[] cls = new Vertex[] {ms.new Vertex(close)};
 	if(edgelc(tc, dir))
@@ -378,6 +380,9 @@ public class Ridges implements MapMesh.ConsHooks {
 	}
 	mkfaces(gv, srfi);
 	gnd[ms.ts.o(tc)] = new MPart(tc, tc.add(m.ul), gv, tcx, tcy, srfi);
+	if (OptWnd.highlightCliffsCheckBox.a){
+		gnd[ms.ts.o(tc)].mat = cliffHighlightMat;
+	}
 
 	if(edgelc(tc, dir))
 	    ridge[ms.ts.o(tc)] = connect(tc, edges[eo(tc, dir)], edges[eo(tc, dir + 2)]);
@@ -407,6 +412,9 @@ public class Ridges implements MapMesh.ConsHooks {
 	}
 	mkfaces(gv, d1rfi);
 	gnd[ms.ts.o(tc)] = new MPart(tc, tc.add(m.ul), gv, tcx, tcy, d1rfi);
+	if (OptWnd.highlightCliffsCheckBox.a){
+		gnd[ms.ts.o(tc)].mat = cliffHighlightMat;
+	}
 
 	if(edgelc(tc, dir))
 	    ridge[ms.ts.o(tc)] = connect(tc, edges[eo(tc, dir)], edges[eo(tc, (dir + 1) % 4)]);
@@ -725,4 +733,8 @@ public class Ridges implements MapMesh.ConsHooks {
 	tc = tc.mod(MCache.cutsz);
 	return(r.edgeo[(2 * r.eo(tc, edge)) + (hi?1:0)]);
     }
+
+	public static void setCliffHighlightMat(){
+		cliffHighlightMat = Pipe.Op.compose(new MixColor(OptWnd.highlightCliffsColorOptionWidget.currentColor), new HueMod(0, 0, 1));
+	}
 }

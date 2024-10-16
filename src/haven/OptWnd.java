@@ -27,6 +27,7 @@
 package haven;
 
 import haven.render.*;
+import haven.resutil.Ridges;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -772,6 +773,9 @@ public class OptWnd extends Window {
 	public static CheckBox displayObjectHealthPercentageCheckBox;
 	public static CheckBox displayObjectQualityOnInspectionCheckBox;
 	public static CheckBox displayGrowthInfoCheckBox;
+	public static CheckBox highlightCliffsCheckBox;
+	public static ColorOptionWidget highlightCliffsColorOptionWidget;
+	public static String[] highlightCliffsColorSetting = Utils.getprefsa("highlightCliffs" + "_colorSetting", new String[]{"255", "0", "0", "200"});
 
 	public class DisplaySettingsPanel extends Panel {
 		public DisplaySettingsPanel(Panel back) {
@@ -830,6 +834,32 @@ public class OptWnd extends Window {
 							dpy);
 				}
 			}
+			leftColumn = add(highlightCliffsCheckBox = new CheckBox("Highlight Cliffs (Color Overlay)"){
+				{a = (Utils.getprefb("highlightCliffs", false));}
+				public void set(boolean val) {
+					Utils.setprefb("highlightCliffs", val);
+					a = val;
+					if (ui.sess != null)
+						ui.sess.glob.map.invalidateAll();
+					if (ui != null && ui.gui != null) {
+						ui.gui.optionInfoMsg("Highlight Cliffs is now " + (val ? "ENABLED" : "DISABLED") + "!", (val ? msgGreen : msgRed));
+					}
+				}
+			}, leftColumn.pos("bl").adds(0, 12).x(0));
+			highlightCliffsCheckBox.tooltip = highlightCliffsTooltip;
+			leftColumn = add(highlightCliffsColorOptionWidget = new ColorOptionWidget("Highlight Cliffs Color:", "highlightCliffs", 115, Integer.parseInt(highlightCliffsColorSetting[0]), Integer.parseInt(highlightCliffsColorSetting[1]), Integer.parseInt(highlightCliffsColorSetting[2]), Integer.parseInt(highlightCliffsColorSetting[3]), (Color col) -> {
+				Ridges.setCliffHighlightMat();
+				if (ui.sess != null)
+					ui.sess.glob.map.invalidateAll();
+			}){}, leftColumn.pos("bl").adds(0, 1).x(0));
+
+			leftColumn = add(new Button(UI.scale(70), "Reset", false).action(() -> {
+				Utils.setprefsa("highlightCliffs" + "_colorSetting", new String[]{"255", "0", "0", "200"});
+				highlightCliffsColorOptionWidget.cb.colorChooser.setColor(highlightCliffsColorOptionWidget.currentColor = new Color(255, 0, 0, 200));
+				Ridges.setCliffHighlightMat();
+				if (ui.sess != null)
+					ui.sess.glob.map.invalidateAll();
+			}), leftColumn.pos("ur").adds(10, 0));
 
 			rightColumn = add(toggleGobCollisionBoxesCheckBox = new CheckBox("Show Object Collision Boxes"){
 				{a = (Utils.getprefb("gobCollisionBoxesDisplayToggle", false));}
@@ -2275,7 +2305,7 @@ public class OptWnd extends Window {
 			"\n$col[185,185,185]{Crops with a seeds stage (carrots, turnips, leeks, etc.) will also display a blue dot during the seeds stage.}" +
 			"\n" +
 			"\n$col[218,163,0]{Keybind:} $col[185,185,185]{This can also be toggled using a keybind.}", UI.scale(330));
-
+	private final Object highlightCliffsTooltip = RichText.render("$col[218,163,0]{Action Button:} $col[185,185,185]{This setting can also be turned on/off using an action button from the menu grid (Custom Client Extras → Toggles).}", UI.scale(320));
 
 	// Quality Display Settings Tooltips
 	private final Object customQualityColorsTooltip = RichText.render("These numbers and colors are completely arbitrary, and you can change them to whatever you like." +
