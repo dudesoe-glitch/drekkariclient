@@ -28,11 +28,12 @@ package haven;
 
 import haven.res.ui.tt.attrmod.AttrMod;
 
+import java.awt.*;
 import java.util.*;
+import java.util.List;
 import java.util.function.*;
 import java.lang.reflect.*;
 import java.awt.image.BufferedImage;
-import java.awt.Graphics;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -355,7 +356,7 @@ public abstract class ItemInfo {
 	return(ret);
     }
 
-    public static BufferedImage catimgsh(int margin, BufferedImage... imgs) {
+    public static BufferedImage catimgsh(int margin, int pad, Color bg, BufferedImage... imgs) {
 	int w = -margin, h = 0;
 	for(BufferedImage img : imgs) {
 	    if(img == null)
@@ -376,6 +377,10 @@ public abstract class ItemInfo {
 	g.dispose();
 	return(ret);
     }
+
+	public static BufferedImage catimgsh(int margin, BufferedImage... imgs) {
+		return catimgsh(margin, 0, null, imgs);
+	}
 
     public static BufferedImage longtip(List<ItemInfo> info) {
 	Layout l = new Layout();

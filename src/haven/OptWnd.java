@@ -769,6 +769,7 @@ public class OptWnd extends Window {
 	}
 
 	public static CheckBox toggleGobCollisionBoxesCheckBox;
+	public static CheckBox displayObjectHealthPercentageCheckBox;
 
 	public class DisplaySettingsPanel extends Panel {
 		public DisplaySettingsPanel(Panel back) {
@@ -840,6 +841,13 @@ public class OptWnd extends Window {
 				}
 			}, UI.scale(230, 0));
 			toggleGobCollisionBoxesCheckBox.tooltip = genericHasKeybindTooltip;
+			rightColumn = add(displayObjectHealthPercentageCheckBox = new CheckBox("Display Object Health Percentage"){
+				{a = (Utils.getprefb("displayObjectHealthPercentage", true));}
+				public void changed(boolean val) {
+					Utils.setprefb("displayObjectHealthPercentage", val);
+				}
+			}, rightColumn.pos("bl").adds(0, 2));
+
 
 			Widget backButton;
 			add(backButton = new PButton(UI.scale(200), "Back", 27, back, "Advanced Settings"), leftColumn.pos("bl").adds(0, 18).x(0));
