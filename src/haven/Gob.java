@@ -65,6 +65,8 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	private HitBoxGobSprite<HidingBox> hidingBoxFilled = null;
 	private HitBoxGobSprite<CollisionBox> collisionBox = null;
 	private final GobQualityInfo qualityInfo;
+	private GobGrowthInfo growthInfo;
+	public boolean isHidden;
 
     public static class Overlay implements RenderTree.Node {
 	public final int id;
@@ -455,6 +457,8 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	updwait(this::updateCollisionBoxes, waiting -> {});
 	qualityInfo = new GobQualityInfo(this);
 	setattr(GobQualityInfo.class, qualityInfo);
+	growthInfo = new GobGrowthInfo(this);
+	setattr(GobGrowthInfo.class, growthInfo);
     }
 
     public Gob(Glob glob, Coord2d c) {
@@ -1261,6 +1265,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 				doHide = OptWnd.toggleGobHidingCheckBox.a;
 				doShowHidingBox = false; // ND: You can walk through them anyway, so it doesn't matter. Their resource doesn't have an actual hitbox layer and we'll have an endless lag loop of trying to draw one.
 			}
+			isHidden = doHide;
 			Drawable d = getattr(Drawable.class);
 			if (d != null && d.skipRender != doHide) {
 				d.skipRender = doHide;

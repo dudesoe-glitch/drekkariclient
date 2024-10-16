@@ -1679,6 +1679,14 @@ public class Resource implements Serializable {
 	public <T> T get(Class<T> cl) {
 	    return(get(cl, true));
 	}
+
+	public Class get(String tag) {
+		Class<?> acl;
+		synchronized (lpe) {
+			acl = lpe.get(tag);
+		}
+		return (acl);
+	}
     }
 
     public static Resource classres(final Class<?> cl) {

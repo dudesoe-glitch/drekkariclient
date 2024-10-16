@@ -771,6 +771,7 @@ public class OptWnd extends Window {
 	public static CheckBox toggleGobCollisionBoxesCheckBox;
 	public static CheckBox displayObjectHealthPercentageCheckBox;
 	public static CheckBox displayObjectQualityOnInspectionCheckBox;
+	public static CheckBox displayGrowthInfoCheckBox;
 
 	public class DisplaySettingsPanel extends Panel {
 		public DisplaySettingsPanel(Panel back) {
@@ -854,6 +855,13 @@ public class OptWnd extends Window {
 					Utils.setprefb("displayObjectQualityOnInspection", val);
 				}
 			}, rightColumn.pos("bl").adds(0, 2));
+			rightColumn = add(displayGrowthInfoCheckBox = new CheckBox("Display Growth Info on Plants"){
+				{a = (Utils.getprefb("displayGrowthInfo", false));}
+				public void changed(boolean val) {
+					Utils.setprefb("displayGrowthInfo", val);
+				}
+			}, rightColumn.pos("bl").adds(0, 2));
+			displayGrowthInfoCheckBox.tooltip = displayGrowthInfoTooltip;
 
 
 			Widget backButton;
@@ -1152,6 +1160,7 @@ public class OptWnd extends Window {
 		y+=20;
 		y = addbtn(cont, "Toggle Collision Boxes", GameUI.kb_toggleCollisionBoxes, y);
 		y = addbtn(cont, "Toggle Object Hiding", GameUI.kb_toggleHidingBoxes, y);
+		y = addbtn(cont, "Display Growth Info on Plants", GameUI.kb_toggleGrowthInfo, y);
 
 		prev = adda(new PointBind(UI.scale(200)), scroll.pos("bl").adds(0, 10).x(scroll.sz.x / 2), 0.5, 0.0);
 	    prev = adda(new PButton(UI.scale(200), "Back", 27, back, "Options            "), prev.pos("bl").adds(0, 10).x(scroll.sz.x / 2), 0.5, 0.0);
@@ -2257,6 +2266,16 @@ public class OptWnd extends Window {
 	// Display Settings Tooltips
 	private final Object granularityPositionTooltip = RichText.render("Equivalent of the :placegrid console command, this allows you to have more freedom when placing constructions/objects.", UI.scale(300));
 	private final Object granularityAngleTooltip = RichText.render("Equivalent of the :placeangle console command, this allows you to have more freedom when rotating constructions/objects before placement.", UI.scale(300));
+	private final Object displayGrowthInfoTooltip = RichText.render("Enabling this will show the following growth information:" +
+			"\n" +
+			"\n> Trees and Bushes will display their current growth percentage." +
+			"\n$col[185,185,185]{If a Tree or Bush is not showing a percentage, that means it reached full growth.}" +
+			"\n" +
+			"\n> Crops will generally display their growth stage as \"Current / Final\", and a red dot when they reached the final stage." +
+			"\n$col[185,185,185]{Crops with a seeds stage (carrots, turnips, leeks, etc.) will also display a blue dot during the seeds stage.}" +
+			"\n" +
+			"\n$col[218,163,0]{Keybind:} $col[185,185,185]{This can also be toggled using a keybind.}", UI.scale(330));
+
 
 	// Quality Display Settings Tooltips
 	private final Object customQualityColorsTooltip = RichText.render("These numbers and colors are completely arbitrary, and you can change them to whatever you like." +
