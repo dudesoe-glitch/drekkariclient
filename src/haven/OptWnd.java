@@ -772,10 +772,11 @@ public class OptWnd extends Window {
 
 	public class DisplaySettingsPanel extends Panel {
 		public DisplaySettingsPanel(Panel back) {
-			Widget prev;
-			prev = add(new Label("Object fine-placement granularity"), 0, 0);
+			Widget leftColumn;
+			Widget rightColumn;
+			leftColumn = add(new Label("Object fine-placement granularity"), 0, 0);
 			{
-				Label pos = add(new Label("Position"), prev.pos("bl").adds(5, 4));
+				Label pos = add(new Label("Position"), leftColumn.pos("bl").adds(5, 4));
 				pos.tooltip = granularityPositionTooltip;
 				Label ang = add(new Label("Angle"), pos.pos("bl").adds(0, 4));
 				ang.tooltip = granularityAngleTooltip;
@@ -786,7 +787,7 @@ public class OptWnd extends Window {
 					final int steps = (int)Math.round((smax - smin) / 0.25);
 					int ival = (int)Math.round(MapView.plobpgran);
 					addhlp(Coord.of(x + UI.scale(5), pos.c.y), UI.scale(5),
-							prev = new HSlider(UI.scale(155) - x, 2, 65, (ival == 0) ? 65 : ival) {
+							leftColumn = new HSlider(UI.scale(155) - x, 2, 65, (ival == 0) ? 65 : ival) {
 								protected void added() {
 									dpy();
 								}
@@ -811,7 +812,7 @@ public class OptWnd extends Window {
 							ival = i;
 					}
 					addhlp(Coord.of(x + UI.scale(5), ang.c.y), UI.scale(5),
-							prev = new HSlider(UI.scale(155) - x, 0, vals.length - 1, ival) {
+							leftColumn = new HSlider(UI.scale(155) - x, 0, vals.length - 1, ival) {
 								protected void added() {
 									dpy();
 								}
@@ -827,7 +828,7 @@ public class OptWnd extends Window {
 				}
 			}
 
-			prev = add(toggleGobCollisionBoxesCheckBox = new CheckBox("Show Object Collision Boxes"){
+			rightColumn = add(toggleGobCollisionBoxesCheckBox = new CheckBox("Show Object Collision Boxes"){
 				{a = (Utils.getprefb("gobCollisionBoxesDisplayToggle", false));}
 				public void set(boolean val) {
 					Utils.setprefb("gobCollisionBoxesDisplayToggle", val);
@@ -837,11 +838,11 @@ public class OptWnd extends Window {
 						ui.gui.map.updatePlobCollisionBox();
 					}
 				}
-			}, prev.pos("bl").adds(0, 18).x(0));
+			}, UI.scale(230, 0));
 			toggleGobCollisionBoxesCheckBox.tooltip = genericHasKeybindTooltip;
 
 			Widget backButton;
-			add(backButton = new PButton(UI.scale(200), "Back", 27, back, "Advanced Settings"), prev.pos("bl").adds(0, 18).x(0));
+			add(backButton = new PButton(UI.scale(200), "Back", 27, back, "Advanced Settings"), leftColumn.pos("bl").adds(0, 18).x(0));
 			pack();
 			centerBackButton(backButton, this);
 		}
