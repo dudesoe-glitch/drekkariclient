@@ -996,4 +996,13 @@ public class UI {
 		pwdg.pack();
 	}
 
+	public boolean checkCursorImage(String name) {
+		Resource curs = null;
+		try {
+			curs = root.cursor != null ? root.cursor.get() : null;
+		} catch (Loading ignored) {
+		}
+		return curs != null && curs.name.equals(name);
+	}
+
 }

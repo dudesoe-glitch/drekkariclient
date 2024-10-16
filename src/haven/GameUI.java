@@ -95,6 +95,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 	private boolean partyPermsOnLoginToggleSet = false;
 	private boolean itemStackingOnLoginToggleSet = false;
 	public static boolean flowerMenuAutoSelect = Utils.getprefb("flowerMenuAutoSelect", false);
+	public Gob lastInspectedGob;
 
 	// Script Threads
 	public Thread autoRepeatFlowerMenuScriptThread;
@@ -1812,6 +1813,17 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 	msgtime = Utils.rtime();
 	lastmsg = RootWidget.msgfoundry.render(msg, color);
 	syslog.append(msg, logcol);
+	Gob g = lastInspectedGob;
+		if(g != null) {
+			Matcher m = GobQualityInfo.GOB_Q.matcher(msg);
+			if(m.matches()) {
+				try {
+					int q = Integer.parseInt(m.group(1));
+					g.setQualityInfo(q);
+				} catch (Exception ignored) {}
+				lastInspectedGob = null;
+			}
+		}
     }
 
     public void msg(String msg, Color color) {

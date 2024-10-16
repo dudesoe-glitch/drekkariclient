@@ -64,6 +64,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	private HitBoxGobSprite<HidingBox> hidingBoxHollow = null;
 	private HitBoxGobSprite<HidingBox> hidingBoxFilled = null;
 	private HitBoxGobSprite<CollisionBox> collisionBox = null;
+	private final GobQualityInfo qualityInfo;
 
     public static class Overlay implements RenderTree.Node {
 	public final int id;
@@ -452,6 +453,8 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	    virtual = true;
 	updwait(this::updateHidingBoxes, waiting -> {});
 	updwait(this::updateCollisionBoxes, waiting -> {});
+	qualityInfo = new GobQualityInfo(this);
+	setattr(GobQualityInfo.class, qualityInfo);
     }
 
     public Gob(Glob glob, Coord2d c) {
@@ -1341,6 +1344,11 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 				collisionBox.show(false);
 			}
 		}
+	}
+
+	public void setQualityInfo(int quality){
+		qualityInfo.clear();
+		qualityInfo.setQ(quality);
 	}
 
 }

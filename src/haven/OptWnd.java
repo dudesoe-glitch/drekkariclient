@@ -770,6 +770,7 @@ public class OptWnd extends Window {
 
 	public static CheckBox toggleGobCollisionBoxesCheckBox;
 	public static CheckBox displayObjectHealthPercentageCheckBox;
+	public static CheckBox displayObjectQualityOnInspectionCheckBox;
 
 	public class DisplaySettingsPanel extends Panel {
 		public DisplaySettingsPanel(Panel back) {
@@ -845,6 +846,12 @@ public class OptWnd extends Window {
 				{a = (Utils.getprefb("displayObjectHealthPercentage", true));}
 				public void changed(boolean val) {
 					Utils.setprefb("displayObjectHealthPercentage", val);
+				}
+			}, rightColumn.pos("bl").adds(0, 2));
+			rightColumn = add(displayObjectQualityOnInspectionCheckBox = new CheckBox("Display Object Quality on Inspection"){
+				{a = (Utils.getprefb("displayObjectQualityOnInspection", true));}
+				public void changed(boolean val) {
+					Utils.setprefb("displayObjectQualityOnInspection", val);
 				}
 			}, rightColumn.pos("bl").adds(0, 2));
 

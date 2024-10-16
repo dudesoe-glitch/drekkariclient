@@ -48,7 +48,7 @@ public abstract class GobInfo extends GAttrib implements RenderTree.Node, PView.
 
     protected abstract Tex render();
 
-    public void clean() {
+    public void clear() {
         synchronized(texLock) {
             if(tex != null) {
                 tex.dispose();
@@ -59,6 +59,6 @@ public abstract class GobInfo extends GAttrib implements RenderTree.Node, PView.
     }
 
     public void dispose() {
-        clean();
+        clear();
     }
 }
