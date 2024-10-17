@@ -12,7 +12,7 @@ public class CollisionBox extends SlottedNode implements Rendered {
     private static final VertexArray.Layout LAYOUT = new VertexArray.Layout(new VertexArray.Layout.Input(Homo3D.vertex, new VectorFormat(3, NumberFormat.FLOAT32), 0, 0, 12));
 	private Model model;
 	private final Gob gob;
-	private static final Map<String, Model> MODEL_CACHE = new HashMap<>();
+	public static final Map<String, Model> MODEL_CACHE = new HashMap<>();
 	private static final float Z = 0.2f;
 	public static final float WIDTH = 2f;
 
@@ -50,6 +50,13 @@ public class CollisionBox extends SlottedNode implements Rendered {
 	}
 
 	public void updateState() {
+		if (gob.getres() != null && gob.getres().name.equals("gfx/terobjs/cupboard")) {
+			model = getModel(gob);
+			if (OptWnd.flatCupboardsCheckBox.a)
+				this.state = Pipe.Op.compose(SOLID_HOLLOW, Location.rot(new Coord3f(0, 1, 0), 4.71f), Location.scale(1.818f, 1, 1), Location.xlate(new Coord3f(4.95f, 0, 4.7f)));
+			else
+				this.state = SOLID_HOLLOW;
+		}
 		if(model != null && slots != null) {
 			try {
 				Model m = getModel(gob);

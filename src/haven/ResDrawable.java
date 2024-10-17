@@ -116,6 +116,7 @@ public class ResDrawable extends Drawable implements EquipTarget {
 		g.updateHidingBoxes();
 		g.updateCollisionBoxes();
 		g.updateContainerFullnessHighlight();
+		g.updateCustomSizeAndRotation();
 	    }
 	}
     }

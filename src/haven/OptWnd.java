@@ -1769,6 +1769,7 @@ public class OptWnd extends Window {
 	public static CheckBox disableObjectAnimationsCheckBox;
 	public static CheckBox disableIndustrialSmokeCheckBox;
 	public static CheckBox disableScentSmokeCheckBox;
+	public static CheckBox flatCupboardsCheckBox;
 
 	public class WorldGraphicsSettingsPanel extends Panel {
 
@@ -1959,6 +1960,20 @@ public class OptWnd extends Window {
 					}
 				}
 			}, prev.pos("bl").adds(0, 2));
+			prev = add(new Label("Other Altered Objects:"), prev.pos("bl").adds(0, 10).x(0));
+			prev = add(flatCupboardsCheckBox = new CheckBox("Flat Cupboards"){
+				{a = (Utils.getprefb("flatCupboards", true));}
+				public void set(boolean val) {
+					Utils.setprefb("flatCupboards", val);
+					a = val;
+					if (ui != null && ui.gui != null) {
+						ui.sess.glob.oc.gobAction(Gob::updateCustomSizeAndRotation);
+						ui.sess.glob.oc.gobAction(Gob::updateCollisionBoxes);
+						ui.gui.map.updatePlobCustomSizeAndRotation();
+						ui.gui.map.updatePlobCollisionBox();
+					}
+				}
+			}, prev.pos("bl").adds(12, 8));
 
 			Widget backButton;
 			add(backButton = new PButton(UI.scale(200), "Back", 27, back, "Advanced Settings"), prev.pos("bl").adds(0, 18));

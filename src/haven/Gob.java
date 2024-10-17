@@ -68,6 +68,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	private final GobQualityInfo qualityInfo;
 	private GobGrowthInfo growthInfo;
 	public boolean isHidden;
+	private final GobCustomSizeAndRotation customSizeAndRotation = new GobCustomSizeAndRotation();
 
     public static class Overlay implements RenderTree.Node {
 	public final int id;
@@ -160,6 +161,11 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	    if(slots == null)
 		slots = new ArrayList<>(1);
 	    slots.add(slot);
+		if (this.spr != null && this.spr.res != null && this.spr.res.name.contains("decal")){
+			if (OptWnd.flatCupboardsCheckBox.a && this.spr.owner.getres().name.equals("gfx/terobjs/cupboard"))
+				slot.cstate(Pipe.Op.compose(Location.scale(1, 1, 1.8f), Location.xlate(new Coord3f(0, 0, -6.3f))));
+			slot.ostate(new MixColor(new Color(255, 255, 255, 0)));
+		}
 	}
 
 	public void removed(RenderTree.Slot slot) {
@@ -454,6 +460,8 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	this.id = id;
 	if(id < 0)
 	    virtual = true;
+	setupmods.add(customSizeAndRotation);
+	updwait(this::updateCustomSizeAndRotation, waiting -> {});
 	updwait(this::updateHidingBoxes, waiting -> {});
 	updwait(this::updateCollisionBoxes, waiting -> {});
 	updwait(this::updateContainerFullnessHighlight, waiting -> {});
@@ -698,6 +706,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 		if (a != prev) updateHidingBoxes();
 		if (a != prev) updateCollisionBoxes();
 		if (a != prev) updateContainerFullnessHighlight();
+		if (a != prev) updateCustomSizeAndRotation();
 	}
 	if(prev != null)
 	    prev.dispose();
@@ -1473,6 +1482,24 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 		}
 	}
 
-
+	public void updateCustomSizeAndRotation(){
+		customSizeAndRotation.update(this);
+		if (getres() != null && getres().name.equals("gfx/terobjs/cupboard")) {
+			CollisionBox.MODEL_CACHE.remove("gfx/terobjs/cupboard");
+			if (collisionBox != null) {
+				collisionBox.fx.updateState();
+			}
+			for (Overlay ol : ols){
+				if (ol.spr != null && ol.spr.res != null && ol.spr.res.name.equals("gfx/terobjs/items/parchment-decal") && ol.slots != null){
+					for (RenderTree.Slot slot : ol.slots){
+						if (OptWnd.flatCupboardsCheckBox.a)
+							slot.cstate(Pipe.Op.compose(Location.scale(1, 1, 2), Location.xlate(new Coord3f(0, 0, -6.5f))));
+						else
+							slot.cstate(Pipe.Op.compose(Location.scale(1, 1, 1), Location.xlate(new Coord3f(0, 0, 0))));
+					}
+				}
+			}
+		}
+	}
 
 }
