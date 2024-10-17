@@ -80,6 +80,9 @@ public class StaticSprite extends Sprite {
     }
 
     public void added(RenderTree.Slot slot) {
+	if (this.res.name.equals("gfx/terobjs/items/hats/magahat")) {
+		slot.cstate(Pipe.Op.compose(Location.rot(new Coord3f(0, 0, 1), 3.15f)));
+	}
 	for(RenderTree.Node p : parts)
 	    slot.add(p);
     }
