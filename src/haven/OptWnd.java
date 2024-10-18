@@ -770,6 +770,8 @@ public class OptWnd extends Window {
 	}
 
 	public static CheckBox toggleGobCollisionBoxesCheckBox;
+	public static ColorOptionWidget collisionBoxColorOptionWidget;
+	public static String[] collisionBoxColorSetting = Utils.getprefsa("collisionBox" + "_colorSetting", new String[]{"255", "255", "255", "210"});
 	public static CheckBox displayObjectHealthPercentageCheckBox;
 	public static CheckBox displayObjectQualityOnInspectionCheckBox;
 	public static CheckBox displayGrowthInfoCheckBox;
@@ -967,12 +969,29 @@ public class OptWnd extends Window {
 				}
 			}, UI.scale(230, 0));
 			toggleGobCollisionBoxesCheckBox.tooltip = genericHasKeybindTooltip;
+			rightColumn = add(collisionBoxColorOptionWidget = new ColorOptionWidget("Collision Box Color:", "collisionBox", 115, Integer.parseInt(collisionBoxColorSetting[0]), Integer.parseInt(collisionBoxColorSetting[1]), Integer.parseInt(collisionBoxColorSetting[2]), Integer.parseInt(collisionBoxColorSetting[3]), (Color col) -> {
+				CollisionBox.SOLID_HOLLOW = Pipe.Op.compose(new ColorMask(col), new States.LineWidth(CollisionBox.WIDTH), CollisionBox.TOP);
+				if (ui != null && ui.gui != null) {
+					ui.sess.glob.oc.gobAction(Gob::updateCollisionBoxes);
+					ui.gui.map.updatePlobCollisionBox();
+				}
+			}){}, rightColumn.pos("bl").adds(1, 0));
+			add(new Button(UI.scale(70), "Reset", false).action(() -> {
+				Utils.setprefsa("collisionBox" + "_colorSetting", new String[]{"255", "255", "255", "210"});
+				collisionBoxColorOptionWidget.cb.colorChooser.setColor(collisionBoxColorOptionWidget.currentColor = new Color(255, 255, 255, 210));
+				CollisionBox.SOLID_HOLLOW = Pipe.Op.compose(new ColorMask(OptWnd.collisionBoxColorOptionWidget.currentColor), new States.LineWidth(CollisionBox.WIDTH), CollisionBox.TOP);
+				if (ui != null && ui.gui != null) {
+					ui.sess.glob.oc.gobAction(Gob::updateCollisionBoxes);
+					ui.gui.map.updatePlobCollisionBox();
+				}
+			}), collisionBoxColorOptionWidget.pos("ur").adds(10, 0));
+
 			rightColumn = add(displayObjectHealthPercentageCheckBox = new CheckBox("Display Object Health Percentage"){
 				{a = (Utils.getprefb("displayObjectHealthPercentage", true));}
 				public void changed(boolean val) {
 					Utils.setprefb("displayObjectHealthPercentage", val);
 				}
-			}, rightColumn.pos("bl").adds(0, 2));
+			}, rightColumn.pos("bl").adds(0, 12).x(UI.scale(230)));
 			rightColumn = add(displayObjectQualityOnInspectionCheckBox = new CheckBox("Display Object Quality on Inspection"){
 				{a = (Utils.getprefb("displayObjectQualityOnInspection", true));}
 				public void changed(boolean val) {

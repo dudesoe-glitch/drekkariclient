@@ -17,7 +17,7 @@ public class CollisionBox extends SlottedNode implements Rendered {
 	public static final float WIDTH = 2f;
 
 	public static final Pipe.Op TOP = Pipe.Op.compose(Rendered.last, States.Depthtest.none, States.maskdepth);
-	public static Pipe.Op SOLID_HOLLOW = Pipe.Op.compose(Pipe.Op.compose(new BaseColor(new Color (255, 255, 255, 210)), new States.LineWidth(WIDTH)), TOP);
+	public static Pipe.Op SOLID_HOLLOW = Pipe.Op.compose(new ColorMask(OptWnd.collisionBoxColorOptionWidget.currentColor), new States.LineWidth(WIDTH), TOP);
 
     private Pipe.Op state = null;
 
@@ -50,6 +50,7 @@ public class CollisionBox extends SlottedNode implements Rendered {
 	}
 
 	public void updateState() {
+		this.state = SOLID_HOLLOW;
 		if (gob.getres() != null && gob.getres().name.equals("gfx/terobjs/cupboard")) {
 			model = getModel(gob);
 			if (OptWnd.flatCupboardsCheckBox.a)
