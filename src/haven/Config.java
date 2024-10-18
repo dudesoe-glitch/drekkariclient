@@ -498,4 +498,12 @@ public class Config {
 			"gfx/terobjs/woodbox",
 			"gfx/terobjs/linencrate",
 	};
+
+	public static final String[] workstationsResPaths = {
+			"gfx/terobjs/ttub",
+			"gfx/terobjs/dframe",
+			"gfx/terobjs/cheeserack",
+			"gfx/terobjs/gardenpot",
+	};
+
 }

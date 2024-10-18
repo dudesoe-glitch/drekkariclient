@@ -789,6 +789,20 @@ public class OptWnd extends Window {
 	public static ColorOptionWidget showContainerFullnessEmptyColorOptionWidget;
 	public static String[] containerFullnessEmptyColorSetting = Utils.getprefsa("containerFullnessEmpty" + "_colorSetting", new String[]{"0", "120", "0", "180"});
 
+	public static CheckBox showWorkstationProgressCheckBox;
+	public static CheckBox showWorkstationProgressFinishedCheckBox;
+	public static ColorOptionWidget showWorkstationProgressFinishedColorOptionWidget;
+	public static String[] workstationProgressFinishedColorSetting = Utils.getprefsa("workstationProgressFinished" + "_colorSetting", new String[]{"170", "0", "0", "170"});
+	public static CheckBox showWorkstationProgressInProgressCheckBox;
+	public static ColorOptionWidget showWorkstationProgressInProgressColorOptionWidget;
+	public static String[] workstationProgressInProgressColorSetting = Utils.getprefsa("workstationProgressInProgress" + "_colorSetting", new String[]{"194", "155", "2", "140"});
+	public static CheckBox showWorkstationProgressReadyForUseCheckBox;
+	public static ColorOptionWidget showWorkstationProgressReadyForUseColorOptionWidget;
+	public static String[] workstationProgressReadyForUseColorSetting = Utils.getprefsa("workstationProgressReadyForUse" + "_colorSetting", new String[]{"0", "120", "0", "180"});
+	public static CheckBox showWorkstationProgressUnpreparedCheckBox;
+	public static ColorOptionWidget showWorkstationProgressUnpreparedColorOptionWidget;
+	public static String[] workstationProgressUnpreparedColorSetting = Utils.getprefsa("workstationProgressUnprepared" + "_colorSetting", new String[]{"20", "20", "20", "180"});
+
 	public class DisplaySettingsPanel extends Panel {
 		public DisplaySettingsPanel(Panel back) {
 			Widget leftColumn;
@@ -956,6 +970,113 @@ public class OptWnd extends Window {
 					ui.gui.map.updatePlobContainerHighlight();
 				}
 			}), showContainerFullnessEmptyColorOptionWidget.pos("ur").adds(10, 0));
+			leftColumn = add(showWorkstationProgressCheckBox = new CheckBox("Highlight Workstation Progress:"){
+				{a = (Utils.getprefb("showWorkstationProgress", true));}
+				public void changed(boolean val) {
+					Utils.setprefb("showWorkstationProgress", val);
+					if (ui != null && ui.gui != null) {
+						ui.sess.glob.oc.gobAction(Gob::updateWorkstationProgressHighlight);
+						ui.gui.map.updatePlobWorkstationProgressHighlight();
+					}
+				}
+			}, leftColumn.pos("bl").adds(0, 12).x(0));
+			showWorkstationProgressCheckBox.tooltip = showWorkstationProgressTooltip;
+			leftColumn = add(showWorkstationProgressFinishedCheckBox = new CheckBox("Finished"){
+				{a = (Utils.getprefb("showWorkstationProgressFinished", true));}
+				public void changed(boolean val) {
+					Utils.setprefb("showWorkstationProgressFinished", val);
+					if (ui != null && ui.gui != null) {
+						ui.sess.glob.oc.gobAction(Gob::updateWorkstationProgressHighlight);
+						ui.gui.map.updatePlobWorkstationProgressHighlight();
+					}
+				}
+			}, leftColumn.pos("bl").adds(20, 4));
+			add(showWorkstationProgressFinishedColorOptionWidget = new ColorOptionWidget("", "workstationProgressFinished", 0, Integer.parseInt(workstationProgressFinishedColorSetting[0]), Integer.parseInt(workstationProgressFinishedColorSetting[1]), Integer.parseInt(workstationProgressFinishedColorSetting[2]), Integer.parseInt(workstationProgressFinishedColorSetting[3]), (Color col) -> {
+				if (ui != null && ui.gui != null) {
+					ui.sess.glob.oc.gobAction(Gob::updateWorkstationProgressHighlight);
+					ui.gui.map.updatePlobWorkstationProgressHighlight();
+				}
+			}){}, leftColumn.pos("ur").adds(32, -3));
+			add(new Button(UI.scale(70), "Reset", false).action(() -> {
+				Utils.setprefsa("workstationProgressFinished" + "_colorSetting", new String[]{"170", "0", "0", "170"});
+				showWorkstationProgressFinishedColorOptionWidget.cb.colorChooser.setColor(showWorkstationProgressFinishedColorOptionWidget.currentColor = new Color(170, 0, 0, 170));
+				if (ui != null && ui.gui != null) {
+					ui.sess.glob.oc.gobAction(Gob::updateWorkstationProgressHighlight);
+					ui.gui.map.updatePlobWorkstationProgressHighlight();
+				}
+			}), showWorkstationProgressFinishedColorOptionWidget.pos("ur").adds(10, 0));
+			leftColumn = add(showWorkstationProgressInProgressCheckBox = new CheckBox("In progress"){
+				{a = (Utils.getprefb("showWorkstationProgressInProgress", true));}
+				public void changed(boolean val) {
+					Utils.setprefb("showWorkstationProgressInProgress", val);
+					if (ui != null && ui.gui != null) {
+						ui.sess.glob.oc.gobAction(Gob::updateWorkstationProgressHighlight);
+						ui.gui.map.updatePlobWorkstationProgressHighlight();
+					}
+				}
+			}, leftColumn.pos("bl").adds(0, 8));
+			add(showWorkstationProgressInProgressColorOptionWidget = new ColorOptionWidget("", "workstationProgressInProgress", 0, Integer.parseInt(workstationProgressInProgressColorSetting[0]), Integer.parseInt(workstationProgressInProgressColorSetting[1]), Integer.parseInt(workstationProgressInProgressColorSetting[2]), Integer.parseInt(workstationProgressInProgressColorSetting[3]), (Color col) -> {
+				if (ui != null && ui.gui != null) {
+					ui.sess.glob.oc.gobAction(Gob::updateWorkstationProgressHighlight);
+					ui.gui.map.updatePlobWorkstationProgressHighlight();
+				}
+			}){}, leftColumn.pos("ur").adds(22, -3));
+			add(new Button(UI.scale(70), "Reset", false).action(() -> {
+				Utils.setprefsa("workstationProgressInProgress" + "_colorSetting", new String[]{"194", "155", "2", "140"});
+				showWorkstationProgressInProgressColorOptionWidget.cb.colorChooser.setColor(showWorkstationProgressInProgressColorOptionWidget.currentColor = new Color(194, 155, 2, 140));
+				if (ui != null && ui.gui != null) {
+					ui.sess.glob.oc.gobAction(Gob::updateWorkstationProgressHighlight);
+					ui.gui.map.updatePlobWorkstationProgressHighlight();
+				}
+			}), showWorkstationProgressInProgressColorOptionWidget.pos("ur").adds(10, 0));
+			leftColumn = add(showWorkstationProgressReadyForUseCheckBox = new CheckBox("Ready for use"){
+				{a = (Utils.getprefb("showWorkstationProgressReadyForUse", true));}
+				public void changed(boolean val) {
+					Utils.setprefb("showWorkstationProgressReadyForUse", val);
+					if (ui != null && ui.gui != null) {
+						ui.sess.glob.oc.gobAction(Gob::updateWorkstationProgressHighlight);
+						ui.gui.map.updatePlobWorkstationProgressHighlight();
+					}
+				}
+			}, leftColumn.pos("bl").adds(0, 8));
+			add(showWorkstationProgressReadyForUseColorOptionWidget = new ColorOptionWidget("", "workstationProgressReadyForUse", 0, Integer.parseInt(workstationProgressReadyForUseColorSetting[0]), Integer.parseInt(workstationProgressReadyForUseColorSetting[1]), Integer.parseInt(workstationProgressReadyForUseColorSetting[2]), Integer.parseInt(workstationProgressReadyForUseColorSetting[3]), (Color col) -> {
+				if (ui != null && ui.gui != null) {
+					ui.sess.glob.oc.gobAction(Gob::updateWorkstationProgressHighlight);
+					ui.gui.map.updatePlobWorkstationProgressHighlight();
+				}
+			}){}, leftColumn.pos("ur").adds(8, -3));
+			add(new Button(UI.scale(70), "Reset", false).action(() -> {
+				Utils.setprefsa("workstationProgressReadyForUse" + "_colorSetting", new String[]{"0", "120", "0", "180"});
+				showWorkstationProgressReadyForUseColorOptionWidget.cb.colorChooser.setColor(showWorkstationProgressReadyForUseColorOptionWidget.currentColor = new Color(0, 120, 0, 180));
+				if (ui != null && ui.gui != null) {
+					ui.sess.glob.oc.gobAction(Gob::updateWorkstationProgressHighlight);
+					ui.gui.map.updatePlobWorkstationProgressHighlight();
+				}
+			}), showWorkstationProgressReadyForUseColorOptionWidget.pos("ur").adds(10, 0));
+			leftColumn = add(showWorkstationProgressUnpreparedCheckBox = new CheckBox("Unprepared"){
+				{a = (Utils.getprefb("showWorkstationProgressUnprepared", true));}
+				public void changed(boolean val) {
+					Utils.setprefb("showWorkstationProgressUnprepared", val);
+					if (ui != null && ui.gui != null) {
+						ui.sess.glob.oc.gobAction(Gob::updateWorkstationProgressHighlight);
+						ui.gui.map.updatePlobWorkstationProgressHighlight();
+					}
+				}
+			}, leftColumn.pos("bl").adds(0, 8));
+			add(showWorkstationProgressUnpreparedColorOptionWidget = new ColorOptionWidget("", "workstationProgressUnprepared", 0, Integer.parseInt(workstationProgressUnpreparedColorSetting[0]), Integer.parseInt(workstationProgressUnpreparedColorSetting[1]), Integer.parseInt(workstationProgressUnpreparedColorSetting[2]), Integer.parseInt(workstationProgressUnpreparedColorSetting[3]), (Color col) -> {
+				if (ui != null && ui.gui != null) {
+					ui.sess.glob.oc.gobAction(Gob::updateWorkstationProgressHighlight);
+					ui.gui.map.updatePlobWorkstationProgressHighlight();
+				}
+			}){}, leftColumn.pos("ur").adds(17, -3));
+			add(new Button(UI.scale(70), "Reset", false).action(() -> {
+				Utils.setprefsa("workstationProgressUnprepared" + "_colorSetting", new String[]{"0", "120", "0", "180"});
+				showWorkstationProgressUnpreparedColorOptionWidget.cb.colorChooser.setColor(showWorkstationProgressUnpreparedColorOptionWidget.currentColor = new Color(0, 120, 0, 180));
+				if (ui != null && ui.gui != null) {
+					ui.sess.glob.oc.gobAction(Gob::updateWorkstationProgressHighlight);
+					ui.gui.map.updatePlobWorkstationProgressHighlight();
+				}
+			}), showWorkstationProgressUnpreparedColorOptionWidget.pos("ur").adds(10, 0));
 
 			rightColumn = add(toggleGobCollisionBoxesCheckBox = new CheckBox("Show Object Collision Boxes"){
 				{a = (Utils.getprefb("gobCollisionBoxesDisplayToggle", false));}
@@ -2435,6 +2556,9 @@ public class OptWnd extends Window {
 			"\n$col[218,163,0]{Keybind:} $col[185,185,185]{This can also be toggled using a keybind.}", UI.scale(330));
 	private final Object highlightCliffsTooltip = RichText.render("$col[218,163,0]{Action Button:} $col[185,185,185]{This setting can also be turned on/off using an action button from the menu grid (Custom Client Extras → Toggles).}", UI.scale(320));
 	private final Object showContainerFullnessTooltip = RichText.render("Colors containers (like )Cupboards, Chests, Crates, etc.), depending on how much stuff is in them." +
+			"\n" +
+			"\n$col[185,185,185]{Select from below what states you want to be highlighted, and what colors you want each of them to show.}", UI.scale(330));
+	private final Object showWorkstationProgressTooltip = RichText.render("Colors workstations (Drying Racks, Tanning Tubs, Cheese Racks, Flower Pots), depending on their current progress." +
 			"\n" +
 			"\n$col[185,185,185]{Select from below what states you want to be highlighted, and what colors you want each of them to show.}", UI.scale(330));
 

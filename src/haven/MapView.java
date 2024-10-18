@@ -590,6 +590,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	if (OptWnd.toggleGobCollisionBoxesCheckBox.a) updatePlobCollisionBox();
 	if (OptWnd.showContainerFullnessCheckBox.a) updatePlobContainerHighlight();
 	updatePlobCustomSizeAndRotation();
+	if (OptWnd.showWorkstationProgressCheckBox.a) updatePlobWorkstationProgressHighlight();
     }
     
     protected void envdispose() {
@@ -2714,4 +2715,11 @@ public class MapView extends PView implements DTarget, Console.Directory {
 			placing.get().updateCustomSizeAndRotation();
 		}
 	}
+
+	public void updatePlobWorkstationProgressHighlight() {
+		if(placing != null && placing.done()) {
+			placing.get().updateWorkstationProgressHighlight();
+		}
+	}
+
 }

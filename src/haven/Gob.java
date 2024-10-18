@@ -465,6 +465,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	updwait(this::updateHidingBoxes, waiting -> {});
 	updwait(this::updateCollisionBoxes, waiting -> {});
 	updwait(this::updateContainerFullnessHighlight, waiting -> {});
+	updwait(this::updateWorkstationProgressHighlight, waiting -> {});
 	qualityInfo = new GobQualityInfo(this);
 	setattr(GobQualityInfo.class, qualityInfo);
 	growthInfo = new GobGrowthInfo(this);
@@ -707,6 +708,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 		if (a != prev) updateCollisionBoxes();
 		if (a != prev) updateContainerFullnessHighlight();
 		if (a != prev) updateCustomSizeAndRotation();
+		if (a != prev) updateWorkstationProgressHighlight();
 	}
 	if(prev != null)
 	    prev.dispose();
@@ -1492,8 +1494,9 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 			for (Overlay ol : ols){
 				if (ol.spr != null && ol.spr.res != null && ol.spr.res.name.equals("gfx/terobjs/items/parchment-decal") && ol.slots != null){
 					for (RenderTree.Slot slot : ol.slots){
-						if (OptWnd.flatCupboardsCheckBox.a)
+						if (OptWnd.flatCupboardsCheckBox.a) {
 							slot.cstate(Pipe.Op.compose(Location.scale(1, 1, 2), Location.xlate(new Coord3f(0, 0, -6.5f))));
+						}
 						else
 							slot.cstate(Pipe.Op.compose(Location.scale(1, 1, 1), Location.xlate(new Coord3f(0, 0, 0))));
 					}
@@ -1501,5 +1504,108 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 			}
 		}
 	}
+
+	public void setWorkstationProgressHighlight(String resName) {
+		if (OptWnd.showWorkstationProgressCheckBox.a) {
+
+			// ND: Workstations that depend on the rbuf
+			Drawable drawable = getattr(Drawable.class);
+			ResDrawable resDrawable = (drawable instanceof ResDrawable) ? (ResDrawable) drawable : null;
+			int rbuf = (resDrawable != null) ? resDrawable.sdt.checkrbuf(0) : -1; // ND: Just also remember to check if resDrawable is not null wherever we use rbuf
+			if (resName.equals("gfx/terobjs/ttub") && resDrawable != null) {
+				if (rbuf == 0 || rbuf == 1 || rbuf == 4 || rbuf == 5) {
+					if (OptWnd.showWorkstationProgressUnpreparedCheckBox.a) setGobStateHighlight(OptWnd.showWorkstationProgressUnpreparedColorOptionWidget.currentColor);
+					else delattr(GobStateHighlight.class);
+				} else if (rbuf == 10 || rbuf == 9 || rbuf == 8) {
+					if (OptWnd.showWorkstationProgressFinishedCheckBox.a) setGobStateHighlight(OptWnd.showWorkstationProgressFinishedColorOptionWidget.currentColor);
+					else delattr(GobStateHighlight.class);
+				} else if (rbuf != 6) {
+					if (OptWnd.showWorkstationProgressReadyForUseCheckBox.a) setGobStateHighlight(OptWnd.showWorkstationProgressReadyForUseColorOptionWidget.currentColor);
+					else delattr(GobStateHighlight.class);
+				} else {
+					if (OptWnd.showWorkstationProgressInProgressCheckBox.a) setGobStateHighlight(OptWnd.showWorkstationProgressInProgressColorOptionWidget.currentColor);
+					else delattr(GobStateHighlight.class);
+				}
+			}
+
+			// ND: Workstations that depend on overlays
+			int olsSize = ols.size(); // ND: For some workstations we count the amount of overlays to determine progress.
+			if(collisionBox != null) // ND: The collisionBox overlay might not always exist, but when it does, remove it from the counter.
+				olsSize = olsSize - 1;
+			if (resName.equals("gfx/terobjs/dframe")) {
+				boolean done = true;
+				boolean empty = true;
+				for (Overlay ol : ols) {
+					try {
+						Resource olres = ol.spr.res;
+						if (olres != null) {
+							empty = false;
+							if (olres.name.endsWith("-blood") || olres.name.endsWith("-windweed") || olres.name.endsWith("-fishraw")) {
+								done = false;
+								break;
+							}
+						}
+					} catch (Loading l) {
+					}
+				}
+				if (OptWnd.showWorkstationProgressInProgressCheckBox.a) setGobStateHighlight(OptWnd.showWorkstationProgressInProgressColorOptionWidget.currentColor);
+				else delattr(GobStateHighlight.class);
+				if (done && !empty) {
+					if (OptWnd.showWorkstationProgressFinishedCheckBox.a) setGobStateHighlight(OptWnd.showWorkstationProgressFinishedColorOptionWidget.currentColor);
+					else delattr(GobStateHighlight.class);
+				} else if (empty) {
+					if (OptWnd.showWorkstationProgressReadyForUseCheckBox.a) setGobStateHighlight(OptWnd.showWorkstationProgressReadyForUseColorOptionWidget.currentColor);
+					else delattr(GobStateHighlight.class);
+				}
+			}
+			if (resName.equals("gfx/terobjs/cheeserack")) {
+				if (olsSize == 3) {
+					if (OptWnd.showWorkstationProgressFinishedCheckBox.a) setGobStateHighlight(OptWnd.showWorkstationProgressFinishedColorOptionWidget.currentColor);
+					else delattr(GobStateHighlight.class);
+				} else if (olsSize == 0) {
+					if (OptWnd.showWorkstationProgressReadyForUseCheckBox.a) setGobStateHighlight(OptWnd.showWorkstationProgressReadyForUseColorOptionWidget.currentColor);
+					else delattr(GobStateHighlight.class);
+				} else {
+					if (OptWnd.showWorkstationProgressInProgressCheckBox.a) setGobStateHighlight(OptWnd.showWorkstationProgressInProgressColorOptionWidget.currentColor);
+					else delattr(GobStateHighlight.class);
+				}
+			}
+
+			// ND: Workstations that depend on both rbuf and overlays
+			if (resName.equals("gfx/terobjs/gardenpot")) {
+				if (olsSize == 2) {
+					if (OptWnd.showWorkstationProgressFinishedCheckBox.a) setGobStateHighlight(OptWnd.showWorkstationProgressFinishedColorOptionWidget.currentColor);
+					else delattr(GobStateHighlight.class);
+				} else if (olsSize == 1) {
+					if (OptWnd.showWorkstationProgressInProgressCheckBox.a) setGobStateHighlight(OptWnd.showWorkstationProgressInProgressColorOptionWidget.currentColor);
+					else delattr(GobStateHighlight.class);
+				} else if (olsSize == 0) {
+					if (rbuf == 3) {
+						if (OptWnd.showWorkstationProgressReadyForUseCheckBox.a) setGobStateHighlight(OptWnd.showWorkstationProgressReadyForUseColorOptionWidget.currentColor);
+						else delattr(GobStateHighlight.class);
+					} else { // (rbuf == 0 || peekrbuf == 1 || peekrbuf == 2)
+						if (OptWnd.showWorkstationProgressUnpreparedCheckBox.a) setGobStateHighlight(OptWnd.showWorkstationProgressUnpreparedColorOptionWidget.currentColor);
+						else delattr(GobStateHighlight.class);
+					}
+				} else {
+					delattr(GobStateHighlight.class);
+				}
+			}
+		} else {
+			delattr(GobStateHighlight.class);
+		}
+	}
+
+	public void updateWorkstationProgressHighlight() {
+		if (getres() != null) {
+			String resName = getres().name;
+			if (Arrays.stream(Config.workstationsResPaths).anyMatch(resName::matches)) {
+				setWorkstationProgressHighlight(resName);
+			}
+		}
+	}
+
+
+
 
 }
