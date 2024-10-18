@@ -173,7 +173,7 @@
       <fileset dir="res" includes="**"/>
     </copy>
     <copy file="etc/ansgar-config.properties" tofile="bin/haven-config.properties" />
-    <copy file="RUN.bat" todir="bin"/>
+    <copy file="Play.bat" todir="bin"/>
     <chmod file="bin/hafen.jar" perm="a+x" />
     <copy todir="bin/MapIconsPresets" >
       <fileset dir="MapIconsPresets" includes="**"/>
@@ -186,7 +186,7 @@
     <exec dir="bin/" executable="cmd">
       <arg value="/c"/>
       <arg value = "start"/>
-      <arg value="RUN.bat"/>
+      <arg value="Play.bat"/>
     </exec>
   </target>
 
