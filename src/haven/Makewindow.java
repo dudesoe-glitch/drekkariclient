@@ -42,7 +42,9 @@ public class Makewindow extends Widget {
     public List<SpecWidget> outputs = Collections.emptyList();
     public List<Indir<Resource>> qmod = Collections.emptyList();
     public List<Indir<Resource>> tools = new ArrayList<>();;
-    private final int xoff = UI.scale(45), qmy = UI.scale(38), outy = UI.scale(65);
+    private int xoff = UI.scale(45), qmy = UI.scale(38), outy = UI.scale(65);
+	private static double softcap = 0;
+	private static Tex softTex = null;
 
     @RName("make")
     public static class $_ implements Factory {
@@ -141,8 +143,9 @@ public class Makewindow extends Widget {
     public static final KeyBinding kb_make = KeyBinding.get("make/one", KeyMatch.forcode(java.awt.event.KeyEvent.VK_ENTER, 0));
     public static final KeyBinding kb_makeall = KeyBinding.get("make/all", KeyMatch.forcode(java.awt.event.KeyEvent.VK_ENTER, KeyMatch.C));
     public Makewindow(String rcpnm) {
-	add(new Label("Input:"), new Coord(0, UI.scale(8)));
-	add(new Label("Result:"), new Coord(0, outy + UI.scale(8)));
+	int inputW = add(new Label("Input:"), new Coord(0, UI.scale(8))).sz.x;
+	int resultW = add(new Label("Result:"), new Coord(0, outy + UI.scale(8))).sz.x;
+	xoff = Math.max(inputW, resultW) + UI.scale(10);
 	add(new Button(UI.scale(85), "Craft"), UI.scale(new Coord(265, 75))).action(() -> wdgmsg("make", 0)).setgkey(kb_make);
 	add(new Button(UI.scale(85), "Craft All"), UI.scale(new Coord(360, 75))).action(() -> wdgmsg("make", 1)).setgkey(kb_makeall);
 	pack();
@@ -234,9 +237,11 @@ public class Makewindow extends Widget {
 
     public static final Coord qmodsz = UI.scale(20, 20);
     private static final Map<Indir<Resource>, Tex> qmicons = new WeakHashMap<>();
-    private static Tex qmicon(Indir<Resource> qm) {
-	return(qmicons.computeIfAbsent(qm, res -> new TexI(PUtils.convolve(res.get().flayer(Resource.imgc).img, qmodsz, CharWnd.iconfilter))));
-    }
+	private Tex qmicon(Indir<Resource> qm) {
+		synchronized (qmicons) {
+			return qmicons.computeIfAbsent(qm, Makewindow.this::buildQTex);
+		}
+	}
 
     public static class SpecWidget extends Widget {
 	public final Spec spec;
@@ -259,32 +264,32 @@ public class Makewindow extends Widget {
 	    spec.draw(g);
 	}
 
-	private double hoverstart;
+//	private double hoverstart;
 	Indir<Object> stip, ltip;
 	public Object tooltip(Coord c, Widget prev) {
-	    double now = Utils.rtime();
-	    if(prev == this) {
-	    } else if(prev instanceof SpecWidget) {
-		double ps = ((SpecWidget)prev).hoverstart;
-		hoverstart = (now - ps < 1.0) ? now : ps;
-	    } else {
-		hoverstart = now;
-	    }
-	    if(now - hoverstart >= 1.0) {
-		if(stip == null) {
-		    BufferedImage tip = spec.shorttip();
-		    Tex tt = (tip == null) ? null : new TexI(tip);
-		    stip = () -> tt;
-		}
-		return(stip);
-	    } else {
+//	    double now = Utils.rtime();
+//	    if(prev == this) {
+//	    } else if(prev instanceof SpecWidget) {
+//		double ps = ((SpecWidget)prev).hoverstart;
+//		hoverstart = (now - ps < 1.0) ? now : ps;
+//	    } else {
+//		hoverstart = now;
+//	    }
+//	    if(now - hoverstart >= 1.0) {
+//		if(stip == null) {
+//		    BufferedImage tip = spec.shorttip();
+//		    Tex tt = (tip == null) ? null : new TexI(tip);
+//		    stip = () -> tt;
+//		}
+//		return(stip);
+//	    } else {
 		if(ltip == null) {
 		    BufferedImage tip = spec.longtip();
 		    Tex tt = (tip == null) ? null : new TexI(tip);
 		    ltip = () -> tt;
 		}
 		return(ltip);
-	    }
+//	    }
 	}
 
 	public void tick(double dt) {
@@ -320,7 +325,10 @@ public class Makewindow extends Widget {
 		if(!rpag.isEmpty()) {
 		    SListMenu.of(UI.scale(250, 120), rpag,
 				 pag -> pag.button().name(), pag -> pag.button().img(),
-				 pag -> pag.button().use(new MenuGrid.Interaction(1, ui.modflags())))
+				pag -> {
+					pag.button().use(new MenuGrid.Interaction(1, ui.modflags()));
+					ui.gui.makewnd.setLastAction(pag);
+				})
 			.addat(this, cc.add(UI.scale(5, 5))).tick(dt);
 		}
 		cc = null;
@@ -339,14 +347,24 @@ public class Makewindow extends Widget {
 	    x += qmodl.sz().x + UI.scale(5);
 	    x = Math.max(x, xoff);
 	    qmx = x;
+		int count = 0;
+		double product = 1.0;
 	    for(Indir<Resource> qm : qmod) {
 		try {
 		    Tex t = qmicon(qm);
 		    g.image(t, new Coord(x, qmy));
 		    x += t.sz().x + UI.scale(1);
+			Glob.CAttr attr = ui.gui.chrwdg.findattr(qm.get().basename());
+			if(attr != null) {
+				count++;
+				product = product * attr.comp;
+			}
 		} catch(Loading l) {
 		}
 	    }
+		if(count > 0) {
+			x += drawSoftcap(g, new Coord(x, qmy), product, count);
+		}
 	    x += UI.scale(25);
 	}
 	if(!tools.isEmpty()) {
@@ -426,4 +444,45 @@ public class Makewindow extends Widget {
 		buf.add(new MakePrep(outer));
 	}
     }
+
+	private Tex buildQTex(Indir<Resource> res) {
+		BufferedImage result = PUtils.convolve(res.get().layer(Resource.imgc).img, qmodsz, CharWnd.iconfilter);
+		try {
+			Glob.CAttr attr = ui.gui.chrwdg.findattr(res.get().basename());
+			if(attr != null) {
+				result = ItemInfo.catimgsh(1, result, attr.compline().img);
+			}
+		} catch (Exception ignored) {
+		}
+		return new TexI(result);
+	}
+
+	private int drawSoftcap(GOut g, Coord p, double product, int count) {
+		if(count > 0) {
+			double current = Math.pow(product, 1.0 / count);
+			if(current != softcap || softTex == null) {
+				softcap = current;
+				String format = String.format("%s %.1f", "Softcap:", softcap);
+				Text txt = Text.renderstroked(format, Color.WHITE, Color.BLACK, Glob.CAttr.fnd);
+				if(softTex != null) {
+					softTex.dispose();
+				}
+				softTex = new TexI(txt.img);
+			}
+			g.image(softTex, p.add(UI.scale(5), 0));
+			return softTex.sz().x + UI.scale(6);
+		}
+		return 0;
+	}
+
+	public static void invalidate(String name) {
+		synchronized (qmicons) {
+			LinkedList<Indir<Resource>> tmp = new LinkedList<>(qmicons.keySet());
+			tmp.forEach(res -> {
+				if(name.equals(res.get().basename())) {
+					qmicons.remove(res);
+				}
+			});
+		}
+	}
 }

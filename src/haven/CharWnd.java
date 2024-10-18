@@ -321,4 +321,18 @@ public class CharWnd extends Window {
 			return Integer.compare(b1, b2);
 		}
 	}
+
+	public Glob.CAttr findattr(String name) {
+		for (SAttrWnd.SAttr skill : sattr.attrs) {
+			if(name.equals(skill.attr.nm)) {
+				return skill.attr;
+			}
+		}
+		for (BAttrWnd.Attr stat : battr.attrs) {
+			if(name.equals(stat.attr.nm)) {
+				return stat.attr;
+			}
+		}
+		return null;
+	}
 }
