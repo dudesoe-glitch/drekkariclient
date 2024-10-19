@@ -1482,7 +1482,7 @@ public class OptWnd extends Window {
 	public static CheckBox autoReloadCuriositiesFromInventoryCheckBox;
 	public static CheckBox preventCutleryFromBreakingCheckBox = null;
 	public static CheckBox autoDropLeechesCheckBox;
-	public static CheckBox autoSwitchBunnySlippersCheckBox;
+	public static CheckBox autoEquipBunnySlippersPlateBootsCheckBox;
 
 	public class GameplayAutomationSettingsPanel extends Panel {
 
@@ -1622,14 +1622,14 @@ public class OptWnd extends Window {
 					}
 				}
 			}, prev.pos("bl").adds(0, 12));
-			prev = add(autoSwitchBunnySlippersCheckBox = new CheckBox("Auto-Switch Bunny Slippers"){
-				{a = Utils.getprefb("autoSwitchBunnySlippers", true);}
+			prev = add(autoEquipBunnySlippersPlateBootsCheckBox = new CheckBox("Auto-Equip Bunny Slippers/Plate Boots"){
+				{a = Utils.getprefb("autoEquipBunnySlippersPlateBoots", true);}
 				public void set(boolean val) {
-					Utils.setprefb("autoSwitchBunnySlippers", val);
+					Utils.setprefb("autoEquipBunnySlippersPlateBoots", val);
 					a = val;
 				}
 			}, prev.pos("bl").adds(0, 2));
-			autoSwitchBunnySlippersCheckBox.tooltip = autoSwitchBunnySlippersTooltip;
+			autoEquipBunnySlippersPlateBootsCheckBox.tooltip = autoEquipBunnySlippersPlateBootsTooltip;
 			prev = add(new Button(UI.scale(250), "Auto-Drop Manager", false, () -> {
 				if(!autoDropManagerWindow.attached) {
 					this.parent.parent.add(autoDropManagerWindow); // ND: this.parent.parent is root widget in login screen or gui in game.
@@ -2604,9 +2604,7 @@ public class OptWnd extends Window {
 	private final Object flowerMenuAutoSelectManagerTooltip = RichText.render("An advanced menu to automatically select specific flower menu options all the time. New options are added to the list as you discover them." +
 			"\n" +
 			"\n$col[185,185,185]{I don't recommend using this, but nevertheless it exists due to popular demand.}", UI.scale(300));
-	private final Object autoSwitchBunnySlippersTooltip = RichText.render("Switches your equipped Plate Boots with a pair of Bunny Slippers from your inventory, whenever you right click to chase a rabbit, and vice versa if you click on anything else." +
-			"\n" +
-			"\n$col[200,0,0]{It only works with Plate Boots! It won't switch other boots!}" +
+	private final Object autoEquipBunnySlippersPlateBootsTooltip = RichText.render("Switches your currently equipped shoes to Bunny Slippers when you right click to chase a rabbit, or Plate Boots if you click on anything else." +
 			"\n" +
 			"\n$col[185,185,185]{I suggest always using this setting in PVP.}", UI.scale(300));
 

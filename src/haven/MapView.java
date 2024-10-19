@@ -2101,12 +2101,12 @@ public class MapView extends PView implements DTarget, Console.Directory {
 					}
 				}
 				if (clickb == 1) { // Left Click
-					if (OptWnd.autoSwitchBunnySlippersCheckBox.a) {
+					if (OptWnd.autoEquipBunnySlippersPlateBootsCheckBox.a) {
 						switchToPlateBoots();
 					}
 				}
 				if (clickb == 3) { // Right Click
-					if (OptWnd.autoSwitchBunnySlippersCheckBox.a) {
+					if (OptWnd.autoEquipBunnySlippersPlateBootsCheckBox.a) {
 						switchBunnySlippersAndPlateBoots(gob);
 					}
 					wdgmsg("click", args);
@@ -2120,7 +2120,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
 			}
 		} else { // ND: This means no object was clicked. We clicked the ground.
 			if (clickb == 1) { // Left Click
-				if (OptWnd.autoSwitchBunnySlippersCheckBox.a) {
+				if (OptWnd.autoEquipBunnySlippersPlateBootsCheckBox.a) {
 					switchToPlateBoots();
 				}
 			}
@@ -2683,12 +2683,12 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	public void switchToPlateBoots(){
 		WItem eqboots = ui.gui.getequipory().slots[15];
 		List<WItem> invboots = ui.gui.maininv.getItemsExact("Plate Boots");
-		if (eqboots != null && eqboots.item.getname().equals("Bunny Slippers")) {
-			if (!invboots.isEmpty()) {
+		if (!invboots.isEmpty()) {
+			if (eqboots != null && !eqboots.item.getname().equals("Plate Boots")) {
 				eqboots.item.wdgmsg("transfer", new Coord(eqboots.sz.x / 2, eqboots.sz.y / 2));
-				WItem boots = invboots.get(0);
-				boots.item.wdgmsg("transfer", new Coord(boots.sz.x / 2, boots.sz.y / 2));
 			}
+			WItem boots = invboots.get(0);
+			boots.item.wdgmsg("transfer", new Coord(boots.sz.x / 2, boots.sz.y / 2));
 		}
 	}
 

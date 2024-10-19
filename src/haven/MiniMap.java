@@ -32,7 +32,6 @@ import java.util.function.*;
 import java.awt.Color;
 import haven.MapFile.Segment;
 import haven.MapFile.DataGrid;
-import haven.MapFile.Grid;
 import haven.MapFile.GridInfo;
 import haven.MapFile.Marker;
 import haven.MapFile.PMarker;
@@ -981,12 +980,12 @@ public class MiniMap extends Widget {
 	if(mc == null) mc = ui.mc;
 	if((sessloc != null) && (sessloc.seg == loc.seg)) {
 	    if(gob == null) {
-			if (OptWnd.autoSwitchBunnySlippersCheckBox.a) {
+			if (OptWnd.autoEquipBunnySlippersPlateBootsCheckBox.a) {
 				ui.gui.map.switchToPlateBoots();
 			}
 		mv.wdgmsg("click", mc, loc.tc.sub(sessloc.tc).mul(tilesz).add(tilesz.div(2)).floor(posres),	button, ui.modflags());
 		} else {
-			if (OptWnd.autoSwitchBunnySlippersCheckBox.a) {
+			if (OptWnd.autoEquipBunnySlippersPlateBootsCheckBox.a) {
 				if (button == 3)
 					ui.gui.map.switchBunnySlippersAndPlateBoots(gob);
 				if (button == 1)
