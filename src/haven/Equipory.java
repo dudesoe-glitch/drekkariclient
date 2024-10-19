@@ -138,6 +138,7 @@ public class Equipory extends Widget implements DTarget {
 		final FColor cc = new FColor(0, 0, 0, 0);
 		protected FColor clearcolor() {return(cc);}
 	    }, bgc);
+	ava.drawv = false;
 	bonuses = add(new AttrBonusesWdg(isz.y), isz.x + UI.scale(20), 0);
 	bonuses.show(showEquipmentBonuses);
 	add(expandButton = new Button(UI.scale(24), showEquipmentBonuses ? "←" : "→", false).action(this::expandAttributes), isz.x + UI.scale(10), 0);

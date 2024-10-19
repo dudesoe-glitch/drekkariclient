@@ -45,6 +45,8 @@ public class Avaview extends PView {
     private List<Composited.MD> cmod = null;
     private List<Composited.ED> cequ = null;
     private final String camnm;
+	private final Coord speedCoord;
+	public boolean drawv = true;
 
     @RName("av")
     public static class $_ implements Factory {
@@ -70,6 +72,7 @@ public class Avaview extends PView {
 	this.camnm = camnm;
 	this.avagob = avagob;
 	basic.add(new DirLight(Color.WHITE, Color.WHITE, Color.WHITE, new Coord3f(1, 1, 1).norm()), null);
+	this.speedCoord = Coord.z.add(UI.scale(12),sz.y-UI.scale(15));
 	makeproj();
     }
 
@@ -245,9 +248,10 @@ public class Avaview extends PView {
 
     public void draw(GOut g) {
 	boolean drawn = false;
+		Gob gob = null;
 	try {
 	    if(avagob != -1) {
-		Gob gob = ui.sess.glob.oc.getgob(avagob);
+		gob = ui.sess.glob.oc.getgob(avagob);
 		if(gob != null) {
 		    Avatar ava = gob.getattr(Avatar.class);
 		    if(ava != null) {
@@ -270,6 +274,11 @@ public class Avaview extends PView {
 	    } catch(Loading e) {
 		g.image(missing, Coord.z, sz);
 	    }
+	}
+	if (gob != null) {
+		if (drawv && gob.gobSpeed > 0)
+			//g.text(String.format("%.2f u/s", gob.gobSpeed), speedCoord);
+			g.aimage(PUtils.strokeTex(Text.renderstroked(String.format("%.2f u/s", gob.gobSpeed))), speedCoord, 0, 0); // ND: stroked text. Previous (unstroked) line was killing my framerate, idk why.
 	}
     }
 

@@ -1033,6 +1033,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 	} else if(place == "buddy") {
 	    zerg.ntab(buddies = (BuddyWnd)child, zerg.kin);
 		buddies.avaMe.avagob = plid;
+		buddies.avaMe.drawv = false;
 	} else if(place == "pol") {
 	    Polity p = (Polity)child;
 	    polities.add(p);
