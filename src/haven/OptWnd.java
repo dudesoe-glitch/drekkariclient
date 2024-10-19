@@ -913,7 +913,7 @@ public class OptWnd extends Window {
 					ui.sess.glob.oc.gobAction(Gob::updateContainerFullnessHighlight);
 					ui.gui.map.updatePlobContainerHighlight();
 				}
-			}){}, leftColumn.pos("ur").adds(54, -3));
+			}){}, leftColumn.pos("ur").adds(0, -3).x(UI.scale(115)));
 			add(new Button(UI.scale(70), "Reset", false).action(() -> {
 				Utils.setprefsa("containerFullnessFull" + "_colorSetting", new String[]{"170", "0", "0", "170"});
 				showContainerFullnessFullColorOptionWidget.cb.colorChooser.setColor(showContainerFullnessFullColorOptionWidget.currentColor = new Color(170, 0, 0, 170));
@@ -937,7 +937,7 @@ public class OptWnd extends Window {
 					ui.sess.glob.oc.gobAction(Gob::updateContainerFullnessHighlight);
 					ui.gui.map.updatePlobContainerHighlight();
 				}
-			}){}, leftColumn.pos("ur").adds(41, -3));
+			}){}, leftColumn.pos("ur").adds(0, -3).x(UI.scale(115)));
 			add(new Button(UI.scale(70), "Reset", false).action(() -> {
 				Utils.setprefsa("containerFullnessPartial" + "_colorSetting", new String[]{"194", "155", "2", "140"});
 				showContainerFullnessPartialColorOptionWidget.cb.colorChooser.setColor(showContainerFullnessPartialColorOptionWidget.currentColor = new Color(194, 155, 2, 140));
@@ -961,7 +961,7 @@ public class OptWnd extends Window {
 					ui.sess.glob.oc.gobAction(Gob::updateContainerFullnessHighlight);
 					ui.gui.map.updatePlobContainerHighlight();
 				}
-			}){}, leftColumn.pos("ur").adds(42, -3));
+			}){}, leftColumn.pos("ur").adds(0, -3).x(UI.scale(115)));
 
 			add(new Button(UI.scale(70), "Reset", false).action(() -> {
 				Utils.setprefsa("containerFullnessEmpty" + "_colorSetting", new String[]{"0", "120", "0", "180"});
@@ -997,7 +997,7 @@ public class OptWnd extends Window {
 					ui.sess.glob.oc.gobAction(Gob::updateWorkstationProgressHighlight);
 					ui.gui.map.updatePlobWorkstationProgressHighlight();
 				}
-			}){}, leftColumn.pos("ur").adds(32, -3));
+			}){}, leftColumn.pos("ur").adds(0, -3).x(UI.scale(115)));
 			add(new Button(UI.scale(70), "Reset", false).action(() -> {
 				Utils.setprefsa("workstationProgressFinished" + "_colorSetting", new String[]{"170", "0", "0", "170"});
 				showWorkstationProgressFinishedColorOptionWidget.cb.colorChooser.setColor(showWorkstationProgressFinishedColorOptionWidget.currentColor = new Color(170, 0, 0, 170));
@@ -1021,7 +1021,7 @@ public class OptWnd extends Window {
 					ui.sess.glob.oc.gobAction(Gob::updateWorkstationProgressHighlight);
 					ui.gui.map.updatePlobWorkstationProgressHighlight();
 				}
-			}){}, leftColumn.pos("ur").adds(22, -3));
+			}){}, leftColumn.pos("ur").adds(0, -3).x(UI.scale(115)));
 			add(new Button(UI.scale(70), "Reset", false).action(() -> {
 				Utils.setprefsa("workstationProgressInProgress" + "_colorSetting", new String[]{"194", "155", "2", "140"});
 				showWorkstationProgressInProgressColorOptionWidget.cb.colorChooser.setColor(showWorkstationProgressInProgressColorOptionWidget.currentColor = new Color(194, 155, 2, 140));
@@ -1045,7 +1045,7 @@ public class OptWnd extends Window {
 					ui.sess.glob.oc.gobAction(Gob::updateWorkstationProgressHighlight);
 					ui.gui.map.updatePlobWorkstationProgressHighlight();
 				}
-			}){}, leftColumn.pos("ur").adds(8, -3));
+			}){}, leftColumn.pos("ur").adds(0, -3).x(UI.scale(115)));
 			add(new Button(UI.scale(70), "Reset", false).action(() -> {
 				Utils.setprefsa("workstationProgressReadyForUse" + "_colorSetting", new String[]{"0", "120", "0", "180"});
 				showWorkstationProgressReadyForUseColorOptionWidget.cb.colorChooser.setColor(showWorkstationProgressReadyForUseColorOptionWidget.currentColor = new Color(0, 120, 0, 180));
@@ -1069,7 +1069,7 @@ public class OptWnd extends Window {
 					ui.sess.glob.oc.gobAction(Gob::updateWorkstationProgressHighlight);
 					ui.gui.map.updatePlobWorkstationProgressHighlight();
 				}
-			}){}, leftColumn.pos("ur").adds(17, -3));
+			}){}, leftColumn.pos("ur").adds(0, -3).x(UI.scale(115)));
 			add(new Button(UI.scale(70), "Reset", false).action(() -> {
 				Utils.setprefsa("workstationProgressUnprepared" + "_colorSetting", new String[]{"0", "120", "0", "180"});
 				showWorkstationProgressUnpreparedColorOptionWidget.cb.colorChooser.setColor(showWorkstationProgressUnpreparedColorOptionWidget.currentColor = new Color(0, 120, 0, 180));
@@ -1338,7 +1338,7 @@ public class OptWnd extends Window {
 		int y = 5;
 		Label topNote = new Label("Don't use the same keys on multiple Keybinds!");
 		topNote.setcolor(Color.RED);
-		y = adda(topNote, 310 / 2, y, 0.5, 0.0).pos("bl").adds(0, 5).y;
+		y = adda(topNote, UI.scale(155), y, 0.5, 0.0).pos("bl").adds(0, 5).y;
 		y = adda(new Label("If you do that, only one of them will work. God knows which."), 310 / 2, y, 0.5, 0.0).pos("bl").adds(0, 5).y;
 		Scrollport scroll = add(new Scrollport(UI.scale(new Coord(310, 360))), 0, 60);
 	    Widget cont = scroll.cont;
@@ -1402,7 +1402,7 @@ public class OptWnd extends Window {
 		y = addbtnImproved(cont, "Night Vision / Brighter World", "This will simulate daytime lighting during the night. \n$col[185,185,185]{It slightly affects the light levels during the day too.}" +
 				"\n\n$col[218,163,0]{Note:} $col[185,185,185]{This keybind just switches the value of Night Vision / Brighter World between minimum and maximum. This can also be set more precisely using the slider in the World Graphics Settings.}", Color.WHITE, GameUI.kb_nightVision, y);
 
-		y+=20;
+		y+=UI.scale(20);
 		y = addbtnImproved(cont, "Click Nearest Object","When this button is pressed, you will instantly click the nearest object, selected from below." +
 				"\n$col[218,163,0]{Range:} $col[185,185,185]{12 tiles (approximately)}", new Color(255, 191, 0,255), GameUI.kb_clickNearestObject, y);
 		Widget objectsLeft, objectsRight;
@@ -1417,12 +1417,12 @@ public class OptWnd extends Window {
 			public void changed(boolean val) {Utils.setprefb("clickNearestObject_Caves", val);}}, objectsRight.pos("bl").adds(0, 4)).settip("Go through the nearest Cave Entrance/Exit.");
 		objectsLeft = cont.add(new CheckBox("Mineholes & Ladders"){{a = Utils.getprefb("clickNearestObject_MineholesAndLadders", false);}
 			public void changed(boolean val) {Utils.setprefb("clickNearestObject_MineholesAndLadders", val);}}, objectsLeft.pos("bl").adds(0, 4)).settip("Hop down the nearest Minehole, or Climb up the nearest Ladder.");
-		y+=60;
+		y+=UI.scale(60);
 		y = addbtnImproved(cont, "Hop on Nearest Vehicle", "When this button is pressed, your character will run towards the nearest mountable Vehicle/Animal, and try to mount it." +
 				"\n\n$col[185,185,185]{If the closest vehicle to you is full, or unmountable (like a rowboat on land), it will keep looking for the next closest mountable vehicle.}" +
 				"\n\n$col[218,163,0]{Works with:} Knarr, Snekkja, Rowboat, Dugout, Kicksled, Coracle, Wagon, Wilderness Skis, Tamed Horse" +
 				"\n\n$col[218,163,0]{Range:} $col[185,185,185]{36 tiles (approximately)}", new Color(255, 191, 0,255), GameUI.kb_enterNearestVehicle, y);
-		y+=20;
+		y+=UI.scale(20);
 		y = addbtn(cont, "Toggle Collision Boxes", GameUI.kb_toggleCollisionBoxes, y);
 		y = addbtn(cont, "Toggle Object Hiding", GameUI.kb_toggleHidingBoxes, y);
 		y = addbtn(cont, "Display Growth Info on Plants", GameUI.kb_toggleGrowthInfo, y);
