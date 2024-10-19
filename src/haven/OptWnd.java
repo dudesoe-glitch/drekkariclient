@@ -50,6 +50,7 @@ public class OptWnd extends Window {
 	public static final Color msgRed = new Color(197, 0, 0);
 	public static final Color msgYellow = new Color(218, 163, 0);
 	public static FlowerMenuAutoSelectManagerWindow flowerMenuAutoSelectManagerWindow;
+	public static AutoDropManagerWindow autoDropManagerWindow;
 
     public void chpanel(Panel p) {
 	if(current != null)
@@ -1620,15 +1621,23 @@ public class OptWnd extends Window {
 						}
 					}
 				}
-			}, prev.pos("bl").adds(0, 2));
+			}, prev.pos("bl").adds(0, 12));
 			prev = add(autoSwitchBunnySlippersCheckBox = new CheckBox("Auto-Switch Bunny Slippers"){
 				{a = Utils.getprefb("autoSwitchBunnySlippers", true);}
 				public void set(boolean val) {
 					Utils.setprefb("autoSwitchBunnySlippers", val);
 					a = val;
 				}
-			}, prev.pos("bl").adds(0, 12));
+			}, prev.pos("bl").adds(0, 2));
 			autoSwitchBunnySlippersCheckBox.tooltip = autoSwitchBunnySlippersTooltip;
+			prev = add(new Button(UI.scale(250), "Auto-Drop Manager", false, () -> {
+				if(!autoDropManagerWindow.attached) {
+					this.parent.parent.add(autoDropManagerWindow); // ND: this.parent.parent is root widget in login screen or gui in game.
+					autoDropManagerWindow.show();
+				} else {
+					autoDropManagerWindow.show(!autoDropManagerWindow.visible);
+				}
+			}),prev.pos("bl").adds(0, 12).x(0));
 
 			Widget backButton;
 			add(backButton = new PButton(UI.scale(200), "Back", 27, back, "Advanced Settings"), prev.pos("bl").adds(0, 18));
@@ -2401,6 +2410,7 @@ public class OptWnd extends Window {
 
     public OptWnd(boolean gopts) {
 	super(Coord.z, "Options            ", true); // ND: Added a bunch of spaces to the caption(title) in order avoid text cutoff when changing it
+	autoDropManagerWindow = new AutoDropManagerWindow();
 	if (simpleUIFuture != null)
 		simpleUIFuture.cancel(true);
 	main = add(new Panel());

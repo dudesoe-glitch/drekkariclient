@@ -28,8 +28,9 @@ package haven;
 
 import java.util.*;
 import haven.render.*;
+import haven.res.ui.tt.q.quality.Quality;
+
 import java.awt.Color;
-import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
 public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owner, RandomSource {
@@ -51,6 +52,7 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 	public long meterUpdated = 0; // ND: last time meter was updated, ms
 	public Tex stackQualityTex = null;
 	public double studytime = 0.0;
+	private boolean checkedAutodrop = false;
 
     @RName("item")
     public static class $_ implements Factory {
@@ -177,6 +179,9 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 	if(spr == null) {
 	    try {
 		spr = this.spr = GSprite.create(this, res.get(), sdt.clone());
+		if (OptWnd.autoDropManagerWindow != null) {
+			checkAutoDropItem();
+		}
 	    } catch(Loading l) {
 	    }
 	}
@@ -577,6 +582,38 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 			return ItemInfo.find(ItemInfo.Name.class, info()).str.text;
 		} catch (Exception ex) {
 			return "exception";
+		}
+	}
+
+	private void checkAutoDropItem() {
+		if (!checkedAutodrop) {
+			if (AutoDropManagerWindow.autoDropItemsCheckBox.a) {
+				String itemBaseName = this.resource().basename();
+				double quality = 0.0;
+				if(this.rawinfo != null){
+					quality = this.info().stream().filter(info -> info instanceof Quality).mapToDouble(info -> ((Quality) info).q).findFirst().orElse(0.0);
+				}
+				if (AutoDropManagerWindow.autoDropStonesCheckbox.a && Config.stoneItemBaseNames.contains(itemBaseName) && parseTextEntryInt(AutoDropManagerWindow.autoDropStonesQualityTextEntry) > quality) {
+					this.wdgmsg("drop", Coord.z);
+				} else if (AutoDropManagerWindow.autoDropOresCheckbox.a && Config.oreItemBaseNames.contains(itemBaseName) && parseTextEntryInt(AutoDropManagerWindow.autoDropOresQualityTextEntry) > quality) {
+					this.wdgmsg("drop", Coord.z);
+				} else if (AutoDropManagerWindow.autoDropPreciousOresCheckbox.a && Config.preciousOreItemBaseNames.contains(itemBaseName) && parseTextEntryInt(AutoDropManagerWindow.autoDropPreciousOresQualityTextEntry) > quality) {
+					this.wdgmsg("drop", Coord.z);
+				} else if (AutoDropManagerWindow.autoDropMinedCuriosCheckbox.a && Config.minedCuriosItemBaseNames.contains(itemBaseName) && parseTextEntryInt(AutoDropManagerWindow.autoDropMinedCuriosQualityTextEntry) > quality) {
+					this.wdgmsg("drop", Coord.z);
+				} else if (AutoDropManagerWindow.autoDropQuarryartzCheckbox.a && itemBaseName.equals("quarryartz") && parseTextEntryInt(AutoDropManagerWindow.autoDropQuarryartzQualityTextEntry) > quality) {
+					this.wdgmsg("drop", Coord.z);
+				}
+				checkedAutodrop = true;
+			}
+		}
+	}
+
+	private int parseTextEntryInt(TextEntry textEntry){
+		try {
+			return Integer.parseInt(textEntry.text());
+		} catch (NumberFormatException ex){
+			return 0;
 		}
 	}
 }

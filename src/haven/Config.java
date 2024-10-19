@@ -506,4 +506,82 @@ public class Config {
 			"gfx/terobjs/gardenpot",
 	};
 
+
+	public final static Set<String> stoneItemBaseNames = new HashSet<String>(Arrays.asList(
+			"gneiss",
+			"basalt",
+			"cinnabar",
+			"sunstone",
+			"dolomite",
+			"feldspar",
+			"flint",
+			"granite",
+			"hornblende",
+			"limestone",
+			"marble",
+			"porphyry",
+			"quartz",
+			"sandstone",
+			"schist",
+			"blackcoal",
+			"coal",
+			"zincspar",
+			"apatite",
+			"sodalite",
+			"fluorospar",
+			"soapstone",
+			"olivine",
+			"gabbro",
+			"alabaster",
+			"microlite",
+			"mica",
+			"kyanite",
+			"corund",
+			"orthoclase",
+			"breccia",
+			"diabase",
+			"arkose",
+			"diorite",
+			"slate",
+			"jasper",
+			"rhyolite",
+			"pegmatite",
+			"greenschist",
+			"eclogite",
+			"pumice",
+			"serpentine",
+			"chert",
+			"graywacke"
+	));
+
+	public final static Set<String> oreItemBaseNames = new HashSet<String>(Arrays.asList(
+			"cassiterite",
+			"chalcopyrite",
+			"malachite",
+			"ilmenite",
+			"limonite",
+			"hematite",
+			"magnetite",
+			"peacockore",
+			"leadglance",
+			"cuprite"
+	));
+
+	public final static Set<String> preciousOreItemBaseNames = new HashSet<String>(Arrays.asList(
+			"galena",
+			"argentite",
+			"hornsilver",
+			"petzite",
+			"sylvanite",
+			"nagyagite"
+	));
+
+	public final static Set<String> minedCuriosItemBaseNames = new HashSet<String>(Arrays.asList(
+			"catgold",
+			"petrifiedshell",
+			"strangecrystal"
+	));
+
+
+
 }
