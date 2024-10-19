@@ -69,6 +69,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	private GobGrowthInfo growthInfo;
 	public boolean isHidden;
 	private final GobCustomSizeAndRotation customSizeAndRotation = new GobCustomSizeAndRotation();
+	public double gobSpeed = 0;
 
     public static class Overlay implements RenderTree.Node {
 	public final int id;
@@ -629,6 +630,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	Moving m = getattr(Moving.class);
 	if(m != null)
 	    m.move(c);
+	this.gobSpeed = m != null ? m.getv() : 0;
 	this.rc = c;
 	this.a = a;
     }
