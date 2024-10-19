@@ -43,17 +43,17 @@ public class MenuSearch extends Window {
 			    }, Coord.z);
 		    }
 
-		    private double lastcl = 0;
+//		    private double lastcl = 0;
 		    public boolean mousedown(Coord c, int button) {
 			boolean psel = sel == item;
 			super.mousedown(c, button);
-			double now = Utils.rtime();
+//			double now = Utils.rtime();
 //			if(psel) {
-			    if(now - lastcl < 0.5)
-				menu.use(item.btn, new MenuGrid.Interaction(1, ui.modflags()), false);
+//			    if(now - lastcl < 0.5)
+			menu.use(item.btn, new MenuGrid.Interaction(1, ui.modflags()), false);
 				setfocus(ui.gui.portrait); // ND: do this to defocus the search box after you select something. It's focusing on your portrait, which does nothing.
 //			}
-			lastcl = now;
+//			lastcl = now;
 			return(true);
 		    }
 		});
