@@ -52,6 +52,8 @@ public class WItem extends Widget implements DTarget {
 	private String cachedTipValue = null;
 	private Tex cachedStudyTex = null;
 	private boolean holdingShift = false;
+	private boolean searchItemColorShiftUp = true;
+	private int searchItemColorValue = 0;
 
 	public static Color redDurability = new Color(255, 0, 0, 180);
 	public static Color orangeDurability = new Color(255, 153, 0, 180);
@@ -205,6 +207,33 @@ public class WItem extends Widget implements DTarget {
 	    g.defstate();
 	    if(rstate.get() != null)
 		g.usestate(rstate.get());
+		String itemName = item.getname().toLowerCase();
+		String searchKeyword = InventorySearchWindow.inventorySearchString.toLowerCase();
+		if (searchKeyword.length() > 1) {
+			if (itemName.contains(searchKeyword)) {
+				int colorShiftSpeed = 800/GLPanel.Loop.fps;
+				if (searchItemColorShiftUp) {
+					if (searchItemColorValue + colorShiftSpeed <= 255) {
+						searchItemColorValue += colorShiftSpeed;
+					} else {
+						searchItemColorShiftUp = false;
+						searchItemColorValue = 255;
+					}
+				} else {
+					if (searchItemColorValue - colorShiftSpeed >= 0){
+						searchItemColorValue -= colorShiftSpeed;
+					} else {
+						searchItemColorShiftUp = true;
+						searchItemColorValue = 0;
+					}
+				}
+				g.usestate(new ColorMask(new Color(searchItemColorValue, searchItemColorValue, searchItemColorValue, searchItemColorValue)));
+			}
+		} else {
+			if(olcol.get() != null){
+				g.usestate(new ColorMask(olcol.get()));
+			}
+		}
 	    drawmain(g, spr);
 	    g.defstate();
 	    GItem.InfoOverlay<?>[] ols = itemols.get();
@@ -395,4 +424,26 @@ public class WItem extends Widget implements DTarget {
 			}
 		}
 	}
+
+	public final AttrCache<Color> olcol = new AttrCache<>(this::info, info -> {
+		ArrayList<GItem.ColorInfo> ols = new ArrayList<>();
+		for(ItemInfo inf : info) {
+			if(inf instanceof GItem.ColorInfo)
+				ols.add((GItem.ColorInfo)inf);
+		}
+		if(ols.size() == 0)
+			return(() -> null);
+		if(ols.size() == 1)
+			return(ols.get(0)::olcol);
+		ols.trimToSize();
+		return(() -> {
+			Color ret = null;
+			for(GItem.ColorInfo ci : ols) {
+				Color c = ci.olcol();
+				if(c != null)
+					ret = (ret == null) ? c : Utils.preblend(ret, c);
+			}
+			return(ret);
+		});
+	});
 }

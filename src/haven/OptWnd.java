@@ -1402,6 +1402,9 @@ public class OptWnd extends Window {
 		y = addbtnImproved(cont, "Night Vision / Brighter World", "This will simulate daytime lighting during the night. \n$col[185,185,185]{It slightly affects the light levels during the day too.}" +
 				"\n\n$col[218,163,0]{Note:} $col[185,185,185]{This keybind just switches the value of Night Vision / Brighter World between minimum and maximum. This can also be set more precisely using the slider in the World Graphics Settings.}", Color.WHITE, GameUI.kb_nightVision, y);
 
+		y+=UI.scale(12);
+		y = addbtn(cont, "Inventory search", GameUI.kb_searchInventoriesButton, y);
+
 		y+=UI.scale(20);
 		y = addbtnImproved(cont, "Click Nearest Object","When this button is pressed, you will instantly click the nearest object, selected from below." +
 				"\n$col[218,163,0]{Range:} $col[185,185,185]{12 tiles (approximately)}", new Color(255, 191, 0,255), GameUI.kb_clickNearestObject, y);

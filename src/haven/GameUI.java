@@ -97,6 +97,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 	private boolean itemStackingOnLoginToggleSet = false;
 	public static boolean flowerMenuAutoSelect = Utils.getprefb("flowerMenuAutoSelect", false);
 	public Gob lastInspectedGob;
+	public InventorySearchWindow inventorySearchWindow;
 
 	// Script Threads
 	public Thread autoRepeatFlowerMenuScriptThread;
@@ -1649,6 +1650,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
     public static final KeyBinding kb_logout = KeyBinding.get("logout", KeyMatch.nil);
     public static final KeyBinding kb_switchchr = KeyBinding.get("logout-cs", KeyMatch.nil);
 	public static KeyBinding kb_drinkButton  = KeyBinding.get("DrinkButtonKB",  KeyMatch.forcode(KeyEvent.VK_BACK_QUOTE, 0));
+	public static KeyBinding kb_searchInventoriesButton  = KeyBinding.get("searchInventoriesButtonKB",  KeyMatch.forchar('F', KeyMatch.C | KeyMatch.S));
 	public static KeyBinding kb_rightQuickSlotButton  = KeyBinding.get("rightQuickSlotButtonKB",  KeyMatch.forchar('X', KeyMatch.M));
 	public static KeyBinding kb_leftQuickSlotButton  = KeyBinding.get("leftQuickSlotButtonKB",  KeyMatch.forchar('Z', KeyMatch.M));
 	public static KeyBinding kb_nightVision  = KeyBinding.get("nightVisionKB",  KeyMatch.forchar('N', KeyMatch.C));
@@ -1689,6 +1691,17 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 	    return(true);
 	} else if (kb_drinkButton.key().match(ev)) {
 		wdgmsg("act", "drink");
+		return (true);
+	} else if (kb_searchInventoriesButton.key().match(ev)) {
+		if(inventorySearchWindow != null){
+			Utils.setprefc("wndc-inventorySearchWindow", inventorySearchWindow.c);
+			inventorySearchWindow.reqdestroy();
+			inventorySearchWindow = null;
+			InventorySearchWindow.inventorySearchString = "";
+		} else {
+			inventorySearchWindow = new InventorySearchWindow(this);
+			this.add(inventorySearchWindow, new Coord(Utils.getprefc("wndc-inventorySearchWindow", new Coord(this.sz.x/2 - this.inventorySearchWindow.sz.x/2, this.sz.y/2 - this.inventorySearchWindow.sz.y/2 - 300))));
+		}
 		return (true);
 	} else if(kb_rightQuickSlotButton.key().match(ev)) {
 		quickslots.drop(QuickSlotsWdg.righthandslotc, Coord.z);
