@@ -44,7 +44,7 @@ public interface GLPanel extends UIPanel, UI.Context {
 	public final CPUProfile uprof = new CPUProfile(300), rprof = new CPUProfile(300);
 	public final GPUProfile gprof = new GPUProfile(300);
 	public static boolean bgmode = false;
-	protected int fps, framelag;
+	public static int fps, framelag;
 	protected volatile int frameno;
 	protected double uidle = 0.0, ridle = 0.0;
 	protected long lastrcycle = 0, ridletime = 0;
