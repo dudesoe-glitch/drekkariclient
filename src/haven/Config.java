@@ -39,6 +39,7 @@ public class Config {
     public static final String confid = "Hurricane";
     public static final Variable<Boolean> par = Variable.def(() -> true);
     public final Properties localprops = getlocalprops();
+	public static final String clientVersion = "Unreleased";
 
     private static Config global = null;
     public static Config get() {
