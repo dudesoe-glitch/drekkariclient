@@ -443,6 +443,7 @@ public class Config {
 			"gfx/terobjs/items/grub", // ND: lmao
 			"gfx/terobjs/items/hoppedcow",
 			"gfx/terobjs/items/mandrakespirited",
+			"gfx/terobjs/items/itsybitsyspider",
 	};
 
 	public static final String[] beastResPaths = {
