@@ -39,6 +39,7 @@ import haven.res.lib.svaj.GobSvaj;
 import haven.res.lib.tree.TreeScale;
 import haven.res.ui.obj.buddy.Buddy;
 import haven.res.ui.obj.buddy_v.Vilmate;
+import haven.sprites.AuraCircleSprite;
 
 public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, EquipTarget, RandomSource {
     public Coord2d rc;
@@ -73,6 +74,8 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	private final GobCustomSizeAndRotation customSizeAndRotation = new GobCustomSizeAndRotation();
 	public double gobSpeed = 0;
 	private Overlay customSearchOverlay;
+	public Boolean knocked = null;  // knocked will be null if pose update request hasn't been received yet
+	private Overlay customAuraOverlay;
 
     public static class Overlay implements RenderTree.Node {
 	public final int id;
@@ -1108,6 +1111,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 			}
 		}
 		updateCustomIcons();
+		updateCritterAuras();
 	}
 
 	public void updPose(HashSet<String> poses) {
@@ -1115,6 +1119,12 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 		Iterator<String> iter = poses.iterator();
 		while (iter.hasNext()) {
 			String s = iter.next();
+			if (s.contains("knock") || s.contains("dead") || s.contains("waterdead")) {
+				knocked = true;
+				break;
+			} else {
+				knocked = false;
+			}
 			if (s.contains("mannequin")){
 				isMannequin = true;
 				break;
@@ -1122,6 +1132,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 				isMannequin = false;
 			}
 		}
+		updateCritterAuras();
 	}
 	public void updModAndEqu(List<Composited.MD> mod, List<Composited.ED> equ) {
 
@@ -1662,6 +1673,49 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 			removeOl(customSearchOverlay);
 			customSearchOverlay = null;
 		}
+	}
+
+	public void updateCritterAuras() {
+		if (getres() != null) {
+			String resourceName = getres().name;
+			if (knocked != null && !knocked) {
+				if (Arrays.stream(Config.critterResPaths).anyMatch(resourceName::matches)) {
+					setAuraCircleOverlay(OptWnd.showCritterAurasCheckBox.a, OptWnd.genericCritterAuraColorOptionWidget.currentColor);
+				} else if (resourceName.matches(".*(rabbit|bunny)$")) {
+					setAuraCircleOverlay(OptWnd.showCritterAurasCheckBox.a, OptWnd.rabbitAuraColorOptionWidget.currentColor);
+				}
+			} else if (knocked != null && knocked) {
+				if (Arrays.stream(Config.critterResPaths).anyMatch(resourceName::matches)) {
+					setAuraCircleOverlay(false, OptWnd.genericCritterAuraColorOptionWidget.currentColor);
+				} else if (resourceName.matches(".*(rabbit|bunny)$")) {
+					setAuraCircleOverlay(false, OptWnd.rabbitAuraColorOptionWidget.currentColor);
+				}
+			} else if (!isComposite) { // ND: For critters that can't have a knocked status, like insects.
+				if (Arrays.stream(Config.critterResPaths).anyMatch(resourceName::matches)) {
+					setAuraCircleOverlay(OptWnd.showCritterAurasCheckBox.a, OptWnd.genericCritterAuraColorOptionWidget.currentColor);
+				}
+			}
+		}
+	}
+
+	private void setAuraCircleOverlay(boolean enabled, Color col, float size) {
+		if (enabled) {
+			if (customAuraOverlay != null) {
+				removeOl(customAuraOverlay);
+				customAuraOverlay = null;
+			}
+			customAuraOverlay = new Overlay(this, new AuraCircleSprite(this, col, size));
+			synchronized (ols) {
+				addol(customAuraOverlay);
+			}
+		} else if (customAuraOverlay != null) {
+			removeOl(customAuraOverlay);
+			customAuraOverlay = null;
+		}
+	}
+
+	private void setAuraCircleOverlay(boolean enabled, Color col) {
+		setAuraCircleOverlay(enabled, col, 10f);
 	}
 
 
