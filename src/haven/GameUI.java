@@ -98,6 +98,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 	public static boolean flowerMenuAutoSelect = Utils.getprefb("flowerMenuAutoSelect", false);
 	public Gob lastInspectedGob;
 	public InventorySearchWindow inventorySearchWindow;
+	public ObjectSearchWindow objectSearchWindow;
 
 	// Script Threads
 	public Thread autoRepeatFlowerMenuScriptThread;
@@ -1651,6 +1652,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
     public static final KeyBinding kb_switchchr = KeyBinding.get("logout-cs", KeyMatch.nil);
 	public static KeyBinding kb_drinkButton  = KeyBinding.get("DrinkButtonKB",  KeyMatch.forcode(KeyEvent.VK_BACK_QUOTE, 0));
 	public static KeyBinding kb_searchInventoriesButton  = KeyBinding.get("searchInventoriesButtonKB",  KeyMatch.forchar('F', KeyMatch.C | KeyMatch.S));
+	public static KeyBinding kb_searchObjectsButton  = KeyBinding.get("searchObjectsButtonKB",  KeyMatch.forchar('F', KeyMatch.M));
 	public static KeyBinding kb_rightQuickSlotButton  = KeyBinding.get("rightQuickSlotButtonKB",  KeyMatch.forchar('X', KeyMatch.M));
 	public static KeyBinding kb_leftQuickSlotButton  = KeyBinding.get("leftQuickSlotButtonKB",  KeyMatch.forchar('Z', KeyMatch.M));
 	public static KeyBinding kb_nightVision  = KeyBinding.get("nightVisionKB",  KeyMatch.forchar('N', KeyMatch.C));
@@ -1703,6 +1705,18 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 			this.add(inventorySearchWindow, new Coord(Utils.getprefc("wndc-inventorySearchWindow", new Coord(this.sz.x/2 - this.inventorySearchWindow.sz.x/2, this.sz.y/2 - this.inventorySearchWindow.sz.y/2 - 300))));
 		}
 		return (true);
+	} else if (kb_searchObjectsButton.key().match(ev)) {
+		if(objectSearchWindow != null){
+			Utils.setprefc("wndc-objectSearchWindow", objectSearchWindow.c);
+			ObjectSearchWindow.objectSearchString = "";
+			objectSearchWindow.updateOverlays();
+			objectSearchWindow.reqdestroy();
+			objectSearchWindow = null;
+		} else {
+			objectSearchWindow = new ObjectSearchWindow(this);
+			this.add(objectSearchWindow, new Coord(Utils.getprefc("wndc-objectSearchWindow", new Coord(this.sz.x/2 - this.objectSearchWindow.sz.x/2, this.sz.y/2 - this.objectSearchWindow.sz.y/2 - 300))));
+		}
+
 	} else if(kb_rightQuickSlotButton.key().match(ev)) {
 		quickslots.drop(QuickSlotsWdg.righthandslotc, Coord.z);
 		quickslots.simulateclick(QuickSlotsWdg.righthandslotc);

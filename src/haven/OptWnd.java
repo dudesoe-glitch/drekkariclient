@@ -1404,6 +1404,7 @@ public class OptWnd extends Window {
 
 		y+=UI.scale(12);
 		y = addbtn(cont, "Inventory search", GameUI.kb_searchInventoriesButton, y);
+		y = addbtn(cont, "Object search", GameUI.kb_searchObjectsButton, y);
 
 		y+=UI.scale(20);
 		y = addbtnImproved(cont, "Click Nearest Object","When this button is pressed, you will instantly click the nearest object, selected from below." +

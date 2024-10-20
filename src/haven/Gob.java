@@ -31,6 +31,8 @@ import java.util.*;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.*;
+import java.util.stream.Collectors;
+
 import haven.render.*;
 import haven.render.gl.GLObject;
 import haven.res.lib.svaj.GobSvaj;
@@ -70,6 +72,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	public boolean isHidden;
 	private final GobCustomSizeAndRotation customSizeAndRotation = new GobCustomSizeAndRotation();
 	public double gobSpeed = 0;
+	private Overlay customSearchOverlay;
 
     public static class Overlay implements RenderTree.Node {
 	public final int id;
@@ -711,6 +714,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 		if (a != prev) updateContainerFullnessHighlight();
 		if (a != prev) updateCustomSizeAndRotation();
 		if (a != prev) updateWorkstationProgressHighlight();
+		if (a != prev) setGobSearchOverlay();
 	}
 	if(prev != null)
 	    prev.dispose();
@@ -1607,7 +1611,58 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 		}
 	}
 
+	public void setGobSearchOverlay() {
+		if (getres() == null) return;
+		String resourceName = getres().basename().toLowerCase().replace("stockpile", "");
+		String searchKeyword = ObjectSearchWindow.objectSearchString.toLowerCase();
+		boolean result = resourceName.contains(searchKeyword) && searchKeyword.length() > 1;
+		String barterStandOverlays = null;
+		if (resourceName.contains("barter")) {
+			try {
+				barterStandOverlays = this.ols.stream()
+						.map(ol -> {
+							if(Reflect.is(ol.spr, "haven.res.gfx.fx.eq.Equed")) {
+							Sprite espr = Reflect.getFieldValue(ol.spr, "espr", Sprite.class);
+								try {
+									if (espr.res != null)
+										return espr.res.basename();
+									else return null;
+								} catch (IndexOutOfBoundsException e) {
+									return "N/A";
+								}
+							}
+							return "N/A";
+						})
+						.filter(Objects::nonNull)
+						.collect(Collectors.joining(", "));
+			} catch (Exception ignores) {
+			}
+		}
+		if (barterStandOverlays != null) {
+			if (searchKeyword.startsWith("@") && searchKeyword.length() > 2 && barterStandOverlays.contains(searchKeyword.replaceAll("@", ""))) {
+				result = true;
+			}
+		}
 
+		setSearchOl(result);
+	}
+
+	private void setSearchOl(boolean on) {
+		if (on) {
+			for (Overlay ol : ols) {
+				if (ol.spr instanceof haven.sprites.GobSearchHighlight) {
+					return;
+				}
+			}
+			customSearchOverlay = new Overlay(this, new haven.sprites.GobSearchHighlight(this, null));
+			synchronized (ols) {
+				addol(customSearchOverlay);
+			}
+		} else if (customSearchOverlay != null) {
+			removeOl(customSearchOverlay);
+			customSearchOverlay = null;
+		}
+	}
 
 
 }
