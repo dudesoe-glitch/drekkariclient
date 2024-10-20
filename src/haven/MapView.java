@@ -39,6 +39,7 @@ import haven.render.*;
 import haven.MCache.OverlayInfo;
 import haven.render.sl.Uniform;
 import haven.render.sl.Type;
+import haven.res.ui.obj.buddy.Buddy;
 
 public class MapView extends PView implements DTarget, Console.Directory {
     public static boolean clickdb = false;
@@ -2727,4 +2728,11 @@ public class MapView extends PView implements DTarget, Console.Directory {
 		}
 	}
 
+	@Override
+	protected void added() {
+		super.added();
+		try {
+			glob.oc.getgob(plgob).delattr(Buddy.class); // ND: This is only needed for Valhalla.
+		} catch (NullPointerException ignored){}
+	}
 }

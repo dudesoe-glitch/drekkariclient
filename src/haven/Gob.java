@@ -1189,7 +1189,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 
 	public void setCustomPlayerName() {
 		if (!playerNameChecked) {
-			if (getattr(Buddy.class) == null && isMannequin != null && !isMannequin && glob.sess.ui.gui != null && glob.sess.ui.gui.map != null) {
+			if (getattr(Buddy.class) == null && getattr(haven.res.ui.obj.buddy_n.Named.class) == null && isMannequin != null && !isMannequin && glob.sess.ui.gui != null && glob.sess.ui.gui.map != null) {
 				if (getres() != null) {
 					if (getres().name.equals("gfx/borka/body")) {
 						long plgobid = glob.sess.ui.gui.map.plgob;
