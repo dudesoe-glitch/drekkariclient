@@ -1112,6 +1112,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 		}
 		updateCustomIcons();
 		updateCritterAuras();
+		updateSpeedBuffAuras();
 	}
 
 	public void updPose(HashSet<String> poses) {
@@ -1716,6 +1717,14 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 
 	private void setAuraCircleOverlay(boolean enabled, Color col) {
 		setAuraCircleOverlay(enabled, col, 10f);
+	}
+
+	public void updateSpeedBuffAuras() {
+		if (getres() != null) {
+			String resourceName = getres().name;
+			if (resourceName.equals("gfx/terobjs/boostspeed"))
+				setAuraCircleOverlay(OptWnd.showSpeedBuffAurasCheckBox.a, OptWnd.speedBuffAuraColorOptionWidget.currentColor, 6f);
+		}
 	}
 
 

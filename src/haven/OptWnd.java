@@ -781,6 +781,9 @@ public class OptWnd extends Window {
 	public static String[] rabbitAuraColorSetting = Utils.getprefsa("rabbitAura" + "_colorSetting", new String[]{"88", "255", "0", "140"});
 	public static ColorOptionWidget genericCritterAuraColorOptionWidget;
 	public static String[] genericCritterAuraColorSetting = Utils.getprefsa("genericCritterAura" + "_colorSetting", new String[]{"193", "0", "255", "140"});
+	public static CheckBox showSpeedBuffAurasCheckBox;
+	public static ColorOptionWidget speedBuffAuraColorOptionWidget;
+	public static String[] speedBuffAuraColorSetting = Utils.getprefsa("speedBuffAura" + "_colorSetting", new String[]{"255", "255", "255", "140"});
 	public static CheckBox highlightCliffsCheckBox;
 	public static ColorOptionWidget highlightCliffsColorOptionWidget;
 	public static String[] highlightCliffsColorSetting = Utils.getprefsa("highlightCliffs" + "_colorSetting", new String[]{"255", "0", "0", "200"});
@@ -1166,6 +1169,29 @@ public class OptWnd extends Window {
 					ui.sess.glob.oc.gobAction(Gob::updateCritterAuras);
 				}
 			}), genericCritterAuraColorOptionWidget.pos("ur").adds(10, 0));
+
+			rightColumn = add(showSpeedBuffAurasCheckBox = new CheckBox("Show Speed Buff Circle Auras"){
+				{a = (Utils.getprefb("showSpeedBuffAuras", true));}
+				public void set(boolean val) {
+					Utils.setprefb("showSpeedBuffAuras", val);
+					a = val;
+					if (ui != null && ui.gui != null) {
+						ui.sess.glob.oc.gobAction(Gob::updateSpeedBuffAuras);
+					}
+				}
+			}, rightColumn.pos("bl").adds(0, 18).x(UI.scale(230)));
+			rightColumn = add(speedBuffAuraColorOptionWidget = new ColorOptionWidget("Speed Buff Aura:", "speedBuffAura", 115, Integer.parseInt(speedBuffAuraColorSetting[0]), Integer.parseInt(speedBuffAuraColorSetting[1]), Integer.parseInt(speedBuffAuraColorSetting[2]), Integer.parseInt(speedBuffAuraColorSetting[3]), (Color col) -> {
+				if (ui != null && ui.gui != null) {
+					ui.sess.glob.oc.gobAction(Gob::updateSpeedBuffAuras);
+				}
+			}){}, rightColumn.pos("bl").adds(1, 1));
+			add(new Button(UI.scale(70), "Reset", false).action(() -> {
+				Utils.setprefsa("speedBuffAura" + "_colorSetting", new String[]{"255", "255", "255", "140"});
+				speedBuffAuraColorOptionWidget.cb.colorChooser.setColor(speedBuffAuraColorOptionWidget.currentColor = new Color(255, 255, 255, 140));
+				if (ui != null && ui.gui != null) {
+					ui.sess.glob.oc.gobAction(Gob::updateSpeedBuffAuras);
+				}
+			}), speedBuffAuraColorOptionWidget.pos("ur").adds(10, 0));
 
 
 			Widget backButton;
