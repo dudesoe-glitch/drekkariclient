@@ -26,6 +26,8 @@
 
 package haven;
 
+import haven.res.ui.music.MusicWnd;
+
 import java.util.*;
 import java.awt.Color;
 import java.awt.Font;
@@ -958,11 +960,13 @@ public class ChatUI extends Widget {
 	    if(msg == "msg") {
 		Number from = (Number)args[0];
 		String line = (String)args[1];
+		if (processMessage(line, -1)){
 		if(from == null) {
 		    append(new MyMessage(line), -1);
 		} else {
 		    Message cmsg = new NamedMessage(from.intValue(), line, fromcolor(from.intValue()));
 		    append(cmsg, urgency);
+		}
 		}
 	    } else if(msg == "mutable") {
 		this.muted = Utils.bv(args[0]) ? new HashMap<>() : null;
@@ -982,6 +986,30 @@ public class ChatUI extends Widget {
 	public String name() {
 	    return(name);
 	}
+
+	public boolean processMessage(String msg, long from){
+		if (msg.startsWith("HFMPL@@@")) {
+			try {
+				final String hfmplayer = msg.substring("HFMPL@@@".length());
+				final String[] hfmargs = hfmplayer.split("\\|");
+				if (hfmargs.length > 2) {
+					ui.gui.error("Cannot understand hfmp synch message");
+				}
+				Arrays.stream(hfmargs).forEach(System.out::println);
+				final long timetoplay = Long.parseLong(hfmargs[0]);
+				final String track = hfmargs[1];
+				for (Widget w = ui.gui.lchild; w != null; w = w.prev) {
+					if (w instanceof MusicWnd) {
+						final MusicWnd musicWnd = (MusicWnd)w;
+						musicWnd.hafenMidiplayer.synchPlay(timetoplay, track);
+					}
+				}
+			}
+			catch (NumberFormatException ignored) {}
+		}
+		return true;
+	}
+
     }
     
     public static class PartyChat extends MultiChat {
@@ -994,6 +1022,7 @@ public class ChatUI extends Widget {
 		Number from = (Number)args[0];
 		long gobid = Utils.uiv(args[1]);
 		String line = (String)args[2];
+		if (processMessage(line, gobid)){
 		Color col = Color.WHITE;
 		synchronized(ui.sess.glob.party.memb) {
 		    Party.Member pm = ui.sess.glob.party.memb.get(gobid);
@@ -1005,6 +1034,7 @@ public class ChatUI extends Widget {
 		} else {
 		    Message cmsg = new NamedMessage(from.intValue(), line, Utils.blendcol(col, Color.WHITE, 0.5));
 		    append(cmsg, urgency);
+		}
 		}
 	    } else {
 		super.uimsg(msg, args);
