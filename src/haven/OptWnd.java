@@ -785,6 +785,8 @@ public class OptWnd extends Window {
 	public static ColorOptionWidget speedBuffAuraColorOptionWidget;
 	public static String[] speedBuffAuraColorSetting = Utils.getprefsa("speedBuffAura" + "_colorSetting", new String[]{"255", "255", "255", "140"});
 	public static CheckBox showBeastDangerRadiiCheckBox;
+	public static CheckBox showBeeSkepsRadiiCheckBox;
+	public static CheckBox showFoodTroughsRadiiCheckBox;
 	public static CheckBox highlightCliffsCheckBox;
 	public static ColorOptionWidget highlightCliffsColorOptionWidget;
 	public static String[] highlightCliffsColorSetting = Utils.getprefsa("highlightCliffs" + "_colorSetting", new String[]{"255", "0", "0", "200"});
@@ -1204,6 +1206,30 @@ public class OptWnd extends Window {
 				}
 			}, rightColumn.pos("bl").adds(0, 18).x(UI.scale(230)));
 
+			rightColumn = add(showBeeSkepsRadiiCheckBox = new CheckBox("Show Bee Skep Radii"){
+				{a = (Utils.getprefb("showBeeSkepsRadii", false));}
+				public void set(boolean val) {
+					Utils.setprefb("showBeeSkepsRadii", val);
+					a = val;
+					if (ui != null && ui.gui != null){
+						ui.sess.glob.oc.gobAction(Gob::updateBeeSkepRadius);
+						ui.gui.optionInfoMsg("Bee Skep Radii are now " + (val ? "SHOWN" : "HIDDEN") + "!", (val ? msgGreen : msgGray));
+					}
+				}
+			}, rightColumn.pos("bl").adds(0, 2));
+			showBeeSkepsRadiiCheckBox.tooltip = showBeeSkepsRadiiTooltip;
+			rightColumn = add(showFoodTroughsRadiiCheckBox = new CheckBox("Show Food Trough Radii"){
+				{a = (Utils.getprefb("showFoodTroughsRadii", false));}
+				public void set(boolean val) {
+					Utils.setprefb("showFoodTroughsRadii", val);
+					a = val;
+					if (ui != null && ui.gui != null){
+						ui.sess.glob.oc.gobAction(Gob::updateTroughsRadius);
+						ui.gui.optionInfoMsg("Food Trough Radii are now " + (val ? "SHOWN" : "HIDDEN") + "!", (val ? msgGreen : msgGray));
+					}
+				}
+			}, rightColumn.pos("bl").adds(0, 2));
+			showFoodTroughsRadiiCheckBox.tooltip = showFoodThroughsRadiiTooltip;
 
 			Widget backButton;
 			add(backButton = new PButton(UI.scale(200), "Back", 27, back, "Advanced Settings"), leftColumn.pos("bl").adds(0, 18).x(0));
@@ -2651,6 +2677,8 @@ public class OptWnd extends Window {
 	private final Object showWorkstationProgressTooltip = RichText.render("Colors workstations (Drying Racks, Tanning Tubs, Cheese Racks, Flower Pots), depending on their current progress." +
 			"\n" +
 			"\n$col[185,185,185]{Select from below what states you want to be highlighted, and what colors you want each of them to show.}", UI.scale(330));
+	private final Object showBeeSkepsRadiiTooltip = RichText.render("$col[218,163,0]{Action Button:} $col[185,185,185]{This setting can also be turned on/off using an action button from the menu grid (Custom Client Extras → Toggles).}", UI.scale(320));
+	private final Object showFoodThroughsRadiiTooltip = RichText.render("$col[218,163,0]{Action Button:} $col[185,185,185]{This setting can also be turned on/off using an action button from the menu grid (Custom Client Extras → Toggles).}", UI.scale(320));
 
 	// Quality Display Settings Tooltips
 	private final Object customQualityColorsTooltip = RichText.render("These numbers and colors are completely arbitrary, and you can change them to whatever you like." +

@@ -1118,6 +1118,8 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 		updateCritterAuras();
 		updateSpeedBuffAuras();
 		updateBeastDangerRadii();
+		updateTroughsRadius();
+		updateBeeSkepRadius();
 	}
 
 	public void updPose(HashSet<String> poses) {
@@ -1787,5 +1789,22 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 		}
 	}
 
+	public void updateTroughsRadius() {
+		if (getres() != null) {
+			String resourceName = getres().name;
+			if (resourceName.equals("gfx/terobjs/trough")){
+				setRadiusOverlay(OptWnd.showFoodTroughsRadiiCheckBox.a, new Color(255, 136, 0, 128), 200f);
+			}
+		}
+	}
+
+	public void updateBeeSkepRadius() {
+		if (getres() != null) {
+			String resourceName = getres().name;
+			if (resourceName.equals("gfx/terobjs/beehive")){
+				setRadiusOverlay(OptWnd.showFoodTroughsRadiiCheckBox.a, new Color(255, 242, 0, 128), 150f);
+			}
+		}
+	}
 
 }

@@ -745,6 +745,8 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 		makeLocal("customclient/menugrid/Toggles/ItemDroppingAnywhere");
 		makeLocal("customclient/menugrid/Toggles/ItemDroppingInWater");
 		makeLocal("customclient/menugrid/Toggles/HighlightCliffs");
+		makeLocal("customclient/menugrid/Toggles/BeeSkepsRadii");
+		makeLocal("customclient/menugrid/Toggles/TroughsRadii");
 	}
 
 	public void useCustom(String[] ad) {
@@ -766,6 +768,10 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 				OptWnd.noCursorItemDroppingInWaterCheckBox.set(!OptWnd.noCursorItemDroppingInWaterCheckBox.a);
 			} else if (ad[2].equals("HighlightCliffs")) {
 				OptWnd.highlightCliffsCheckBox.set(!OptWnd.highlightCliffsCheckBox.a);
+			} else if (ad[2].equals("BeeSkepsRadii")) {
+				OptWnd.showBeeSkepsRadiiCheckBox.set(!OptWnd.showBeeSkepsRadiiCheckBox.a);
+			} else if (ad[2].equals("TroughsRadii")) {
+				OptWnd.showFoodTroughsRadiiCheckBox.set(!OptWnd.showFoodTroughsRadiiCheckBox.a);
 			}
 		}
 	}
