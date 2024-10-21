@@ -119,6 +119,7 @@ public class ResDrawable extends Drawable implements EquipTarget {
 	g.updateContainerFullnessHighlight();
 	g.updateCustomSizeAndRotation();
 	g.updateWorkstationProgressHighlight();
+	g.checkIfObjectJustDied();
 	}
     }
 }

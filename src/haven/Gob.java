@@ -27,9 +27,15 @@
 package haven;
 
 import java.awt.*;
+import java.io.File;
+import java.io.IOException;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.function.*;
 import java.util.stream.Collectors;
 
@@ -41,6 +47,11 @@ import haven.res.ui.obj.buddy.Buddy;
 import haven.res.ui.obj.buddy_v.Vilmate;
 import haven.sprites.AuraCircleSprite;
 import haven.sprites.RangeRadiusSprite;
+
+import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.UnsupportedAudioFileException;
 
 public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, EquipTarget, RandomSource {
     public Coord2d rc;
@@ -80,6 +91,13 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	private Overlay customRadiusOverlay;
 	public static Boolean batWingCapeEquipped = false; // ND: Check for Bat Wing Cape
 	public static Boolean nightQueenDefeated = false; // ND: Check for Bat Dungeon Experience (Defeated Bat Queen)
+	public String playerGender = "unknown";
+	public Boolean isDeadPlayer = false;
+	public int playerPoseUpdatedCounter = 0;
+	private long lastKnockedOutSoundtime = 0;
+	public static boolean somethingJustDied = false;
+	public static final ScheduledExecutorService gobDeathExecutor = Executors.newSingleThreadScheduledExecutor();
+	private static Future<?> gobDeathFuture;
 
     public static class Overlay implements RenderTree.Node {
 	public final int id;
@@ -477,6 +495,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	updwait(this::updateCollisionBoxes, waiting -> {});
 	updwait(this::updateContainerFullnessHighlight, waiting -> {});
 	updwait(this::updateWorkstationProgressHighlight, waiting -> {});
+	updwait(this::checkIfObjectJustDied, waiting -> {});
 	qualityInfo = new GobQualityInfo(this);
 	setattr(GobQualityInfo.class, qualityInfo);
 	growthInfo = new GobGrowthInfo(this);
@@ -722,6 +741,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 		if (a != prev) updateCustomSizeAndRotation();
 		if (a != prev) updateWorkstationProgressHighlight();
 		if (a != prev) setGobSearchOverlay();
+		if (a != prev) checkIfObjectJustDied();
 	}
 	if(prev != null)
 	    prev.dispose();
@@ -1142,6 +1162,16 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 		}
 		updateCritterAuras();
 		updateBeastDangerRadii();
+		if (this.getres().name.equals("gfx/borka/body") && isMannequin != null && !isMannequin){
+			setPlayerGender();
+			if  (!isDeadPlayer){
+				checkIfPlayerIsDead(poses);
+				if (playerPoseUpdatedCounter >= 2) { // ND: Do this to prevent the sounds from being played if you load in an already knocked/killed hearthling.
+					knockedOrDeadPlayerSoundEfect(poses);
+				}
+				playerPoseUpdatedCounter = playerPoseUpdatedCounter + 1;
+			}
+		}
 	}
 	public void updModAndEqu(List<Composited.MD> mod, List<Composited.ED> equ) {
 
@@ -1805,6 +1835,160 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 				setRadiusOverlay(OptWnd.showFoodTroughsRadiiCheckBox.a, new Color(255, 242, 0, 128), 150f);
 			}
 		}
+	}
+
+
+	private void setPlayerGender(){
+		try {
+			if (getres() != null) {
+				for (GAttrib g : attr.values()) {
+					if (g instanceof Drawable) {
+						if (g instanceof Composite) {
+							Composite c = (Composite) g;
+							if (c.comp.cmod.size() > 0) {
+								for (Composited.MD item : c.comp.cmod) {
+									if (item.mod.get().basename().equals("male")) {
+										playerGender = "male";
+									} else if (item.mod.get().basename().equals("female")) {
+										playerGender = "female";
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		} catch (Exception ignored){}
+	}
+
+	public void checkIfPlayerIsDead(HashSet<String> poses){
+		Gob hearthling = this;
+		final Timer timer = new Timer(); // ND: Need to do this with a timer cause the knocked out birds get loaded a few miliseconds later. I hope 100 is enough to prevent any issues.
+		timer.schedule(new TimerTask(){
+			@Override
+			public void run() {
+				if (poses.contains("rigormortis")) {
+					isDeadPlayer = true;
+					return;
+				}
+				if (poses.contains("knock") || poses.contains("drowned")) {
+					isDeadPlayer = true;
+					for (GAttrib g : hearthling.attr.values()) {
+						if (g instanceof Drawable) {
+							if (g instanceof Composite) {
+								Composite c = (Composite) g;
+								if (c.comp.cequ.size() > 0) {
+									for (Composited.ED item : c.comp.cequ) {
+										if (item.res.res.get().basename().equals("knockchirp")) {
+											isDeadPlayer = false;
+											break;
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+				timer.cancel();
+			}
+		}, 100);
+	}
+
+	public void knockedOrDeadPlayerSoundEfect(HashSet<String> poses){
+		Gob hearthling = this;
+		final Timer timer = new Timer(); // ND: Need to do this with a timer cause the knocked out birds get loaded a few miliseconds later. I hope 100 is enough to prevent any issues.
+		timer.schedule(new TimerTask(){
+			@Override
+			public void run(){
+				long now = System.currentTimeMillis();
+				// ND: Should only allow this sound to play again after 45 seconds. If you loot someone, their body sometimes does the KO animation again.
+				// So check if at least 45 seconds passed. Tt takes about 50ish seconds for a hearthling to get up after being knocked anyway. They can port or log out after 25-30ish seconds.
+				if ((now - lastKnockedOutSoundtime) > 45000) {
+					boolean imDead = true;
+					ArrayList<Map.Entry<Class<? extends GAttrib>, GAttrib>> gAttribs = new ArrayList<>(hearthling.attr.entrySet());
+					for (int i = 0; i < gAttribs.size(); i++) {
+						Map.Entry<Class<? extends GAttrib>, GAttrib> entry = gAttribs.get(i);
+						GAttrib g = entry.getValue();
+						if (g instanceof Drawable) {
+							if (g instanceof Composite) {
+								Composite c = (Composite) g;
+								if (c.comp.cequ.size() > 0) {
+									for (Composited.ED item : c.comp.cequ) {
+										if (item.res.res.get().basename().equals("knockchirp")) {
+											imDead = false;
+											break;
+										}
+									}
+								}
+							}
+						}
+					}
+					if (poses.contains("knock") || poses.contains("drowned")) {
+						if (!imDead) {
+							File file = new File("res/customclient/sfx/PlayerKnockedOut.wav");
+							if (file.exists()) {
+								try {
+									AudioInputStream in = AudioSystem.getAudioInputStream(file);
+									AudioFormat tgtFormat = new AudioFormat(AudioFormat.Encoding.PCM_SIGNED, 44100, 16, 2, 4, 44100, false);
+									AudioInputStream pcmStream = AudioSystem.getAudioInputStream(tgtFormat, in);
+									Audio.CS klippi = new Audio.PCMClip(pcmStream, 2, 2);
+									((Audio.Mixer) Audio.player.stream).add(new Audio.VolAdjust(klippi, 1));
+								} catch (UnsupportedAudioFileException e) {
+									e.printStackTrace();
+								} catch (IOException e) {
+									e.printStackTrace();
+								}
+							}
+						} else {
+							isDeadPlayer = true;
+							File file = null;
+							if (playerGender.equals("male")) {
+								file = new File("res/customclient/sfx/MalePlayerKilled.wav");
+							} else if (playerGender.equals("female")) {
+								file = new File("res/customclient/sfx/FemalePlayerKilled.wav");
+							}
+							if (file != null && file.exists() && somethingJustDied) {
+								try {
+									AudioInputStream in = AudioSystem.getAudioInputStream(file);
+									AudioFormat tgtFormat = new AudioFormat(AudioFormat.Encoding.PCM_SIGNED, 44100, 16, 2, 4, 44100, false);
+									AudioInputStream pcmStream = AudioSystem.getAudioInputStream(tgtFormat, in);
+									Audio.CS klippi = new Audio.PCMClip(pcmStream, 2, 2);
+									((Audio.Mixer) Audio.player.stream).add(new Audio.VolAdjust(klippi, 1));
+								} catch (UnsupportedAudioFileException e) {
+									e.printStackTrace();
+								} catch (IOException e) {
+									e.printStackTrace();
+								}
+							}
+						}
+						lastKnockedOutSoundtime = now;
+					}
+				}
+				timer.cancel();
+			}
+		}, 100);
+	}
+
+	public void checkIfObjectJustDied(){
+		if (virtual){
+			for (int i = 0; i < ols.size(); i++) {
+				Overlay ol = (Overlay) ols.toArray()[i];
+				if (ol.spr.res != null && ol.spr.res.name.equals("gfx/fx/death")){
+					setSomethingJustDiedStatus();
+				}
+			}
+		}
+	}
+
+	public static void setSomethingJustDiedStatus(){
+		if (gobDeathFuture != null)
+			gobDeathFuture.cancel(true);
+		somethingJustDied = true;
+		gobDeathFuture = gobDeathExecutor.scheduleWithFixedDelay(Gob::resetSomethingJustDiedStatus, 1, 5, TimeUnit.SECONDS);
+	}
+	public static void resetSomethingJustDiedStatus() {
+		somethingJustDied = false;
+		gobDeathFuture.cancel(true);
 	}
 
 }

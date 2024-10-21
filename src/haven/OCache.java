@@ -345,6 +345,7 @@ public class OCache implements Iterable<Gob> {
 		g.updateContainerFullnessHighlight();
 		g.updateCustomSizeAndRotation();
 		g.updateWorkstationProgressHighlight();
+		g.checkIfObjectJustDied();
 	}
     }
 
@@ -360,6 +361,7 @@ public class OCache implements Iterable<Gob> {
 		g.updateContainerFullnessHighlight();
 		g.updateCustomSizeAndRotation();
 		g.updateWorkstationProgressHighlight();
+		g.checkIfObjectJustDied();
 	}
     }
 
