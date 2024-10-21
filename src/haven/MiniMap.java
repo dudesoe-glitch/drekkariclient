@@ -36,6 +36,8 @@ import haven.MapFile.GridInfo;
 import haven.MapFile.Marker;
 import haven.MapFile.PMarker;
 import haven.MapFile.SMarker;
+import haven.sprites.MapSprite;
+
 import static haven.MCache.cmaps;
 import static haven.MCache.tilesz;
 import static haven.OCache.posres;
@@ -69,6 +71,7 @@ public class MiniMap extends Widget {
 	public static boolean showMapViewRange = Utils.getprefb("showMapViewRange", true);
 	public static boolean showMapGridLines = Utils.getprefb("showMapGridLines", false);
 	public static boolean highlightMapTiles = Utils.getprefb("highlightMapTiles", false);
+	private final List<MapSprite> mapSprites = new LinkedList<>();
 
     public MiniMap(Coord sz, MapFile file) {
 	super(sz);
@@ -250,6 +253,7 @@ public class MiniMap extends Widget {
 			setBiome(null);
 		}
 		allowZooming = true;
+		ticksprites(dt);
     }
 
     public void center(Locator loc) {
@@ -742,6 +746,7 @@ public class MiniMap extends Widget {
 	drawparty(g);
 	drawbiome(g);
 	drawInvalidWarning(g);
+	drawsprites(g);
     }
 
     public void draw(GOut g) {
@@ -980,6 +985,17 @@ public class MiniMap extends Widget {
 	if(mc == null) mc = ui.mc;
 	if((sessloc != null) && (sessloc.seg == loc.seg)) {
 	    if(gob == null) {
+			if(ui.modmeta && button == 3){
+				Gob player = ui.gui.map.player();
+				if (player != null && player.rc != null) {
+					Map<String, ChatUI.MultiChat> chats = ui.gui.chat.getMultiChannels();
+					Coord2d clickloc = loc.tc.sub(sessloc.tc).mul(tilesz).add(tilesz.div(2));
+					ChatUI.MultiChat chat = chats.get("Party");
+					if (chat != null) {
+						chat.send("LOC@" + (int)(clickloc.x-player.rc.x) + "x" + (int)(clickloc.y-player.rc.y));
+					}
+				}
+			}
 			if (OptWnd.autoEquipBunnySlippersPlateBootsCheckBox.a) {
 				ui.gui.map.switchToPlateBoots();
 			}
@@ -1142,6 +1158,34 @@ public class MiniMap extends Widget {
 			}
 		}
 		g.chcolor(col);
+	}
+
+	private void drawsprites(GOut g) {
+
+		synchronized (mapSprites) {
+			for (MapSprite mapSprite : mapSprites) {
+				mapSprite.draw(g, p2c(mapSprite.rc), zoomlevel);
+			}
+		}
+	}
+
+	private void ticksprites(double dt) {
+		synchronized (mapSprites) {
+			ListIterator<MapSprite> iter = mapSprites.listIterator();
+			while (iter.hasNext()) {
+				MapSprite mapSprite = iter.next();
+				boolean done = mapSprite.tick(dt);
+				if (done) {
+					iter.remove();
+				}
+			}
+		}
+	}
+
+	public void addSprite(MapSprite mapSprite) {
+		synchronized (mapSprites) {
+			mapSprites.add(mapSprite);
+		}
 	}
 
 }

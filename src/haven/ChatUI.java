@@ -27,7 +27,13 @@
 package haven;
 
 import haven.res.ui.music.MusicWnd;
+import haven.sprites.PingSprite;
 
+import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.UnsupportedAudioFileException;
+import java.io.File;
 import java.util.*;
 import java.awt.Color;
 import java.awt.Font;
@@ -868,6 +874,7 @@ public class ChatUI extends Widget {
 	private final Map<Integer, Color> pc = new HashMap<Integer, Color>();
 	private Map<Integer, Boolean> muted = null;
 	private Integer mutewait = null;
+	static private final File mapPingFile = new File("res/customclient/sfx/mapPing.wav");
 
 	public class NamedMessage extends Message {
 	    public final int from;
@@ -1005,6 +1012,46 @@ public class ChatUI extends Widget {
 				} catch (Exception ignored){}
 			}
 			return true;
+		} else if(msg.startsWith("LOC@")) {
+			if (from == -1)
+				return false;
+			Pattern highlight = Pattern.compile("^LOC@(-?\\d+)x(-?\\d+)$");
+			Matcher matcher = highlight.matcher(msg);
+			if(matcher.matches()){
+				try {
+					synchronized (ui.sess.glob.party.memb) {
+						Party.Member pm = ui.sess.glob.party.memb.get(from);
+						Gob player = ui.gui.map.player();
+						if (player != null && pm != null) {
+							Coord2d playerc = player.rc;
+							Coord2d partyc = pm.getc();
+							if (playerc.dist(partyc) < 975*11) {
+								Coord2d playertopartym = partyc.sub(playerc);
+								Coord2d partyoffset = new Coord2d(Integer.parseInt(matcher.group(1)), Integer.parseInt(matcher.group(2)));
+								Coord2d pingc = playerc.add(playertopartym).add(partyoffset);
+								ui.gui.mapfile.view.addSprite(new PingSprite(pingc, pm.col, 4));
+								try {
+									AudioInputStream in = AudioSystem.getAudioInputStream(mapPingFile);
+									AudioFormat tgtFormat = new AudioFormat(AudioFormat.Encoding.PCM_SIGNED, 44100, 16, 2,4, 44100, false);
+									AudioInputStream pcmStream = AudioSystem.getAudioInputStream(tgtFormat, in);
+									Audio.CS klippi = new Audio.PCMClip(pcmStream, 2, 2);
+									((Audio.Mixer)Audio.player.stream).add(new Audio.VolAdjust(klippi, 0.7));
+								} catch(UnsupportedAudioFileException e) {
+									e.printStackTrace();
+								} catch(IOException e) {
+									e.printStackTrace();
+								}
+							} else {
+								System.out.println("Party Member pinging map is too far away from you");
+							}
+						} else {
+							System.out.println("Party Member pinging map is not in the same instance as you");
+						}
+					}
+
+				} catch (Exception ignored){}
+				return false;
+			}
 		} else if (msg.startsWith("HFMPL@@@")) {
 			try {
 				final String hfmplayer = msg.substring("HFMPL@@@".length());
