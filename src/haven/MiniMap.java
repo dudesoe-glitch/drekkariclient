@@ -739,6 +739,7 @@ public class MiniMap extends Widget {
     public void drawparts(GOut g){
 	drawmap(g);
 	drawmarkers(g);
+	drawmovequeue(g);
 	if(showMapViewRange) {drawview(g);}
 	if(showMapGridLines && dlvl <= 6) {drawgridlines(g);}
 	if(dlvl <= 3)
@@ -995,9 +996,15 @@ public class MiniMap extends Widget {
 						chat.send("LOC@" + (int)(clickloc.x-player.rc.x) + "x" + (int)(clickloc.y-player.rc.y));
 					}
 				}
+			} else if (ui.modmeta && button == 1){
+				mv.addCheckpoint(loc.tc.sub(sessloc.tc).mul(tilesz).add(tilesz.div(2)));
 			}
 			if (OptWnd.autoEquipBunnySlippersPlateBootsCheckBox.a) {
 				ui.gui.map.switchToPlateBoots();
+			}
+			if(mv.checkpointManager != null && mv.checkpointManagerThread != null && button == 1){
+				if (!ui.modmeta)
+					mv.checkpointManager.pauseIt();
 			}
 		mv.wdgmsg("click", mc, loc.tc.sub(sessloc.tc).mul(tilesz).add(tilesz.div(2)).floor(posres),	button, ui.modflags());
 		} else {
@@ -1185,6 +1192,49 @@ public class MiniMap extends Widget {
 	public void addSprite(MapSprite mapSprite) {
 		synchronized (mapSprites) {
 			mapSprites.add(mapSprite);
+		}
+	}
+
+	private void drawmovequeue(GOut g) {
+		MapView mv = ui.gui.map;
+		if (mv == null){
+			return;
+		}
+		if (mv.checkpointManager != null && mv.checkpointManagerThread != null) {
+			if(mv.checkpointManager.checkpointList.listitems() > 0){
+				List<Coord2d> coords = mv.getCheckPointList();
+				Gob player = mv.player();
+				if (player == null) return;
+				final Coord2d movingto = coords.get(0);
+				final Iterator<Coord2d> queue = coords.iterator();
+				Coord last;
+				if (movingto != null && player.rc != null) {
+					//Make the line first
+					g.chcolor(Color.WHITE);
+					Coord cloc = p2c(player.rc);
+					last = p2c(mv.getCheckPointList().get(0));
+					if (last != null && cloc != null) {
+						g.dottedline(cloc, last, 2);
+						if (queue.hasNext()) {
+							while (queue.hasNext()) {
+								final Coord next = p2c(queue.next());
+								if (next != null) {
+									g.dottedline(last, next, 2);
+									last = next;
+								} else {
+									break;
+								}
+							}
+						}
+					}
+				} else if (mv.player().rc != null && player.rc != null) {
+					Coord cloc = p2c(player.rc);
+					last = p2c(mv.player().rc);
+					if (last != null && cloc != null) {
+						g.dottedline(cloc, last, 1);
+					}
+				}
+			}
 		}
 	}
 

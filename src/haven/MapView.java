@@ -63,6 +63,8 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	private long lastmmhittest = System.currentTimeMillis();
 	private Coord lasthittestc = Coord.z;
 	private Collection<DelayedB> delayedB = new LinkedList<DelayedB>();
+	public CheckpointManager checkpointManager;
+	public Thread checkpointManagerThread;
     
     public interface Delayed {
 	public void run(GOut g);
@@ -2130,11 +2132,16 @@ public class MapView extends PView implements DTarget, Console.Directory {
 				}
 			}
 		} else { // ND: This means no object was clicked. We clicked the ground.
-			if (clickb == 1) { // Left Click
+			if (clickb == 1 && ui.modmeta && ui.gui.vhand == null) {
+				addCheckpoint(mc);
+			} else if (clickb == 1) { // Left Click
 				if (OptWnd.autoEquipBunnySlippersPlateBootsCheckBox.a) {
 					switchToPlateBoots();
 				}
 			}
+		}
+		if(checkpointManager != null && checkpointManagerThread != null && clickb == 1){
+			checkpointManager.pauseIt();
 		}
 	    wdgmsg("click", args);
 	}
@@ -2744,5 +2751,28 @@ public class MapView extends PView implements DTarget, Console.Directory {
 		try {
 			glob.oc.getgob(plgob).delattr(Buddy.class); // ND: This is only needed for Valhalla.
 		} catch (NullPointerException ignored){}
+	}
+
+	public void addCheckpoint(Coord2d coord){
+		if(checkpointManager != null && checkpointManagerThread != null){
+			checkpointManager.addCoord(coord);
+		} else {
+			GameUI gameUI = ui.gui;
+			checkpointManager = new CheckpointManager(gameUI);
+			Window window = checkpointManager;
+			gameUI.add(window, new Coord(gameUI.sz.x/2 - window.sz.x/2 + 100, gameUI.sz.y - window.sz.y));
+			checkpointManagerThread = new Thread(checkpointManager, "CheckpointManager");
+			checkpointManagerThread.start();
+			checkpointManager.addCoord(coord);
+		}
+	}
+
+	public List<Coord2d> getCheckPointList(){
+		if(checkpointManager != null && checkpointManagerThread != null){
+			synchronized (checkpointManager.checkpointList){
+				return checkpointManager.getAllCoords();
+			}
+		}
+		return null;
 	}
 }
