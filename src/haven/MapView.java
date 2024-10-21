@@ -2096,6 +2096,16 @@ public class MapView extends PView implements DTarget, Console.Directory {
 		Long gobid = new Long((Integer) inf.clickargs()[1]);
 		Gob gob = glob.oc.getgob(gobid);
 			if(gob != null) {
+				if (ui.modmeta && ui.gui.vhand == null) {
+					Map<String, ChatUI.MultiChat> chats = ui.gui.chat.getMultiChannels();
+					if (clickb == 1 && (!ui.modshift || !ui.modctrl)) {
+						chats.get("Area Chat").send("@" + gob.id);
+					} else if (clickb == 3 && (!ui.modshift || !ui.modctrl)) {
+						if (chats.get("Party") != null)
+							chats.get("Party").send("@" + gob.id);
+					}
+					return;
+				}
 				if(ui.checkCursorImage("gfx/hud/curs/study") && clickb == 1) {
 					if (!gob.getres().name.equals("gfx/borka/body")) { // ND: helps with ignoring if you clicked yourself by mistake, after trying to inspect something
 						ui.gui.lastInspectedGob = gob;

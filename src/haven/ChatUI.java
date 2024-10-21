@@ -988,7 +988,24 @@ public class ChatUI extends Widget {
 	}
 
 	public boolean processMessage(String msg, long from){
-		if (msg.startsWith("HFMPL@@@")) {
+		if (msg.startsWith("@")) {
+			Pattern highlight = Pattern.compile("^@(-?\\d+)$");
+			Matcher matcher = highlight.matcher(msg);
+			if(matcher.matches()){
+				try {
+					Gob gob = ui.gui.map.glob.oc.getgob(Long.parseLong(matcher.group(1)));
+					if (gob != null) {
+						if (name.equals("Area Chat")) {
+							gob.highlight(new Color(255, 183, 0, 255));
+						} else if (name.equals("Party")) {
+							gob.highlight(new Color(243, 0, 0, 255));
+						}
+					}
+					return false;
+				} catch (Exception ignored){}
+			}
+			return true;
+		} else if (msg.startsWith("HFMPL@@@")) {
 			try {
 				final String hfmplayer = msg.substring("HFMPL@@@".length());
 				final String[] hfmargs = hfmplayer.split("\\|");
@@ -1734,4 +1751,15 @@ public class ChatUI extends Widget {
 //	}
 	return(super.globtype(key, ev));
     }
+
+	public Map<String, ChatUI.MultiChat> getMultiChannels() {
+		Map<String, ChatUI.MultiChat> channels = new HashMap<>();
+		for (Widget w = ui.gui.chat.lchild; w != null; w = w.prev) {
+			if (w instanceof ChatUI.MultiChat) {
+				ChatUI.MultiChat chat = ((ChatUI.MultiChat) w);
+				channels.put(chat.name, chat);
+			}
+		}
+		return channels;
+	}
 }

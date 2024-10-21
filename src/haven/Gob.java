@@ -1991,4 +1991,14 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 		gobDeathFuture.cancel(true);
 	}
 
+	public void highlight(Color c) {
+		GobPingHighlight h = getattr(GobPingHighlight.class);
+		if (h != null) {
+			delattr(h.getClass());
+		}
+		h = new GobPingHighlight(this, c);
+		setattr(h);
+		h.start();
+	}
+
 }
