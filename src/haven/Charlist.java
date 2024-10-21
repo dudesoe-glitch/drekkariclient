@@ -68,6 +68,8 @@ public class Charlist extends Widget {
 	    .action(() -> scroll(1));
 	sau.hide(); sad.hide();
 	resize(new Coord(bsz.x, sad.c.y + sad.sz.y));
+	Gob.batWingCapeEquipped = false;
+	Gob.nightQueenDefeated = false;
     }
 
     public static class Char {

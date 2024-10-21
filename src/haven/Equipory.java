@@ -195,6 +195,12 @@ public class Equipory extends Widget implements DTarget {
 		updateBottomText = true;
 		delayedUpdateTime = System.currentTimeMillis();
 		checkForLeeches = true;
+		try {
+			if (g.resource() != null && g.resource().name.equals("gfx/invobjs/batcape")) {
+				Gob.batWingCapeEquipped = true;
+				ui.sess.glob.oc.gobAction(Gob::updateBeastDangerRadii);
+			}
+		} catch (Exception ignored){}
 	} else {
 	    super.addchild(child, args);
 	}
@@ -215,6 +221,12 @@ public class Equipory extends Widget implements DTarget {
 	updateBottomText = true;
 	delayedUpdateTime = System.currentTimeMillis();
 	checkForLeeches = true;
+		try {
+			if (i.resource() != null && i.resource().name.equals("gfx/invobjs/batcape")) {
+				Gob.batWingCapeEquipped = false;
+				ui.sess.glob.oc.gobAction(Gob::updateBeastDangerRadii);
+			}
+		} catch (Exception ignored){}
 	}
     }
 

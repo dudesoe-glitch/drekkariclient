@@ -784,6 +784,7 @@ public class OptWnd extends Window {
 	public static CheckBox showSpeedBuffAurasCheckBox;
 	public static ColorOptionWidget speedBuffAuraColorOptionWidget;
 	public static String[] speedBuffAuraColorSetting = Utils.getprefsa("speedBuffAura" + "_colorSetting", new String[]{"255", "255", "255", "140"});
+	public static CheckBox showBeastDangerRadiiCheckBox;
 	public static CheckBox highlightCliffsCheckBox;
 	public static ColorOptionWidget highlightCliffsColorOptionWidget;
 	public static String[] highlightCliffsColorSetting = Utils.getprefsa("highlightCliffs" + "_colorSetting", new String[]{"255", "0", "0", "200"});
@@ -1192,6 +1193,16 @@ public class OptWnd extends Window {
 					ui.sess.glob.oc.gobAction(Gob::updateSpeedBuffAuras);
 				}
 			}), speedBuffAuraColorOptionWidget.pos("ur").adds(10, 0));
+
+			rightColumn = add(showBeastDangerRadiiCheckBox = new CheckBox("Show Beast Danger Radii"){
+				{a = (Utils.getprefb("showBeastDangerRadii", true));}
+				public void changed(boolean val) {
+					Utils.setprefb("showBeastDangerRadii", val);
+					if (ui != null && ui.gui != null) {
+						ui.sess.glob.oc.gobAction(Gob::updateBeastDangerRadii);
+					}
+				}
+			}, rightColumn.pos("bl").adds(0, 18).x(UI.scale(230)));
 
 
 			Widget backButton;

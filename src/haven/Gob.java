@@ -40,6 +40,7 @@ import haven.res.lib.tree.TreeScale;
 import haven.res.ui.obj.buddy.Buddy;
 import haven.res.ui.obj.buddy_v.Vilmate;
 import haven.sprites.AuraCircleSprite;
+import haven.sprites.RangeRadiusSprite;
 
 public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, EquipTarget, RandomSource {
     public Coord2d rc;
@@ -76,6 +77,9 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	private Overlay customSearchOverlay;
 	public Boolean knocked = null;  // knocked will be null if pose update request hasn't been received yet
 	private Overlay customAuraOverlay;
+	private Overlay customRadiusOverlay;
+	public static Boolean batWingCapeEquipped = false; // ND: Check for Bat Wing Cape
+	public static Boolean nightQueenDefeated = false; // ND: Check for Bat Dungeon Experience (Defeated Bat Queen)
 
     public static class Overlay implements RenderTree.Node {
 	public final int id;
@@ -1113,6 +1117,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 		updateCustomIcons();
 		updateCritterAuras();
 		updateSpeedBuffAuras();
+		updateBeastDangerRadii();
 	}
 
 	public void updPose(HashSet<String> poses) {
@@ -1134,6 +1139,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 			}
 		}
 		updateCritterAuras();
+		updateBeastDangerRadii();
 	}
 	public void updModAndEqu(List<Composited.MD> mod, List<Composited.ED> equ) {
 
@@ -1724,6 +1730,60 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 			String resourceName = getres().name;
 			if (resourceName.equals("gfx/terobjs/boostspeed"))
 				setAuraCircleOverlay(OptWnd.showSpeedBuffAurasCheckBox.a, OptWnd.speedBuffAuraColorOptionWidget.currentColor, 6f);
+		}
+	}
+
+	public void updateBeastDangerRadii() {
+		if (getres() != null) {
+			String resourceName = getres().name;
+			if (knocked != null && knocked == false) {
+				if (Arrays.stream(Config.beastResPaths).anyMatch(resourceName::endsWith)) {
+					if (resourceName.endsWith("/bat")) {
+						if (nightQueenDefeated || batWingCapeEquipped) {
+							setRadiusOverlay(false, null, 0f);
+						} else {
+							setRadiusOverlay(OptWnd.showBeastDangerRadiiCheckBox.a, new Color(192, 0, 0, 140), 120F);
+						}
+					} else {
+						setRadiusOverlay(OptWnd.showBeastDangerRadiiCheckBox.a, new Color(192, 0, 0, 140), 120F);
+					}
+				}
+			} else if (knocked != null && knocked == true) {
+				if (Arrays.stream(Config.beastResPaths).anyMatch(resourceName::endsWith)) {
+					setRadiusOverlay(false, null, 0f);
+				}
+			}
+			else if (isComposite && knocked == null) { // ND: Workaround. Some of these animals have no animation when standing still, so knocked stays null. I think they have no poses to load or something. Didn't look too much into it.
+				if (Arrays.stream(Config.beastResPaths).anyMatch(resourceName::endsWith)) {
+					if (resourceName.endsWith("/bat")) {
+						if (nightQueenDefeated || batWingCapeEquipped) {
+							setRadiusOverlay(false, null, 0f);
+						} else {
+							setRadiusOverlay(OptWnd.showBeastDangerRadiiCheckBox.a, new Color(192, 0, 0, 140), 120F);
+						}
+					} else {
+						setRadiusOverlay(OptWnd.showBeastDangerRadiiCheckBox.a, new Color(192, 0, 0, 140), 120F);
+					}
+				}
+			}
+		}
+	}
+
+
+
+	private void setRadiusOverlay(boolean enabled, Color col, float radius) {
+		if (enabled) {
+			if (customRadiusOverlay != null) {
+				removeOl(customRadiusOverlay);
+				customRadiusOverlay = null;
+			}
+			customRadiusOverlay = new Overlay(this, new RangeRadiusSprite(this, null, radius, col));
+			synchronized (ols) {
+				addol(customRadiusOverlay);
+			}
+		} else if (customRadiusOverlay != null) {
+			removeOl(customRadiusOverlay);
+			customRadiusOverlay = null;
 		}
 	}
 

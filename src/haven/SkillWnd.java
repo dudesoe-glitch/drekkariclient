@@ -133,6 +133,12 @@ public class SkillWnd extends Widget {
 	    this.res = res;
 	    this.mtime = mtime;
 	    this.score = score;
+		try {
+			if (res.get().name.equals("paginae/exp/nightqueen")) { // ND: Bat Dungeon Experience (Defeated Bat Queen)
+				Gob.nightQueenDefeated = true;
+				ui.sess.glob.oc.gobAction(Gob::updateBeastDangerRadii);
+			}
+		} catch (Exception ignored){}
 	}
 
 	public String rendertext() {
