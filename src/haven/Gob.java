@@ -46,6 +46,7 @@ import haven.res.lib.tree.TreeScale;
 import haven.res.ui.obj.buddy.Buddy;
 import haven.res.ui.obj.buddy_v.Vilmate;
 import haven.sprites.AuraCircleSprite;
+import haven.sprites.ChaseVectorSprite;
 import haven.sprites.RangeRadiusSprite;
 
 import javax.sound.sampled.AudioFormat;
@@ -98,6 +99,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	public static boolean somethingJustDied = false;
 	public static final ScheduledExecutorService gobDeathExecutor = Executors.newSingleThreadScheduledExecutor();
 	private static Future<?> gobDeathFuture;
+	private Overlay gobChaseVector = null;
 
     public static class Overlay implements RenderTree.Node {
 	public final int id;
@@ -755,6 +757,26 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 				}
 				occupiedGobID = null;
 			}
+		}
+	}
+	if (a instanceof Moving) {
+		if (gobChaseVector != null) {
+			gobChaseVector.remove();
+			gobChaseVector = null;
+		}
+	}
+	if (a instanceof Homing) {
+		Homing homing = (Homing) a;
+		if (gobChaseVector == null && homing != null) {
+			gobChaseVector = new Overlay(this, new ChaseVectorSprite(this, homing));
+			addol(gobChaseVector);
+		} else if (gobChaseVector != null && homing != null) {
+			gobChaseVector.remove();
+			gobChaseVector = new Overlay(this, new ChaseVectorSprite(this, homing));
+			addol(gobChaseVector);
+		} else if (gobChaseVector != null) {
+			gobChaseVector.remove();
+			gobChaseVector = null;
 		}
 	}
     }
@@ -1999,6 +2021,29 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 		h = new GobPingHighlight(this, c);
 		setattr(h);
 		h.start();
+	}
+
+	public Set<String> getPoses() {
+		Set<String> poses = new HashSet<>();
+		if (this.isComposite) {
+			try {
+				if (this.getattr(Drawable.class) != null) {
+					poses = new HashSet<>(((Composite) this.getattr(Drawable.class)).poses);
+
+				}
+			} catch (Exception ignored) { }
+		}
+		return poses;
+	}
+
+	public boolean isPartyMember() {
+		synchronized (glob.party.memb) {
+			for (Party.Member m : glob.party.memb.values()) {
+				if (m.gobid == id)
+					return true;
+			}
+		}
+		return false;
 	}
 
 }

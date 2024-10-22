@@ -787,6 +787,7 @@ public class OptWnd extends Window {
 	public static CheckBox showBeastDangerRadiiCheckBox;
 	public static CheckBox showBeeSkepsRadiiCheckBox;
 	public static CheckBox showFoodTroughsRadiiCheckBox;
+	public static CheckBox drawChaseVectorsCheckBox;
 	public static CheckBox highlightCliffsCheckBox;
 	public static ColorOptionWidget highlightCliffsColorOptionWidget;
 	public static String[] highlightCliffsColorSetting = Utils.getprefsa("highlightCliffs" + "_colorSetting", new String[]{"255", "0", "0", "200"});
@@ -1230,6 +1231,13 @@ public class OptWnd extends Window {
 				}
 			}, rightColumn.pos("bl").adds(0, 2));
 			showFoodTroughsRadiiCheckBox.tooltip = showFoodThroughsRadiiTooltip;
+			rightColumn = add(drawChaseVectorsCheckBox = new CheckBox("Draw Chase Vectors"){
+				{a = Utils.getprefb("drawChaseVectors", true);}
+				public void changed(boolean val) {
+					Utils.setprefb("drawChaseVectors", val);
+				}
+			}, rightColumn.pos("bl").adds(0, 2));
+			drawChaseVectorsCheckBox.tooltip = drawChaseVectorsTooltip;
 
 			Widget backButton;
 			add(backButton = new PButton(UI.scale(200), "Back", 27, back, "Advanced Settings"), leftColumn.pos("bl").adds(0, 18).x(0));
@@ -2679,6 +2687,15 @@ public class OptWnd extends Window {
 			"\n$col[185,185,185]{Select from below what states you want to be highlighted, and what colors you want each of them to show.}", UI.scale(330));
 	private final Object showBeeSkepsRadiiTooltip = RichText.render("$col[218,163,0]{Action Button:} $col[185,185,185]{This setting can also be turned on/off using an action button from the menu grid (Custom Client Extras → Toggles).}", UI.scale(320));
 	private final Object showFoodThroughsRadiiTooltip = RichText.render("$col[218,163,0]{Action Button:} $col[185,185,185]{This setting can also be turned on/off using an action button from the menu grid (Custom Client Extras → Toggles).}", UI.scale(320));
+	private final Object drawChaseVectorsTooltip = RichText.render("If this setting is enabled, colored lines will be drawn between chasers and chased targets." +
+			"\n=====================" +
+			"\n$col[255,255,255]{White: }You are the chaser." +
+			"\n$col[0,160,0]{Green: }A party member is the chaser." +
+			"\n$col[185,0,0]{Red: }A player is chasing you or a party member." +
+			"\n$col[165,165,165]{Gray: }An animal is the chaser, OR random (non-party) players are chasing each other." +
+			"\n=====================" +
+			"\n$col[218,163,0]{Note:} $col[185,185,185]{Chase vectors include queuing attacks, clicking a critter to pick up, or simply following someone.}" +
+			"\n$col[218,163,0]{Disclaimer:} $col[185,185,185]{Chase vectors sometimes don't show when chasing a critter that is standing still. The client treats this as something else for some reason and I can't fix it.}", UI.scale(430));
 
 	// Quality Display Settings Tooltips
 	private final Object customQualityColorsTooltip = RichText.render("These numbers and colors are completely arbitrary, and you can change them to whatever you like." +

@@ -84,4 +84,9 @@ public class Homing extends Moving {
 	    }
 	}
     }
+
+	public Gob targetGob() {
+		return(gob.glob.oc.getgob(this.tgt));
+	}
+
 }
