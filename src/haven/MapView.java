@@ -1824,7 +1824,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
 
 	public void adjust(Plob plob, Coord pc, Coord2d mc, int modflags) {
 	    Coord2d nc;
-	    if((modflags & UI.MOD_SHIFT) == 0)
+	    if((!OptWnd.useOGControlsForBuildingAndPlacingCheckBox.a && ((modflags & UI.MOD_SHIFT) == 0)) || (OptWnd.useOGControlsForBuildingAndPlacingCheckBox.a && ((modflags & UI.MOD_CTRL) == 0)))
 		nc = mc.floor(tilesz).mul(tilesz).add(tilesz.div(2));
 	    else if(plobpgran > 0)
 		nc = mc.div(tilesz).mul(plobpgran).roundf().div(plobpgran).mul(tilesz);
@@ -1838,11 +1838,11 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	}
 
 	public boolean rotate(Plob plob, int amount, int modflags) {
-	    if((modflags & (UI.MOD_CTRL | UI.MOD_SHIFT)) == 0)
+	    if((!OptWnd.useOGControlsForBuildingAndPlacingCheckBox.a && ((modflags & (UI.MOD_CTRL | UI.MOD_SHIFT)) == 0)) || (OptWnd.useOGControlsForBuildingAndPlacingCheckBox.a && ((modflags & UI.MOD_CTRL) == 0)) )
 		return(false);
 	    freerot = true;
 	    double na;
-	    if((modflags & UI.MOD_SHIFT) == 0)
+	    if((!OptWnd.useOGControlsForBuildingAndPlacingCheckBox.a && ((modflags & UI.MOD_SHIFT) == 0)) || (OptWnd.useOGControlsForBuildingAndPlacingCheckBox.a && ((modflags & UI.MOD_SHIFT) == 0)))
 		na = (Math.PI / 4) * Math.round((plob.a + (amount * Math.PI / 4)) / (Math.PI / 4));
 	    else
 		na = plob.a + amount * Math.PI / plobagran;
@@ -2175,8 +2175,18 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	    }
 	} else if((placing_l != null) && placing_l.done()) {
 	    Plob placing = placing_l.get();
-	    if(placing.lastmc != null)
-		wdgmsg("place", placing.rc.floor(posres), (int)Math.round(placing.a * 32768 / Math.PI), button, ui.modflags());
+	    if(placing.lastmc != null){
+		int modflags = ui.modflags();
+		// ND: Loftar checks serverside if we're holding CTRL while placing an item, which causes us to walk to that position if we do. So for the OG controls, we send fake info.
+		if (OptWnd.useOGControlsForBuildingAndPlacingCheckBox.a) {
+			if (ui.modctrl && !ui.modmeta) { // ND: Only extract this if we're holding CTRL while also not holding ALT
+				modflags = modflags - 2;
+			} else if (ui.modmeta && !ui.modctrl) { // ND: But also add it if we're holding ALT and not holding CTRL
+				modflags = modflags + 2;
+			}
+		}
+		wdgmsg("place", placing.rc.floor(posres), (int)Math.round(placing.a * 32768 / Math.PI), button, modflags);
+		}
 	} else if((grab != null) && grab.mmousedown(c, button)) {
 	} else {
 	    new Click(c, button).run();

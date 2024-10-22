@@ -1764,6 +1764,7 @@ public class OptWnd extends Window {
 	public static CheckBox overrideCursorItemWhenHoldingAltCheckBox;
 	public static CheckBox noCursorItemDroppingAnywhereCheckBox;
 	public static CheckBox noCursorItemDroppingInWaterCheckBox;
+	public static CheckBox useOGControlsForBuildingAndPlacingCheckBox;
 
 	public class AlteredGameplaySettingsPanel extends Panel {
 
@@ -1803,6 +1804,15 @@ public class OptWnd extends Window {
 				}
 			}, prev.pos("bl").adds(0, 2));
 			noCursorItemDroppingInWaterCheckBox.tooltip = noCursorItemDroppingInWaterTooltip;
+
+			prev = add(useOGControlsForBuildingAndPlacingCheckBox = new CheckBox("Use OG controls for Building and Placing"){
+				{a = Utils.getprefb("useOGControlsForBuildingAndPlacing", true);}
+				public void changed(boolean val) {
+					Utils.setprefb("useOGControlsForBuildingAndPlacing", val);
+				}
+			}, prev.pos("bl").adds(0, 12));
+			useOGControlsForBuildingAndPlacingCheckBox.tooltip = useOGControlsForBuildingAndPlacingTooltip;
+
 
 			Widget backButton;
 			add(backButton = new PButton(UI.scale(200), "Back", 27, back, "Advanced Settings"), prev.pos("bl").adds(0, 18));
@@ -2750,6 +2760,9 @@ public class OptWnd extends Window {
 			"\n$col[200,0,0]{WARNING: If you're holding something on your cursor, you're NOT ABLE to enter Deep Water to Swim. The game prevents you from doing it.}" +
 			"\n" +
 			"\n$col[218,163,0]{Action Button:} $col[185,185,185]{This setting can also be turned on/off using an action button from the menu grid (Custom Client Extras → Toggles).}", UI.scale(320));
+	private final Object useOGControlsForBuildingAndPlacingTooltip = RichText.render("Hold Ctrl to smoothly place, and Ctrl+Shift to also smoothly rotate. To walk to the place you click (rather than build/place the object) hold Alt." +
+			"\n" +
+			"\n$col[185,185,185]{Idk why Loftar changed them when he did, but some of you might be used to the new controls rather than the OG ones, so you have the option to disable this.}", UI.scale(320));
 
 	// Camera Settings Tooltips
 	private final Object reverseOrthoCameraAxesTooltip = RichText.render("Enabling this will reverse the Horizontal axis when dragging the camera to look around." +
