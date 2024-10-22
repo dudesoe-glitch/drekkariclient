@@ -26,11 +26,13 @@
 
 package haven;
 
+import javax.imageio.ImageIO;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
@@ -62,14 +64,17 @@ public class LoginScreen extends Widget {
 	private Window firstTimeUseWindow = null;
 	private Window firstTimeUseExtraBackgroundWindow = null; // ND: Do an extra window to have a solid background, no transparency.
 	private boolean firstTimeWindowCreated = false;
+	private static String backgroundPath = "res/customclient/loginScreen.png";
+
 
     private String getpref(String name, String def) {
 	return(Utils.getpref(name + "@" + hostname, def));
     }
 
     public LoginScreen(String hostname) {
-	super(bg.sz());
+	super(bg().sz());
 	this.hostname = hostname;
+	Tex bg = bg();
 	setfocustab(true);
 	add(new Img(bg), Coord.z);
 	optbtn = adda(new Button(UI.scale(100), "Options"), pos("cbl").add(10, -10), 0, 1);
@@ -554,6 +559,23 @@ public class LoginScreen extends Widget {
 		adda(firstTimeUseExtraBackgroundWindow, 0.5, 0.5);
 		adda(firstTimeUseWindow, 0.5, 0.5);
 		firstTimeWindowCreated = true;
+	}
+
+	static Tex bg(){
+		try {
+			BufferedImage originalImage = ImageIO.read(new File(backgroundPath));
+			// Create a new buffered image with the desired size
+			BufferedImage resizedImage = new BufferedImage(bg.sz().x, bg.sz().y, originalImage.getType());
+			// Create a Graphics2D object to perform the drawing
+			Graphics2D g2d = resizedImage.createGraphics();
+			// Draw the original image scaled to the new size
+			g2d.drawImage(originalImage.getScaledInstance(bg.sz().x, bg.sz().y, Image.SCALE_SMOOTH), 0, 0, null);
+			g2d.dispose(); // Clean up the graphics context
+			return new TexI(resizedImage);
+		} catch (IOException ignored) {
+			ignored.printStackTrace();
+			return bg;
+		}
 	}
 
 }
