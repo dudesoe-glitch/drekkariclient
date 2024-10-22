@@ -100,6 +100,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	public static final ScheduledExecutorService gobDeathExecutor = Executors.newSingleThreadScheduledExecutor();
 	private static Future<?> gobDeathFuture;
 	private Overlay gobChaseVector = null;
+	public static final HashSet<Long> alarmPlayed = new HashSet<Long>();
 
     public static class Overlay implements RenderTree.Node {
 	public final int id;
@@ -541,6 +542,9 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	}
 	if (isMe != null) {
 		setCustomPlayerName();
+		if (!isLoftar) {
+			playPlayerAlarm();
+		}
 	}
 	if (getattr(Moving.class) instanceof Following){
 		Following following = (Following) getattr(Moving.class);
@@ -1145,6 +1149,11 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 				try {
 					initComp((Composite)getattr(Drawable.class));
 					isComposite = true;
+					if(!alarmPlayed.contains(id)) {
+						if(AlarmManager.play(res.name, Gob.this)){
+							alarmPlayed.add(id);
+						}
+					}
 				} catch (Loading e) {
 					if (!throwLoading) {
 						glob.loader.syncdefer(() -> this.init(true), null, this);
@@ -1153,7 +1162,10 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 					}
 				}
 			} else {
-
+				if(!alarmPlayed.contains(id)) {
+					if(AlarmManager.play(res.name, Gob.this))
+						alarmPlayed.add(id);
+				}
 			}
 		}
 		updateCustomIcons();
@@ -1276,8 +1288,8 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 					}
 				}
 			}
+			playerNameChecked = true;
 		}
-		playerNameChecked = true;
 	}
 
 	public void isItLoftar(List<Composited.MD> mod, List<Composited.ED> equ) {
@@ -2044,6 +2056,59 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 			}
 		}
 		return false;
+	}
+
+	public void playPlayerAlarm() {
+		if (!alarmPlayed.contains(id)){
+			if (getres() != null) {
+				if (isMannequin != null && isMannequin == false){
+					if (getres().name.equals("gfx/borka/body")) {
+						Buddy buddyInfo = getattr(Buddy.class);
+						boolean isVillager = getattr(Vilmate.class) != null;
+						if (!isMe) {
+							if (buddyInfo != null) {
+								if ((buddyInfo.customName != null && buddyInfo.customName.equals("Unknown"))) {
+									playPlayerColorAlarm(OptWnd.whitePlayerAlarmEnabledCheckbox.a, OptWnd.whitePlayerAlarmFilename.buf.line(), OptWnd.whitePlayerAlarmVolumeSlider.val);
+								} else if ((buddyInfo.customName != null && buddyInfo.customName.equals("Village/Realm Member") && isVillager) || (buddyInfo.customName == null && buddyInfo.b != null && buddyInfo.rgrp == 0)) {
+									playPlayerColorAlarm(OptWnd.whiteVillageOrRealmPlayerAlarmEnabledCheckbox.a, OptWnd.whiteVillageOrRealmPlayerAlarmFilename.buf.line(), OptWnd.whiteVillageOrRealmPlayerAlarmVolumeSlider.val);
+								} else if (buddyInfo.rgrp == 1) {
+									playPlayerColorAlarm(OptWnd.greenPlayerAlarmEnabledCheckbox.a, OptWnd.greenPlayerAlarmFilename.buf.line(), OptWnd.greenPlayerAlarmVolumeSlider.val);
+								} else if (buddyInfo.rgrp == 2) {
+									playPlayerColorAlarm(OptWnd.redPlayerAlarmEnabledCheckbox.a, OptWnd.redPlayerAlarmFilename.buf.line(), OptWnd.redPlayerAlarmVolumeSlider.val);
+								} else if (buddyInfo.rgrp == 3) {
+									playPlayerColorAlarm(OptWnd.bluePlayerAlarmEnabledCheckbox.a, OptWnd.bluePlayerAlarmFilename.buf.line(), OptWnd.bluePlayerAlarmVolumeSlider.val);
+								} else if (buddyInfo.rgrp == 4) {
+									playPlayerColorAlarm(OptWnd.tealPlayerAlarmEnabledCheckbox.a, OptWnd.tealPlayerAlarmFilename.buf.line(), OptWnd.tealPlayerAlarmVolumeSlider.val);
+								} else if (buddyInfo.rgrp == 5) {
+									playPlayerColorAlarm(OptWnd.yellowPlayerAlarmEnabledCheckbox.a, OptWnd.yellowPlayerAlarmFilename.buf.line(), OptWnd.yellowPlayerAlarmVolumeSlider.val);
+								} else if (buddyInfo.rgrp == 6) {
+									playPlayerColorAlarm(OptWnd.purplePlayerAlarmEnabledCheckbox.a, OptWnd.purplePlayerAlarmFilename.buf.line(), OptWnd.purplePlayerAlarmVolumeSlider.val);
+								} else if (buddyInfo.rgrp == 7) {
+									playPlayerColorAlarm(OptWnd.orangePlayerAlarmEnabledCheckbox.a, OptWnd.orangePlayerAlarmFilename.buf.line(), OptWnd.orangePlayerAlarmVolumeSlider.val);
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	private void playPlayerColorAlarm(Boolean enabled, String line, int val) {
+		if (enabled) {
+			try {
+				File file = new File("AlarmSounds/" + line + ".wav");
+				if (file.exists()) {
+					AudioInputStream in = AudioSystem.getAudioInputStream(file);
+					AudioFormat tgtFormat = new AudioFormat(AudioFormat.Encoding.PCM_SIGNED, 44100, 16, 2, 4, 44100, false);
+					AudioInputStream pcmStream = AudioSystem.getAudioInputStream(tgtFormat, in);
+					Audio.CS klippi = new Audio.PCMClip(pcmStream, 2, 2);
+					((Audio.Mixer) Audio.player.stream).add(new Audio.VolAdjust(klippi, val / 50.0));
+					alarmPlayed.add(id);
+				}
+			} catch (Exception ignored) {
+			}
+		}
 	}
 
 }

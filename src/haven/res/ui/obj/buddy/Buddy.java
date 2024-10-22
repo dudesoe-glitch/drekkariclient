@@ -15,10 +15,10 @@ public class Buddy extends GAttrib implements InfoPart {
     public final Info info;
     private int bseq = -1;
     private BuddyWnd bw = null;
-    private BuddyWnd.Buddy b = null;
-    private int rgrp;
+    public BuddyWnd.Buddy b = null;
+    public int rgrp;
     private String rnm;
-	private String customName = null;
+	public String customName = null;
 	private Color customNameColor = Color.WHITE;
 
     public Buddy(Gob gob, int id) {

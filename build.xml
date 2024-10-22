@@ -172,6 +172,9 @@
     <copy todir="bin/res" >
       <fileset dir="res" includes="**"/>
     </copy>
+    <copy todir="bin/AlarmSounds" >
+      <fileset dir="AlarmSounds" includes="**"/>
+    </copy>
     <copy todir="bin/midiFiles" >
       <fileset dir="midiFiles" includes="**"/>
     </copy>
