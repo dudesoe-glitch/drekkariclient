@@ -51,6 +51,7 @@ public class RealmChannel extends ChatUI.MultiChat {
 	public final int w;
 	private String cn;
 	private Text r = null;
+	private final String timestamp = Utils.timestamp();
 
 	public PNamedMessage(Sender from, String text, int w) {
 	    this.from = from;
@@ -68,17 +69,20 @@ public class RealmChannel extends ChatUI.MultiChat {
 	    }
 
 	    public Text get() {
-		return(ChatUI.fnd.render(RichText.Parser.quote(String.format("%s: %s", nm, text)), w, TextAttribute.FOREGROUND, from.color));
+		return(ChatUI.fnd.render(RichText.Parser.quote(String.format("%s: %s", "[" + timestamp + "] " + nm, text)), w, TextAttribute.FOREGROUND, from.color));
 	    }
 	}
 
 	private String nm() {
 	    BuddyWnd.Buddy b = getparent(GameUI.class).buddies.find(from.bid);
-	    if(b != null)
-		return(b.name);
+	    if(b != null) {
+			if (from.name != null){
+				return (from.name + " [Memo: " + b.name + "]");
+			}
+		}
 	    if(from.name != null)
 		return(from.name);
-	    return("???");
+	    return("??? (Not Memorised)");
 	}
 
 	public Indir<Text> render(int w) {
@@ -99,7 +103,7 @@ public class RealmChannel extends ChatUI.MultiChat {
 		BuddyWnd.Buddy b = getparent(GameUI.class).buddies.find(from.bid);
 		String nm = nm();
 		if((r == null) || !nm.equals(cn)) {
-		    r = ChatUI.fnd.render(RichText.Parser.quote(String.format("%s: %s", nm, text)), w, TextAttribute.FOREGROUND, from.color);
+		    r = ChatUI.fnd.render(RichText.Parser.quote(String.format("[" + timestamp + "] " + "%s: %s", nm, text)), w, TextAttribute.FOREGROUND, from.color);
 		    cn = nm;
 		}
 	    }

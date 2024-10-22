@@ -35,6 +35,7 @@ import java.nio.file.*;
 import java.net.*;
 import java.lang.ref.*;
 import java.lang.reflect.*;
+import java.text.SimpleDateFormat;
 import java.util.prefs.*;
 import java.security.*;
 import java.util.*;
@@ -2479,6 +2480,10 @@ public class Utils {
 			}
 		}
 		return gobs;
+	}
+
+	public static String timestamp() {
+		return new SimpleDateFormat("HH:mm").format(new Date());
 	}
 
 }

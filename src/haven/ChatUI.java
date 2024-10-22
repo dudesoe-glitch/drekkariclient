@@ -265,9 +265,10 @@ public class ChatUI extends Widget {
 	public static class SimpleMessage extends Message {
 	    public final String text;
 	    public final Color col;
+		private final String timestamp = Utils.timestamp();
 
 	    public SimpleMessage(String text, Color col) {
-		this.text = text;
+		this.text = "[" + timestamp + "] " + text;
 		this.col = col;
 	    }
 
@@ -880,6 +881,7 @@ public class ChatUI extends Widget {
 	    public final int from;
 	    public final String text;
 	    public final Color col;
+		private final String timestamp = Utils.timestamp();
 
 	    public NamedMessage(int from, String text, Color col) {
 		this.from = from;
@@ -897,13 +899,13 @@ public class ChatUI extends Widget {
 		}
 
 		public Text get() {
-		    return(fnd.render(RichText.Parser.quote(String.format("%s: %s", nm, text)), w, TextAttribute.FOREGROUND, col));
+		    return(fnd.render(RichText.Parser.quote(String.format("%s: %s", "[" + timestamp + "] " + nm, text)), w, TextAttribute.FOREGROUND, col));
 		}
 	    }
 
 	    private String nm() {
 		BuddyWnd.Buddy b = getparent(GameUI.class).buddies.find(from);
-		return((b == null) ? "???" : b.name);
+		return((b == null) ? "??? (Not Memorised)" : b.name);
 	    }
 
 	    public Indir<Text> render(int w) {
@@ -1172,7 +1174,7 @@ public class ChatUI extends Widget {
 	public String name() {
 	    BuddyWnd.Buddy b = getparent(GameUI.class).buddies.find(other);
 	    if(b == null)
-		return("???");
+		return("??? (Not Memorised)");
 	    else
 		return(b.name);
 	}
