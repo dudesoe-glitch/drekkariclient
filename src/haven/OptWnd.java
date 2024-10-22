@@ -1765,6 +1765,7 @@ public class OptWnd extends Window {
 	public static CheckBox noCursorItemDroppingAnywhereCheckBox;
 	public static CheckBox noCursorItemDroppingInWaterCheckBox;
 	public static CheckBox useOGControlsForBuildingAndPlacingCheckBox;
+	public static CheckBox useImprovedInventoryTransferControlsCheckBox;
 
 	public class AlteredGameplaySettingsPanel extends Panel {
 
@@ -1812,7 +1813,13 @@ public class OptWnd extends Window {
 				}
 			}, prev.pos("bl").adds(0, 12));
 			useOGControlsForBuildingAndPlacingCheckBox.tooltip = useOGControlsForBuildingAndPlacingTooltip;
-
+			prev = add(useImprovedInventoryTransferControlsCheckBox = new CheckBox("Use improved Inventory Transfer controls (hold Alt)"){
+				{a = Utils.getprefb("useImprovedInventoryTransferControls", true);}
+				public void changed(boolean val) {
+					Utils.setprefb("useImprovedInventoryTransferControls", val);
+				}
+			}, prev.pos("bl").adds(0, 2));
+			useImprovedInventoryTransferControlsCheckBox.tooltip = useImprovedInventoryTransferControlsTooltip;
 
 			Widget backButton;
 			add(backButton = new PButton(UI.scale(200), "Back", 27, back, "Advanced Settings"), prev.pos("bl").adds(0, 18));
@@ -2763,6 +2770,7 @@ public class OptWnd extends Window {
 	private final Object useOGControlsForBuildingAndPlacingTooltip = RichText.render("Hold Ctrl to smoothly place, and Ctrl+Shift to also smoothly rotate. To walk to the place you click (rather than build/place the object) hold Alt." +
 			"\n" +
 			"\n$col[185,185,185]{Idk why Loftar changed them when he did, but some of you might be used to the new controls rather than the OG ones, so you have the option to disable this.}", UI.scale(320));
+	private final Object useImprovedInventoryTransferControlsTooltip = RichText.render("Alt+Left Click for descending order, and Alt+Right click for ascending order.", UI.scale(320));
 
 	// Camera Settings Tooltips
 	private final Object reverseOrthoCameraAxesTooltip = RichText.render("Enabling this will reverse the Horizontal axis when dragging the camera to look around." +

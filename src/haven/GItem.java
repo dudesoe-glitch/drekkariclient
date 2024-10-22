@@ -28,6 +28,7 @@ package haven;
 
 import java.util.*;
 import haven.render.*;
+import haven.res.ui.tt.q.qbuff.QBuff;
 import haven.res.ui.tt.q.quality.Quality;
 
 import java.awt.Color;
@@ -53,6 +54,7 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 	public Tex stackQualityTex = null;
 	public double studytime = 0.0;
 	private boolean checkedAutodrop = false;
+	private QBuff qBuff;
 
     @RName("item")
     public static class $_ implements Factory {
@@ -615,5 +617,30 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 		} catch (NumberFormatException ex){
 			return 0;
 		}
+	}
+
+	public void qualitycalc(List<ItemInfo> infolist) {
+		for (ItemInfo info : infolist) {
+			if (info instanceof QBuff) {
+				this.qBuff = (QBuff) info;
+				break;
+			}
+		}
+	}
+
+	public QBuff getQBuff() {
+		if (qBuff == null) {
+			try {
+				for (ItemInfo info : info()) {
+					if (info instanceof ItemInfo.Contents) {
+						qualitycalc(((ItemInfo.Contents) info).sub);
+						return qBuff;
+					}
+				}
+				qualitycalc(info());
+			} catch (Loading l) {
+			}
+		}
+		return qBuff;
 	}
 }

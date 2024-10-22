@@ -257,7 +257,14 @@ public class WItem extends Widget implements DTarget {
     }
 
     public boolean mousedown(Coord c, int btn) {
+	boolean inv = parent instanceof Inventory;
 	if(btn == 1) {
+		if (OptWnd.useImprovedInventoryTransferControlsCheckBox.a && ui.modmeta && !ui.modctrl) {
+			if (inv) {
+				wdgmsg("transfer-ordered", item, false);
+				return true;
+			}
+		}
 	    if(ui.modshift) {
 		int n = ui.modctrl ? -1 : 1;
 		item.wdgmsg("transfer", c, n);
@@ -269,6 +276,12 @@ public class WItem extends Widget implements DTarget {
 	    }
 	    return(true);
 	} else if(btn == 3) {
+		if (OptWnd.useImprovedInventoryTransferControlsCheckBox.a && ui.modmeta && !ui.modctrl) {
+			if (inv) {
+				wdgmsg("transfer-ordered", item, true);
+				return true;
+			}
+		}
 		if (ui.modctrl && OptWnd.autoSelect1stFlowerMenuCheckBox.a && !ui.modshift && !ui.modmeta) {
 			String itemname = item.getname();
 			int option = 0;
