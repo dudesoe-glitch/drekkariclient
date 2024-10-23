@@ -830,6 +830,8 @@ public class OptWnd extends Window {
 	public static OldDropBox<Integer> sweeperDurationDropbox;
 	public static final List<Integer> sweeperDurations = Arrays.asList(5, 10, 15, 30, 45, 60, 120);
 	public static int sweeperSetDuration = Utils.getprefi("sweeperSetDuration", 3);
+	public static CheckBox highlightPartyMembersCheckBox;
+	public static CheckBox showCirclesUnderPartyMembersCheckBox;
 
 	public class DisplaySettingsPanel extends Panel {
 		public DisplaySettingsPanel(Panel back) {
@@ -1320,6 +1322,24 @@ public class OptWnd extends Window {
 				}
 			}, rightColumn.pos("bl").adds(0, 2));
 			drawChaseVectorsCheckBox.tooltip = drawChaseVectorsTooltip;
+			rightColumn = add(highlightPartyMembersCheckBox = new CheckBox("Highlight Party Members"){
+				{a = Utils.getprefb("highlightPartyMembers", false);}
+				public void changed(boolean val) {
+					Utils.setprefb("highlightPartyMembers", val);
+					if (ui != null && ui.gui != null && ui.gui.map != null && ui.gui.map.partyHighlight != null)
+						ui.gui.map.partyHighlight.update();
+				}
+			}, rightColumn.pos("bl").adds(0, 12));
+			highlightPartyMembersCheckBox.tooltip = highlightPartyMembersTooltip;
+			rightColumn = add(showCirclesUnderPartyMembersCheckBox = new CheckBox("Show Circles under Party Members"){
+				{a = Utils.getprefb("showCirclesUnderPartyMembers", true);}
+				public void changed(boolean val) {
+					Utils.setprefb("showCirclesUnderPartyMembers", val);
+					if (ui != null && ui.gui != null && ui.gui.map != null && ui.gui.map.partyCircles != null)
+						ui.gui.map.partyCircles.update();
+				}
+			}, rightColumn.pos("bl").adds(0, 2));
+			showCirclesUnderPartyMembersCheckBox.tooltip = showCirclesUnderPartyMembersTooltip;
 
 			Widget backButton;
 			add(backButton = new PButton(UI.scale(200), "Back", 27, back, "Advanced Settings"), leftColumn.pos("bl").adds(0, 18).x(0));
@@ -3561,7 +3581,16 @@ public class OptWnd extends Window {
 			"\n" +
 			"\n$col[200,0,0]{NOTE:} $col[185,185,185]{There's a bug with the falling dust particles, that we can't really \"fix\". If you mine them out on a level, the same particles can also show up on different levels or the overworld. If you want them to vanish, you can just relog, but they will despawn from their original location too.}" +
 			"\n$col[218,163,0]{Action Button:} $col[185,185,185]{This setting can also be turned on/off using an action button from the menu grid (Custom Client Extras → Toggles).}", UI.scale(320));
-
+	private final Object highlightPartyMembersTooltip = RichText.render("Enabling this will put a color highlight over all party members." +
+			"\n=====================" +
+			"\n$col[255,255,255]{White: }$col[185,185,185]{Yourself}\n$col[0,74,208]{Blue: }$col[185,185,185]{Party Leader}\n$col[0,160,0]{Green: }$col[185,185,185]{Other Members}" +
+			"\n=====================" +
+			"\n$col[185,185,185]{If you are the party leader, your color highlight will always be $col[0,74,208]{Blue}, rather than $col[255,255,255]{White}.}", UI.scale(310));
+	private final Object showCirclesUnderPartyMembersTooltip = RichText.render("Enabling this will put a colored circle under all party members." +
+			"\n=====================" +
+			"\n$col[255,255,255]{White: }$col[185,185,185]{Yourself}\n$col[0,74,208]{Blue: }$col[185,185,185]{Party Leader}\n$col[0,160,0]{Green: }$col[185,185,185]{Other Members}" +
+			"\n=====================" +
+			"\n$col[185,185,185]{If you are the party leader, your circle's color will always be $col[0,74,208]{Blue}, rather than $col[255,255,255]{White}.}", UI.scale(300));
 
 	// Quality Display Settings Tooltips
 	private final Object customQualityColorsTooltip = RichText.render("These numbers and colors are completely arbitrary, and you can change them to whatever you like." +

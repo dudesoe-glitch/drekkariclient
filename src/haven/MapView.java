@@ -65,6 +65,8 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	private Collection<DelayedB> delayedB = new LinkedList<DelayedB>();
 	public CheckpointManager checkpointManager;
 	public Thread checkpointManagerThread;
+	public final PartyHighlight partyHighlight;
+	public final PartyCircles partyCircles;
     
     public interface Delayed {
 	public void run(GOut g);
@@ -594,6 +596,8 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	if (OptWnd.showContainerFullnessCheckBox.a) updatePlobContainerHighlight();
 	updatePlobCustomSizeAndRotation();
 	if (OptWnd.showWorkstationProgressCheckBox.a) updatePlobWorkstationProgressHighlight();
+	this.partyHighlight = new PartyHighlight(glob.party, plgob);
+	this.partyCircles = new PartyCircles(glob.party, plgob);
     }
     
     protected void envdispose() {
@@ -1807,6 +1811,8 @@ public class MapView extends PView implements DTarget, Console.Directory {
 		ob.ctick(dt);
 	    }
 	}
+	partyHighlight.update();
+	partyCircles.update();
     }
     
     public void resize(Coord sz) {
