@@ -41,12 +41,14 @@ import java.util.stream.Collectors;
 
 import haven.render.*;
 import haven.render.gl.GLObject;
+import haven.res.gfx.fx.msrad.MSRad;
 import haven.res.lib.svaj.GobSvaj;
 import haven.res.lib.tree.TreeScale;
 import haven.res.ui.obj.buddy.Buddy;
 import haven.res.ui.obj.buddy_v.Vilmate;
 import haven.sprites.AuraCircleSprite;
 import haven.sprites.ChaseVectorSprite;
+import haven.sprites.MiningSafeTilesSprite;
 import haven.sprites.RangeRadiusSprite;
 
 import javax.sound.sampled.AudioFormat;
@@ -101,6 +103,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	private static Future<?> gobDeathFuture;
 	private Overlay gobChaseVector = null;
 	public static final HashSet<Long> alarmPlayed = new HashSet<Long>();
+	private Overlay miningSafeTilesOverlay = null;
 
     public static class Overlay implements RenderTree.Node {
 	public final int id;
@@ -1174,6 +1177,8 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 		updateBeastDangerRadii();
 		updateTroughsRadius();
 		updateBeeSkepRadius();
+		updateMineLadderRadius();
+		updateSupportOverlays();
 	}
 
 	public void updPose(HashSet<String> poses) {
@@ -2108,6 +2113,46 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 				}
 			} catch (Exception ignored) {
 			}
+		}
+	}
+
+	public void updateMineLadderRadius() {
+		if (getres() != null) {
+			String resourceName = getres().name;
+			if (resourceName.equals("gfx/terobjs/ladder")){
+				setRadiusOverlay(OptWnd.showMineSupportRadiiCheckBox.a, new Color(0, 121, 12, 128), 100F);
+			}
+		}
+	}
+
+	public void updateSupportOverlays(){
+		if (getres() != null) {
+			if (getres().name.equals("gfx/terobjs/map/naturalminesupport") ){
+				setMiningSafeTilesOverlay(OptWnd.showMineSupportSafeTilesCheckBox.a, (float) a, 0);
+			} else if (getres().name.equals("gfx/terobjs/ladder") || getres().name.equals("gfx/terobjs/minesupport") ){
+				setMiningSafeTilesOverlay(OptWnd.showMineSupportSafeTilesCheckBox.a, (float) a, 1);
+			} else if (getres().name.equals("gfx/terobjs/column")){
+				setMiningSafeTilesOverlay(OptWnd.showMineSupportSafeTilesCheckBox.a, (float) a, 2);
+			} else if (getres().name.equals("gfx/terobjs/minebeam")){
+				setMiningSafeTilesOverlay(OptWnd.showMineSupportSafeTilesCheckBox.a, (float) a, 3);
+			}
+		}
+	}
+
+	public void setMiningSafeTilesOverlay(boolean enabled, float angle, int size) {
+		if (enabled) {
+			for (Overlay ol : ols) {
+				if (ol.spr instanceof MiningSafeTilesSprite) {
+					return;
+				}
+			}
+			miningSafeTilesOverlay = new Overlay(this, new MiningSafeTilesSprite(this, angle, size));
+			synchronized (ols) {
+				addol(miningSafeTilesOverlay);
+			}
+		} else if (miningSafeTilesOverlay != null) {
+			removeOl(miningSafeTilesOverlay);
+			miningSafeTilesOverlay = null;
 		}
 	}
 

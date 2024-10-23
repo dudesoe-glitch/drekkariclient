@@ -27,6 +27,8 @@
 package haven;
 
 import haven.render.*;
+import haven.res.gfx.fx.msrad.MSRad;
+import haven.res.ui.pag.toggle.Toggle;
 import haven.resutil.Ridges;
 
 import javax.sound.sampled.AudioFormat;
@@ -822,6 +824,8 @@ public class OptWnd extends Window {
 	public static CheckBox showWorkstationProgressUnpreparedCheckBox;
 	public static ColorOptionWidget showWorkstationProgressUnpreparedColorOptionWidget;
 	public static String[] workstationProgressUnpreparedColorSetting = Utils.getprefsa("workstationProgressUnprepared" + "_colorSetting", new String[]{"20", "20", "20", "180"});
+	public static CheckBox showMineSupportRadiiCheckBox;
+	public static CheckBox showMineSupportSafeTilesCheckBox;
 
 	public class DisplaySettingsPanel extends Panel {
 		public DisplaySettingsPanel(Panel back) {
@@ -1097,6 +1101,31 @@ public class OptWnd extends Window {
 					ui.gui.map.updatePlobWorkstationProgressHighlight();
 				}
 			}), showWorkstationProgressUnpreparedColorOptionWidget.pos("ur").adds(10, 0));
+			leftColumn = add(showMineSupportRadiiCheckBox = new CheckBox("Show Mine Support Radii"){
+				{a = (Utils.getprefb("showMineSupportRadii", false));}
+				public void set(boolean val) {
+					Utils.setprefb("showMineSupportRadii", val);
+					a = val;
+					MSRad.show(val);
+					if (ui != null && ui.gui != null){
+						ui.sess.glob.oc.gobAction(Gob::updateMineLadderRadius);
+						ui.gui.optionInfoMsg("Mine Support Radii are now " + (val ? "SHOWN" : "HIDDEN") + "!", (val ? msgGreen : msgGray), Audio.resclip(val ? Toggle.sfxon : Toggle.sfxoff));
+					}
+				}
+			}, leftColumn.pos("bl").adds(0, 12).x(0));
+			showMineSupportRadiiCheckBox.tooltip = showMineSupportRadiiTooltip;
+			leftColumn = add(showMineSupportSafeTilesCheckBox = new CheckBox("Show Mine Support Safe Tiles"){
+				{a = (Utils.getprefb("showMineSupportTiles", false));}
+				public void set(boolean val) {
+					Utils.setprefb("showMineSupportTiles", val);
+					a = val;
+					if (ui != null && ui.gui != null){
+						ui.sess.glob.oc.gobAction(Gob::updateSupportOverlays);
+						ui.gui.optionInfoMsg("Mine Support Safe Tiles are now " + (val ? "SHOWN" : "HIDDEN") + "!", (val ? msgGreen : msgGray), Audio.resclip(val ? Toggle.sfxon : Toggle.sfxoff));
+					}
+				}
+			}, leftColumn.pos("bl").adds(0, 2));
+			showMineSupportSafeTilesCheckBox.tooltip = showMineSupportSafeTilesTooltip;
 
 			rightColumn = add(toggleGobCollisionBoxesCheckBox = new CheckBox("Show Object Collision Boxes"){
 				{a = (Utils.getprefb("gobCollisionBoxesDisplayToggle", false));}
@@ -3476,6 +3505,8 @@ public class OptWnd extends Window {
 			"\n=====================" +
 			"\n$col[218,163,0]{Note:} $col[185,185,185]{Chase vectors include queuing attacks, clicking a critter to pick up, or simply following someone.}" +
 			"\n$col[218,163,0]{Disclaimer:} $col[185,185,185]{Chase vectors sometimes don't show when chasing a critter that is standing still. The client treats this as something else for some reason and I can't fix it.}", UI.scale(430));
+	private final Object showMineSupportRadiiTooltip = RichText.render("$col[218,163,0]{Action Button:} $col[185,185,185]{This setting can also be turned on/off using an action button from the menu grid (Custom Client Extras → Toggles).}", UI.scale(320));
+	private final Object showMineSupportSafeTilesTooltip = RichText.render("$col[218,163,0]{Action Button:} $col[185,185,185]{This setting can also be turned on/off using an action button from the menu grid (Custom Client Extras → Toggles).}", UI.scale(320));
 
 	// Quality Display Settings Tooltips
 	private final Object customQualityColorsTooltip = RichText.render("These numbers and colors are completely arbitrary, and you can change them to whatever you like." +

@@ -10,8 +10,8 @@ import java.awt.Color;
 /* >spr: BPRad */
 @haven.FromResource(name = "gfx/fx/bprad", version = 9)
 public class BPRad extends Sprite {
-    static final Pipe.Op smat = new BaseColor(new java.awt.Color(192, 0, 0, 128));
-    static final Pipe.Op emat = Pipe.Op.compose(new BaseColor(new java.awt.Color(255, 224, 96)), new States.LineWidth(4));
+    static final Pipe.Op smat = Pipe.Op.compose(new BaseColor(new java.awt.Color(0, 121, 12, 128)), Clickable.notClickable);
+    static final Pipe.Op emat = Pipe.Op.compose(new BaseColor(new java.awt.Color(0, 0, 0, 140)), new States.LineWidth(4), Clickable.notClickable);
     final Gob gob = owner.context(Gob.class);
     final VertexBuf.VertexData posa;
     final VertexBuf vbuf;

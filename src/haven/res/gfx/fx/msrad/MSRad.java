@@ -14,7 +14,7 @@ import haven.res.ui.pag.toggle.*;
 /* >spr: MSRad */
 @haven.FromResource(name = "gfx/fx/msrad", version = 16)
 public class MSRad extends Sprite {
-    public static boolean show = false;
+    public static boolean show = OptWnd.showMineSupportRadiiCheckBox.a;
     public static Collection<MSRad> current = new WeakList<>();
     final Sprite fx;
     final Collection<RenderTree.Slot> slots = new ArrayList<>(1);

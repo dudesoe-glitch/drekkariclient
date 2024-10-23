@@ -25,13 +25,14 @@ public class ShowSupports extends MenuGrid.PagButton {
     }
 
     public void use(MenuGrid.Interaction iact) {
-	MSRad.show(!MSRad.show);
-	pag.scm.ui.msg("Mine-support display is now turned " + (MSRad.show ? "on" : "off") + ".", null,
-		       Audio.resclip(MSRad.show ? Toggle.sfxon : Toggle.sfxoff));
+	OptWnd.showMineSupportRadiiCheckBox.set(!OptWnd.showMineSupportRadiiCheckBox.a);
+//	MSRad.show(!MSRad.show);
+//	pag.scm.ui.msg("Mine-support display is now turned " + (MSRad.show ? "on" : "off") + ".", null,
+//		       Audio.resclip(MSRad.show ? Toggle.sfxon : Toggle.sfxoff));
     }
 
     public void drawmain(GOut g, GSprite spr) {
 	super.drawmain(g, spr);
-	g.image(MSRad.show ? Toggle.on : Toggle.off, Coord.z);
+	g.image(OptWnd.showMineSupportRadiiCheckBox.a ? Toggle.on : Toggle.off, Coord.z);
     }
 }
