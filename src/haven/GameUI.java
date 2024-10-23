@@ -1885,15 +1885,6 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 	}
     }
 
-	public void optionInfoMsg(String msg, Color color) {
-		msg(msg, color, color);
-		double now = Utils.rtime();
-		if(now - lastmsgsfx > 0.1) {
-			ui.sfx(RootWidget.msgsfx);
-			lastmsgsfx = now;
-		}
-	}
-
 	public void optionInfoMsg(String msg, Color color, Audio.Clip sfx) {
 		msg(msg, color, color);
 		double now = Utils.rtime();

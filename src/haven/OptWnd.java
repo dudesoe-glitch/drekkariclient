@@ -892,7 +892,7 @@ public class OptWnd extends Window {
 					if (ui.sess != null)
 						ui.sess.glob.map.invalidateAll();
 					if (ui != null && ui.gui != null) {
-						ui.gui.optionInfoMsg("Highlight Cliffs is now " + (val ? "ENABLED" : "DISABLED") + "!", (val ? msgGreen : msgRed));
+						ui.gui.optionInfoMsg("Highlight Cliffs is now " + (val ? "ENABLED" : "DISABLED") + "!", (val ? msgGreen : msgRed), Audio.resclip(val ? Toggle.sfxon : Toggle.sfxoff));
 					}
 				}
 			}, leftColumn.pos("bl").adds(0, 12).x(0));
@@ -1250,7 +1250,7 @@ public class OptWnd extends Window {
 					a = val;
 					if (ui != null && ui.gui != null){
 						ui.sess.glob.oc.gobAction(Gob::updateBeeSkepRadius);
-						ui.gui.optionInfoMsg("Bee Skep Radii are now " + (val ? "SHOWN" : "HIDDEN") + "!", (val ? msgGreen : msgGray));
+						ui.gui.optionInfoMsg("Bee Skep Radii are now " + (val ? "SHOWN" : "HIDDEN") + "!", (val ? msgGreen : msgGray), Audio.resclip(val ? Toggle.sfxon : Toggle.sfxoff));
 					}
 				}
 			}, rightColumn.pos("bl").adds(0, 2));
@@ -1262,7 +1262,7 @@ public class OptWnd extends Window {
 					a = val;
 					if (ui != null && ui.gui != null){
 						ui.sess.glob.oc.gobAction(Gob::updateTroughsRadius);
-						ui.gui.optionInfoMsg("Food Trough Radii are now " + (val ? "SHOWN" : "HIDDEN") + "!", (val ? msgGreen : msgGray));
+						ui.gui.optionInfoMsg("Food Trough Radii are now " + (val ? "SHOWN" : "HIDDEN") + "!", (val ? msgGreen : msgGray), Audio.resclip(val ? Toggle.sfxon : Toggle.sfxoff));
 					}
 				}
 			}, rightColumn.pos("bl").adds(0, 2));
@@ -1821,7 +1821,7 @@ public class OptWnd extends Window {
 					Utils.setprefb("noCursorItemDroppingAnywhere", val);
 					a = val;
 					if (ui != null && ui.gui != null) {
-						ui.gui.optionInfoMsg("No Item Dropping (Anywhere) is now " + (val ? "ENABLED" : "DISABLED") + "!", (val ? msgGreen : msgRed));
+						ui.gui.optionInfoMsg("No Item Dropping (Anywhere) is now " + (val ? "ENABLED" : "DISABLED") + "!", (val ? msgGreen : msgRed), Audio.resclip(val ? Toggle.sfxon : Toggle.sfxoff));
 					}
 				}
 			}, prev.pos("bl").adds(0, 12));
@@ -1833,9 +1833,9 @@ public class OptWnd extends Window {
 					a = val;
 					if (ui != null && ui.gui != null) {
 						if (!noCursorItemDroppingAnywhereCheckBox.a) {
-							ui.gui.optionInfoMsg("No Item Dropping (in Water) is now " + (val ? "ENABLED" : "DISABLED") + "!", (val ? msgGreen : msgRed));
+							ui.gui.optionInfoMsg("No Item Dropping (in Water) is now " + (val ? "ENABLED" : "DISABLED") + "!", (val ? msgGreen : msgRed), Audio.resclip(val ? Toggle.sfxon : Toggle.sfxoff));
 						} else {
-							ui.gui.optionInfoMsg("No Item Dropping (in Water) is now " + (val ? "ENABLED" : "DISABLED") + "!" + (val ? "" : " (WARNING!!!: No Item Dropping (Anywhere) IS STILL ENABLED, and it overwrites this option!)"), (val ? msgGreen : msgYellow));
+							ui.gui.optionInfoMsg("No Item Dropping (in Water) is now " + (val ? "ENABLED" : "DISABLED") + "!" + (val ? "" : " (WARNING!!!: No Item Dropping (Anywhere) IS STILL ENABLED, and it overwrites this option!)"), (val ? msgGreen : msgYellow), Audio.resclip(val ? Toggle.sfxon : Toggle.sfxoff));
 						}
 					}
 				}
@@ -2147,7 +2147,7 @@ public class OptWnd extends Window {
 					if (ui.sess != null)
 						ui.sess.glob.map.invalidateAll();
 					if (ui != null && ui.gui != null) {
-						ui.gui.optionInfoMsg("Flavor Objects are now now " + (val ? "HIDDEN" : "SHOWN") + "!", (val ? msgGray : msgGreen));
+						ui.gui.optionInfoMsg("Flavor Objects are now now " + (val ? "HIDDEN" : "SHOWN") + "!", (val ? msgGray : msgGreen), Audio.resclip(val ? Toggle.sfxoff : Toggle.sfxon));
 					}
 				}
 			}, prev.pos("bl").adds(0, 2));
@@ -2159,7 +2159,7 @@ public class OptWnd extends Window {
 					if (ui.sess != null)
 						ui.sess.glob.map.resetMap();
 					if (ui != null && ui.gui != null) {
-						ui.gui.optionInfoMsg("Flat World is now " + (val ? "ENABLED" : "DISABLED") + "!", (val ? msgGreen : msgRed));
+						ui.gui.optionInfoMsg("Flat World is now " + (val ? "ENABLED" : "DISABLED") + "!", (val ? msgGreen : msgRed), Audio.resclip(val ? Toggle.sfxon : Toggle.sfxoff));
 					}
 				}
 			}, prev.pos("bl").adds(0, 12));
@@ -2171,7 +2171,7 @@ public class OptWnd extends Window {
 					if (ui.sess != null)
 						ui.sess.glob.map.invalidateAll();
 					if (ui != null && ui.gui != null) {
-						ui.gui.optionInfoMsg("Tile Smoothing is now " + (val ? "DISABLED" : "ENABLED") + "!", (val ? msgRed : msgGreen));
+						ui.gui.optionInfoMsg("Tile Smoothing is now " + (val ? "DISABLED" : "ENABLED") + "!", (val ? msgRed : msgGreen), Audio.resclip(val ? Toggle.sfxoff : Toggle.sfxon));
 					}
 				}
 			}, prev.pos("bl").adds(0, 2));
@@ -2183,7 +2183,7 @@ public class OptWnd extends Window {
 					if (ui.sess != null)
 						ui.sess.glob.map.invalidateAll();
 					if (ui != null && ui.gui != null) {
-						ui.gui.optionInfoMsg("Tile Transitions are now " + (val ? "DISABLED" : "ENABLED") + "!", (val ? msgRed : msgGreen));
+						ui.gui.optionInfoMsg("Tile Transitions are now " + (val ? "DISABLED" : "ENABLED") + "!", (val ? msgRed : msgGreen), Audio.resclip(val ? Toggle.sfxoff : Toggle.sfxon));
 					}
 				}
 			}, prev.pos("bl").adds(0, 2));
@@ -2195,7 +2195,7 @@ public class OptWnd extends Window {
 					if (ui.sess != null)
 						ui.sess.glob.map.invalidateAll();
 					if (ui != null && ui.gui != null)
-						ui.gui.optionInfoMsg("Flat Cave Walls are now " + (val ? "ENABLED" : "DISABLED") + "!", (val ? msgGreen : msgRed));
+						ui.gui.optionInfoMsg("Flat Cave Walls are now " + (val ? "ENABLED" : "DISABLED") + "!", (val ? msgGreen : msgRed), Audio.resclip(val ? Toggle.sfxon : Toggle.sfxoff));
 				}
 			}, prev.pos("bl").adds(0, 2));
 			prev = add(retractedCliffEdgesCheckBox = new CheckBox("Retracted Cliff Edges"){
@@ -2205,7 +2205,7 @@ public class OptWnd extends Window {
 					if (ui.sess != null)
 						ui.sess.glob.map.invalidateAll();
 					if (ui != null && ui.gui != null)
-						ui.gui.optionInfoMsg("Retracted Cliff Edges are now " + (val ? "ENABLED" : "DISABLED") + "!", (val ? msgGreen : msgRed));
+						ui.gui.optionInfoMsg("Retracted Cliff Edges are now " + (val ? "ENABLED" : "DISABLED") + "!", (val ? msgGreen : msgRed), Audio.resclip(val ? Toggle.sfxon : Toggle.sfxoff));
 				}
 			}, prev.pos("bl").adds(0, 2));
 			retractedCliffEdgesCheckBox.tooltip = retractedCliffEdgesTooltip;
