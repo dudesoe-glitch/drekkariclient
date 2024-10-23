@@ -12,7 +12,7 @@ import java.awt.Color;
 
 /* >spr: Cavein */
 @haven.FromResource(name = "gfx/fx/cavewarn", version = 8)
-public class Cavein extends Sprite implements Sprite.CDel {
+public class Cavein extends Sprite implements Sprite.CDel, PView.Render2D {
     static final Pipe.Op mat = new Light.PhongLight(false,
 						    new Color(255, 255, 255), new Color(255, 255, 255),
 						    new Color(128, 128, 128), new Color(0, 0, 0),
@@ -28,13 +28,42 @@ public class Cavein extends Sprite implements Sprite.CDel {
     Coord3f off;
     Coord3f sz;
 
+	final Tex numberTex;
+	final Gob ownerGob;
+	final MapView mapView;
+	Integer number;
+	Map colorMap = new LinkedHashMap<Integer, Color>(){{
+		put(1, new Color(0, 102, 255));
+		put(2, new Color(2, 194, 0));
+		put(3, new Color(251, 4, 0));
+		put(4, new Color(0, 21, 255));
+		put(5, new Color(162, 0, 2));
+		put(6, new Color(0, 175, 169));
+		put(7, new Color(0, 0, 0));
+		put(8, new Color(210, 210, 210));
+	}};
+	Color numberColor;
+
     public Cavein(Owner owner, Resource res, Message sdt) {
 	super(owner, res);
 	str = sdt.uint8();
 	sz = new Coord3f(sdt.float8() * 11f, sdt.float8() * 11f, 0f);
 	off = new Coord3f(-sz.x / 2f, -sz.y / 2f, sdt.float8() * 11f);
-	life = sdt.uint8();
-    }
+	life = 60 * OptWnd.sweeperDurations.get(OptWnd.sweeperSetDuration);
+		number = (int) Math.round(str / 30.0);
+		numberColor = (Color) colorMap.get(number);
+		if (number != 7)
+			numberTex = new TexI(Utils.outline2(Text.num20boldFnd.renderstroked(String.valueOf(number), numberColor, Color.BLACK).img, Color.BLACK, true));
+		else
+			numberTex = new TexI(Utils.outline2(Text.num20boldFnd.renderstroked(String.valueOf(number), numberColor, Color.WHITE).img, Color.BLACK, true));
+		if (owner instanceof Gob) {
+			ownerGob = (Gob) owner;
+			mapView = ownerGob.glob.sess.ui.gui.map;
+		} else {
+			ownerGob = null;
+			mapView = null;
+		}
+	}
 
     class Boll {
 	Coord3f p, v, n;
@@ -115,4 +144,18 @@ public class Cavein extends Sprite implements Sprite.CDel {
     public void delete() {
 	spawn = false;
     }
+
+	@Override
+	public void draw(GOut g, Pipe state) {
+		if (OptWnd.flatWorldCheckBox.a) { // TODO: ND: Need to figure out a way to make flatworld not needed for this. Something to do with the Z coordinate of the virtual gob probably.
+			if (OptWnd.enableMineSweeperCheckBox.a && ownerGob != null && mapView != null){
+				try {
+					Coord3f sc3f = ownerGob.getc();
+					Coord sc = mapView.screenxf(sc3f).round2();
+					g.aimage(numberTex, sc, 0.5, 0.5);
+				} catch (Loading ignored) {
+				}
+			}
+		}
+	}
 }
