@@ -651,7 +651,11 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
     }
 
     public Overlay findol(int id) {
-	for(Overlay ol : ols) {
+	List<Overlay> tempOls;
+	synchronized (ols) {
+		tempOls = new ArrayList<>(ols);
+	}
+	for(Overlay ol : tempOls) {
 	    if(ol.id == id)
 		return(ol);
 	}
