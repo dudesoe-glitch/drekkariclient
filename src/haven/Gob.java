@@ -2088,6 +2088,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 					if (getres().name.equals("gfx/borka/body")) {
 						Buddy buddyInfo = getattr(Buddy.class);
 						boolean isVillager = getattr(Vilmate.class) != null;
+						haven.res.ui.obj.buddy_n.Named namedInfo = getattr(haven.res.ui.obj.buddy_n.Named.class);
 						if (!isMe) {
 							if (buddyInfo != null) {
 								if ((buddyInfo.customName != null && buddyInfo.customName.equals("Unknown"))) {
@@ -2109,6 +2110,9 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 								} else if (buddyInfo.rgrp == 7) {
 									playPlayerColorAlarm(OptWnd.orangePlayerAlarmEnabledCheckbox.a, OptWnd.orangePlayerAlarmFilename.buf.line(), OptWnd.orangePlayerAlarmVolumeSlider.val);
 								}
+							}
+							if (namedInfo != null) {
+								playPlayerColorAlarm(OptWnd.whitePlayerAlarmEnabledCheckbox.a, OptWnd.whitePlayerAlarmFilename.buf.line(), OptWnd.whitePlayerAlarmVolumeSlider.val);
 							}
 						}
 					}
