@@ -832,6 +832,7 @@ public class OptWnd extends Window {
 	public static int sweeperSetDuration = Utils.getprefi("sweeperSetDuration", 3);
 	public static CheckBox highlightPartyMembersCheckBox;
 	public static CheckBox showCirclesUnderPartyMembersCheckBox;
+	public static CheckBox showCirclesUnderCombatFoesCheckBox;
 
 	public class DisplaySettingsPanel extends Panel {
 		public DisplaySettingsPanel(Panel back) {
@@ -1340,6 +1341,12 @@ public class OptWnd extends Window {
 				}
 			}, rightColumn.pos("bl").adds(0, 2));
 			showCirclesUnderPartyMembersCheckBox.tooltip = showCirclesUnderPartyMembersTooltip;
+			rightColumn = add(showCirclesUnderCombatFoesCheckBox = new CheckBox("Show Circles under Combat Foes (Players/Mobs)"){
+				{a = Utils.getprefb("showCirclesUnderCombatFoes", true);}
+				public void changed(boolean val) {
+					Utils.setprefb("showCirclesUnderCombatFoes", val);
+				}
+			}, rightColumn.pos("bl").adds(0, 2));
 
 			Widget backButton;
 			add(backButton = new PButton(UI.scale(200), "Back", 27, back, "Advanced Settings"), leftColumn.pos("bl").adds(0, 18).x(0));

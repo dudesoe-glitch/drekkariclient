@@ -41,15 +41,11 @@ import java.util.stream.Collectors;
 
 import haven.render.*;
 import haven.render.gl.GLObject;
-import haven.res.gfx.fx.msrad.MSRad;
 import haven.res.lib.svaj.GobSvaj;
 import haven.res.lib.tree.TreeScale;
 import haven.res.ui.obj.buddy.Buddy;
 import haven.res.ui.obj.buddy_v.Vilmate;
-import haven.sprites.AuraCircleSprite;
-import haven.sprites.ChaseVectorSprite;
-import haven.sprites.MiningSafeTilesSprite;
-import haven.sprites.RangeRadiusSprite;
+import haven.sprites.*;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
@@ -104,6 +100,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	private Overlay gobChaseVector = null;
 	public static final HashSet<Long> alarmPlayed = new HashSet<Long>();
 	private Overlay miningSafeTilesOverlay = null;
+	public Overlay combatFoeCircleOverlay = null;
 
     public static class Overlay implements RenderTree.Node {
 	public final int id;
@@ -2159,5 +2156,27 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 			miningSafeTilesOverlay = null;
 		}
 	}
+
+
+	public void setCombatFoeCircleOverlay() {
+		if (OptWnd.showCirclesUnderCombatFoesCheckBox.a && combatFoeCircleOverlay == null) {
+			combatFoeCircleOverlay = new Overlay(this, new AggroCircleSprite(this));
+			synchronized (ols) {
+				addol(combatFoeCircleOverlay);
+			}
+		} else if (!OptWnd.showCirclesUnderCombatFoesCheckBox.a && combatFoeCircleOverlay != null) {
+			removeOl(combatFoeCircleOverlay);
+			combatFoeCircleOverlay = null;
+		}
+	}
+
+	public void removeCombatFoeCircleOverlay(){
+		if (combatFoeCircleOverlay != null) {
+			removeOl(combatFoeCircleOverlay);
+			combatFoeCircleOverlay = null;
+		}
+	}
+
+
 
 }

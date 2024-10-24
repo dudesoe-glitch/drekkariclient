@@ -34,8 +34,6 @@ import java.io.File;
 import java.util.*;
 import java.util.List;
 
-import static haven.Utils.uint32;
-
 public class Fightview extends Widget {
     public static final Tex bg = Resource.loadtex("gfx/hud/bosq");
     public static final int height = 5;
@@ -78,12 +76,21 @@ public class Fightview extends Widget {
 	    buffs.destroy();
 	    relbuffs.destroy();
 	    invalid = true;
+		final Gob g = ui.sess.glob.oc.getgob(gobid);
+		if (g != null) g.removeCombatFoeCircleOverlay();
 	}
 
 	public void use(Indir<Resource> act) {
 	    lastact = act;
 	    lastuse = Utils.rtime();
 		playCombatSoundEffect(lastact);
+	}
+
+	public void updateCombatOverlays() {
+		final Gob g = ui.sess.glob.oc.getgob(gobid);
+		if (g != null) {
+			g.setCombatFoeCircleOverlay();
+		}
 	}
     }
 
@@ -293,6 +300,7 @@ public class Fightview extends Widget {
     public void tick(double dt) {
 	super.tick(dt);
 	for(Relation rel : lsrel) {
+		rel.updateCombatOverlays();
 	    Widget inf = obinfo(rel.gobid, false);
 	    if(inf != null)
 		inf.tick(dt);
