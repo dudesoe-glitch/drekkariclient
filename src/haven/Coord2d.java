@@ -190,4 +190,9 @@ public class Coord2d implements Comparable<Coord2d>, java.io.Serializable {
     public String toString() {
 	return("(" + x + ", " + y + ")");
     }
+
+    public Coord2d rotate(double a) {
+        return of((((x * Math.cos(a)) - (y * Math.sin(a)))),
+                (((x * Math.sin(a)) + (y * Math.cos(a)))));
+    }
 }

@@ -27,6 +27,7 @@
 package haven;
 
 import haven.render.*;
+import haven.sprites.CurrentTargetSprite;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
@@ -142,6 +143,7 @@ public class Fightsess extends Widget {
 	if((cur == null) || (cur.slot == null)) {
 	    try {
 		cur = new Effect(Sprite.create(null, fx, Message.nil));
+//		cur = new Effect(new CurrentTargetSprite(null));
 		cur.slot = map.basic.add(cur.spr, place);
 	    } catch(Loading l) {
 		return(null);
@@ -194,6 +196,7 @@ public class Fightsess extends Widget {
     private Indir<Resource> lastact1 = null, lastact2 = null;
     private Text lastacttip1 = null, lastacttip2 = null;
     private Effect curtgtfx;
+	private Effect curtgtfx2;
     public void draw(GOut g) {
 	updatepos();
 	double now = Utils.rtime();
@@ -207,8 +210,9 @@ public class Fightsess extends Widget {
 	    g.aimage(ip.get().tex(), pcc.add(-UI.scale(75), 0), 1, 0.5);
 	    g.aimage(oip.get().tex(), pcc.add(UI.scale(75), 0), 0, 0.5);
 
-	    if(fv.lsrel.size() > 1)
+//	    if(fv.lsrel.size() > 1)
 		curtgtfx = fxon(fv.current.gobid, tgtfx, curtgtfx);
+		curtgtfx2 = fxon2(fv.current.gobid, tgtfx, curtgtfx2);
 	}
 
 	{
@@ -494,4 +498,30 @@ public class Fightsess extends Widget {
 	}
 	return(false);
     }
+
+	private Effect fxon2(long gobid, Resource fx, Effect cur) {
+		MapView map = getparent(GameUI.class).map;
+		Gob gob = ui.sess.glob.oc.getgob(gobid);
+		if((map == null) || (gob == null))
+			return(null);
+		Pipe.Op place;
+		try {
+			place = gob.placed.curplace();
+		} catch(Loading l) {
+			return(null);
+		}
+		if((cur == null) || (cur.slot == null)) {
+			try {
+				cur = new Effect(new CurrentTargetSprite(null));
+				cur.slot = map.basic.add(cur.spr, place);
+			} catch(Loading l) {
+				return(null);
+			}
+			curfx.add(cur);
+		} else {
+			cur.slot.cstate(place);
+		}
+		cur.used = true;
+		return(cur);
+	}
 }
