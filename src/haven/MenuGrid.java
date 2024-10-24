@@ -750,6 +750,7 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 		makeLocal("customclient/menugrid/Toggles/MineSupportRadii");
 		makeLocal("customclient/menugrid/Toggles/MineSupportSafeTiles");
 		makeLocal("customclient/menugrid/Toggles/MineSweeper");
+		makeLocal("customclient/menugrid/Toggles/ClearAllCombatDamage");
 	}
 
 	public void useCustom(String[] ad) {
@@ -781,6 +782,8 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 				OptWnd.showMineSupportSafeTilesCheckBox.set(!OptWnd.showMineSupportSafeTilesCheckBox.a);
 			} else if (ad[2].equals("MineSweeper")) {
 				OptWnd.enableMineSweeperCheckBox.set(!OptWnd.enableMineSweeperCheckBox.a);
+			} else if (ad[2].equals("ClearAllCombatDamage")) {
+				OptWnd.damageInfoClearButton.click();
 			}
 		}
 	}

@@ -102,6 +102,8 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	private Overlay miningSafeTilesOverlay = null;
 	public Overlay combatFoeCircleOverlay = null;
 	public static Set<Long> permanentHighlightList = new HashSet<>();
+	private GobDamageInfo damage;
+	public Boolean imDrinking = false;
 
     public static class Overlay implements RenderTree.Node {
 	public final int id;
@@ -628,6 +630,18 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	ol.init();
 	ol.add0();
 	ols.add(ol);
+	try {
+		Sprite spr = ol.spr;
+		if(spr != null) {
+			Resource res = spr.res;
+			if(res != null) {
+				MessageBuf sdt = spr.sdt;
+				if(sdt != null && res.name.equals("gfx/fx/floatimg")) {
+					processDmg(sdt.clone());
+				}
+			}
+		}
+	} catch (Loading ignored) {}
     }
     public void addol(Overlay ol) {
 	addol(ol, true);
@@ -1213,6 +1227,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 				}
 				playerPoseUpdatedCounter = playerPoseUpdatedCounter + 1;
 			}
+			imDrinking = (poses.contains("drinkan"));
 		}
 	}
 	public void updModAndEqu(List<Composited.MD> mod, List<Composited.ED> equ) {
@@ -2190,6 +2205,32 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 			Gob.permanentHighlightList.remove(id);
 			delattr(GobPermanentHighlight.class);
 		}
+	}
+
+	private void processDmg(MessageBuf msg) {
+		try {
+			msg.rewind();
+			int v = msg.int32();
+			msg.uint8();
+			int c = msg.uint16();
+
+			if(damage == null) {
+				addDmg();
+			}
+			damage.update(c, v);
+		} catch (Exception ignored) {
+			ignored.printStackTrace();
+		}
+	}
+
+	private void addDmg() {
+		damage = new GobDamageInfo(this);
+		setattr(GobDamageInfo.class, damage);
+	}
+
+	public void clearDmg() {
+		setattr(GobDamageInfo.class, null);
+		damage = null;
 	}
 
 }

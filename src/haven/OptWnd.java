@@ -779,6 +779,109 @@ public class OptWnd extends Window {
 		}
 	}
 
+	public static CheckBox showCombatHotkeysUICheckBox;
+	public static CheckBox singleRowCombatMovesCheckBox;
+	public static CheckBox drawFloatingCombatDataOnCurrentTargetCheckBox;
+	public static CheckBox drawFloatingCombatDataOnOthersCheckBox;
+	public static CheckBox combatInfoBackgroundToggledCheckBox;
+	public static HSlider combatUITopPanelHeightSlider;
+	public static HSlider combatUIBottomPanelHeightSlider;
+	public static CheckBox toggleGobDamageInfoCheckBox;
+	public static CheckBox toggleGobDamageWoundInfoCheckBox;
+	public static CheckBox toggleGobDamageArmorInfoCheckBox;
+	public static Button damageInfoClearButton;
+	public class CombatUIPanel extends Panel {
+		public CombatUIPanel(Panel back) {
+			Widget prev;
+
+			prev = add(new Label("Top panel height:"), 0, 0);
+			prev = add(combatUITopPanelHeightSlider = new HSlider(UI.scale(200), 36, 480, Utils.getprefi("combatTopPanelHeight", 400)) {
+				public void changed() {
+					Utils.setprefi("combatTopPanelHeight", val);
+				}
+			}, prev.pos("bl").adds(0, 2));
+			add(new Button(UI.scale(70), "Reset", false).action(() -> {
+				combatUITopPanelHeightSlider.val = 400;
+				Utils.setprefi("combatTopPanelHeight", 400);
+			}), prev.pos("bl").adds(210, -20));
+			prev = add(new Label("Bottom panel height:"), prev.pos("bl").adds(0, 10));
+			prev = add(combatUIBottomPanelHeightSlider = new HSlider(UI.scale(200), 10, 480, Utils.getprefi("combatBottomPanelHeight", 100)) {
+				public void changed() {
+					Utils.setprefi("combatBottomPanelHeight", val);
+				}
+			}, prev.pos("bl").adds(0, 2));
+			add(new Button(UI.scale(70), "Reset", false).action(() -> {
+				combatUIBottomPanelHeightSlider.val = 100;
+				Utils.setprefi("combatBottomPanelHeight", 100);
+			}), prev.pos("bl").adds(210, -20));
+			prev = add(showCombatHotkeysUICheckBox = new CheckBox("Show Combat Move Hotkeys (Bottom Panel)"){
+				{a = Utils.getprefb("showCombatHotkeysUI", true);}
+				public void changed(boolean val) {
+					Utils.setprefb("showCombatHotkeysUI", val);
+				}
+			}, prev.pos("bl").adds(12, 10));
+			prev = add(singleRowCombatMovesCheckBox = new CheckBox("Single row for Combat Moves (Bottom Panel)"){
+				{a = Utils.getprefb("singleRowCombatMoves", false);}
+				public void set(boolean val) {
+					Utils.setprefb("singleRowCombatMoves", val);
+					a = val;
+				}
+			}, prev.pos("bl").adds(0, 2));
+
+			prev = add(drawFloatingCombatDataOnCurrentTargetCheckBox = new CheckBox("Display Combat Data above Current Target"){
+				{a = Utils.getprefb("drawFloatingCombatDataOnCurrentTarget", true);}
+				public void changed(boolean val) {
+					Utils.setprefb("drawFloatingCombatDataOnCurrentTarget", val);
+				}
+			}, prev.pos("bl").adds(0, 12));
+			prev = add(drawFloatingCombatDataOnOthersCheckBox = new CheckBox("Display Combat Data above other Combat Foes"){
+				{a = Utils.getprefb("drawFloatingCombatDataOnOthers", true);}
+				public void changed(boolean val) {
+					Utils.setprefb("drawFloatingCombatDataOnOthers", val);
+				}
+			}, prev.pos("bl").adds(0, 2));
+			prev = add(combatInfoBackgroundToggledCheckBox = new CheckBox("Background for Combat Data"){
+				{a = Utils.getprefb("CombatInfoBackgroundToggled", false);}
+				public void changed(boolean val) {
+					Utils.setprefb("CombatInfoBackgroundToggled", val);
+				}
+			}, prev.pos("bl").adds(0, 2));
+			prev = add(toggleGobDamageInfoCheckBox = new CheckBox("Display Damage Info:"){
+				{a = Utils.getprefb("GobDamageInfoToggled", true);}
+				public void changed(boolean val) {
+					Utils.setprefb("GobDamageInfoToggled", val);
+				}
+			}, prev.pos("bl").adds(0, 10).x(UI.scale(12)));
+			prev = add(new Label("> Include:"), prev.pos("bl").adds(0, 1));
+			prev = add(toggleGobDamageWoundInfoCheckBox = new CheckBox("Wounds"){
+				{a = Utils.getprefb("GobDamageInfoWoundsToggled", true);}
+				public void changed(boolean val) {
+					Utils.setprefb("GobDamageInfoWoundsToggled", val);
+				}
+			}, prev.pos("bl").adds(56, -17));
+			toggleGobDamageWoundInfoCheckBox.lbl = Text.create("Wounds", PUtils.strokeImg(Text.std.render("Wounds", new Color(255, 232, 0, 255))));
+			prev = add(toggleGobDamageArmorInfoCheckBox = new CheckBox("Armor"){
+				{a = Utils.getprefb("GobDamageInfoArmorToggled", true);}
+				public void changed(boolean val) {
+					Utils.setprefb("GobDamageInfoArmorToggled", val);
+				}
+			}, prev.pos("bl").adds(66, -18));
+			toggleGobDamageArmorInfoCheckBox.lbl = Text.create("Armor", PUtils.strokeImg(Text.std.render("Armor", new Color(50, 255, 92, 255))));
+			add(damageInfoClearButton = new Button(UI.scale(70), "Clear", false).action(() -> {
+				GobDamageInfo.clearAllDamage(ui.gui);
+				if (ui != null && ui.gui != null) {
+					ui.gui.optionInfoMsg("All Combat Damage Info has been CLEARED!", msgYellow, Audio.resclip(Toggle.sfxoff));
+				}
+			}), prev.pos("bl").adds(0, -34).x(UI.scale(210)));
+			damageInfoClearButton.tooltip = damageInfoClearTooltip;
+
+			Widget backButton;
+			add(backButton = new PButton(UI.scale(200), "Back", 27, back, "Advanced Settings"), prev.pos("bl").adds(0, 18).x(0));
+			pack();
+			centerBackButton(backButton, this);
+		}
+	}
+
 	public static CheckBox toggleGobCollisionBoxesCheckBox;
 	public static ColorOptionWidget collisionBoxColorOptionWidget;
 	public static String[] collisionBoxColorSetting = Utils.getprefsa("collisionBox" + "_colorSetting", new String[]{"255", "255", "255", "210"});
@@ -3446,10 +3549,12 @@ public class OptWnd extends Window {
 		Panel worldgraphicssettings = add(new WorldGraphicsSettingsPanel(advancedSettings));
 		Panel hidingsettings = add(new HidingSettingsPanel(advancedSettings));
 		Panel alarmsettings = add(new AlarmsAndSoundsSettingsPanel(advancedSettings));
+		Panel combatuipanel = add(new CombatUIPanel(advancedSettings));
 
 		int y2 = UI.scale(6);
 		y2 = advancedSettings.add(new PButton(UI.scale(200), "Interface Settings", -1, interfacesettings, "Interface Settings"), 0, y2).pos("bl").adds(0, 5).y;
 		y2 = advancedSettings.add(new PButton(UI.scale(200), "Action Bars Settings", -1, actionbarssettings, "Action Bars Settings"), 0, y2).pos("bl").adds(0, 5).y;
+		y2 = advancedSettings.add(new PButton(UI.scale(200), "Combat UI Settings", -1, combatuipanel, "Combat UI Settings"), 0, y2).pos("bl").adds(0, 5).y;
 		y2 = advancedSettings.add(new PButton(UI.scale(200), "Display Settings", -1, displaysettings, "Display Settings"), 0, y2).pos("bl").adds(0, 5).y;
 		y2 = advancedSettings.add(new PButton(UI.scale(200), "Quality Display Settings", -1, qualitydisplaysettings, "Quality Display Settings"), 0, y2).pos("bl").adds(0, 5).y;
 		y2 = advancedSettings.add(new PButton(UI.scale(200), "Camera Settings", -1, camsettings, "Camera Settings"), 0, y2).pos("bl").adds(0, 5).y;
@@ -3558,6 +3663,10 @@ public class OptWnd extends Window {
 			"\n" +
 			"\n$col[185,185,185]{It doesn't work with Gems. Don't ask me why.}", UI.scale(300));
 	private final Object lockStudyReportTooltip = RichText.render("Enabling this will prevent moving or dropping items from the Study Report", UI.scale(300));
+
+	// Combat UI Settings Tooltips
+	private final Object damageInfoClearTooltip = RichText.render("Clears all damage info." +
+			"\n$col[218,163,0]{Action Button:} $col[185,185,185]{This setting can also be turned on/off using an action button from the menu grid (Custom Client Extras → Toggles).}", UI.scale(320));
 
 	// Display Settings Tooltips
 	private final Object granularityPositionTooltip = RichText.render("Equivalent of the :placegrid console command, this allows you to have more freedom when placing constructions/objects.", UI.scale(300));

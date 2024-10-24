@@ -52,6 +52,12 @@ public class Buff extends Widget implements ItemInfo.ResOwner, Bufflist.Managed 
     int ameter = -1;
     int nmeter = -1;
     Tex ntext = null;
+	public static final Map<String, Color> improvedOpeningsImageColor = new HashMap<String, Color>(4) {{
+		put("paginae/atk/offbalance", new Color(0, 128, 3));
+		put("paginae/atk/reeling", new Color(217, 177, 20));
+		put("paginae/atk/dizzy", new Color(39, 82, 191));
+		put("paginae/atk/cornered", new Color(192, 28, 28));
+	}};
 
     @RName("buff")
     public static class $_ implements Factory {
@@ -85,7 +91,7 @@ public class Buff extends Widget implements ItemInfo.ResOwner, Bufflist.Managed 
 	return(info);
     }
 
-    private Tex nmeter() {
+    public Tex nmeter() {
 	if(ntext == null)
 	    ntext = new TexI(Utils.outline2(nfnd.render(Integer.toString(nmeter), Color.WHITE).img, Color.BLACK));
 	return(ntext);
@@ -109,7 +115,7 @@ public class Buff extends Widget implements ItemInfo.ResOwner, Bufflist.Managed 
 	public Tip shortvar() {return(this);}
     }
 
-    private final AttrCache<Double> ameteri = new AttrCache<>(this::info, AttrCache.map1(AMeterInfo.class, minf -> minf::ameter));
+    public final AttrCache<Double> ameteri = new AttrCache<>(this::info, AttrCache.map1(AMeterInfo.class, minf -> minf::ameter));
     private final AttrCache<Tex> nmeteri = new AttrCache<>(this::info, AttrCache.map1s(GItem.NumberInfo.class, ninf -> new TexI(GItem.NumberInfo.numrender(ninf.itemnum(), ninf.numcolor()))));
     private final AttrCache<Double> cmeteri = new AttrCache<>(this::info, AttrCache.map1(GItem.MeterInfo.class, minf -> minf::meter));
 

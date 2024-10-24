@@ -2149,6 +2149,8 @@ public class MapView extends PView implements DTarget, Console.Directory {
 			if (clickb == 1 && ui.modmeta && ui.gui.vhand == null) {
 				addCheckpoint(mc);
 			} else if (clickb == 1) { // Left Click
+				if (ui.gui.fv != null)
+					ui.gui.fv.currentChanged = false;
 				if (OptWnd.autoEquipBunnySlippersPlateBootsCheckBox.a) {
 					switchToPlateBoots();
 				}

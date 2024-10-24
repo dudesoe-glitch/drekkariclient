@@ -54,6 +54,9 @@ public class Fightview extends Widget {
     public double lastuse = 0;
     public Mainrel curdisp;
     private List<Relation> nonmain = Collections.emptyList();
+	public boolean currentChanged = false;
+	public double lastMoveCooldown, lastMoveCooldownSeconds;
+	public Boolean lastMoveUpdated = false;
 
     public class Relation {
         public final long gobid;
@@ -63,6 +66,11 @@ public class Fightview extends Widget {
 	public Indir<Resource> lastact = null;
 	public double lastuse = 0;
 	public boolean invalid = false;
+	public Long lastActCleave = null;
+	public Long lastActDefence = null;
+	public Long lastDefenceDuration = null;
+	public double minAgi = 0D;
+	public double maxAgi = 2D;
 
         public Relation(long gobid) {
             this.gobid = gobid;
@@ -83,6 +91,34 @@ public class Fightview extends Widget {
 	public void use(Indir<Resource> act) {
 	    lastact = act;
 	    lastuse = Utils.rtime();
+		try {
+			if (lastact.get() != null && lastact.get().name.endsWith("cleave")) {
+				for (Buff buff : buffs.children(Buff.class)) {
+					if (buff.res != null && buff.res.get() != null) {
+						String name = buff.res.get().name;
+						if (Config.maneuvers.contains(name)) {
+							if (name.equals("paginae/atk/combmed")) {
+								int meterValue = 0;
+								Double meterDouble = (buff.ameter >= 0) ? Double.valueOf(buff.ameter / 100.0) : buff.ameteri.get();
+								if (meterDouble != null) {
+									meterValue = (int) (100 * meterDouble);
+								}
+								if (meterValue < 1) {
+									lastActCleave = System.currentTimeMillis();
+								}
+								break;
+							} else {
+								lastActCleave = System.currentTimeMillis();
+							}
+						}
+					}
+				}
+			}
+			if (lastact.get() != null && (Config.nonAttackDefences.keySet().stream().anyMatch(lastact.get().name::matches))){
+				lastActDefence = System.currentTimeMillis();
+				lastDefenceDuration = Config.nonAttackDefences.get(lastact.get().name);
+			}
+		} catch (Loading ignored) {}
 		playCombatSoundEffect(lastact);
 	}
 
@@ -203,6 +239,8 @@ public class Fightview extends Widget {
 	lastact = act;
 	lastuse = Utils.rtime();
 	playCombatSoundEffect(lastact);
+	if (currentChanged) lastMoveUpdated = false;
+	currentChanged = false;
     }
     
     @RName("frv")
@@ -292,6 +330,7 @@ public class Fightview extends Widget {
 	if(rel != null) {
 	    add(curdisp = new Mainrel(rel));
 	}
+	currentChanged = true;
 	current = rel;
 	layout();
 	updrel();
@@ -367,6 +406,9 @@ public class Fightview extends Widget {
 	} else if(msg == "atkc") {
 	    atkcs = Utils.rtime();
 	    atkct = atkcs + (Utils.dv(args[0]) * 0.06);
+		lastMoveCooldown = ((Number)args[0]).doubleValue();
+		lastMoveCooldownSeconds = lastMoveCooldown * 0.06;
+		lastMoveUpdated = true;
 	    return;
 	} else if(msg == "blk") {
 	    blk = ui.sess.getresv(args[0]);
