@@ -768,4 +768,12 @@ public class GOut {
 				c2.y + 0.5f};
 		drawp(Model.Mode.LINES, data);
 	}
+
+	public void image(BufferedImage img, Coord c, Coord sz) {
+		if(img == null)
+			return;
+		Tex tex = new TexI(img);
+		image(tex, c, sz);
+		tex.dispose();
+	}
 }
