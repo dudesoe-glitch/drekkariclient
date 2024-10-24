@@ -101,6 +101,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	public static final HashSet<Long> alarmPlayed = new HashSet<Long>();
 	private Overlay miningSafeTilesOverlay = null;
 	public Overlay combatFoeCircleOverlay = null;
+	public static Set<Long> permanentHighlightList = new HashSet<>();
 
     public static class Overlay implements RenderTree.Node {
 	public final int id;
@@ -1180,6 +1181,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 		updateBeeSkepRadius();
 		updateMineLadderRadius();
 		updateSupportOverlays();
+		initPermanentHighlightOverlay();
 	}
 
 	public void updPose(HashSet<String> poses) {
@@ -2177,6 +2179,17 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 		}
 	}
 
+	public void initPermanentHighlightOverlay(){
+		if (permanentHighlightList.contains(id)) {
+			setattr(new GobPermanentHighlight(this));
+		}
+	}
 
+	public void removePermanentHighlightOverlay(){
+		if (Gob.permanentHighlightList.contains(id)) {
+			Gob.permanentHighlightList.remove(id);
+			delattr(GobPermanentHighlight.class);
+		}
+	}
 
 }

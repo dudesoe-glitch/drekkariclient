@@ -810,7 +810,6 @@ public class OptWnd extends Window {
 	public static CheckBox showContainerFullnessEmptyCheckBox;
 	public static ColorOptionWidget showContainerFullnessEmptyColorOptionWidget;
 	public static String[] containerFullnessEmptyColorSetting = Utils.getprefsa("containerFullnessEmpty" + "_colorSetting", new String[]{"0", "120", "0", "180"});
-
 	public static CheckBox showWorkstationProgressCheckBox;
 	public static CheckBox showWorkstationProgressFinishedCheckBox;
 	public static ColorOptionWidget showWorkstationProgressFinishedColorOptionWidget;
@@ -833,6 +832,7 @@ public class OptWnd extends Window {
 	public static CheckBox highlightPartyMembersCheckBox;
 	public static CheckBox showCirclesUnderPartyMembersCheckBox;
 	public static CheckBox showCirclesUnderCombatFoesCheckBox;
+	public static CheckBox objectPermanentHighlightingCheckBox;
 
 	public class DisplaySettingsPanel extends Panel {
 		public DisplaySettingsPanel(Panel back) {
@@ -1175,6 +1175,17 @@ public class OptWnd extends Window {
 					Utils.setprefi("sweeperSetDuration", sweeperDurations.indexOf(item));
 				}
 			}, leftColumn.pos("ul").adds(160, 2));
+			leftColumn = add(objectPermanentHighlightingCheckBox = new CheckBox("Permanently Highlight Objects with on Alt + Middle Click (Mouse Scroll Click)"){
+				{a = (Utils.getprefb("objectPermanentHighlighting", false));}
+				public void changed(boolean val) {
+					Utils.setprefb("objectPermanentHighlighting", val);
+					if (!val) {
+						if (ui != null && ui.gui != null)
+							ui.sess.glob.oc.gobAction(Gob::removePermanentHighlightOverlay);
+						Gob.permanentHighlightList.clear();
+					}
+				}
+			}, leftColumn.pos("bl").adds(0, 12));
 
 			rightColumn = add(toggleGobCollisionBoxesCheckBox = new CheckBox("Show Object Collision Boxes"){
 				{a = (Utils.getprefb("gobCollisionBoxesDisplayToggle", false));}

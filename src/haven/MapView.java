@@ -2111,6 +2111,14 @@ public class MapView extends PView implements DTarget, Console.Directory {
 					} else if (clickb == 3 && (!ui.modshift || !ui.modctrl)) {
 						if (chats.get("Party") != null)
 							chats.get("Party").send("@" + gob.id);
+					} else if (clickb == 2 && !(ui.modshift || ui.modctrl)){
+						if (Gob.permanentHighlightList.contains(gob.id)) {
+							Gob.permanentHighlightList.remove(gob.id);
+							gob.delattr(GobPermanentHighlight.class);
+						} else {
+							Gob.permanentHighlightList.add(gob.id);
+							gob.setattr(new GobPermanentHighlight(gob));
+						}
 					}
 					return;
 				}
@@ -2176,6 +2184,7 @@ public class MapView extends PView implements DTarget, Console.Directory {
 	parent.setfocus(this);
 	Loader.Future<Plob> placing_l = this.placing;
 	if(button == 2) {
+		new Click(c, button).run();
 	    if(((Camera)camera).click(c)) {
 		camdrag = ui.grabmouse(this);
 	    }
