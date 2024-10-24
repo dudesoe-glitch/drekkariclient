@@ -36,6 +36,7 @@ import haven.render.*;
 public abstract class Sprite implements RenderTree.Node {
     public final Resource res;
     public final Owner owner;
+	public MessageBuf sdt;
     public static List<Factory> factories = new LinkedList<Factory>();
     static {
 	factories.add(SpriteLink.sfact);
@@ -123,13 +124,18 @@ public abstract class Sprite implements RenderTree.Node {
     public static Sprite create(Owner owner, Resource res, Message sdt) {
 	{
 	    Factory f = res.getcode(Factory.class, false);
-	    if(f != null)
-		return(f.create(owner, res, sdt));
+	    if(f != null) {
+			Sprite spr = f.create(owner, res, sdt);
+			if(sdt instanceof MessageBuf) {spr.sdt = (MessageBuf) sdt;}
+			return spr;
+		}
 	}
 	for(Factory f : factories) {
 	    Sprite ret = f.create(owner, res, sdt);
-	    if(ret != null)
-		return(ret);
+		if(ret != null) {
+			if(sdt instanceof MessageBuf) {ret.sdt = (MessageBuf) sdt;}
+			return(ret);
+		}
 	}
 	/* XXXRENDER
 	throw(new ResourceException("Does not know how to draw resource " + res.name, res));
