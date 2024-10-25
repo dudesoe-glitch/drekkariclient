@@ -2237,4 +2237,20 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 		damage = null;
 	}
 
+	public boolean isFriend() {
+		synchronized (glob.party.memb) {
+			for (Party.Member m : glob.party.memb.values()) {
+				if (m.gobid == id)
+					return true;
+			}
+		}
+		Buddy buddyInfo = getattr(Buddy.class);
+		Vilmate vilmateInfo = getattr(Vilmate.class);
+		if (buddyInfo != null && ((buddyInfo.customName != null && buddyInfo.customName.equals("Unknown")) || buddyInfo.rgrp == 2)) // ND: Red players
+			return false;
+		if ((vilmateInfo != null)) // ND: Village/Realm members
+			return true;
+		return false;
+	}
+
 }

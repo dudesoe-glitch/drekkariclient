@@ -332,6 +332,9 @@ public class Fightview extends Widget {
 	}
 	currentChanged = true;
 	current = rel;
+	if (current != null) {
+		ui.gui.lastopponent = current.gobid;
+	}
 	layout();
 	updrel();
     }

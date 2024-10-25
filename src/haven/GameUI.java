@@ -99,6 +99,8 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 	public Gob lastInspectedGob;
 	public InventorySearchWindow inventorySearchWindow;
 	public ObjectSearchWindow objectSearchWindow;
+	public Thread keyboundActionThread;
+	public long lastopponent = -1;
 
 	// Script Threads
 	public Thread autoRepeatFlowerMenuScriptThread;
@@ -1661,6 +1663,11 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 	public static KeyBinding kb_toggleHidingBoxes  = KeyBinding.get("toggleHidingBoxesKB",  KeyMatch.forchar('H', KeyMatch.C));
 	public static KeyBinding kb_toggleCollisionBoxes  = KeyBinding.get("toggleCollisionBoxesKB",  KeyMatch.forchar('B', KeyMatch.S));
 	public static KeyBinding kb_toggleGrowthInfo  = KeyBinding.get("toggleGrowthInfoKB",  KeyMatch.forchar('I',  KeyMatch.C | KeyMatch.S));
+	public static KeyBinding kb_aggroNearestTargetButton = KeyBinding.get("AggroNearestTargetButtonKB",  KeyMatch.forcode(KeyEvent.VK_SPACE, KeyMatch.S));
+	public static KeyBinding kb_aggroNearestPlayerButton = KeyBinding.get("AggroNearestPlayerButtonKB",  KeyMatch.nil);
+	public static KeyBinding kb_aggroAllNonFriendlyPlayers = KeyBinding.get("AggroAllNonFriendlyPlayers",   KeyMatch.nil);
+	public static KeyBinding kb_aggroLastTarget = KeyBinding.get("aggroLastTarget",  KeyMatch.forchar('T', KeyMatch.S));
+	public static KeyBinding kb_peaceCurrentTarget  = KeyBinding.get("peaceCurrentTargetKB",  KeyMatch.forchar('P', KeyMatch.M));
     public boolean globtype(char key, KeyEvent ev) {
 	if(key == ':') {
 	    entercmd();
@@ -1764,6 +1771,21 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 		return(true);
 	} else if(kb_toggleGrowthInfo.key().match(ev)) {
 		OptWnd.displayGrowthInfoCheckBox.set(!OptWnd.displayGrowthInfoCheckBox.a);
+		return(true);
+	} else if(kb_aggroNearestTargetButton.key().match(ev)) {
+		this.runActionThread(new Thread(new AggroNearestTarget(this), "AggroNearestTarget"));
+		return(true);
+	} else if(kb_aggroNearestPlayerButton.key().match(ev)) {
+		this.runActionThread(new Thread(new AggroNearestPlayer(this), "AggroNearestPlayer"));
+		return(true);
+	} else if(kb_aggroAllNonFriendlyPlayers.key().match(ev)) {
+		this.runActionThread(new Thread(new AggroEveryoneInRange(this), "AggroEverythingInRange"));
+		return (true);
+	} else if (kb_aggroLastTarget.key().match(ev)) {
+		this.runActionThread(new Thread(new AttackOpponent(this, this.lastopponent), "Reaggro"));
+		return(true);
+	} else if(kb_peaceCurrentTarget.key().match(ev)) {
+		peaceCurrentTarget();
 		return(true);
 	} else if((key == 27) && (map != null) && !map.hasfocus) {
 	    setfocus(map);
@@ -2605,6 +2627,30 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 			}
 		}
 		return null;
+	}
+
+	public void runActionThread(Thread t) {
+		if (this.keyboundActionThread != null && keyboundActionThread.isAlive()) {
+			keyboundActionThread.interrupt();
+		}
+		this.keyboundActionThread = t;
+		t.start();
+	}
+
+	public void stopActionThread() { // ND: This was never used in Havoc. But maybe at some point it'll be needed
+		if (keyboundActionThread != null && keyboundActionThread.isAlive()) {
+			keyboundActionThread.interrupt();
+		}
+	}
+
+	public void peaceCurrentTarget() {
+		try {
+			if (fv != null && fv.curdisp != null && fv.curdisp.give != null) {
+				fv.curdisp.give.wdgmsg("click", 1);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 }
