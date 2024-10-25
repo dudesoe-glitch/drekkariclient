@@ -31,11 +31,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
 import java.util.concurrent.Future;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 import java.util.function.*;
 import java.util.stream.Collectors;
 
@@ -60,7 +57,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
     public long id;
     public boolean removed = false;
     public final Glob glob;
-    public Map<Class<? extends GAttrib>, GAttrib> attr = new HashMap<Class<? extends GAttrib>, GAttrib>();
+	public ConcurrentHashMap<Class<? extends GAttrib>, GAttrib> attr = new ConcurrentHashMap<>(); // ND: Make this ConcurrentHashMap to prevent concurrent modification exceptions. It doesn't seem to affect performance
     public final Collection<Overlay> ols = new ArrayList<Overlay>();
     public final Collection<RenderTree.Slot> slots = new CopyOnWriteArrayList<>(); // ND: Make this COW to prevent concurrent modification exceptions. It doesn't seem to affect performance
     public int updateseq = 0;
