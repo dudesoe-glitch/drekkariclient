@@ -29,6 +29,7 @@ package haven;
 import java.util.*;
 
 import haven.automated.AddCoalToSmelter;
+import haven.automated.CloverScript;
 import haven.automated.OceanScoutBot;
 import haven.render.*;
 import java.awt.Color;
@@ -761,6 +762,7 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 		// Category: Other Scripts & Tools
 		makeLocal("customclient/menugrid/OtherScriptsAndTools/Add9CoalScript");
 		makeLocal("customclient/menugrid/OtherScriptsAndTools/Add12CoalScript");
+		makeLocal("customclient/menugrid/OtherScriptsAndTools/CloverScript");
 	}
 
 	public void useCustom(String[] ad) {
@@ -817,6 +819,16 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 				gui.runActionThread(new Thread(new AddCoalToSmelter(gui, 9), "Add9Coal"));
 			} else if (ad[2].equals("Add12CoalScript")) {
 				gui.runActionThread(new Thread(new AddCoalToSmelter(gui, 12), "Add12Coal"));
+			} else if (ad[2].equals("CloverScript")) {
+				if (gui.cloverScriptThread == null) {
+					gui.cloverScriptThread = new Thread(new CloverScript(gui), "CloverScript");
+					gui.cloverScriptThread.start();
+				} else {
+					gui.cloverScriptThread.interrupt();
+					gui.cloverScriptThread = null;
+					gui.cloverScriptThread = new Thread(new CloverScript(gui), "CloverScript");
+					gui.cloverScriptThread.start();
+				}
 			}
 		}
 	}

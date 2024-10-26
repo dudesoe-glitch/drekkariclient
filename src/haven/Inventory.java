@@ -197,6 +197,19 @@ public class Inventory extends Widget implements DTarget {
 		return items;
 	}
 
+	public WItem getItemPrecise(String name) {
+		if (name == null)
+			return null;
+		for (Widget wdg = child; wdg != null; wdg = wdg.next) {
+			if (wdg instanceof WItem) {
+				String wdgname = ((WItem)wdg).item.getname();
+				if (wdgname.equals(name))
+					return (WItem) wdg;
+			}
+		}
+		return null;
+	}
+
 	@Override
 	public void wdgmsg(Widget sender, String msg, Object... args) {
 		if(msg.equals("transfer-ordered")){

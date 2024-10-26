@@ -106,6 +106,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 	public Thread autoRepeatFlowerMenuScriptThread;
 	public Thread interactWithNearestObjectThread;
 	public Thread enterNearestVehicleThread;
+	public Thread cloverScriptThread;
 
 	// Bot Threads
 	public OceanScoutBot OceanScoutBot;
