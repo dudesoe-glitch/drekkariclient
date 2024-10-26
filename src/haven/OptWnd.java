@@ -2008,10 +2008,24 @@ public class OptWnd extends Window {
 		public AlteredGameplaySettingsPanel(Panel back) {
 			Widget prev;
 
-			prev = add(overrideCursorItemWhenHoldingAltCheckBox = new CheckBox("Override cursor item and prevent dropping it (hold Alt)"){
+			prev = add(overrideCursorItemWhenHoldingAltCheckBox = new CheckBox("Override Cursor Item and prevent dropping it (hold Alt)"){
 				{a = Utils.getprefb("overrideCursorItemWhenHoldingAlt", true);}
-				public void changed(boolean val) {
+				public void set(boolean val) {
 					Utils.setprefb("overrideCursorItemWhenHoldingAlt", val);
+					a = val;
+					if (val) {
+						if (noCursorItemDroppingAnywhereCheckBox.a) {// ND: Set it like this so it doesn't do the optionInfoMsg
+							noCursorItemDroppingAnywhereCheckBox.a = false;
+							Utils.setprefb("noCursorItemDroppingAnywhere", false);
+						}
+						if (noCursorItemDroppingInWaterCheckBox.a) { // ND: Set it like this so it doesn't do the optionInfoMsg
+							noCursorItemDroppingInWaterCheckBox.a = false;
+							Utils.setprefb("noCursorItemDroppingInWater", false);
+						}
+					}
+					if (ui != null && ui.gui != null) {
+						ui.gui.optionInfoMsg("Override Cursor Item and prevent dropping it (hold Alt) is now " + (val ? "ENABLED" : "DISABLED") + "!", (val ? msgGreen : msgRed), Audio.resclip(val ? Toggle.sfxon : Toggle.sfxoff));
+					}
 				}
 			}, UI.scale(0, 2));
 			overrideCursorItemWhenHoldingAltCheckBox.tooltip = overrideCursorItemWhenHoldingAltTooltip;
@@ -2020,6 +2034,12 @@ public class OptWnd extends Window {
 				public void set(boolean val) {
 					Utils.setprefb("noCursorItemDroppingAnywhere", val);
 					a = val;
+					if (val) {
+						if (overrideCursorItemWhenHoldingAltCheckBox.a) { // ND: Set it like this so it doesn't do the optionInfoMsg
+							overrideCursorItemWhenHoldingAltCheckBox.a = false;
+							Utils.setprefb("overrideCursorItemWhenHoldingAlt", false);
+						}
+					}
 					if (ui != null && ui.gui != null) {
 						ui.gui.optionInfoMsg("No Item Dropping (Anywhere) is now " + (val ? "ENABLED" : "DISABLED") + "!", (val ? msgGreen : msgRed), Audio.resclip(val ? Toggle.sfxon : Toggle.sfxoff));
 					}
@@ -2031,6 +2051,9 @@ public class OptWnd extends Window {
 				public void set(boolean val) {
 					Utils.setprefb("noCursorItemDroppingInWater", val);
 					a = val;
+					if (val) {
+						if (overrideCursorItemWhenHoldingAltCheckBox.a) overrideCursorItemWhenHoldingAltCheckBox.set(false);
+					}
 					if (ui != null && ui.gui != null) {
 						if (!noCursorItemDroppingAnywhereCheckBox.a) {
 							ui.gui.optionInfoMsg("No Item Dropping (in Water) is now " + (val ? "ENABLED" : "DISABLED") + "!", (val ? msgGreen : msgRed), Audio.resclip(val ? Toggle.sfxon : Toggle.sfxoff));
@@ -3782,20 +3805,28 @@ public class OptWnd extends Window {
 	// Altered Gameplay Settings Tooltips
 	private final Object overrideCursorItemWhenHoldingAltTooltip = RichText.render("Holding Alt while having an item on your cursor will allow you to left click to walk, or right click to interact with objects, rather than drop it on the ground." +
 			"\n" +
-			"\n$col[185,185,185]{Left click ignores the UI when you do this, so don't try to click on the map to walk while holding an item.}", UI.scale(300));
+			"\n$col[185,185,185]{Left click ignores the UI when you do this, so don't try to click on the map to walk while holding an item.}" +
+			"\n" +
+			"\n$col[200,0,0]{SETTING OVERRIDE:} This doesn't work with the \"No Cursor Dropping\" settings, and it will toggle them off when this is enabled.", UI.scale(320));
 	private final Object noCursorItemDroppingAnywhereTooltip = RichText.render("This will allow you to have an item on your cursor and still be able to left click to walk, or right click to interact with objects." +
-			"\n$col[185,185,185]{You can drop the item from your cursor if you hold Ctrl.}" +
+			"\n" +
+			"\n$col[185,185,185]{You can drop the item from your cursor if you hold Alt.}" +
 			"\n" +
 			"\n$col[200,0,0]{WARNING: If you're holding something on your cursor, you're NOT ABLE to enter Deep Water to Swim. The game prevents you from doing it.}" +
 			"\n" +
-			"\n$col[218,163,0]{Action Button:} $col[185,185,185]{This setting can also be turned on/off using an action button from the menu grid (Custom Client Extras → Toggles).}", UI.scale(320));
+			"\n$col[218,163,0]{Action Button:} $col[185,185,185]{This setting can also be turned on/off using an action button from the menu grid (Custom Client Extras → Toggles).}" +
+			"\n" +
+			"\n$col[200,0,0]{SETTING OVERRIDE:} This doesn't work with the \"Override Cursor Item\" setting, and it will toggle it off when this is enabled.", UI.scale(320));
 	private final Object noCursorItemDroppingInWaterTooltip =  RichText.render("This will allow you to have an item on your cursor and still be able to left click to walk, or right click to interact with objects, while you are in water. " +
 			"\nIf the previous setting is Enabled, this one will be ignored." +
-			"\n$col[185,185,185]{You can drop the item from your cursor if you hold Ctrl.}" +
+			"\n" +
+			"\n$col[185,185,185]{You can drop the item from your cursor if you hold Alt.}" +
 			"\n" +
 			"\n$col[200,0,0]{WARNING: If you're holding something on your cursor, you're NOT ABLE to enter Deep Water to Swim. The game prevents you from doing it.}" +
 			"\n" +
-			"\n$col[218,163,0]{Action Button:} $col[185,185,185]{This setting can also be turned on/off using an action button from the menu grid (Custom Client Extras → Toggles).}", UI.scale(320));
+			"\n$col[218,163,0]{Action Button:} $col[185,185,185]{This setting can also be turned on/off using an action button from the menu grid (Custom Client Extras → Toggles).}" +
+			"\n" +
+			"\n$col[200,0,0]{SETTING OVERRIDE:} This doesn't work with the \"Override Cursor Item\" setting, and it will toggle it off when this is enabled.", UI.scale(320));
 	private final Object useOGControlsForBuildingAndPlacingTooltip = RichText.render("Hold Ctrl to smoothly place, and Ctrl+Shift to also smoothly rotate. To walk to the place you click (rather than build/place the object) hold Alt." +
 			"\n" +
 			"\n$col[185,185,185]{Idk why Loftar changed them when he did, but some of you might be used to the new controls rather than the OG ones, so you have the option to disable this.}", UI.scale(320));

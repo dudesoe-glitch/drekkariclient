@@ -84,27 +84,44 @@ public class ItemDrag extends WItem {
 	
     public boolean mousedown(Coord c, int button) {
 	if(OptWnd.overrideCursorItemWhenHoldingAltCheckBox.a && ui.modmeta) {
-	    /* XXX */
-	    GameUI gui = getparent(GameUI.class);
-	    if((gui != null) && (gui.map != null)) {
-		return(gui.map.mousedown(gui.map.rootxlate(c.add(rootpos())), button));
-	    }
-	}
-	if (OptWnd.noCursorItemDroppingAnywhereCheckBox.a && !ui.modctrl){
-		return(ui.gui.map.mousedown(ui.gui.map.rootxlate(c.add(rootpos())), button));
-	}
-	if (OptWnd.noCursorItemDroppingInWaterCheckBox.a && !ui.modctrl){
-		if (ui.gui.map.player() != null){
-			int t = ui.gui.map.glob.map.gettile(ui.gui.map.player().rc.floor(tilesz));
-			Resource res = ui.gui.map.glob.map.tilesetr(t);
-			if (res != null && (
-					res.name.equals("gfx/tiles/water")
-					|| res.name.equals("gfx/tiles/deep")
-					|| res.name.equals("gfx/tiles/owater")
-					|| res.name.equals("gfx/tiles/odeep")
-					|| res.name.equals("gfx/tiles/odeeper"))) {
+		if(button == 1) {
+			interact(parent, c.add(this.c));
+			return(ui.gui.map.mousedown(ui.gui.map.rootxlate(c.add(rootpos())), button));
+		} else if(button == 3) {
+			interact(parent, c.add(this.c));
+			return(ui.gui.map.mousedown(ui.gui.map.rootxlate(c.add(rootpos())), button));
+		}
+	} else if (OptWnd.noCursorItemDroppingAnywhereCheckBox.a && !ui.modmeta){
+		if(button == 1) {
+			if (droponwindow(parent, c.add(this.c))) {
+				return(true);
+			} else
 				return(ui.gui.map.mousedown(ui.gui.map.rootxlate(c.add(rootpos())), button));
+		} else if(button == 3) {
+			interact(parent, c.add(this.c));
+			return(ui.gui.map.mousedown(ui.gui.map.rootxlate(c.add(rootpos())), button));
+		}
+	} else if (OptWnd.noCursorItemDroppingInWaterCheckBox.a && !ui.modmeta){
+		if(button == 1) {
+			if (droponwindow(parent, c.add(this.c))) {
+				return (true);
+			} else if (ui.gui.map.player() != null) {
+				int t = ui.gui.map.glob.map.gettile(ui.gui.map.player().rc.floor(tilesz));
+				Resource res = ui.gui.map.glob.map.tilesetr(t);
+				if (res != null && (
+						res.name.equals("gfx/tiles/water")
+								|| res.name.equals("gfx/tiles/deep")
+								|| res.name.equals("gfx/tiles/owater")
+								|| res.name.equals("gfx/tiles/odeep")
+								|| res.name.equals("gfx/tiles/odeeper"))) {
+					return (ui.gui.map.mousedown(ui.gui.map.rootxlate(c.add(rootpos())), button));
+				}
 			}
+		} else if(button == 3) {
+			if(interact(parent, c.add(this.c))) {
+				return(true);
+			} else
+				return(ui.gui.map.mousedown(ui.gui.map.rootxlate(c.add(rootpos())), button));
 		}
 	}
 	if(button == 1) {
@@ -120,4 +137,23 @@ public class ItemDrag extends WItem {
     public void mousemove(Coord c) {
 	this.c = this.c.add(c.add(doff.inv()));
     }
+
+	public boolean droponwindow(Widget w, Coord c) {
+		if(w instanceof DTarget) {
+			if(((DTarget)w).drop(c, c.add(doff.inv())))
+				return(true);
+		}
+		for(Widget wdg = w.lchild; wdg != null; wdg = wdg.prev) {
+			if((wdg == this) || !wdg.visible())
+				continue;
+			Coord cc = w.xlate(wdg.c, true);
+			if (wdg instanceof Window)
+			if(c.isect(cc, wdg.sz)) {
+				if(dropon(wdg, c.add(cc.inv())))
+					return(true);
+			}
+		}
+		return(false);
+	}
+
 }
