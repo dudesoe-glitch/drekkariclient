@@ -195,4 +195,12 @@ public class Coord2d implements Comparable<Coord2d>, java.io.Serializable {
         return of((((x * Math.cos(a)) - (y * Math.sin(a)))),
                 (((x * Math.sin(a)) + (y * Math.cos(a)))));
     }
+
+    public double getX() {
+        return x;
+    }
+
+    public double getY() {
+        return y;
+    }
 }

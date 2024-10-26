@@ -74,6 +74,8 @@ public class CollisionBox extends SlottedNode implements Rendered {
 
 	private static Model getModel(Gob gob) {
 		Model model = null;
+		Coord bboxa = new Coord(0,0);
+		Coord bboxb = new Coord(0,0);
 		Resource res = getResource(gob);
         String resName = res.name;
 		TreeScale treeScale = null;
@@ -120,6 +122,10 @@ public class CollisionBox extends SlottedNode implements Rendered {
 						box.add(new Coord3f(neg.bc.x*boxScaleFinal, -neg.ac.y*boxScaleFinal, Z));
 						box.add(new Coord3f(neg.bc.x*boxScaleFinal, -neg.bc.y*boxScaleFinal, Z));
 						box.add(new Coord3f(neg.ac.x*boxScaleFinal, -neg.bc.y*boxScaleFinal, Z));
+						bboxa.x = neg.ac.x;
+						bboxa.y = neg.ac.y;
+						bboxb.x = neg.bc.x;
+						bboxb.y = neg.bc.y;
 						if (!aurochsSpecialCase) {
 							polygons.add(box);
 						}
@@ -128,9 +134,26 @@ public class CollisionBox extends SlottedNode implements Rendered {
 
 				Collection<Resource.Obstacle> obstacles = res.layers(Resource.Obstacle.class);
 				if(obstacles != null) {
+					Optional<Coord2d> minX;
+					Optional<Coord2d> minY;
+					Optional<Coord2d> maxX;
+					Optional<Coord2d> maxY;
 					for (Resource.Obstacle obstacle : obstacles) {
 						if("build".equals(obstacle.id)) {continue;}
 						for (Coord2d[] polygon : obstacle.p) {
+							minX = Arrays.stream(polygon)
+									.min(Comparator.comparingDouble(Coord2d::getX));
+							minY = Arrays.stream(polygon)
+									.min(Comparator.comparingDouble(Coord2d::getY));
+
+							maxX = Arrays.stream(polygon)
+									.max(Comparator.comparingDouble(Coord2d::getX));
+							maxY = Arrays.stream(polygon)
+									.max(Comparator.comparingDouble(Coord2d::getY));
+							bboxa.x = (int) minX.get().getX();
+							bboxa.y = (int) minY.get().getX();
+							bboxb.x = (int) maxX.get().getX();
+							bboxb.y = (int) maxY.get().getY();
 							if (!aurochsSpecialCase) {
 								polygons.add(Arrays.stream(polygon)
 										.map(coord2d -> new Coord3f((float) coord2d.x * boxScaleFinal, (float) -coord2d.y * boxScaleFinal, Z))
@@ -163,6 +186,10 @@ public class CollisionBox extends SlottedNode implements Rendered {
 						box.add(new Coord3f(bx, -ay, Z));
 						box.add(new Coord3f(bx, -by, Z));
 						box.add(new Coord3f(ax, -by, Z));
+						bboxa.x = (int)ax;
+						bboxa.y = (int)ay;
+						bboxb.x = (int)bx;
+						bboxb.y = (int)by;
 						polygons2.add(box);
 						List<Float> vertices = new LinkedList<>();
 						for (List<Coord3f> polygon : polygons2) {
@@ -172,6 +199,7 @@ public class CollisionBox extends SlottedNode implements Rendered {
 						VertexArray.Buffer vbo = new VertexArray.Buffer(data.length * 4, DataBuffer.Usage.STATIC, DataBuffer.Filler.of(data));
 						VertexArray va = new VertexArray(LAYOUT, vbo);
 						model = new Model(Model.Mode.LINES, va, null);
+						model.bbox = new Model.BoundingBox(bboxa, bboxb);
 						if (!growingTreeOrBush)
 							MODEL_CACHE.put(resName, model);
 					}
@@ -188,6 +216,7 @@ public class CollisionBox extends SlottedNode implements Rendered {
 					VertexArray va = new VertexArray(LAYOUT, vbo);
 
 					model = new Model((Model.Mode.LINES), va, null);
+					model.bbox = new Model.BoundingBox(bboxa, bboxb);
 					if (!growingTreeOrBush)
 						MODEL_CACHE.put(resName, model);
 				}

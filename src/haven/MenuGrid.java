@@ -27,6 +27,8 @@
 package haven;
 
 import java.util.*;
+
+import haven.automated.OceanScoutBot;
 import haven.render.*;
 import java.awt.Color;
 import java.awt.Font;
@@ -751,6 +753,9 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 		makeLocal("customclient/menugrid/Toggles/MineSupportSafeTiles");
 		makeLocal("customclient/menugrid/Toggles/MineSweeper");
 		makeLocal("customclient/menugrid/Toggles/ClearAllCombatDamage");
+
+		// Category: Bots
+		makeLocal("customclient/menugrid/Bots/OceanScoutBot");
 	}
 
 	public void useCustom(String[] ad) {
@@ -784,6 +789,23 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 				OptWnd.enableMineSweeperCheckBox.set(!OptWnd.enableMineSweeperCheckBox.a);
 			} else if (ad[2].equals("ClearAllCombatDamage")) {
 				OptWnd.damageInfoClearButton.click();
+			}
+		} else if (ad[1].equals("Bots")) { // Category: Toggles
+			if (ad[2].equals("OceanScoutBot")) {
+				if (gui.OceanScoutBot == null && gui.oceanScoutBotThread == null) {
+					gui.OceanScoutBot = new OceanScoutBot(gui);
+					gui.add(gui.OceanScoutBot, new Coord(gui.sz.x / 2 - gui.OceanScoutBot.sz.x / 2, gui.sz.y / 2 - gui.OceanScoutBot.sz.y / 2 - 200));
+					gui.oceanScoutBotThread = new Thread(gui.OceanScoutBot, "OceanScoutBot");
+					gui.oceanScoutBotThread.start();
+				} else {
+					if (gui.OceanScoutBot != null) {
+						gui.OceanScoutBot.stop = true;
+						gui.OceanScoutBot.stop();
+						gui.OceanScoutBot.reqdestroy();
+						gui.OceanScoutBot = null;
+						gui.oceanScoutBotThread = null;
+					}
+				}
 			}
 		}
 	}

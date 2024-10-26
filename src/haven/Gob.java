@@ -75,7 +75,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	public Long occupiedGobID = null; // ND: The id of the "vehicle" this gob is currently in
 	private HitBoxGobSprite<HidingBox> hidingBoxHollow = null;
 	private HitBoxGobSprite<HidingBox> hidingBoxFilled = null;
-	private HitBoxGobSprite<CollisionBox> collisionBox = null;
+	public HitBoxGobSprite<CollisionBox> collisionBox = null;
 	private final GobQualityInfo qualityInfo;
 	private GobGrowthInfo growthInfo;
 	public boolean isHidden;
@@ -2248,6 +2248,30 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 		if ((vilmateInfo != null)) // ND: Village/Realm members
 			return true;
 		return false;
+	}
+
+	public boolean isPlgob(GameUI gui) {
+		try {
+			return gui.map.plgob == id;
+		} catch (Exception e) {
+			return false;
+		}
+	}
+
+	public boolean isMoving() {
+		return (getattr(Moving.class) != null);
+	}
+
+	public LinMove getLinMove() {
+		LinMove lm = getattr(LinMove.class);
+		if (lm != null)
+			return lm;
+
+		Following follow = getattr(Following.class);
+		if (follow != null)
+			return follow.tgt().getattr(LinMove.class);
+
+		return null;
 	}
 
 }
