@@ -204,9 +204,9 @@ public class Ridges implements MapMesh.ConsHooks {
 	    float zp = (z / (hi - lo));
 	    float cd = (4 * zp * zp) - (4 * zp) + 0.5f;
 	    cd *= cfac;
-	    ret[v] = ms.new Vertex(base.add(dc(bb + ((rnd.nextFloat() - 0.5f) * 2.0f) + cd, e)).add(0, 0, z));
+	    ret[v] = ms.new Vertex(base.add(dc(OptWnd.straightCliffEdgesCheckBox.a ? cd*2 : (bb + ((rnd.nextFloat() - 0.5f) * 2.0f) + cd), e)).add(0, 0, z));
 	    if((v > 0) && (v < nseg))
-		ret[v].z += (rnd.nextFloat() - 0.5f) * segi * 0.5f;
+		ret[v].z +=!OptWnd.straightCliffEdgesCheckBox.a ? segi * 0.5f : ((rnd.nextFloat() - 0.5f) * segi * 0.5f);
 	}
 	if (OptWnd.retractedCliffEdgesCheckBox.a) ret[nseg+1] = ms.new Vertex(ret[nseg-1].x, ret[nseg-1].y, ret[nseg].z+0.2f);
 	return(ret);

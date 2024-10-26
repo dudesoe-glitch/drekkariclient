@@ -2280,6 +2280,7 @@ public class OptWnd extends Window {
 	public static CheckBox disableTileTransitionsCheckBox;
 	public static CheckBox flatCaveWallsCheckBox;
 	public static CheckBox retractedCliffEdgesCheckBox;
+	public static CheckBox straightCliffEdgesCheckBox;
 	public static HSlider treeAndBushScaleSlider;
 	private Button treeAndBushScaleResetButton;
 	public static CheckBox disableTreeAndBushSwayingCheckBox;
@@ -2409,6 +2410,16 @@ public class OptWnd extends Window {
 				}
 			}, prev.pos("bl").adds(0, 2));
 			retractedCliffEdgesCheckBox.tooltip = retractedCliffEdgesTooltip;
+			prev = add(straightCliffEdgesCheckBox = new CheckBox("Straight Cliff Edges"){
+				{a = Utils.getprefb("straightCliffEdges", true);}
+				public void changed(boolean val) {
+					Utils.setprefb("straightCliffEdges", val);
+					if (ui.sess != null)
+						ui.sess.glob.map.invalidateAll();
+					if (ui != null && ui.gui != null)
+						ui.gui.optionInfoMsg("Straight Cliff Edges are now " + (val ? "ENABLED" : "DISABLED") + "!", (val ? msgGreen : msgRed), Audio.resclip(val ? Toggle.sfxon : Toggle.sfxoff));
+				}
+			}, prev.pos("bl").adds(0, 2));
 			prev = add(new Label("Trees & Bushes Scale:"), prev.pos("bl").adds(0, 10).x(0));
 			prev = add(treeAndBushScaleSlider = new HSlider(UI.scale(200), 30, 100, Utils.getprefi("treeAndBushScale", 100)) {
 				protected void attach(UI ui) {
