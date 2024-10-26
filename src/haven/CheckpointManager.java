@@ -556,7 +556,7 @@ public class CheckpointManager extends Window implements Runnable {
                     }
                     if (notMovingCounter == 30) {
                         gui.ui.error("Queued Movement PAUSED: I'm stuck!!!");
-                        File file = new File("res/sfx/ImStuck.wav");
+                        File file = new File("res/customclient/sfx/ImStuck.wav");
                         if (file.exists()) {
                             try {
                                 AudioInputStream in = AudioSystem.getAudioInputStream(file);
