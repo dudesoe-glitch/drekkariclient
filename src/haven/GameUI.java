@@ -122,6 +122,8 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 	public Thread tarKilnCleanerThread;
 	public TurnipBot turnipBot;
 	public Thread turnipThread;
+	public CleanupBot cleanupBot;
+	public Thread cleanupThread;
 
 
     public static abstract class BeltSlot {

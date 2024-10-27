@@ -5,6 +5,7 @@ import haven.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Random;
 
 import static haven.OCache.posres;
 
@@ -358,6 +359,22 @@ public class AUtils {
 
     public static void clickWItemAndSelectOption(GameUI gui, WItem wItem, int index) {
         wItem.item.wdgmsg("iact", Coord.z, gui.ui.modflags());
+        gui.ui.rcvr.rcvmsg(gui.ui.lastWidgetID+1, "cl", index, gui.ui.modflags());
+    }
+
+    public static void unstuck(GameUI gui) throws InterruptedException {
+        Coord2d pc = gui.map.player().rc;
+        Random r = new Random();
+        for (int i = 0; i < 5; i++) {
+            int xAdd = r.nextInt(500) - 250;
+            int yAdd = r.nextInt(500) - 250;
+            gui.map.wdgmsg("click", Coord.z, pc.floor(posres).add(xAdd, yAdd), 1, 0);
+            Thread.sleep(100);
+        }
+    }
+
+    public static void rightClickGobAndSelectOption(GameUI gui, Gob gob, int index) {
+        gui.map.wdgmsg("click", Coord.z, gob.rc.floor(posres), 3, 0, 0, (int) gob.id, gob.rc.floor(posres), 0, -1);
         gui.ui.rcvr.rcvmsg(gui.ui.lastWidgetID+1, "cl", index, gui.ui.modflags());
     }
 
