@@ -109,6 +109,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 	public Thread cloverScriptThread;
 	public Thread coracleScriptThread;
 	public Thread skisScriptThread;
+	public Thread refillWaterContainersThread;
 
 	// Bot Threads
 	public OceanScoutBot OceanScoutBot;

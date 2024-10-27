@@ -763,6 +763,7 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 		makeLocal("customclient/menugrid/OtherScriptsAndTools/CloverScript");
 		makeLocal("customclient/menugrid/OtherScriptsAndTools/CoracleScript");
 		makeLocal("customclient/menugrid/OtherScriptsAndTools/SkisScript");
+		makeLocal("customclient/menugrid/OtherScriptsAndTools/RefillWaterContainers");
 	}
 
 	public void useCustom(String[] ad) {
@@ -848,6 +849,16 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 					gui.skisScriptThread = null;
 					gui.skisScriptThread = new Thread(new SkisScript(gui), "SkisScript");
 					gui.skisScriptThread.start();
+				}
+			} else if (ad[2].equals("RefillWaterContainers")) {
+				if (gui.refillWaterContainersThread == null) {
+					gui.refillWaterContainersThread = new Thread(new RefillWaterContainers(gui), "RefillWaterContainers");
+					gui.refillWaterContainersThread.start();
+				} else {
+					gui.refillWaterContainersThread.interrupt();
+					gui.refillWaterContainersThread = null;
+					gui.refillWaterContainersThread = new Thread(new RefillWaterContainers(gui), "RefillWaterContainers");
+					gui.refillWaterContainersThread.start();
 				}
 			}
 		}

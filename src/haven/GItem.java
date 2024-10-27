@@ -267,6 +267,10 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 	    if(args.length > 2)
 		contentsid = args[2];
 	    contentswnd = contparent().add(new ContentsWindow(this, contents));
+		if(this.parent instanceof Equipory){
+			Equipory equipory = (Equipory) this.parent;
+			contentswnd.myOwnEquipory = equipory.myOwnEquipory;
+		}
 	}
     }
 
@@ -435,6 +439,7 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 	private Coord psz = null;
 	private String st;
 	private boolean hovering;
+	public boolean myOwnEquipory = false;
 
 	public ContentsWindow(GItem cont, Widget inv) {
 	    super(Coord.z, cont.contentsnm);
