@@ -113,6 +113,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 	public CombatDistanceTool combatDistanceTool;
 	public Thread combatDistanceToolThread;
 	public Thread harvestNearestDreamcatcherThread;
+	public Thread destroyNearestTrellisPlantScriptThread;
 
 	// Bot Threads
 	public OceanScoutBot OceanScoutBot;
