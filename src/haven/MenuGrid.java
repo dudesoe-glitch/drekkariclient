@@ -768,6 +768,7 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 		makeLocal("customclient/menugrid/OtherScriptsAndTools/RefillWaterContainers");
 		makeLocal("customclient/menugrid/OtherScriptsAndTools/CombatDistanceTool");
 		makeLocal("customclient/menugrid/OtherScriptsAndTools/RefillCheeseTrays");
+		makeLocal("customclient/menugrid/OtherScriptsAndTools/HarvestNearestDreamcatcher");
 	}
 
 	public void useCustom(String[] ad) {
@@ -908,6 +909,16 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 				}
 			} else if (ad[2].equals("RefillCheeseTrays")) {
 				gui.runActionThread(new Thread(new FillCheeseTray(gui), "FillCheeseTrays"));
+			} else if (ad[2].equals("HarvestNearestDreamcatcher")) {
+				if (gui.harvestNearestDreamcatcherThread == null) {
+					gui.harvestNearestDreamcatcherThread = new Thread(new HarvestNearestDreamcatcher(gui), "HarvestNearestDreamcatcher");
+					gui.harvestNearestDreamcatcherThread.start();
+				} else {
+					gui.harvestNearestDreamcatcherThread.interrupt();
+					gui.harvestNearestDreamcatcherThread = null;
+					gui.harvestNearestDreamcatcherThread = new Thread(new HarvestNearestDreamcatcher(gui), "HarvestNearestDreamcatcher");
+					gui.harvestNearestDreamcatcherThread.start();
+				}
 			}
 		}
 	}
