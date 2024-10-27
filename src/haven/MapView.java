@@ -2794,6 +2794,7 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
 		super.added();
 		try {
 			glob.oc.getgob(plgob).delattr(Buddy.class); // ND: This is only needed for Valhalla.
+			glob.oc.getgob(plgob).isMe = null;
 		} catch (NullPointerException ignored){}
 	}
 

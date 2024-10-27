@@ -838,6 +838,8 @@ public class OptWnd extends Window {
 	public static CheckBox toggleGobDamageWoundInfoCheckBox;
 	public static CheckBox toggleGobDamageArmorInfoCheckBox;
 	public static Button damageInfoClearButton;
+	public static CheckBox yourselfDamageInfoCheckBox;
+	public static CheckBox partyMembersDamageInfoCheckBox;
 	public class CombatUIPanel extends Panel {
 		public CombatUIPanel(Panel back) {
 			Widget prev;
@@ -922,6 +924,19 @@ public class OptWnd extends Window {
 				}
 			}), prev.pos("bl").adds(0, -34).x(UI.scale(210)));
 			damageInfoClearButton.tooltip = damageInfoClearTooltip;
+			prev = add(new Label("> Also show on:"), prev.pos("bl").adds(0, 2).x(12));
+			prev = add(yourselfDamageInfoCheckBox = new CheckBox("Yourself"){
+				{a = Utils.getprefb("yourselfDamageInfo", true);}
+				public void changed(boolean val) {
+					Utils.setprefb("yourselfDamageInfo", val);
+				}
+			}, prev.pos("bl").adds(80, -17));
+			prev = add(partyMembersDamageInfoCheckBox = new CheckBox("Party Members"){
+				{a = Utils.getprefb("(partyMembersDamageInfo", true);}
+				public void changed(boolean val) {
+					Utils.setprefb("(partyMembersDamageInfo", val);
+				}
+			}, prev.pos("ur").adds(6, 0));
 
 			Widget backButton;
 			add(backButton = new PButton(UI.scale(200), "Back", 27, back, "Advanced Settings"), prev.pos("bl").adds(0, 18).x(0));
