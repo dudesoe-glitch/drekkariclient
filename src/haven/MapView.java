@@ -75,7 +75,7 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
 	private static final int MAX_TILE_RANGE = 40;
 	private AreaSelectCallback areaSelectCallback;
 	public boolean areaSelect = false;
-    
+
     public interface Delayed {
 	public void run(GOut g);
     }
@@ -113,7 +113,7 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
 	}
 
 	public void snap(String dir) {}
-	
+
 	public void resized() {
 	    float field = 0.5f;
 	    float aspect = ((float)sz.y) / ((float)sz.x);
@@ -2016,8 +2016,6 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
 	}
     }
 
-    private UI.Grab camdrag = null;
-    
     public abstract class Maptest {
 	private final Coord pc;
 
@@ -2185,6 +2183,8 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
 	    this.grab = null;
     }
     
+    private UI.Grab camdrag = null;
+
     public boolean mousedown(Coord c, int button) {
 	if (camdrag != null) { // Ardennes: this fixes a loftar bug where alt tabbing out while dragging the camera locks it in permanent drag state.
 		camera.release();
@@ -2206,7 +2206,7 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
 	}
 	if(button == 2) {
 		new Click(c, button).run();
-	    if(((Camera)camera).click(c)) {
+        if((camdrag == null) && ((Camera)camera).click(c)) {
 		camdrag = ui.grabmouse(this);
 	    }
 	} else if((placing_l != null) && placing_l.done()) {
