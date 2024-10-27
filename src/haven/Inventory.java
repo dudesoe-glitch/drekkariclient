@@ -300,4 +300,31 @@ public class Inventory extends Widget implements DTarget {
 
 		return freespot;
 	}
+
+	public int getFreeSpace() {
+		int feespace = isz.x * isz.y;
+		for (Widget wdg = child; wdg != null; wdg = wdg.next) {
+			if (wdg instanceof WItem)
+				feespace -= (wdg.sz.x * wdg.sz.y) / (sqsz.x * sqsz.y);
+		}
+		return feespace;
+	}
+
+	public List<WItem> getItemsPartial(String... names) {
+		List<WItem> items = new ArrayList<WItem>();
+		for (Widget wdg = child; wdg != null; wdg = wdg.next) {
+			if (wdg instanceof WItem) {
+				String wdgname = ((WItem)wdg).item.getname();
+				for (String name : names) {
+					if (name == null)
+						continue;
+					if (wdgname.contains(name)) {
+						items.add((WItem) wdg);
+						break;
+					}
+				}
+			}
+		}
+		return items;
+	}
 }

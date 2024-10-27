@@ -2242,6 +2242,7 @@ public class Resource implements Serializable {
 
 	private static HashMap<String, Class> customFetchedClasses = new HashMap<String, Class>(){{ // ND: Stole this from shubla, it overrides the stupid fetched res file code, doesn't even check for the res version.
 		put("ui/tt/armor$haven.ItemInfo$InfoFactory", Armor.Fac.class);
+		put("ui/grainslot$haven.Widget$Factory", Grainslot.GrainSlotFactory.class);
 	}};
 
 }

@@ -277,4 +277,88 @@ public class AUtils {
         }
         return gobs;
     }
+
+    public static ArrayList<Gob> getGobsInSelectionStartingWith(String name, Coord start, Coord end, GameUI gui) {
+        ArrayList<Gob> selected = new ArrayList<>();
+        synchronized (gui.map.glob.oc) {
+            for (Gob gob : gui.map.glob.oc) {
+                if (gob.rc.x > start.x && gob.rc.x < end.x && gob.rc.y > start.y && gob.rc.y < end.y) {
+                    try {
+                        Resource res = gob.getres();
+                        if (res != null && res.name.startsWith(name)) {
+                            selected.add(gob);
+                        }
+                    } catch (Loading l) {
+                    }
+                }
+            }
+        }
+        return selected;
+    }
+
+    public static Gob getClosestCropInSelectionStartingWith(String name, Coord start, Coord end, GameUI gui, int stageP) {
+        Gob closestGob = null;
+        double minDist = Double.MAX_VALUE;
+        Coord2d player = gui.map.player().rc;
+
+        synchronized (gui.map.glob.oc) {
+            for (Gob gob : gui.map.glob.oc) {
+                if (gob.rc.x > start.x && gob.rc.x < end.x && gob.rc.y > start.y && gob.rc.y < end.y) {
+                    try {
+                        Resource res = gob.getres();
+                        if (res != null && res.name.equals(name)) {
+                            int stage = AUtils.getDrawState(gob);
+                            double dist = player.dist(gob.rc);
+                            if(dist < minDist && (stage >= stageP)) {
+                                minDist = dist;
+                                closestGob = gob;
+                            }
+                        }
+                    } catch (Loading l) {
+                    }
+                }
+            }
+        }
+        return closestGob;
+    }
+
+    public static int getDrawState(Gob gob) {
+        try {
+            return gob.getattr(ResDrawable.class).sdt.checkrbuf(0);
+        } catch (NullPointerException | Loading e) {
+            System.out.println(e.getClass() + " when trying to get drawstate from gob " + gob.id);
+        }
+        return 0;
+    }
+
+    public static void rightClickGob(GameUI gui, Gob gob, int mods) {
+        gui.map.wdgmsg("click", Coord.z, gob.rc.floor(posres), 3, mods, 0, (int) gob.id, gob.rc.floor(posres), 0, -1);
+    }
+
+    public static boolean isPlayerInSelectedArea(Coord start, Coord end, GameUI gui) {
+        try {
+            Coord2d player = gui.map.player().rc;
+            return player.x > start.x && player.x < end.x && player.y > start.y && player.y < end.y;
+        } catch (Exception e){
+            return false;
+        }
+    }
+
+    public static void drinkTillFull(GameUI gui, double threshold, double stoplevel) throws InterruptedException {
+        while (gui.drink(threshold)) {
+            Thread.sleep(490);
+            do {
+                Thread.sleep(10);
+                IMeter.Meter stam = gui.getmeter("stam", 0);
+                if (stam.a >= stoplevel)
+                    break;
+            } while (gui.prog != null && gui.prog.prog >= 0);
+        }
+    }
+
+    public static void clickWItemAndSelectOption(GameUI gui, WItem wItem, int index) {
+        wItem.item.wdgmsg("iact", Coord.z, gui.ui.modflags());
+        gui.ui.rcvr.rcvmsg(gui.ui.lastWidgetID+1, "cl", index, gui.ui.modflags());
+    }
+
 }

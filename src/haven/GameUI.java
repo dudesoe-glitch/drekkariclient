@@ -118,6 +118,8 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 	public Thread oceanScoutBotThread;
 	public TarKilnCleanerBot tarKilnCleanerBot;
 	public Thread tarKilnCleanerThread;
+	public TurnipBot turnipBot;
+	public Thread turnipThread;
 
 
     public static abstract class BeltSlot {
@@ -2664,6 +2666,61 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	public boolean drink(double threshold) {
+		//TODO add trigger to stop drinking tea while > 90% energy
+		IMeter.Meter stam = getmeter("stam", 0);
+		IMeter.Meter nrj = getmeter("nrj", 0);
+		if (stam == null || stam.a > threshold) {
+			return false;
+		}
+		List<WItem> containers = new ArrayList<WItem>();
+		List<Inventory> inventories = getAllInventories();
+		for (Inventory i : inventories) {
+			containers.addAll(i.getItemsPartial("Waterskin", "Waterflask", "Kuksa", "Bucket", "glassjug"));
+		}
+		for (int i = 6; i <= 7; i++) {
+			try {
+				if (getequipory().slots[i].item.res.get().basename().equals("bucket-water")) {
+					containers.add(getequipory().slots[i]);
+				}
+			} catch (Loading | NullPointerException ignored) {}
+		}
+		Collections.reverse(containers);
+		WItem teacontainer = null;
+		WItem watercontainer = null;
+		for (WItem wi : containers) {
+			ItemInfo.Contents cont = wi.item.getcontents();
+			if (cont == null)
+				continue;
+			if (cont.content.name.equals("Tea")) {
+				teacontainer = wi;
+			} else if (cont.content.name.equals("Water")) {
+				watercontainer = wi;
+			}
+			if (teacontainer != null && watercontainer != null) {
+				break;
+			}
+		}
+		if (teacontainer == null && watercontainer == null) {
+			return false;
+		}
+		ui.lcc = Coord.z;
+		if (fv != null && fv.current != null) {
+			if (watercontainer != null) {
+				AUtils.clickWItemAndSelectOption(this, watercontainer, 0);
+			} else {
+				AUtils.clickWItemAndSelectOption(this, teacontainer, 0);
+			}
+		} else {
+			if ((nrj != null && nrj.a < 0.95 && teacontainer != null) || watercontainer == null) {
+				AUtils.clickWItemAndSelectOption(this, teacontainer, 0);
+			} else {
+				AUtils.clickWItemAndSelectOption(this, watercontainer, 0);
+			}
+		}
+		return true;
 	}
 
 }

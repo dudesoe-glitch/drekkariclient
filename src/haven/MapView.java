@@ -35,6 +35,7 @@ import java.util.function.*;
 import java.lang.reflect.*;
 import java.util.stream.Collectors;
 
+import haven.automated.helpers.AreaSelectCallback;
 import haven.automated.pathfinder.PFListener;
 import haven.automated.pathfinder.Pathfinder;
 import haven.render.*;
@@ -72,6 +73,8 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
 	public Pathfinder pf;
 	public Thread pfthread;
 	private static final int MAX_TILE_RANGE = 40;
+	private AreaSelectCallback areaSelectCallback;
+	public boolean areaSelect = false;
     
     public interface Delayed {
 	public void run(GOut g);
@@ -2190,6 +2193,17 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
 	}
 	parent.setfocus(this);
 	Loader.Future<Plob> placing_l = this.placing;
+	if (button == 1 && areaSelect) {
+		synchronized (this) {
+			if (selection == null) {
+				selection = new Selector();
+			} else {
+				selection.destroy();
+				selection = null;
+				areaSelect = false;
+			}
+		}
+	}
 	if(button == 2) {
 		new Click(c, button).run();
 	    if(((Camera)camera).click(c)) {
@@ -2528,6 +2542,9 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
 		    tt = null;
 		    ol.destroy();
 		    mgrab.remove();
+			if (areaSelectCallback != null) {
+				areaSelectCallback.areaselect(ol.a.ul, ol.a.br);
+			}
 		    wdgmsg("sel", sc, ec, modflags);
 		    sc = null;
 		}
@@ -2888,5 +2905,16 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
 			pfthread = new Thread(pf, "Pathfinder");
 			pfthread.start();
 		}
+	}
+
+	public void registerAreaSelect(AreaSelectCallback callback) {
+		this.areaSelectCallback = callback;
+	}
+
+	public void unregisterAreaSelect() {
+		this.areaSelectCallback = null;
+		areaSelect = false;
+		selection.destroy();
+		selection = null;
 	}
 }
