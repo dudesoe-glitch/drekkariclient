@@ -2,6 +2,7 @@ package haven.automated;
 
 import haven.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 
@@ -226,5 +227,54 @@ public class AUtils {
             }
         }
         return true;
+    }
+
+    public static boolean waitPf(GameUI gui) throws InterruptedException {
+        if(gui.map.pfthread == null){
+            return false;
+        }
+        int time = 0;
+        boolean moved = false;
+        Thread.sleep(300);
+        while (gui.map.pfthread.isAlive()) {
+            time += 70;
+            Thread.sleep(70);
+            if (gui.map.player().getv() > 0) {
+                time = 0;
+            }
+            if (time > 2000 && moved == false) {
+                System.out.println("TRYING UNSTUCK");
+                return false;
+            } else if (time > 20000) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static void waitProgBar(GameUI gui) throws InterruptedException {
+        while (gui.prog != null && gui.prog.prog >= 0) {
+            Thread.sleep(40);
+        }
+    }
+
+    public static void rightClickShiftCtrl(GameUI gui, Gob gob) {
+        gui.map.wdgmsg("click", Coord.z, gob.rc.floor(posres), 3, 3, 0, (int) gob.id, gob.rc.floor(posres), 0, -1);
+    }
+
+    public static ArrayList<Gob> getGobs(String name, GameUI gui) {
+        ArrayList<Gob> gobs = new ArrayList<>();
+        synchronized (gui.map.glob.oc) {
+            for (Gob gob : gui.map.glob.oc) {
+                try {
+                    Resource res = gob.getres();
+                    if (res != null && res.name.equals(name)) {
+                        gobs.add(gob);
+                    }
+                } catch (Loading l) {
+                }
+            }
+        }
+        return gobs;
     }
 }

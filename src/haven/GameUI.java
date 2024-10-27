@@ -116,6 +116,8 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 	// Bot Threads
 	public OceanScoutBot OceanScoutBot;
 	public Thread oceanScoutBotThread;
+	public TarKilnCleanerBot tarKilnCleanerBot;
+	public Thread tarKilnCleanerThread;
 
 
     public static abstract class BeltSlot {
