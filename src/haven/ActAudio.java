@@ -243,6 +243,8 @@ public class ActAudio extends State {
 	    Audio.Clip clip = res.flayer(Audio.clip, "amb");
 	    if(bvol < 0)
 		bvol = clip.bvol();
+		if (res.name.equals("sfx/terobjs/cauldron"))
+			bvol = bvol * OptWnd.cauldronSoundVolumeSlider.val/100d;
 	    this.res = res;
 	    this.bvol = bvol;
 	}

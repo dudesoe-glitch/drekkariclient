@@ -415,16 +415,22 @@ public class OptWnd extends Window {
 	}
     }
 
+	public static HSlider clapSoundVolumeSlider;
+	public static HSlider quernSoundVolumeSlider;
+	public static HSlider cauldronSoundVolumeSlider;
+	public static HSlider squeakSoundVolumeSlider;
+	private final int audioSliderWidth = 220;
+
     public class AudioPanel extends Panel {
 	public AudioPanel(Panel back) {
 	    prev = add(new Label("Master audio volume"), 0, 0);
-	    prev = add(new HSlider(UI.scale(200), 0, 1000, (int)(Audio.volume * 1000)) {
+	    prev = add(new HSlider(UI.scale(audioSliderWidth), 0, 1000, (int)(Audio.volume * 1000)) {
 		    public void changed() {
 			Audio.setvolume(val / 1000.0);
 		    }
 		}, prev.pos("bl").adds(0, 2));
 	    prev = add(new Label("Interface sound volume"), prev.pos("bl").adds(0, 15));
-	    prev = add(new HSlider(UI.scale(200), 0, 1000, 0) {
+	    prev = add(new HSlider(UI.scale(audioSliderWidth), 0, 1000, 0) {
 		    protected void attach(UI ui) {
 			super.attach(ui);
 			val = (int)(ui.audio.aui.volume * 1000);
@@ -434,7 +440,7 @@ public class OptWnd extends Window {
 		    }
 		}, prev.pos("bl").adds(0, 2));
 	    prev = add(new Label("In-game event volume"), prev.pos("bl").adds(0, 5));
-	    prev = add(new HSlider(UI.scale(200), 0, 1000, 0) {
+	    prev = add(new HSlider(UI.scale(audioSliderWidth), 0, 1000, 0) {
 		    protected void attach(UI ui) {
 			super.attach(ui);
 			val = (int)(ui.audio.pos.volume * 1000);
@@ -444,7 +450,7 @@ public class OptWnd extends Window {
 		    }
 		}, prev.pos("bl").adds(0, 2));
 	    prev = add(new Label("Ambient volume"), prev.pos("bl").adds(0, 5));
-	    prev = add(new HSlider(UI.scale(200), 0, 1000, 0) {
+	    prev = add(new HSlider(UI.scale(audioSliderWidth), 0, 1000, 0) {
 		    protected void attach(UI ui) {
 			super.attach(ui);
 			val = (int)(ui.audio.amb.volume * 1000);
@@ -458,7 +464,7 @@ public class OptWnd extends Window {
 	    {
 		Label dpy = new Label("");
 		addhlp(prev.pos("bl").adds(0, 2), UI.scale(5),
-		       prev = new HSlider(UI.scale(160), Math.round(Audio.fmt.getSampleRate() * 0.05f), Math.round(Audio.fmt.getSampleRate() / 4), Audio.bufsize()) {
+		       prev = new HSlider(UI.scale(audioSliderWidth-40), Math.round(Audio.fmt.getSampleRate() * 0.05f), Math.round(Audio.fmt.getSampleRate() / 4), Audio.bufsize()) {
 			       protected void added() {
 				   dpy();
 			       }
@@ -472,6 +478,48 @@ public class OptWnd extends Window {
 			   }, dpy);
 		prev.tooltip = audioLatencyTooltip;
 	    }
+
+		prev = add(new Label("Other Sound Settings"), prev.pos("bl").adds(52, 20));
+		prev = add(new Label("Clap Sound Effect Volume"), prev.pos("bl").adds(0, 5).x(0));
+		prev = add(clapSoundVolumeSlider = new HSlider(UI.scale(audioSliderWidth), 0, 100, Utils.getprefi("clapSoundVolume", 10)) {
+			protected void attach(UI ui) {
+				super.attach(ui);
+			}
+			public void changed() {
+				Utils.setprefi("clapSoundVolume", val);
+			}
+		}, prev.pos("bl").adds(0, 2));
+
+		prev = add(new Label("Quern Sound Effect Volume"), prev.pos("bl").adds(0, 5).x(0));
+		prev = add(quernSoundVolumeSlider = new HSlider(UI.scale(audioSliderWidth), 0, 100, Utils.getprefi("quernSoundVolume", 10)) {
+			protected void attach(UI ui) {
+				super.attach(ui);
+			}
+			public void changed() {
+				Utils.setprefi("quernSoundVolume", val);
+			}
+		}, prev.pos("bl").adds(0, 2));
+
+		prev = add(new Label("Boiling Cauldron Volume (Requires Reload)"), prev.pos("bl").adds(0, 5).x(0));
+		prev = add(cauldronSoundVolumeSlider = new HSlider(UI.scale(audioSliderWidth), 0, 100, Utils.getprefi("cauldronSoundVolume", 25)) {
+			protected void attach(UI ui) {
+				super.attach(ui);
+			}
+			public void changed() {
+				Utils.setprefi("cauldronSoundVolume", val);
+			}
+		}, prev.pos("bl").adds(0, 2));
+
+		prev = add(new Label("Squeak Sound Volume (Roasting Spit, etc.)"), prev.pos("bl").adds(0, 5).x(0));
+		prev = add(squeakSoundVolumeSlider = new HSlider(UI.scale(audioSliderWidth), 0, 100, Utils.getprefi("squeakSoundVolume", 25)) {
+			protected void attach(UI ui) {
+				super.attach(ui);
+			}
+			public void changed() {
+				Utils.setprefi("squeakSoundVolume", val);
+			}
+		}, prev.pos("bl").adds(0, 2));
+
 	    add(new PButton(UI.scale(200), "Back", 27, back, "Options            "), prev.pos("bl").adds(0, 30));
 	    pack();
 	}
