@@ -3694,6 +3694,7 @@ public class OptWnd extends Window {
     public void wdgmsg(Widget sender, String msg, Object... args) {
 	if((sender == this) && (msg == "close")) {
 	    hide();
+		cap = "Options            ";
 	} else {
 	    super.wdgmsg(sender, msg, args);
 	}
