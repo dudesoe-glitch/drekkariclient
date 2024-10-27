@@ -764,6 +764,7 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 		makeLocal("customclient/menugrid/OtherScriptsAndTools/CoracleScript");
 		makeLocal("customclient/menugrid/OtherScriptsAndTools/SkisScript");
 		makeLocal("customclient/menugrid/OtherScriptsAndTools/RefillWaterContainers");
+		makeLocal("customclient/menugrid/OtherScriptsAndTools/CombatDistanceTool");
 	}
 
 	public void useCustom(String[] ad) {
@@ -859,6 +860,20 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 					gui.refillWaterContainersThread = null;
 					gui.refillWaterContainersThread = new Thread(new RefillWaterContainers(gui), "RefillWaterContainers");
 					gui.refillWaterContainersThread.start();
+				}
+			} else if (ad[2].equals("CombatDistanceTool")) {
+				if (gui.combatDistanceTool == null && gui.combatDistanceToolThread == null) {
+					gui.combatDistanceTool = new CombatDistanceTool(gui);
+					gui.add(gui.combatDistanceTool, new Coord(gui.sz.x/2 - gui.combatDistanceTool.sz.x/2, gui.sz.y/2 - gui.combatDistanceTool.sz.y/2 - 200));
+					gui.combatDistanceToolThread = new Thread(gui.combatDistanceTool, "CombatDistanceTool");
+					gui.combatDistanceToolThread.start();
+				} else {
+					if (gui.combatDistanceTool != null) {
+						gui.combatDistanceTool.stop();
+						gui.combatDistanceTool.reqdestroy();
+						gui.combatDistanceTool = null;
+						gui.combatDistanceToolThread = null;
+					}
 				}
 			}
 		}
