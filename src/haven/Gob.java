@@ -1199,22 +1199,9 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 
 	public void updPose(HashSet<String> poses) {
 		isComposite = true;
-		Iterator<String> iter = poses.iterator();
-		while (iter.hasNext()) {
-			String s = iter.next();
-			if (s.contains("knock") || s.contains("dead") || s.contains("waterdead")) {
-				knocked = true;
-				break;
-			} else {
-				knocked = false;
-			}
-			if (s.contains("mannequin")){
-				isMannequin = true;
-				break;
-			} else {
-				isMannequin = false;
-			}
-		}
+		knocked = (poses.contains("knock") || poses.contains("dead") || poses.contains("waterdead"));
+		if (this.getres().name.equals("gfx/borka/body"))
+			isMannequin = (poses.contains("mannequinlift"));
 		updateCritterAuras();
 		updateBeastDangerRadii();
 		if (this.getres().name.equals("gfx/borka/body") && isMannequin != null && !isMannequin){
@@ -1230,9 +1217,6 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 			imInCoracle = (poses.contains("coracleidle") || poses.contains("coraclerowan"));
 			imOnSkis = (poses.contains("skian-idle") || poses.contains("skian-walk") || poses.contains("skian-run"));
 		}
-	}
-	public void updModAndEqu(List<Composited.MD> mod, List<Composited.ED> equ) {
-
 	}
 
 	public void initComp(Composite c) {
