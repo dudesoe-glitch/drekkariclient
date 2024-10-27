@@ -203,4 +203,8 @@ public class Coord2d implements Comparable<Coord2d>, java.io.Serializable {
     public double getY() {
         return y;
     }
+
+    public Coord2d floord() {
+        return (new Coord2d(Math.floor(x), Math.floor(y)));
+    }
 }

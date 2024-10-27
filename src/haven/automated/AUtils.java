@@ -2,10 +2,7 @@ package haven.automated;
 
 import haven.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Random;
+import java.util.*;
 
 import static haven.OCache.posres;
 
@@ -376,6 +373,22 @@ public class AUtils {
     public static void rightClickGobAndSelectOption(GameUI gui, Gob gob, int index) {
         gui.map.wdgmsg("click", Coord.z, gob.rc.floor(posres), 3, 0, 0, (int) gob.id, gob.rc.floor(posres), 0, -1);
         gui.ui.rcvr.rcvmsg(gui.ui.lastWidgetID+1, "cl", index, gui.ui.modflags());
+    }
+
+    public static ArrayList<Gob> getAllSupports(GameUI gui) {
+        ArrayList<Gob> supports = new ArrayList<>();
+        Set<String> types = new HashSet<>(Arrays.asList("gfx/terobjs/ladder", "gfx/terobjs/minesupport", "gfx/terobjs/column", "gfx/terobjs/minebeam"));
+        synchronized (gui.map.glob.oc) {
+            for (Gob gob : gui.map.glob.oc) {
+                try {
+                    Resource res = gob.getres();
+                    if (res != null && types.contains(res.name)) {
+                        supports.add(gob);
+                    }
+                } catch (Loading ignored) {}
+            }
+        }
+        return supports;
     }
 
 }

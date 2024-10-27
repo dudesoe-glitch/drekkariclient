@@ -771,6 +771,7 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 		makeLocal("customclient/menugrid/OtherScriptsAndTools/RefillCheeseTrays");
 		makeLocal("customclient/menugrid/OtherScriptsAndTools/HarvestNearestDreamcatcher");
 		makeLocal("customclient/menugrid/OtherScriptsAndTools/DestroyNearestTrellisPlantScript");
+		makeLocal("customclient/menugrid/OtherScriptsAndTools/MiningSafetyAssistant");
 
 		// Category: Quick Switch From Belt
 		makeLocal("customclient/menugrid/QuickSwitchFromBelt/Equip_B12");
@@ -961,6 +962,18 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 					gui.destroyNearestTrellisPlantScriptThread = null;
 					gui.destroyNearestTrellisPlantScriptThread = new Thread(new DestroyNearestTrellisPlantScript(gui), "DestroyNearestTrellisPlantScript");
 					gui.destroyNearestTrellisPlantScriptThread.start();
+				}
+			} else if (ad[2].equals("MiningSafetyAssistant")) {
+				if (gui.miningSafetyAssistantWindow == null && gui.miningSafetyAssistantThread == null) {
+					gui.miningSafetyAssistantWindow = new MiningSafetyAssistant(gui);
+					gui.miningSafetyAssistantWindow = gui.add(gui.miningSafetyAssistantWindow, new Coord(gui.sz.x/2 - ui.gui.miningSafetyAssistantWindow.sz.x/2, gui.sz.y/2 - gui.miningSafetyAssistantWindow.sz.y/2 - 200));
+					gui.miningSafetyAssistantThread = new Thread(gui.miningSafetyAssistantWindow, "miningSafetyAssistantThread");
+					gui.miningSafetyAssistantThread.start();
+				} else if (gui.miningSafetyAssistantWindow != null) {
+					gui.miningSafetyAssistantThread.interrupt();
+					gui.miningSafetyAssistantThread = null;
+					gui.miningSafetyAssistantWindow.reqdestroy();
+					gui.miningSafetyAssistantWindow = null;
 				}
 			}
 		} else if (ad[1].equals("QuickSwitchFromBelt")) {

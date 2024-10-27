@@ -1294,6 +1294,8 @@ public class OptWnd extends Window {
 						} else {
 							ui.gui.optionInfoMsg("Mine Sweeper numbers are now " + (val ? "ENABLED" : "DISABLED") + "!" + (!val ? "" : " (HEY!!!: Flat World is DISABLED! You need to enable Flat World in order to see the mine sweeper numbers!)"), (val ? msgYellow : msgRed), Audio.resclip(val ? Toggle.sfxon : Toggle.sfxoff));
 						}
+						if (ui != null && ui.gui != null && ui.gui.miningSafetyAssistantWindow != null)
+							ui.gui.miningSafetyAssistantWindow.enableMineSweeperCheckBox.a = val;
 					}
 					a = val;
 				}
@@ -1324,6 +1326,8 @@ public class OptWnd extends Window {
 					sweeperSetDuration = sweeperDurations.indexOf(item);
 					System.out.println(sweeperSetDuration);
 					Utils.setprefi("sweeperSetDuration", sweeperDurations.indexOf(item));
+					if (ui != null && ui.gui != null && ui.gui.miningSafetyAssistantWindow != null)
+						ui.gui.miningSafetyAssistantWindow.sweeperDurationDropbox.change2(item);
 				}
 			}, leftColumn.pos("ul").adds(160, 2));
 			leftColumn = add(objectPermanentHighlightingCheckBox = new CheckBox("Permanently Highlight Objects with on Alt + Middle Click (Mouse Scroll Click)"){
