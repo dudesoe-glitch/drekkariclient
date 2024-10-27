@@ -765,6 +765,7 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 		makeLocal("customclient/menugrid/OtherScriptsAndTools/SkisScript");
 		makeLocal("customclient/menugrid/OtherScriptsAndTools/RefillWaterContainers");
 		makeLocal("customclient/menugrid/OtherScriptsAndTools/CombatDistanceTool");
+		makeLocal("customclient/menugrid/OtherScriptsAndTools/RefillCheeseTrays");
 	}
 
 	public void useCustom(String[] ad) {
@@ -875,6 +876,8 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 						gui.combatDistanceToolThread = null;
 					}
 				}
+			} else if (ad[2].equals("RefillCheeseTrays")) {
+				gui.runActionThread(new Thread(new FillCheeseTray(gui), "FillCheeseTrays"));
 			}
 		}
 	}
