@@ -101,6 +101,8 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	public static Set<Long> permanentHighlightList = new HashSet<>();
 	private GobDamageInfo damage;
 	public Boolean imDrinking = false;
+	public Boolean imInCoracle = false;
+	public Boolean imOnSkis = false;
 
     public static class Overlay implements RenderTree.Node {
 	public final int id;
@@ -1225,6 +1227,8 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 				playerPoseUpdatedCounter = playerPoseUpdatedCounter + 1;
 			}
 			imDrinking = (poses.contains("drinkan"));
+			imInCoracle = (poses.contains("coracleidle") || poses.contains("coraclerowan"));
+			imOnSkis = (poses.contains("skian-idle") || poses.contains("skian-walk") || poses.contains("skian-run"));
 		}
 	}
 	public void updModAndEqu(List<Composited.MD> mod, List<Composited.ED> equ) {

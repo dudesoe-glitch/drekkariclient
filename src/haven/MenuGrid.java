@@ -28,9 +28,7 @@ package haven;
 
 import java.util.*;
 
-import haven.automated.AddCoalToSmelter;
-import haven.automated.CloverScript;
-import haven.automated.OceanScoutBot;
+import haven.automated.*;
 import haven.render.*;
 import java.awt.Color;
 import java.awt.Font;
@@ -763,6 +761,8 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 		makeLocal("customclient/menugrid/OtherScriptsAndTools/Add9CoalScript");
 		makeLocal("customclient/menugrid/OtherScriptsAndTools/Add12CoalScript");
 		makeLocal("customclient/menugrid/OtherScriptsAndTools/CloverScript");
+		makeLocal("customclient/menugrid/OtherScriptsAndTools/CoracleScript");
+		makeLocal("customclient/menugrid/OtherScriptsAndTools/SkisScript");
 	}
 
 	public void useCustom(String[] ad) {
@@ -828,6 +828,26 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 					gui.cloverScriptThread = null;
 					gui.cloverScriptThread = new Thread(new CloverScript(gui), "CloverScript");
 					gui.cloverScriptThread.start();
+				}
+			} else if (ad[2].equals("CoracleScript")) {
+				if (gui.coracleScriptThread == null) {
+					gui.coracleScriptThread = new Thread(new CoracleScript(gui), "CoracleScript");
+					gui.coracleScriptThread.start();
+				} else {
+					gui.coracleScriptThread.interrupt();
+					gui.coracleScriptThread = null;
+					gui.coracleScriptThread = new Thread(new CoracleScript(gui), "CoracleScript");
+					gui.coracleScriptThread.start();
+				}
+			} else if (ad[2].equals("SkisScript")) {
+				if (gui.skisScriptThread == null) {
+					gui.skisScriptThread = new Thread(new SkisScript(gui), "SkisScript");
+					gui.skisScriptThread.start();
+				} else {
+					gui.skisScriptThread.interrupt();
+					gui.skisScriptThread = null;
+					gui.skisScriptThread = new Thread(new SkisScript(gui), "SkisScript");
+					gui.skisScriptThread.start();
 				}
 			}
 		}

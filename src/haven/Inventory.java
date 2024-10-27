@@ -210,6 +210,19 @@ public class Inventory extends Widget implements DTarget {
 		return null;
 	}
 
+	public WItem getItemPartial(String name) {
+		if (name == null)
+			return null;
+		for (Widget wdg = child; wdg != null; wdg = wdg.next) {
+			if (wdg instanceof WItem) {
+				String wdgname = ((WItem)wdg).item.getname();
+				if (wdgname.contains(name))
+					return (WItem) wdg;
+			}
+		}
+		return null;
+	}
+
 	@Override
 	public void wdgmsg(Widget sender, String msg, Object... args) {
 		if(msg.equals("transfer-ordered")){
@@ -244,5 +257,47 @@ public class Inventory extends Widget implements DTarget {
 			Collections.sort(items, ascending ? ITEM_COMPARATOR_ASC : ITEM_COMPARATOR_DESC);
 		} catch (Loading e) { }
 		return items;
+	}
+
+	public Coord isRoom(int x, int y) {
+		//check if there is a space for an x times y item, return coordinate where.
+		Coord freespot = null;
+		boolean[][] occumap = new boolean[isz.x][isz.y];
+		for (Widget wdg = child; wdg != null; wdg = wdg.next) {
+			if (wdg instanceof WItem) {
+				for (int i = 0; i < wdg.sz.x; i++) {
+					for (int j = 0; j < wdg.sz.y; j++) {
+						occumap[(wdg.c.x/sqsz.x+i/sqsz.x)][(wdg.c.y/sqsz.y+j/sqsz.y)] = true;
+					}
+				}
+			}
+		}
+		//(NICE LOOPS)
+		//Iterate through all spots in inventory
+		superloop:
+		for (int i = 0; i < isz.x; i++) {
+			for (int j = 0; j < isz.y; j++) {
+				boolean itsclear = true;
+				//Check if there is X times Y free slots
+				try {
+					for (int k = 0; k < x; k++) {
+						for (int l = 0; l < y; l++) {
+							if (occumap[i+k][j+l] == true) {
+								itsclear = false;
+							}
+						}
+					}
+				} catch (IndexOutOfBoundsException e) {
+					itsclear = false;
+				}
+
+				if (itsclear) {
+					freespot = new Coord(i,j);
+					break superloop;
+				}
+			}
+		}
+
+		return freespot;
 	}
 }
