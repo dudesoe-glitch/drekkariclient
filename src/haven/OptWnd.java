@@ -1885,6 +1885,7 @@ public class OptWnd extends Window {
 	public static CheckBox preventCutleryFromBreakingCheckBox = null;
 	public static CheckBox autoDropLeechesCheckBox;
 	public static CheckBox autoEquipBunnySlippersPlateBootsCheckBox;
+	public static CheckBox autoPeaceAnimalsWhenCombatStartsCheckBox;
 
 	public class GameplayAutomationSettingsPanel extends Panel {
 
@@ -2040,6 +2041,18 @@ public class OptWnd extends Window {
 					autoDropManagerWindow.show(!autoDropManagerWindow.visible);
 				}
 			}),prev.pos("bl").adds(0, 12).x(0));
+
+			prev = add(autoPeaceAnimalsWhenCombatStartsCheckBox = new CheckBox("Auto-Peace Animals when Combat Starts"){
+				{a = Utils.getprefb("autoPeaceAnimalsWhenCombatStarts", false);}
+				public void set(boolean val) {
+					Utils.setprefb("autoPeaceAnimalsWhenCombatStarts", val);
+					a = val;
+					if (ui != null && ui.gui != null) {
+						ui.gui.optionInfoMsg("Autopeace Animals when Combat Starts is now " + (val ? "ENABLED" : "DISABLED") + ".", (val ? msgGreen : msgRed), Audio.resclip(val ? Toggle.sfxon : Toggle.sfxoff));
+					}
+				}
+			}, prev.pos("bl").adds(0, 12));
+			autoPeaceAnimalsWhenCombatStartsCheckBox.tooltip = autoPeaceAnimalsWhenCombatStartsTooltip;
 
 			Widget backButton;
 			add(backButton = new PButton(UI.scale(200), "Back", 27, back, "Advanced Settings"), prev.pos("bl").adds(0, 18));
@@ -3854,6 +3867,9 @@ public class OptWnd extends Window {
 	private final Object autoEquipBunnySlippersPlateBootsTooltip = RichText.render("Switches your currently equipped shoes to Bunny Slippers when you right click to chase a rabbit, or Plate Boots if you click on anything else." +
 			"\n" +
 			"\n$col[185,185,185]{I suggest always using this setting in PVP.}", UI.scale(300));
+	private final Object autoPeaceAnimalsWhenCombatStartsTooltip = RichText.render("Enabling this will automatically set your status to 'Peace' when combat is initiated with a new target (animals only). Toggling this on while in combat will also autopeace all animals you are currently fighting." +
+			"\n\n$col[218,163,0]{Action Button:} $col[185,185,185]{This setting can also be turned on/off using an action button from the menu grid (Custom Client Extras → Toggles).}", UI.scale(320));
+
 
 	// Altered Gameplay Settings Tooltips
 	private final Object overrideCursorItemWhenHoldingAltTooltip = RichText.render("Holding Alt while having an item on your cursor will allow you to left click to walk, or right click to interact with objects, rather than drop it on the ground." +

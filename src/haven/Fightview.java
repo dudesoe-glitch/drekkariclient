@@ -71,6 +71,7 @@ public class Fightview extends Widget {
 	public Long lastDefenceDuration = null;
 	public double minAgi = 0D;
 	public double maxAgi = 2D;
+	public boolean autopeaced = false;
 
         public Relation(long gobid) {
             this.gobid = gobid;
@@ -346,6 +347,17 @@ public class Fightview extends Widget {
 	    Widget inf = obinfo(rel.gobid, false);
 	    if(inf != null)
 		inf.tick(dt);
+		try {
+			if (OptWnd.autoPeaceAnimalsWhenCombatStartsCheckBox.a && !rel.autopeaced && curdisp != null && curdisp.give != null && curdisp.give.state != 1) {
+				synchronized (ui.sess.glob) {
+					Gob curgob = ui.sess.glob.oc.getgob(rel.gobid);
+					if (curgob != null && !curgob.getres().name.contains("gfx/borka")) {
+						wdgmsg("give", (int)rel.gobid, 1);
+					}
+					rel.autopeaced = true;
+				}
+			}
+		} catch (Exception ignored) {}
 	}
     }
 
