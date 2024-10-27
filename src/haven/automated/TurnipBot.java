@@ -242,7 +242,7 @@ public class TurnipBot extends Window implements Runnable, AreaSelectCallback {
             depositAllSeeds();
         } else {
             if(plant){
-                new Thread(new EquipFromBelt(gui, "tsacks"), "EquipFromBelt").start();
+                new Thread(new EquipFromBelt(gui, "Equip_TravelersSacks"), "EquipFromBelt").start();
                 stage = 2;
                 currentField.setCurrentIndex(0);
                 gui.msg("Seeds deposited, planting.", Color.WHITE);
@@ -278,7 +278,7 @@ public class TurnipBot extends Window implements Runnable, AreaSelectCallback {
             depositAllSeeds();
         } else {
             if(harvest){
-                new Thread(new EquipFromBelt(gui, "scythe"), "EquipFromBelt").start();
+                new Thread(new EquipFromBelt(gui, "Equip_Scythe"), "EquipFromBelt").start();
                 stage = 0;
             } else {
                 stage = 2;

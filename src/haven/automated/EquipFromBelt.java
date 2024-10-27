@@ -21,46 +21,46 @@ public class EquipFromBelt implements Runnable {
         try {
             if (gui.vhand == null) {
                 switch (actionButtonString) {
-                    case "tsacks":
+                    case "Equip_TravelersSacks":
                         equipDoubleItemsFromBelt("gfx/invobjs/small/travellerssack", "Traveller's Sacks");
                         break;
-                    case "wbindles":
+                    case "Equip_WanderersBindles":
                         equipDoubleItemsFromBelt("gfx/invobjs/small/wanderersbindle", "Wanderer's Bindles");
                         break;
-                    case "b12":
+                    case "Equip_B12":
                         equipTwoHanderFromBelt("gfx/invobjs/small/b12axe", "B12");
                         break;
-                    case "cutblade":
+                    case "Equip_Cutblade":
                         equipTwoHanderFromBelt("gfx/invobjs/small/cutblade", "Cutblade");
                         break;
-                    case "boarspear":
+                    case "Equip_BoarSpear":
                         equipTwoHanderFromBelt("gfx/invobjs/small/boarspear", "Boar Spear");
                         break;
-                    case "pickaxe":
+                    case "Equip_Pickaxe":
                         equipTwoHanderFromBelt("gfx/invobjs/small/pickaxe", "Pickaxe");
                         break;
-                    case "sledgehammer":
+                    case "Equip_Sledgehammer":
                         equipTwoHanderFromBelt("gfx/invobjs/small/sledgehammer", "Sledgehammer");
                         break;
-                    case "scythe":
+                    case "Equip_Scythe":
                         equipTwoHanderFromBelt("gfx/invobjs/small/scythe", "Scythe");
                         break;
-                    case "metalshovel":
+                    case "Equip_MetalShovel":
                         equipTwoHanderFromBelt("gfx/invobjs/small/shovel-m", "Metal Shovel");
                         break;
-                    case "tinkershovel":
+                    case "Equip_TinkersShovel":
                         equipTwoHanderFromBelt("gfx/invobjs/small/shovel-t", "Tinker's Shovel");
                         break;
-                    case "woodenshovel":
+                    case "Equip_WoodenShovel":
                         equipTwoHanderFromBelt("gfx/invobjs/small/shovel-w", "Wooden Shovel");
                         break;
-                    case "hirdsmanshield":
+                    case "Equip_HirdsmansSwordWoodenShield":
                         equipTwoDifferentItemsFromBelt("gfx/invobjs/small/roundshield", "gfx/invobjs/small/hirdsword", "Shield", "Hirdsman's Sword");
                         break;
-                    case "bronzeshield":
+                    case "Equip_BronzeSwordWoodenShield":
                         equipTwoDifferentItemsFromBelt("gfx/invobjs/small/roundshield", "gfx/invobjs/small/bronzesword", "Shield", "Bronze Sword");
                         break;
-                    case "fyrdsmanshield":
+                    case "Equip_FyrdsmansSwordWoodenShield":
                         equipTwoDifferentItemsFromBelt("gfx/invobjs/small/roundshield", "gfx/invobjs/small/fyrdsword", "Shield", "Fyrdsman's Sword");
                         break;
                     default:

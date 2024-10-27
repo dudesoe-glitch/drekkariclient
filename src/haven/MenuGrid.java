@@ -770,6 +770,23 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 		makeLocal("customclient/menugrid/OtherScriptsAndTools/RefillCheeseTrays");
 		makeLocal("customclient/menugrid/OtherScriptsAndTools/HarvestNearestDreamcatcher");
 		makeLocal("customclient/menugrid/OtherScriptsAndTools/DestroyNearestTrellisPlantScript");
+
+		// Category: Quick Switch From Belt
+		makeLocal("customclient/menugrid/QuickSwitchFromBelt/Equip_B12");
+		makeLocal("customclient/menugrid/QuickSwitchFromBelt/Equip_BoarSpear");
+		makeLocal("customclient/menugrid/QuickSwitchFromBelt/Equip_BronzeSwordWoodenShield");
+		makeLocal("customclient/menugrid/QuickSwitchFromBelt/Equip_Cutblade");
+		makeLocal("customclient/menugrid/QuickSwitchFromBelt/Equip_FyrdsmansSwordWoodenShield");
+		makeLocal("customclient/menugrid/QuickSwitchFromBelt/Equip_HirdsmansSwordWoodenShield");
+		makeLocal("customclient/menugrid/QuickSwitchFromBelt/Equip_MetalShovel");
+		makeLocal("customclient/menugrid/QuickSwitchFromBelt/Equip_Pickaxe");
+		makeLocal("customclient/menugrid/QuickSwitchFromBelt/Equip_Scythe");
+		makeLocal("customclient/menugrid/QuickSwitchFromBelt/Equip_Sledgehammer");
+		makeLocal("customclient/menugrid/QuickSwitchFromBelt/Equip_TinkersShovel");
+		makeLocal("customclient/menugrid/QuickSwitchFromBelt/Equip_TravelersSacks");
+		makeLocal("customclient/menugrid/QuickSwitchFromBelt/Equip_WanderersBindles");
+		makeLocal("customclient/menugrid/QuickSwitchFromBelt/Equip_WoodenShovel");
+
 	}
 
 	public void useCustom(String[] ad) {
@@ -931,6 +948,8 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 					gui.destroyNearestTrellisPlantScriptThread.start();
 				}
 			}
+		} else if (ad[1].equals("QuickSwitchFromBelt")) {
+			new Thread(new EquipFromBelt(gui, ad[2]), "EquipFromBelt").start();
 		}
 	}
 }
