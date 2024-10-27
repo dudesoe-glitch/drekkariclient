@@ -2186,11 +2186,6 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
     private UI.Grab camdrag = null;
 
     public boolean mousedown(Coord c, int button) {
-	if (camdrag != null) { // Ardennes: this fixes a loftar bug where alt tabbing out while dragging the camera locks it in permanent drag state.
-		camera.release();
-		camdrag.remove();
-		camdrag = null;
-	}
 	parent.setfocus(this);
 	Loader.Future<Plob> placing_l = this.placing;
 	if (button == 1 && areaSelect) {
