@@ -103,6 +103,9 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	public Boolean imDrinking = false;
 	public Boolean imInCoracle = false;
 	public Boolean imOnSkis = false;
+	List<String> onWaterAnimations = List.of("coracleidle", "coraclerowan", "dugout", "rowboat", "rowing", "snekkja", "knarr");
+	private Overlay archeryVector;
+	private Overlay archeryRadius;
 
     public static class Overlay implements RenderTree.Node {
 	public final int id;
@@ -1216,6 +1219,33 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 			imDrinking = (poses.contains("drinkan"));
 			imInCoracle = (poses.contains("coracleidle") || poses.contains("coraclerowan"));
 			imOnSkis = (poses.contains("skian-idle") || poses.contains("skian-walk") || poses.contains("skian-run"));
+			boolean imOnWater = onWaterAnimations.stream().anyMatch(target -> poses.stream().anyMatch(s -> s.contains(target)));
+			if (poses.contains("spear-ready")) {
+				archeryIndicator(155, !imOnWater);
+			} else if (poses.contains("sling-aim")) {
+				archeryIndicator(155, !imOnWater);
+			} else if (poses.contains("drawbow")) {
+				for (GAttrib g : this.attr.values()) {
+					if (g instanceof Drawable) {
+						if (g instanceof Composite) {
+							Composite c = (Composite) g;
+							if (c.comp.cequ.size() > 0) {
+								for (Composited.ED item : c.comp.cequ) {
+									if (item.res.res.get().basename().equals("huntersbow"))
+										archeryIndicator(195, !imOnWater);
+									else if (item.res.res.get().basename().equals("rangersbow"))
+										archeryIndicator(252, !imOnWater);
+								}
+							}
+						}
+					}
+				}
+			} else {
+				removeOl(archeryVector);
+				archeryVector = null;
+				removeOl(archeryRadius);
+				archeryRadius = null;
+			}
 		}
 	}
 
@@ -2260,6 +2290,23 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 			return follow.tgt().getattr(LinMove.class);
 
 		return null;
+	}
+
+	private void archeryIndicator(int range, boolean imOnLand) {
+		if (imOnLand){
+			if (this.archeryVector == null) {
+				archeryVector = new Overlay(this, new ArcheryVectorSprite(this, 45));
+				synchronized (ols) {
+					addol(archeryVector);
+				}
+			}
+		}
+		if (this.archeryRadius == null) {
+			archeryRadius = new Overlay(this, new ArcheryRadiusSprite(this, range));
+			synchronized (ols) {
+				addol(archeryRadius);
+			}
+		}
 	}
 
 }
