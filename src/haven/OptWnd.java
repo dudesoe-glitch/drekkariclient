@@ -1671,7 +1671,7 @@ public class OptWnd extends Window {
 				public void changed(boolean val) {
 					Utils.setprefb("drawChaseVectors", val);
 				}
-			}, rightColumn.pos("bl").adds(0, 2));
+			}, rightColumn.pos("bl").adds(0, 12));
 			drawChaseVectorsCheckBox.tooltip = drawChaseVectorsTooltip;
 			rightColumn = add(highlightPartyMembersCheckBox = new CheckBox("Highlight Party Members"){
 				{a = Utils.getprefb("highlightPartyMembers", false);}
@@ -1680,7 +1680,7 @@ public class OptWnd extends Window {
 					if (ui != null && ui.gui != null && ui.gui.map != null && ui.gui.map.partyHighlight != null)
 						ui.gui.map.partyHighlight.update();
 				}
-			}, rightColumn.pos("bl").adds(0, 12));
+			}, rightColumn.pos("bl").adds(0, 2));
 			highlightPartyMembersCheckBox.tooltip = highlightPartyMembersTooltip;
 			rightColumn = add(showCirclesUnderPartyMembersCheckBox = new CheckBox("Show Circles under Party Members"){
 				{a = Utils.getprefb("showCirclesUnderPartyMembers", true);}
