@@ -829,9 +829,15 @@ public class OptWnd extends Window {
 
 	public static CheckBox showCombatHotkeysUICheckBox;
 	public static CheckBox singleRowCombatMovesCheckBox;
+	public static CheckBox includeHHPTextHealthBarCheckBox;
+	public static CheckBox showEstimatedAgilityTextCheckBox;
+	public static CheckBox drawFloatingCombatDataCheckBox;
 	public static CheckBox drawFloatingCombatDataOnCurrentTargetCheckBox;
 	public static CheckBox drawFloatingCombatDataOnOthersCheckBox;
-	public static CheckBox combatInfoBackgroundToggledCheckBox;
+	public static CheckBox showCombatManeuverCombatInfoCheckBox;
+	public static CheckBox onlyShowOpeningsAbovePercentageCombatInfoCheckBox;
+	public static CheckBox onlyShowCoinsAbove4CombatInfoCheckBox;
+	public static TextEntry minimumOpeningTextEntry;
 	public static HSlider combatUITopPanelHeightSlider;
 	public static HSlider combatUIBottomPanelHeightSlider;
 	public static CheckBox toggleGobDamageInfoCheckBox;
@@ -840,6 +846,7 @@ public class OptWnd extends Window {
 	public static Button damageInfoClearButton;
 	public static CheckBox yourselfDamageInfoCheckBox;
 	public static CheckBox partyMembersDamageInfoCheckBox;
+	public static boolean stamBarLocationIsTop = Utils.getprefb("stamBarLocationIsTop", true);
 	public class CombatUIPanel extends Panel {
 		public CombatUIPanel(Panel back) {
 			Widget prev;
@@ -869,7 +876,7 @@ public class OptWnd extends Window {
 				public void changed(boolean val) {
 					Utils.setprefb("showCombatHotkeysUI", val);
 				}
-			}, prev.pos("bl").adds(12, 10));
+			}, prev.pos("bl").adds(0, 10));
 			prev = add(singleRowCombatMovesCheckBox = new CheckBox("Single row for Combat Moves (Bottom Panel)"){
 				{a = Utils.getprefb("singleRowCombatMoves", false);}
 				public void set(boolean val) {
@@ -878,30 +885,101 @@ public class OptWnd extends Window {
 				}
 			}, prev.pos("bl").adds(0, 2));
 
-			prev = add(drawFloatingCombatDataOnCurrentTargetCheckBox = new CheckBox("Display Combat Data above Current Target"){
+			prev = add(includeHHPTextHealthBarCheckBox = new CheckBox("Include HHP% text in Health Bar"){
+				{a = Utils.getprefb("includeHHPTextHealthBar", false);}
+				public void changed(boolean val) {
+					Utils.setprefb("includeHHPTextHealthBar", val);
+				}
+			}, prev.pos("bl").adds(0, 12));
+
+			prev = add(new Label("Stamina Bar Location:"), prev.pos("bl").adds(0, 8));{
+				RadioGroup expWindowGrp = new RadioGroup(this) {
+					public void changed(int btn, String lbl) {
+						try {
+							if(btn==0) {
+								Utils.setprefb("stamBarLocationIsTop", true);
+								stamBarLocationIsTop = true;
+							}
+							if(btn==1) {
+								Utils.setprefb("stamBarLocationIsTop", false);
+								stamBarLocationIsTop = false;
+							}
+						} catch (Exception e) {
+							throw new RuntimeException(e);
+						}
+					}
+				};
+				prev = expWindowGrp.add("Top Panel", prev.pos("bl").adds(0, 3));
+				prev = expWindowGrp.add("Bottom Panel", prev.pos("ur").adds(30, 0));
+				if (Utils.getprefb("stamBarLocationIsTop", true)){
+					expWindowGrp.check(0);
+				} else {
+					expWindowGrp.check(1);
+				}
+			}
+
+			prev = add(showEstimatedAgilityTextCheckBox = new CheckBox("Show Target Estimated Agility"){
+				{a = Utils.getprefb("showEstimatedAgility", true);}
+				public void changed(boolean val) {
+					Utils.setprefb("showEstimatedAgility", val);
+				}
+			}, prev.pos("bl").adds(0, 12).x(0));
+
+			prev = add(new HRuler(UI.scale(280)), prev.pos("bl").adds(0, 12).x(0));
+			prev = add(drawFloatingCombatDataCheckBox = new CheckBox("Display Combat Data above Combat Foes"){
+				{a = Utils.getprefb("drawFloatingCombatData", true);}
+				public void changed(boolean val) {
+					Utils.setprefb("drawFloatingCombatData", val);
+				}
+			}, prev.pos("bl").adds(0, 4));
+			prev = add(drawFloatingCombatDataOnCurrentTargetCheckBox = new CheckBox("Show on Current Target"){
 				{a = Utils.getprefb("drawFloatingCombatDataOnCurrentTarget", true);}
 				public void changed(boolean val) {
 					Utils.setprefb("drawFloatingCombatDataOnCurrentTarget", val);
 				}
-			}, prev.pos("bl").adds(0, 12));
-			prev = add(drawFloatingCombatDataOnOthersCheckBox = new CheckBox("Display Combat Data above other Combat Foes"){
+			}, prev.pos("bl").adds(20, 2));
+			prev = add(drawFloatingCombatDataOnOthersCheckBox = new CheckBox("Show on other Combat Foes"){
 				{a = Utils.getprefb("drawFloatingCombatDataOnOthers", true);}
 				public void changed(boolean val) {
 					Utils.setprefb("drawFloatingCombatDataOnOthers", val);
 				}
 			}, prev.pos("bl").adds(0, 2));
-			prev = add(combatInfoBackgroundToggledCheckBox = new CheckBox("Background for Combat Data"){
-				{a = Utils.getprefb("CombatInfoBackgroundToggled", false);}
+			prev = add(showCombatManeuverCombatInfoCheckBox = new CheckBox("Show Combat Stance/Maneuver"){
+				{a = Utils.getprefb("showCombatManeuverCombatInfo", true);}
 				public void changed(boolean val) {
-					Utils.setprefb("CombatInfoBackgroundToggled", val);
+					Utils.setprefb("showCombatManeuverCombatInfo", val);
 				}
 			}, prev.pos("bl").adds(0, 2));
+			prev = add(onlyShowOpeningsAbovePercentageCombatInfoCheckBox = new CheckBox("Only show openings when higher than:"){
+				{a = Utils.getprefb("onlyShowOpeningsAbovePercentage", false);}
+				public void changed(boolean val) {
+					Utils.setprefb("onlyShowOpeningsAbovePercentage", val);
+				}
+			}, prev.pos("bl").adds(0, 6));
+			onlyShowOpeningsAbovePercentageCombatInfoCheckBox.tooltip = onlyShowOpeningsAbovePercentageCombatInfoTooltip;
+			add(minimumOpeningTextEntry = new TextEntry(UI.scale(40), Utils.getpref("minimumOpening", "30")){
+				protected void changed() {
+					this.settext(this.text().replaceAll("[^\\d]", "")); // Only numbers
+					this.settext(this.text().replaceAll("(?<=^.{2}).*", "")); // No more than 2 digits
+					Utils.setpref("minimumOpening", this.buf.line());
+					super.changed();
+				}
+			}, prev.pos("ur").adds(10, 0));
+
+			prev = add(onlyShowCoinsAbove4CombatInfoCheckBox = new CheckBox("Only show coins when higher than 4"){
+				{a = Utils.getprefb("onlyShowCoinsAbove4", false);}
+				public void changed(boolean val) {
+					Utils.setprefb("onlyShowCoinsAbove4", val);
+				}
+			}, prev.pos("bl").adds(0, 6));
+			prev = add(new HRuler(UI.scale(280)), prev.pos("bl").adds(0, 12).x(0));
+
 			prev = add(toggleGobDamageInfoCheckBox = new CheckBox("Display Damage Info:"){
 				{a = Utils.getprefb("GobDamageInfoToggled", true);}
 				public void changed(boolean val) {
 					Utils.setprefb("GobDamageInfoToggled", val);
 				}
-			}, prev.pos("bl").adds(0, 10).x(UI.scale(12)));
+			}, prev.pos("bl").adds(0, 4));
 			prev = add(new Label("> Include:"), prev.pos("bl").adds(0, 1));
 			prev = add(toggleGobDamageWoundInfoCheckBox = new CheckBox("Wounds"){
 				{a = Utils.getprefb("GobDamageInfoWoundsToggled", true);}
@@ -924,7 +1002,7 @@ public class OptWnd extends Window {
 				}
 			}), prev.pos("bl").adds(0, -34).x(UI.scale(210)));
 			damageInfoClearButton.tooltip = damageInfoClearTooltip;
-			prev = add(new Label("> Also show on:"), prev.pos("bl").adds(0, 2).x(12));
+			prev = add(new Label("> Also show on:"), prev.pos("bl").adds(0, 2).x(0));
 			prev = add(yourselfDamageInfoCheckBox = new CheckBox("Yourself"){
 				{a = Utils.getprefb("yourselfDamageInfo", true);}
 				public void changed(boolean val) {
@@ -3795,6 +3873,9 @@ public class OptWnd extends Window {
 	// Combat UI Settings Tooltips
 	private final Object damageInfoClearTooltip = RichText.render("Clears all damage info." +
 			"\n$col[218,163,0]{Action Button:} $col[185,185,185]{This setting can also be turned on/off using an action button from the menu grid (Custom Client Extras → Toggles).}", UI.scale(320));
+	private final Object onlyShowOpeningsAbovePercentageCombatInfoTooltip = RichText.render("Only show the combat info openings if at least one of them is above the set number. If one of them is above that, show all of them." +
+			"\n" +
+			"\nThis does NOT apply to your current target, only other combat foes.}", UI.scale(320));
 
 	// Display Settings Tooltips
 	private final Object granularityPositionTooltip = RichText.render("Equivalent of the :placegrid console command, this allows you to have more freedom when placing constructions/objects.", UI.scale(300));
