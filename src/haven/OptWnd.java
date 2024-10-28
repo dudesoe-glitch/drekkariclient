@@ -1658,6 +1658,7 @@ public class OptWnd extends Window {
 					}
 				}
 			}, rightColumn.pos("bl").adds(0, 2));
+			showFoodTroughsRadiiCheckBox.tooltip = showFoodThroughsRadiiTooltip;
 			rightColumn = add(showBarrelContentsTextCheckBox = new CheckBox("Show Barrel Contents Text"){
 				{a = (Utils.getprefb("showBarrelContentsText", true));}
 				public void changed(boolean val) {
@@ -1665,7 +1666,6 @@ public class OptWnd extends Window {
 				}
 			}, rightColumn.pos("bl").adds(0, 2));
 
-			showFoodTroughsRadiiCheckBox.tooltip = showFoodThroughsRadiiTooltip;
 			rightColumn = add(drawChaseVectorsCheckBox = new CheckBox("Draw Chase Vectors"){
 				{a = Utils.getprefb("drawChaseVectors", true);}
 				public void changed(boolean val) {
