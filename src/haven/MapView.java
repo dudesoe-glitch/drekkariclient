@@ -75,6 +75,7 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
 	private static final int MAX_TILE_RANGE = 40;
 	private AreaSelectCallback areaSelectCallback;
 	public boolean areaSelect = false;
+	public Coord currentCursorLocation;
 
     public interface Delayed {
 	public void run(GOut g);
@@ -2226,6 +2227,7 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
     }
     
     public void mousemove(Coord c) {
+	currentCursorLocation = c;
 	if(grab != null)
 	    grab.mmousemove(c);
 	Loader.Future<Plob> placing_l = this.placing;

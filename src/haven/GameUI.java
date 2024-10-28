@@ -1690,6 +1690,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 	public static KeyBinding kb_toggleCollisionBoxes  = KeyBinding.get("toggleCollisionBoxesKB",  KeyMatch.forchar('B', KeyMatch.S));
 	public static KeyBinding kb_toggleGrowthInfo  = KeyBinding.get("toggleGrowthInfoKB",  KeyMatch.forchar('I',  KeyMatch.C | KeyMatch.S));
 	public static KeyBinding kb_aggroNearestTargetButton = KeyBinding.get("AggroNearestTargetButtonKB",  KeyMatch.forcode(KeyEvent.VK_SPACE, KeyMatch.S));
+	public static KeyBinding kb_aggroOrTargetNearestCursor = KeyBinding.get("AggroOrTargetNearestCursorButtonKB",  KeyMatch.nil);
 	public static KeyBinding kb_aggroNearestPlayerButton = KeyBinding.get("AggroNearestPlayerButtonKB",  KeyMatch.nil);
 	public static KeyBinding kb_aggroAllNonFriendlyPlayers = KeyBinding.get("AggroAllNonFriendlyPlayers",   KeyMatch.nil);
 	public static KeyBinding kb_aggroLastTarget = KeyBinding.get("aggroLastTarget",  KeyMatch.forchar('T', KeyMatch.S));
@@ -1803,6 +1804,9 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 		return(true);
 	} else if(kb_aggroNearestPlayerButton.key().match(ev)) {
 		this.runActionThread(new Thread(new AggroNearestPlayer(this), "AggroNearestPlayer"));
+		return(true);
+	} else if(kb_aggroOrTargetNearestCursor.key().match(ev)) {
+		this.runActionThread(new Thread(new AggroOrTargetCursorNearest(this), "AggroOrTargetCursorNearest"));
 		return(true);
 	} else if(kb_aggroAllNonFriendlyPlayers.key().match(ev)) {
 		this.runActionThread(new Thread(new AggroEveryoneInRange(this), "AggroEverythingInRange"));
