@@ -118,6 +118,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 	// Tool Threads
 	public MiningSafetyAssistant miningSafetyAssistantWindow;
 	public Thread miningSafetyAssistantThread;
+	public PointerTriangulation pointerTriangulation;
 
 	// Bot Threads
 	public OceanScoutBot OceanScoutBot;

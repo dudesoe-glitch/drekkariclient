@@ -1877,6 +1877,7 @@ public class OptWnd extends Window {
 				"\n\n$col[218,163,0]{Case 1:} $col[185,185,185]{If you are in combat with Players, it will only attack other not-already-aggroed non-friendly players.}" +
 				"\n$col[218,163,0]{Case 2:} $col[185,185,185]{If you are in combat with Animals, it will try to attack the closest not-already-aggroed player. If none is found, try to attack the closest animal. Once this happens, you're back to Case 1.}" +
 				"\n\n$col[185,185,185]{Party members will never be attacked by this button. Memorised/Kinned players will not be attacked unless they're marked $col[185,0,0]{Red}. Village/Realm members will not be attacked regardless of being kinned or not, unless they're $col[185,0,0]{Red} in your kin list.}", new Color(255, 0, 0,255), GameUI.kb_aggroNearestTargetButton, y);
+//		y = addbtnImproved(cont, "Aggro/Target Cursor Nearest", "Tries to attack/target the closest player/animal it can find near the cursor.", new Color(255, 0, 0,255), Fightsess.kb_aggroOrTargetNearestCursor, y);
 		y = addbtnImproved(cont, "Aggro Nearest Player", "Selects the nearest non-aggroed Player to attack." +
 				"\n\n$col[185,185,185]{This only attacks players.}" +
 				"\n\n$col[185,185,185]{Party members will never be attacked by this button. Memorised/Kinned players will not be attacked unless they're marked $col[185,0,0]{Red}. Village/Realm members will not be attacked regardless of being kinned or not, unless they're $col[185,0,0]{Red} in your kin list.}", new Color(255, 0, 0,255), GameUI.kb_aggroNearestPlayerButton, y);

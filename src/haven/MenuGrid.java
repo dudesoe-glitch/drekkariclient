@@ -773,6 +773,7 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 		makeLocal("customclient/menugrid/OtherScriptsAndTools/HarvestNearestDreamcatcher");
 		makeLocal("customclient/menugrid/OtherScriptsAndTools/DestroyNearestTrellisPlantScript");
 		makeLocal("customclient/menugrid/OtherScriptsAndTools/MiningSafetyAssistant");
+		makeLocal("customclient/menugrid/OtherScriptsAndTools/QuestgiverTriangulation");
 
 		// Category: Quick Switch From Belt
 		makeLocal("customclient/menugrid/QuickSwitchFromBelt/Equip_B12");
@@ -977,6 +978,14 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 					gui.miningSafetyAssistantThread = null;
 					gui.miningSafetyAssistantWindow.reqdestroy();
 					gui.miningSafetyAssistantWindow = null;
+				}
+			} else if (ad[2].equals("QuestgiverTriangulation")) {
+				if(gui.pointerTriangulation != null){
+					gui.pointerTriangulation.reqdestroy();
+					gui.pointerTriangulation = null;
+				} else {
+					gui.pointerTriangulation = new PointerTriangulation(gui);
+					gui.add(gui.pointerTriangulation, new Coord(gui.sz.x/2 - gui.pointerTriangulation.sz.x/2, gui.sz.y/2 - gui.pointerTriangulation.sz.y/2 - 300));
 				}
 			}
 		} else if (ad[1].equals("QuickSwitchFromBelt")) {
