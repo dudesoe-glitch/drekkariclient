@@ -2276,6 +2276,7 @@ public class OptWnd extends Window {
 	public static CheckBox noCursorItemDroppingInWaterCheckBox;
 	public static CheckBox useOGControlsForBuildingAndPlacingCheckBox;
 	public static CheckBox useImprovedInventoryTransferControlsCheckBox;
+	public static CheckBox tileCenteringCheckBox;
 
 	public class AlteredGameplaySettingsPanel extends Panel {
 
@@ -2353,6 +2354,18 @@ public class OptWnd extends Window {
 				}
 			}, prev.pos("bl").adds(0, 2));
 			useImprovedInventoryTransferControlsCheckBox.tooltip = useImprovedInventoryTransferControlsTooltip;
+
+			prev = add(tileCenteringCheckBox = new CheckBox("Tile Centering"){
+				{a = Utils.getprefb("tileCentering", false);}
+				public void set(boolean val) {
+					Utils.setprefb("tileCentering", val);
+					a = val;
+					if (ui != null && ui.gui != null) {
+						ui.gui.optionInfoMsg("Tile Centering is now " + (val ? "ENABLED" : "DISABLED") + "!", (val ? msgGreen : msgRed), Audio.resclip(val ? Toggle.sfxon : Toggle.sfxoff));
+					}
+				}
+			}, prev.pos("bl").adds(0, 12));
+			tileCenteringCheckBox.tooltip = tileCenteringTooltip;
 
 			Widget backButton;
 			add(backButton = new PButton(UI.scale(200), "Back", 27, back, "Advanced Settings"), prev.pos("bl").adds(0, 18));
@@ -4120,6 +4133,10 @@ public class OptWnd extends Window {
 			"\n" +
 			"\n$col[185,185,185]{Idk why Loftar changed them when he did, but some of you might be used to the new controls rather than the OG ones, so you have the option to disable this.}", UI.scale(320));
 	private final Object useImprovedInventoryTransferControlsTooltip = RichText.render("Alt+Left Click for descending order, and Alt+Right click for ascending order.", UI.scale(320));
+	private final Object tileCenteringTooltip = RichText.render("This forces your left and right clicks in the world to go to the center of the tile you clicked. So you will always walk to the center of the tile, or place items down on the center." +
+			"\n$col[185,185,185]{It doesn't affect the manual precise placement of objects, just the quick right-click one.}" +
+			"\n" +
+			"\n$col[218,163,0]{Action Button:} $col[185,185,185]{This setting can also be turned on/off using an action button from the menu grid (Custom Client Extras → Toggles).}", UI.scale(320));
 
 	// Camera Settings Tooltips
 	private final Object reverseOrthoCameraAxesTooltip = RichText.render("Enabling this will reverse the Horizontal axis when dragging the camera to look around." +

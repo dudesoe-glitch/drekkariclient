@@ -2078,6 +2078,7 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
 	    if(done) {
 		synchronized(ui) {
 		    if(mapcl != null) {
+			if (OptWnd.tileCenteringCheckBox.a) mapcl = mapcl.floor(tilesz).mul(tilesz).add(5, 5);
 			if(objcl == null)
 			    hit(pc, mapcl, null);
 			else

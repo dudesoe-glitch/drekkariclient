@@ -755,6 +755,7 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 		makeLocal("customclient/menugrid/Toggles/ClearAllCombatDamage");
 		makeLocal("customclient/menugrid/Toggles/AnimalAutoPeace");
 		makeLocal("customclient/menugrid/Toggles/AutoDrinking");
+		makeLocal("customclient/menugrid/Toggles/TileCentering");
 
 		// Category: Bots
 		makeLocal("customclient/menugrid/Bots/OceanScoutBot");
@@ -830,6 +831,8 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 				OptWnd.autoPeaceAnimalsWhenCombatStartsCheckBox.set(!OptWnd.autoPeaceAnimalsWhenCombatStartsCheckBox.a);
 			} else if (ad[2].equals("AutoDrinking")) {
 				OptWnd.autoDrinkingCheckBox.set(!OptWnd.autoDrinkingCheckBox.a);
+			} else if (ad[2].equals("TileCentering")) {
+				OptWnd.tileCenteringCheckBox.set(!OptWnd.tileCenteringCheckBox.a);
 			}
 		} else if (ad[1].equals("Bots")) { // Category: Toggles
 			if (ad[2].equals("OceanScoutBot")) {
