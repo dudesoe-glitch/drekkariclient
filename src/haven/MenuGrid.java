@@ -774,6 +774,7 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 		makeLocal("customclient/menugrid/OtherScriptsAndTools/DestroyNearestTrellisPlantScript");
 		makeLocal("customclient/menugrid/OtherScriptsAndTools/MiningSafetyAssistant");
 		makeLocal("customclient/menugrid/OtherScriptsAndTools/QuestgiverTriangulation");
+		makeLocal("customclient/menugrid/OtherScriptsAndTools/OreAndStoneCounter");
 
 		// Category: Quick Switch From Belt
 		makeLocal("customclient/menugrid/QuickSwitchFromBelt/Equip_B12");
@@ -986,6 +987,20 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 				} else {
 					gui.pointerTriangulation = new PointerTriangulation(gui);
 					gui.add(gui.pointerTriangulation, new Coord(gui.sz.x/2 - gui.pointerTriangulation.sz.x/2, gui.sz.y/2 - gui.pointerTriangulation.sz.y/2 - 300));
+				}
+			} else if (ad[2].equals("OreAndStoneCounter")) {
+				if (gui.oreAndStoneCounter == null && gui.oreAndStoneCounterThread == null) {
+					gui.oreAndStoneCounter = new OreAndStoneCounter(gui);
+					gui.add(gui.oreAndStoneCounter, new Coord(gui.sz.x/2 - gui.oreAndStoneCounter.sz.x/2, gui.sz.y/2 - gui.oreAndStoneCounter.sz.y/2 - 200));
+					gui.oreAndStoneCounterThread = new Thread(gui.oreAndStoneCounter, "OreAndStoneCounter");
+					gui.oreAndStoneCounterThread.start();
+				} else {
+					if (gui.oreAndStoneCounter != null) {
+						gui.oreAndStoneCounter.stop();
+						gui.oreAndStoneCounter.reqdestroy();
+						gui.oreAndStoneCounter = null;
+						gui.oreAndStoneCounterThread = null;
+					}
 				}
 			}
 		} else if (ad[1].equals("QuickSwitchFromBelt")) {
