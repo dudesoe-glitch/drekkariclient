@@ -862,7 +862,7 @@ public class Fightsess extends Widget {
 
 	private void drawCombatData(GOut g, Fightview.Relation rels, Coord sc, boolean showAllOpenings, boolean alwaysShowCoins) {
 		int scaledY = sc.y - UI.scale(90);
-		Coord topLeft = new Coord(sc.x - UI.scale(40), scaledY);
+		Coord topLeft = new Coord(sc.x - UI.scale(32), scaledY);
 		Coord bgTopLeftFrame = new Coord(sc.x - UI.scale(41), scaledY);
 		boolean openings;
 		boolean cleaveUsed = false;
