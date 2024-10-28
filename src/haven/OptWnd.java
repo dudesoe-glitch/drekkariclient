@@ -1123,6 +1123,7 @@ public class OptWnd extends Window {
 	public static CheckBox showBeastDangerRadiiCheckBox;
 	public static CheckBox showBeeSkepsRadiiCheckBox;
 	public static CheckBox showFoodTroughsRadiiCheckBox;
+	public static CheckBox showBarrelContentsTextCheckBox;
 	public static CheckBox drawChaseVectorsCheckBox;
 	public static CheckBox highlightCliffsCheckBox;
 	public static ColorOptionWidget highlightCliffsColorOptionWidget;
@@ -1657,6 +1658,13 @@ public class OptWnd extends Window {
 					}
 				}
 			}, rightColumn.pos("bl").adds(0, 2));
+			rightColumn = add(showBarrelContentsTextCheckBox = new CheckBox("Show Barrel Contents Text"){
+				{a = (Utils.getprefb("showBarrelContentsText", true));}
+				public void changed(boolean val) {
+					Utils.setprefb("showBarrelContentsText", val);
+				}
+			}, rightColumn.pos("bl").adds(0, 2));
+
 			showFoodTroughsRadiiCheckBox.tooltip = showFoodThroughsRadiiTooltip;
 			rightColumn = add(drawChaseVectorsCheckBox = new CheckBox("Draw Chase Vectors"){
 				{a = Utils.getprefb("drawChaseVectors", true);}

@@ -356,6 +356,34 @@ public abstract class ItemInfo {
 	return(ret);
     }
 
+	public static BufferedImage catimgs(int margin, int align, BufferedImage... imgs) {
+		int w = 0, h = -margin;
+		for(BufferedImage img : imgs) {
+			if(img == null)
+				continue;
+			if(img.getWidth() > w)
+				w = img.getWidth();
+			h += img.getHeight() + margin;
+		}
+		BufferedImage ret = TexI.mkbuf(new Coord(w, h));
+		Graphics g = ret.getGraphics();
+		int y = 0;
+		for(BufferedImage img : imgs) {
+			if(img == null)
+				continue;
+			int x = 0;
+			if(align == 2) {
+				x = w - img.getWidth();
+			} else if(align == 1) {
+				x = (w - img.getWidth()) / 2;
+			}
+			g.drawImage(img, x, y, null);
+			y += img.getHeight() + margin;
+		}
+		g.dispose();
+		return(ret);
+	}
+
     public static BufferedImage catimgsh(int margin, int pad, Color bg, BufferedImage... imgs) {
 	int w = -margin, h = 0;
 	for(BufferedImage img : imgs) {

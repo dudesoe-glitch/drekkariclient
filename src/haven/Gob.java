@@ -106,6 +106,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	List<String> onWaterAnimations = List.of("coracleidle", "coraclerowan", "dugout", "rowboat", "rowing", "snekkja", "knarr");
 	private Overlay archeryVector;
 	private Overlay archeryRadius;
+	private BarrelContentsGobInfo barrelContentsGobInfo;
 
     public static class Overlay implements RenderTree.Node {
 	public final int id;
@@ -208,6 +209,17 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	public void removed(RenderTree.Slot slot) {
 	    if(slots != null)
 		slots.remove(slot);
+	}
+
+	public String getSprResName() {
+		Sprite spr = this.spr;
+		if(spr != null) {
+			Resource res = spr.res;
+			if(res != null) {
+				return res.name;
+			}
+		}
+		return "";
 	}
     }
 
@@ -508,6 +520,8 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	setattr(GobQualityInfo.class, qualityInfo);
 	growthInfo = new GobGrowthInfo(this);
 	setattr(GobGrowthInfo.class, growthInfo);
+	barrelContentsGobInfo = new BarrelContentsGobInfo(this);
+	setattr(BarrelContentsGobInfo.class, barrelContentsGobInfo);
     }
 
     public Gob(Glob glob, Coord2d c) {
