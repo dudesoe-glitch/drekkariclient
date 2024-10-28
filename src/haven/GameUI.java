@@ -101,6 +101,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 	public ObjectSearchWindow objectSearchWindow;
 	public Thread keyboundActionThread;
 	public long lastopponent = -1;
+	private long lastAutoDrinkTime = 0;
 
 	// Script Threads
 	public Thread autoRepeatFlowerMenuScriptThread;
@@ -1419,6 +1420,15 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 	    afk = false;
 	}
 	mapfiletick();
+	if(OptWnd.autoDrinkingCheckBox.a && getmeter("stam", 0) != null){
+		float meterFullness = OptWnd.autoDrinkingThresholdTextEntry.text().isEmpty() ? 0.75f : Integer.parseInt(OptWnd.autoDrinkingThresholdTextEntry.text())/100f;
+		if (getmeter("stam", 0).a < meterFullness) {
+			if(System.currentTimeMillis() > lastAutoDrinkTime + 1000 || System.currentTimeMillis() > lastAutoDrinkTime + 3500){
+				lastAutoDrinkTime = System.currentTimeMillis();
+				drink(0.99);
+			}
+		}
+	}
     }
     
     public void uimsg(String msg, Object... args) {
@@ -2684,7 +2694,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 	}
 
 	public boolean drink(double threshold) {
-		//TODO add trigger to stop drinking tea while > 90% energy
+		// TODO add trigger to stop drinking tea while > 90% energy
 		IMeter.Meter stam = getmeter("stam", 0);
 		IMeter.Meter nrj = getmeter("nrj", 0);
 		if (stam == null || stam.a > threshold) {
@@ -2729,7 +2739,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 				AUtils.clickWItemAndSelectOption(this, teacontainer, 0);
 			}
 		} else {
-			if ((nrj != null && nrj.a < 0.95 && teacontainer != null) || watercontainer == null) {
+			if ((nrj != null && nrj.a < 0.85 && teacontainer != null) || watercontainer == null) {
 				AUtils.clickWItemAndSelectOption(this, teacontainer, 0);
 			} else {
 				AUtils.clickWItemAndSelectOption(this, watercontainer, 0);
