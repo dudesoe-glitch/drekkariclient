@@ -1882,7 +1882,7 @@ public class OptWnd extends Window {
 				"\n\n$col[185,185,185]{This only attacks players.}" +
 				"\n\n$col[185,185,185]{Party members will never be attacked by this button. Memorised/Kinned players will not be attacked unless they're marked $col[185,0,0]{Red}. Village/Realm members will not be attacked regardless of being kinned or not, unless they're $col[185,0,0]{Red} in your kin list.}", new Color(255, 0, 0,255), GameUI.kb_aggroNearestPlayerButton, y);
 		y = addbtnImproved(cont, "Aggro all Non-Friendly Players", "Tries to attack everyone in range. " +
-				"\"\\n\\n$col[185,185,185]{Party members will never be attacked by this button. Memorised/Kinned players will not be attacked unless they're marked $col[185,0,0]{Red}. Village/Realm members will not be attacked regardless of being kinned or not, unless they're $col[185,0,0]{Red} in your kin list.}\"", new Color(255, 0, 0,255), GameUI.kb_aggroAllNonFriendlyPlayers, y);
+				"\n\n$col[185,185,185]{Party members will never be attacked by this button. Memorised/Kinned players will not be attacked unless they're marked $col[185,0,0]{Red}. Village/Realm members will not be attacked regardless of being kinned or not, unless they're $col[185,0,0]{Red} in your kin list.}\"", new Color(255, 0, 0,255), GameUI.kb_aggroAllNonFriendlyPlayers, y);
 		y = addbtnImproved(cont, "Re-Aggro Animal (Cheese)", "Use this to cheese animals and re-aggro them quickly when they flee." +
 				"\n $col[185,185,185]{This is useful when you use animal auto-peace. Also, it only works when you're fighting one single animal.}", new Color(255, 68, 0,255), GameUI.kb_aggroLastTarget, y);
 		y = addbtnImproved(cont, "Peace Current Target", "", new Color(0, 255, 34,255), GameUI.kb_peaceCurrentTarget, y);
