@@ -340,12 +340,7 @@ public class OCache implements Iterable<Gob> {
 			ol.remove(false);
 		}
 	    }
-		g.updateHidingBoxes();
-		g.updateCollisionBoxes();
-		g.updateContainerFullnessHighlight();
-		g.updateCustomSizeAndRotation();
-		g.updateWorkstationProgressHighlight();
-		g.checkIfObjectJustDied();
+		g.updateDrawableStuff();
 	}
     }
 
@@ -356,12 +351,7 @@ public class OCache implements Iterable<Gob> {
 	    int len = msg.uint8();
 	    Message dat = (len > 0) ? new MessageBuf(msg.bytes(len)) : null;
 	    resid.get().getcode(GAttrib.Parser.class, true).apply(g, dat);
-		g.updateHidingBoxes();
-		g.updateCollisionBoxes();
-		g.updateContainerFullnessHighlight();
-		g.updateCustomSizeAndRotation();
-		g.updateWorkstationProgressHighlight();
-		g.checkIfObjectJustDied();
+		g.updateDrawableStuff();
 	}
     }
 

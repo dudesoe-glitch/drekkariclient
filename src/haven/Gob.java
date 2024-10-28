@@ -77,7 +77,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	private HitBoxGobSprite<HidingBox> hidingBoxFilled = null;
 	public HitBoxGobSprite<CollisionBox> collisionBox = null;
 	private final GobQualityInfo qualityInfo;
-	private GobGrowthInfo growthInfo;
+	GobGrowthInfo growthInfo;
 	public boolean isHidden;
 	private final GobCustomSizeAndRotation customSizeAndRotation = new GobCustomSizeAndRotation();
 	public double gobSpeed = 0;
@@ -106,7 +106,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	List<String> onWaterAnimations = List.of("coracleidle", "coraclerowan", "dugout", "rowboat", "rowing", "snekkja", "knarr");
 	private Overlay archeryVector;
 	private Overlay archeryRadius;
-	private BarrelContentsGobInfo barrelContentsGobInfo;
+	BarrelContentsGobInfo barrelContentsGobInfo;
 
     public static class Overlay implements RenderTree.Node {
 	public final int id;
@@ -510,18 +510,13 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	if(id < 0)
 	    virtual = true;
 	setupmods.add(customSizeAndRotation);
-	updwait(this::updateCustomSizeAndRotation, waiting -> {});
-	updwait(this::updateHidingBoxes, waiting -> {});
-	updwait(this::updateCollisionBoxes, waiting -> {});
-	updwait(this::updateContainerFullnessHighlight, waiting -> {});
-	updwait(this::updateWorkstationProgressHighlight, waiting -> {});
-	updwait(this::checkIfObjectJustDied, waiting -> {});
 	qualityInfo = new GobQualityInfo(this);
 	setattr(GobQualityInfo.class, qualityInfo);
 	growthInfo = new GobGrowthInfo(this);
 	setattr(GobGrowthInfo.class, growthInfo);
 	barrelContentsGobInfo = new BarrelContentsGobInfo(this);
 	setattr(BarrelContentsGobInfo.class, barrelContentsGobInfo);
+	updwait(this::updateDrawableStuff, waiting -> {});
     }
 
     public Gob(Glob glob, Coord2d c) {
@@ -776,13 +771,9 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	    attr.put(ac, a);
 	}
 	if (ac == Drawable.class) {
-		if (a != prev) updateHidingBoxes();
-		if (a != prev) updateCollisionBoxes();
-		if (a != prev) updateContainerFullnessHighlight();
-		if (a != prev) updateCustomSizeAndRotation();
-		if (a != prev) updateWorkstationProgressHighlight();
-		if (a != prev) setGobSearchOverlay();
-		if (a != prev) checkIfObjectJustDied();
+		if (a != prev) {
+			updateDrawableStuff();
+		}
 	}
 	if(prev != null)
 	    prev.dispose();
@@ -2329,6 +2320,17 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 				addol(archeryRadius);
 			}
 		}
+	}
+
+	public void updateDrawableStuff(){
+		updateHidingBoxes();
+		updateCollisionBoxes();
+		updateContainerFullnessHighlight();
+		updateCustomSizeAndRotation();
+		updateWorkstationProgressHighlight();
+		checkIfObjectJustDied();
+		growthInfo.clear();
+		barrelContentsGobInfo.clear();
 	}
 
 }
