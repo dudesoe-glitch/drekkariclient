@@ -2260,11 +2260,19 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 			}
 		}
 		Buddy buddyInfo = getattr(Buddy.class);
+		if (buddyInfo != null) {
+			if (buddyInfo.customName != null && buddyInfo.customName.equals("Unknown")) return false;
+			if (buddyInfo.rgrp == 1 && OptWnd.excludeGreenBuddyFromAggroCheckBox.a) return true;
+			if (buddyInfo.rgrp == 2 && OptWnd.excludeRedBuddyFromAggroCheckBox.a) return true;
+			if (buddyInfo.rgrp == 3 && OptWnd.excludeBlueBuddyFromAggroCheckBox.a) return true;
+			if (buddyInfo.rgrp == 4 && OptWnd.excludeTealBuddyFromAggroCheckBox.a) return true;
+			if (buddyInfo.rgrp == 5 && OptWnd.excludeYellowBuddyFromAggroCheckBox.a) return true;
+			if (buddyInfo.rgrp == 6 && OptWnd.excludePurpleBuddyFromAggroCheckBox.a) return true;
+			if (buddyInfo.rgrp == 7 && OptWnd.excludeOrangeBuddyFromAggroCheckBox.a) return true;
+		}
 		Vilmate vilmateInfo = getattr(Vilmate.class);
-		if (buddyInfo != null && ((buddyInfo.customName != null && buddyInfo.customName.equals("Unknown")) || buddyInfo.rgrp == 2)) // ND: Red players
-			return false;
-		if ((vilmateInfo != null)) // ND: Village/Realm members
-			return true;
+		if (vilmateInfo != null && OptWnd.excludeAllVillageOrRealmMembersFromAggroCheckBox.a) return true;
+
 		return false;
 	}
 

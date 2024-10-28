@@ -1023,7 +1023,90 @@ public class OptWnd extends Window {
 		}
 	}
 
-	public static CheckBox toggleGobCollisionBoxesCheckBox;
+
+	public static CheckBox excludeGreenBuddyFromAggroCheckBox;
+	public static CheckBox excludeRedBuddyFromAggroCheckBox;
+	public static CheckBox excludeBlueBuddyFromAggroCheckBox;
+	public static CheckBox excludeTealBuddyFromAggroCheckBox;
+	public static CheckBox excludeYellowBuddyFromAggroCheckBox;
+	public static CheckBox excludePurpleBuddyFromAggroCheckBox;
+	public static CheckBox excludeOrangeBuddyFromAggroCheckBox;
+	public static CheckBox excludeAllVillageOrRealmMembersFromAggroCheckBox;
+
+	public class AggroExclusionSettingsPanel extends Panel {
+		public AggroExclusionSettingsPanel(Panel back) {
+			Widget prev;
+			prev = add(new Label("Manually attacking will still work, regardless of these settings!"), 0, 0);
+			prev = add(new Label("Select which Players should be excluded from Aggro Keybinds:"), prev.pos("bl").adds(0, 4));
+
+			prev = add(excludeGreenBuddyFromAggroCheckBox = new CheckBox("Green Memorised / Kinned Players"){
+				{a = (Utils.getprefb("excludeGreenBuddyFromAggro", false));}
+				public void changed(boolean val) {
+					Utils.setprefb("excludeGreenBuddyFromAggro", val);
+				}
+			}, prev.pos("bl").adds(0, 12));
+			excludeGreenBuddyFromAggroCheckBox.lbl = Text.create("Green Memorised / Kinned Players", PUtils.strokeImg(Text.std.render("Green Memorised / Kinned Players", BuddyWnd.gc[1])));
+			prev = add(excludeRedBuddyFromAggroCheckBox = new CheckBox("Red Memorised / Kinned Players"){
+				{a = (Utils.getprefb("excludeRedBuddyFromAggro", false));}
+				public void changed(boolean val) {
+					Utils.setprefb("excludeRedBuddyFromAggro", val);
+				}
+			}, prev.pos("bl").adds(0, 4));
+			excludeRedBuddyFromAggroCheckBox.lbl = Text.create("Red Memorised / Kinned Players", PUtils.strokeImg(Text.std.render("Red Memorised / Kinned Players", BuddyWnd.gc[2])));
+			prev = add(excludeBlueBuddyFromAggroCheckBox = new CheckBox("Blue Memorised / Kinned Players"){
+				{a = (Utils.getprefb("excludeBlueBuddyFromAggro", false));}
+				public void changed(boolean val) {
+					Utils.setprefb("excludeBlueBuddyFromAggro", val);
+				}
+			}, prev.pos("bl").adds(0, 4));
+			excludeBlueBuddyFromAggroCheckBox.lbl = Text.create("Blue Memorised / Kinned Players", PUtils.strokeImg(Text.std.render("Blue Memorised / Kinned Players", BuddyWnd.gc[3])));
+			prev = add(excludeTealBuddyFromAggroCheckBox = new CheckBox("Teal Memorised / Kinned Players"){
+				{a = (Utils.getprefb("excludeTealBuddyFromAggro", false));}
+				public void changed(boolean val) {
+					Utils.setprefb("excludeTealBuddyFromAggro", val);
+				}
+			}, prev.pos("bl").adds(0, 4));
+			excludeTealBuddyFromAggroCheckBox.lbl = Text.create("Teal Memorised / Kinned Players", PUtils.strokeImg(Text.std.render("Teal Memorised / Kinned Players", BuddyWnd.gc[4])));
+			prev = add(excludeYellowBuddyFromAggroCheckBox = new CheckBox("Yellow Memorised / Kinned Players"){
+				{a = (Utils.getprefb("excludeYellowBuddyFromAggro", false));}
+				public void changed(boolean val) {
+					Utils.setprefb("excludeYellowBuddyFromAggro", val);
+				}
+			}, prev.pos("bl").adds(0, 4));
+			excludeYellowBuddyFromAggroCheckBox.lbl = Text.create("Yellow Memorised / Kinned Players", PUtils.strokeImg(Text.std.render("Yellow Memorised / Kinned Players", BuddyWnd.gc[5])));
+			prev = add(excludePurpleBuddyFromAggroCheckBox = new CheckBox("Purple Memorised / Kinned Players"){
+				{a = (Utils.getprefb("excludePurpleBuddyFromAggro", false));}
+				public void changed(boolean val) {
+					Utils.setprefb("excludePurpleBuddyFromAggro", val);
+				}
+			}, prev.pos("bl").adds(0, 4));
+			excludePurpleBuddyFromAggroCheckBox.lbl = Text.create("Purple Memorised / Kinned Players", PUtils.strokeImg(Text.std.render("Purple Memorised / Kinned Players", BuddyWnd.gc[6])));
+			prev = add(excludeOrangeBuddyFromAggroCheckBox = new CheckBox("Orange Memorised / Kinned Players"){
+				{a = (Utils.getprefb("excludeOrangeBuddyFromAggro", false));}
+				public void changed(boolean val) {
+					Utils.setprefb("excludeOrangeBuddyFromAggro", val);
+				}
+			}, prev.pos("bl").adds(0, 4));
+			excludeOrangeBuddyFromAggroCheckBox.lbl = Text.create("Orange Memorised / Kinned Players", PUtils.strokeImg(Text.std.render("Orange Memorised / Kinned Players", BuddyWnd.gc[7])));
+
+			prev = add(excludeAllVillageOrRealmMembersFromAggroCheckBox = new CheckBox("ALL Village & Realm Members (Regardless of Memo/Kin)"){
+				{a = (Utils.getprefb("excludeAllVillageOrRealmMembersFromAggro", false));}
+				public void changed(boolean val) {
+					Utils.setprefb("excludeAllVillageOrRealmMembersFromAggro", val);
+				}
+			}, prev.pos("bl").adds(0, 20));
+			excludeAllVillageOrRealmMembersFromAggroCheckBox.lbl = Text.create("ALL Village & Realm Members (Regardless of Memo/Kin)", PUtils.strokeImg(Text.std.render("ALL Village & Realm Members (Regardless of Memo/Kin)", new Color(151, 17, 17, 255))));
+
+			prev = add(new Label("PARTY MEMBERS ARE ALWAYS EXCLUDED!"), prev.pos("bl").adds(0, 20));
+
+			Widget backButton;
+			add(backButton = new PButton(UI.scale(200), "Back", 27, back, "Advanced Settings"), prev.pos("bl").adds(0, 18).x(0));
+			pack();
+			centerBackButton(backButton, this);
+		}
+	}
+
+			public static CheckBox toggleGobCollisionBoxesCheckBox;
 	public static ColorOptionWidget collisionBoxColorOptionWidget;
 	public static String[] collisionBoxColorSetting = Utils.getprefsa("collisionBox" + "_colorSetting", new String[]{"255", "255", "255", "210"});
 	public static CheckBox displayObjectHealthPercentageCheckBox;
@@ -1876,13 +1959,14 @@ public class OptWnd extends Window {
 		y = addbtnImproved(cont, "Aggro Nearest Player/Animal", "Selects the nearest non-friendly Player or Animal to attack, based on your situation:" +
 				"\n\n$col[218,163,0]{Case 1:} $col[185,185,185]{If you are in combat with Players, it will only attack other not-already-aggroed non-friendly players.}" +
 				"\n$col[218,163,0]{Case 2:} $col[185,185,185]{If you are in combat with Animals, it will try to attack the closest not-already-aggroed player. If none is found, try to attack the closest animal. Once this happens, you're back to Case 1.}" +
-				"\n\n$col[185,185,185]{Party members will never be attacked by this button. Memorised/Kinned players will not be attacked unless they're marked $col[185,0,0]{Red}. Village/Realm members will not be attacked regardless of being kinned or not, unless they're $col[185,0,0]{Red} in your kin list.}", new Color(255, 0, 0,255), GameUI.kb_aggroNearestTargetButton, y);
-		y = addbtnImproved(cont, "Aggro/Target Nearest Cursor", "Tries to attack/target the closest player/animal it can find near the cursor.", new Color(255, 0, 0,255), GameUI.kb_aggroOrTargetNearestCursor, y);
+				"\n\n$col[185,185,185]{Party members will never be attacked by this button. You can exclude other specific player groups from being attacked in the Aggro Exclusion Settings.}", new Color(255, 0, 0,255), GameUI.kb_aggroNearestTargetButton, y);
+		y = addbtnImproved(cont, "Aggro/Target Nearest Cursor", "Tries to attack/target the closest player/animal it can find near the cursor." +
+				"\n\n$col[185,185,185]{Party members will never be attacked by this button. You can exclude other specific player groups from being attacked in the Aggro Exclusion Settings.}", new Color(255, 0, 0,255), GameUI.kb_aggroOrTargetNearestCursor, y);
 		y = addbtnImproved(cont, "Aggro Nearest Player", "Selects the nearest non-aggroed Player to attack." +
 				"\n\n$col[185,185,185]{This only attacks players.}" +
-				"\n\n$col[185,185,185]{Party members will never be attacked by this button. Memorised/Kinned players will not be attacked unless they're marked $col[185,0,0]{Red}. Village/Realm members will not be attacked regardless of being kinned or not, unless they're $col[185,0,0]{Red} in your kin list.}", new Color(255, 0, 0,255), GameUI.kb_aggroNearestPlayerButton, y);
+				"\n\n$col[185,185,185]{Party members will never be attacked by this button. You can exclude other specific player groups from being attacked in the Aggro Exclusion Settings.}", new Color(255, 0, 0,255), GameUI.kb_aggroNearestPlayerButton, y);
 		y = addbtnImproved(cont, "Aggro all Non-Friendly Players", "Tries to attack everyone in range. " +
-				"\n\n$col[185,185,185]{Party members will never be attacked by this button. Memorised/Kinned players will not be attacked unless they're marked $col[185,0,0]{Red}. Village/Realm members will not be attacked regardless of being kinned or not, unless they're $col[185,0,0]{Red} in your kin list.}\"", new Color(255, 0, 0,255), GameUI.kb_aggroAllNonFriendlyPlayers, y);
+				"\n\n$col[185,185,185]{Party members will never be attacked by this button. You can exclude other specific player groups from being attacked in the Aggro Exclusion Settings.}", new Color(255, 0, 0,255), GameUI.kb_aggroAllNonFriendlyPlayers, y);
 		y = addbtnImproved(cont, "Re-Aggro Animal (Cheese)", "Use this to cheese animals and re-aggro them quickly when they flee." +
 				"\n $col[185,185,185]{This is useful when you use animal auto-peace. Also, it only works when you're fighting one single animal.}", new Color(255, 68, 0,255), GameUI.kb_aggroLastTarget, y);
 		y = addbtnImproved(cont, "Peace Current Target", "", new Color(0, 255, 34,255), GameUI.kb_peaceCurrentTarget, y);
@@ -3756,11 +3840,13 @@ public class OptWnd extends Window {
 		Panel hidingsettings = add(new HidingSettingsPanel(advancedSettings));
 		Panel alarmsettings = add(new AlarmsAndSoundsSettingsPanel(advancedSettings));
 		Panel combatuipanel = add(new CombatUIPanel(advancedSettings));
+		Panel combataggrosettings = add(new AggroExclusionSettingsPanel(advancedSettings));
 
 		int y2 = UI.scale(6);
 		y2 = advancedSettings.add(new PButton(UI.scale(200), "Interface Settings", -1, interfacesettings, "Interface Settings"), 0, y2).pos("bl").adds(0, 5).y;
 		y2 = advancedSettings.add(new PButton(UI.scale(200), "Action Bars Settings", -1, actionbarssettings, "Action Bars Settings"), 0, y2).pos("bl").adds(0, 5).y;
 		y2 = advancedSettings.add(new PButton(UI.scale(200), "Combat UI Settings", -1, combatuipanel, "Combat UI Settings"), 0, y2).pos("bl").adds(0, 5).y;
+		y2 = advancedSettings.add(new PButton(UI.scale(200), "Aggro Exclusion Settings", -1, combataggrosettings, "Aggro Exclusion Settings"), 0, y2).pos("bl").adds(0, 5).y;
 		y2 = advancedSettings.add(new PButton(UI.scale(200), "Display Settings", -1, displaysettings, "Display Settings"), 0, y2).pos("bl").adds(0, 5).y;
 		y2 = advancedSettings.add(new PButton(UI.scale(200), "Quality Display Settings", -1, qualitydisplaysettings, "Quality Display Settings"), 0, y2).pos("bl").adds(0, 5).y;
 		y2 = advancedSettings.add(new PButton(UI.scale(200), "Camera Settings", -1, camsettings, "Camera Settings"), 0, y2).pos("bl").adds(0, 5).y;
