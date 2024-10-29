@@ -2299,7 +2299,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 					if(belt[slot] != null) {
 						belt[slot].draw(g.reclip(c.add(UI.scale(1), UI.scale(1)), invsq.sz().sub(UI.scale(2), UI.scale(2))));
 					}
-				} catch(Loading e) {}
+				} catch(Exception ignored) {}
 				String keybindString = beltkeys[i].key().name();
 				g.aimage(new TexI(Utils.outline2(actBarKeybindsFoundry.render(keybindString).img, Color.BLACK, true)), c.add(invsq.sz().sub(UI.scale(2), 0)), 1, 1);
 			}
@@ -2411,16 +2411,20 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 
 		private void use(int slot) {
 			try {
-				Resource res = ((PagBeltSlot) belt[slot]).pag.res();
-				Resource.AButton act = res.layer(Resource.action);
-				if (act == null) {
-					GameUI.this.wdgmsg("belt", slot, 1, ui.modflags());
-				} else {
-					if (res.name.startsWith("customclient/menugrid")) {
-						ui.gui.menu.useCustom(act.ad);
+				if (belt[slot] instanceof PagBeltSlot) {
+					Resource res = ((PagBeltSlot) belt[slot]).pag.res();
+					Resource.AButton act = res.layer(Resource.action);
+					if (act == null) {
+						GameUI.this.wdgmsg("belt", slot, 1, ui.modflags());
 					} else {
-						act(slot, new MenuGrid.Interaction(1, ui.modflags()));
+						if (res.name.startsWith("customclient/menugrid")) {
+							ui.gui.menu.useCustom(act.ad);
+						} else {
+							act(slot, new MenuGrid.Interaction(1, ui.modflags()));
+						}
 					}
+				} else {
+					act(slot, new MenuGrid.Interaction(1, ui.modflags()));
 				}
 			} catch (Exception e) {
 			}
