@@ -85,12 +85,14 @@ public class ChatUI extends Widget {
 	}
 
 	public static final Attribute HYPERLINK = new ChatAttribute("hyperlink");
+	public static final Attribute HEARTHSECRET = new ChatAttribute("hearthsecret");
     }
 
     public static class ChatParser extends RichText.Parser {
 	public static final Pattern urlpat = Pattern.compile("\\b((https?://)|(www\\.[a-z0-9_.-]+\\.[a-z0-9_.-]+))[a-z0-9/_.~#%+?&:*=-]*", Pattern.CASE_INSENSITIVE);
 	public static final Map<? extends Attribute, ?> urlstyle = RichText.fillattrs(TextAttribute.FOREGROUND, new Color(64, 64, 255),
 										      TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON);
+	public static final Pattern hspat = Pattern.compile("\\bhs: ?(.*)", Pattern.CASE_INSENSITIVE);
 
 	public ChatParser(Object... args) {
 	    super(args);
@@ -121,6 +123,21 @@ public class ChatUI extends Widget {
 		ret.append(new RichText.TextPart(text.substring(m.start(), m.end()), na));
 		p = m.end();
 	    }
+		int p2 = 0;
+		while(true){
+			Matcher m2 = hspat.matcher(text);
+			if(!m2.find(p))
+				break;
+			String hs = text.substring(m2.start()+3, m2.end());
+			RichText.Part lead = new RichText.TextPart(text.substring(p, m2.start()), attrs);
+			if(ret == null) ret = lead; else ret.append(lead);
+			Map<Attribute, Object> na = new HashMap<Attribute, Object>(attrs);
+			na.putAll(urlstyle);
+			na.put(ChatAttribute.HEARTHSECRET, hs);
+			ret.append(new RichText.TextPart(text.substring(m2.start(), m2.end()), na));
+			p = m2.end();
+			continue;
+		}
 	    if(ret == null)
 		ret = new RichText.TextPart(text, attrs);
 	    else
@@ -690,6 +707,11 @@ public class ChatUI extends Widget {
 		    } catch(WebBrowser.BrowserException e) {
 			getparent(GameUI.class).error("Could not launch web browser.");
 		    }
+		}
+		String hs = (String) inf.getAttribute(ChatAttribute.HEARTHSECRET);
+		if(hs != null) {
+			ui.gui.buddies.show();
+			ui.gui.buddies.wdgmsg("bypwd", hs );
 		}
 		return(true);
 	    }
