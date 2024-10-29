@@ -34,6 +34,10 @@ import java.util.*;
 import java.awt.Color;
 import java.awt.event.KeyEvent;
 import java.awt.image.WritableRaster;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -102,6 +106,9 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 	public Thread keyboundActionThread;
 	public long lastopponent = -1;
 	private long lastAutoDrinkTime = 0;
+	public boolean areaChatLoaded = false;
+	private static ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+	private static Future<?> areaChatFuture;
 
 	// Script Threads
 	public Thread autoRepeatFlowerMenuScriptThread;
@@ -1072,6 +1079,20 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 	    zerg.addpol(p);
 	} else if(place == "chat") {
 	    chat.addchild(child);
+		if (!areaChatLoaded){ // ND: Do this stuff to select Area Chat on login
+			Map<String, ChatUI.MultiChat> channels = new HashMap<>();
+			for (Widget w = chat.lchild; w != null; w = w.prev) {
+				if (w instanceof ChatUI.MultiChat) {
+					ChatUI.MultiChat chat = ((ChatUI.MultiChat) w);
+					channels.put(chat.name, chat);
+				}
+			}
+			if (channels.get("Area Chat") != null)
+				chat.select(channels.get("Area Chat"), false);
+			if (areaChatFuture != null)
+				areaChatFuture.cancel(true);
+			areaChatFuture = executor.scheduleWithFixedDelay(this::setAreaChatLoaded, 1000, 5000, TimeUnit.MILLISECONDS);
+		}
 	} else if(place == "party") {
 	    add(child, portrait.pos("bl").adds(0, 10));
 	} else if(place == "meter") {
@@ -2750,6 +2771,11 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 			}
 		}
 		return true;
+	}
+
+	public void setAreaChatLoaded() {
+		areaChatLoaded = true;
+		areaChatFuture.cancel(true);
 	}
 
 }
