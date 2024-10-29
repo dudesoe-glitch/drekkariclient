@@ -10,14 +10,15 @@ import static haven.PUtils.*;
 
 @haven.FromResource(name = "gfx/fx/floatimg", version = 6)
 public class FloatSprite extends Sprite implements PView.Render2D {
-    public static final double floaty = UI.scale(10.0);
+    public static final double floaty = UI.scale(40.0);
     public final double tm;
     final Tex tex;
-    final int sy;
+    int sy;
     double a = 0;
+	int damageType = 0;
 
     public int cury() {
-	return(sy - (int)(floaty * a));
+	return(sy + (int)(floaty * a));
     }
 
     public FloatSprite(Owner owner, Resource res, Tex tex, int tm) {
@@ -26,6 +27,14 @@ public class FloatSprite extends Sprite implements PView.Render2D {
 	this.tm = tm;
 	this.sy = place(owner.context(Gob.class), tex.sz().y);
     }
+
+	public FloatSprite(Owner owner, Resource res, Tex tex, int tm, int damageType) {
+		super(owner, res);
+		this.tex = tex;
+		this.tm = tm;
+		this.sy = place(owner.context(Gob.class), tex.sz().y/4);
+		this.damageType = damageType;
+	}
 
     private static int place(Gob gob, int h) {
 	int y = 0;
@@ -59,7 +68,14 @@ public class FloatSprite extends Sprite implements PView.Render2D {
 	Coord c = tex.sz().inv();
 	c.x = c.x / 2;
 	c.y += cury();
-	c.y -= 15;
+	if (damageType == 61455) { // SHP
+		c.x -= UI.scale(28);
+		c.y += UI.scale(4);
+	} else if (damageType == 36751) { // ARM
+		c.x += UI.scale(28);
+	} else if (damageType == 64527) { // HHP
+		c.y += UI.scale(8);
+	}
 	g.image(tex, sc.add(c));
 	g.chcolor();
     }

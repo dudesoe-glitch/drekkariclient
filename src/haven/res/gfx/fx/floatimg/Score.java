@@ -57,6 +57,9 @@ public class Score implements Sprite.Factory {
 			       dup((col & 0x0f00) >> 8),
 			       dup((col & 0x00f0) >> 4),
 			       dup((col & 0x000f) >> 0));
+	if (col == 64527 || col == 61455 || col == 36751) {
+		return (new FloatText(owner, res, buf, dcol, col));
+	}
 	return(new FloatText(owner, res, buf, dcol));
     }
 }
