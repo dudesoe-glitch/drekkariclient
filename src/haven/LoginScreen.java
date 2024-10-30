@@ -65,6 +65,8 @@ public class LoginScreen extends Widget {
 	private Window firstTimeUseExtraBackgroundWindow = null; // ND: Do an extra window to have a solid background, no transparency.
 	private boolean firstTimeWindowCreated = false;
 	private static String backgroundPath = "res/customclient/loginScreen.png";
+	private final Window updateWindow;
+	private boolean githubVersionChecked = false;
 
 
     private String getpref(String name, String def) {
@@ -113,6 +115,40 @@ public class LoginScreen extends Widget {
 	Gob.batWingCapeEquipped = false;
 	Gob.nightQueenDefeated = false;
 	Gob.alarmPlayed.clear();
+	updateWindow = new Window(Coord.z, "Update Available!", true) {
+		{
+			Widget prev;
+			prev = add(new Label("A new client version is available!"), UI.scale(new Coord(74, 3)));
+			prev = add(new Label("Please remember to update your client to avoid bugs & crashes!"), prev.pos("bl").adds(0, 8).x(0));
+			Button close = new Button(UI.scale(120), "Close", false) {
+				@Override
+				public void click() {
+					parent.reqdestroy();
+				}
+			};
+			add(close, prev.pos("bl").adds(0, 10).adds(92, 10));
+			pack();
+		}
+
+		@Override
+		public void drag(Coord off) {
+			// ND: Don't do anything
+		}
+		@Override
+		public void wdgmsg(Widget sender, String msg, Object... args) {
+			if (msg.equals("close"))
+				reqdestroy();
+			else
+				super.wdgmsg(sender, msg, args);
+		}
+	};
+	Config.githubLatestVersion = "Loading...";
+	GitHubVersionFetcher.fetchLatestVersion("Nightdawg", "Hurricane", new GitHubVersionFetcher.VersionCallback() {
+		@Override
+		public void onVersionFetched(String version) {
+			Config.githubLatestVersion = version; // Update immediately upon response
+		}
+	});
     }
 
 //    public static final KeyBinding kb_savtoken = KeyBinding.get("login/savtoken", KeyMatch.forchar('R', KeyMatch.M)); // ND: Why the fuck are there keybinds for these? Someone might press one of those by mistake
@@ -442,6 +478,12 @@ public class LoginScreen extends Widget {
 		playMainTheme();
 		if (!firstTimeWindowCreated && Utils.getprefb("firstTimeOpeningClient", true)){
 			createFirstTimeUseWindow();
+		}
+		if (!githubVersionChecked && !Config.githubLatestVersion.equals("Loading...") && !Config.githubLatestVersion.equals("Failed")){
+			if (!Config.clientVersion.equals(Config.githubLatestVersion)) {
+				adda(updateWindow, 0.5, 0);
+			}
+			githubVersionChecked = true;
 		}
 		super.tick(dt);
 	}
