@@ -17,7 +17,7 @@ public class Buddy extends GAttrib implements InfoPart {
     private BuddyWnd bw = null;
     public BuddyWnd.Buddy b = null;
     public int rgrp;
-    private String rnm;
+    public String rnm;
 	public String customName = null;
 	private Color customNameColor = Color.WHITE;
 

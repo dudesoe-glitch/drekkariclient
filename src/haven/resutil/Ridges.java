@@ -738,4 +738,29 @@ public class Ridges implements MapMesh.ConsHooks {
 	public static void setCliffHighlightMat(){
 		cliffHighlightMat = Pipe.Op.compose(new MixColor(OptWnd.highlightCliffsColorOptionWidget.currentColor), new HueMod(0, 0, 1));
 	}
+
+	public static boolean brokenp(MCache map, Coord tc, MCache.Grid g) {
+		Tiler t = map.tiler(g.gettile(tc));
+		if (!(t instanceof RidgeTile))
+			return (false);
+		double bz = ((RidgeTile) t).breakz() + EPSILON;
+		for (Coord ec : tecs) {
+			Coord coord = tc.add(ec);
+			if (coord.x < 0 || coord.x > MCache.cmaps.x - 1 || coord.y < 0 || coord.y > MCache.cmaps.y - 1)
+				continue;
+			t = map.tiler(g.gettile(coord));
+			if (t instanceof RidgeTile)
+				bz = Math.min(bz, ((RidgeTile) t).breakz() + EPSILON);
+		}
+		for (int i = 0; i < 4; i++) {
+			Coord coord1 = tc.add(tccs[i]);
+			Coord coord2 = tc.add(tccs[(i + 1) % 4]);
+			if (coord1.x < 0 || coord1.x > MCache.cmaps.x - 1 || coord1.y < 0 || coord1.y > MCache.cmaps.y - 1 ||
+					coord2.x < 0 || coord2.x > MCache.cmaps.x - 1 || coord2.y < 0 || coord2.y > MCache.cmaps.y - 1)
+				continue;
+			if (Math.abs(g.getz(coord2) - g.getz(coord1)) > bz)
+				return (true);
+		}
+		return (false);
+	}
 }

@@ -101,6 +101,8 @@ public class Charlist extends Widget {
 	    add(new Img(tf.render(chr.name).tex()), avaf.pos("ur").adds(5, 0));
 	    adda(new Button(UI.scale(100), "Play"), pos("cbr").subs(10, 2), 1.0, 1.0).action(() -> {
 			Charlist.this.wdgmsg("play", chr.name);
+			Config.setPlayerName(chr.name);
+			Config.initAutomapper(ui);
 		});
 	}
 

@@ -40,7 +40,9 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
@@ -3747,6 +3749,89 @@ public class OptWnd extends Window {
 		}
 	}
 
+	public static TextEntry webmapEndpointTextEntry;
+	public static CheckBox uploadMapTilesCheckBox;
+	public static CheckBox sendLiveLocationCheckBox;
+	public static TextEntry liveLocationNameTextEntry;
+	public static Map<Color, Boolean> colorCheckboxesMap = new HashMap<>();
+	static {
+		for (Color color : BuddyWnd.gc) {
+			colorCheckboxesMap.put(color, Utils.getprefb("enableMarkerUpload" + color.getRGB(), false));
+		}
+	}
+
+	public class ServerIntegrationSettingsPanel extends Panel {
+
+		public ServerIntegrationSettingsPanel(Panel back) {
+			Widget prev;
+			prev = add(new Label("Web Map Integration"), 110, 8);
+			prev = add(new Label("Web Map Endpoint:"), prev.pos("bl").adds(0, 16).x(0));
+			prev = add(webmapEndpointTextEntry = new TextEntry(UI.scale(220), Utils.getpref("webMapEndpoint", "")){
+				protected void changed() {
+					Utils.setpref("webMapEndpoint", this.buf.line());
+					super.changed();
+				}
+			}, prev.pos("ur").adds(6, 0));
+			prev = add(uploadMapTilesCheckBox = new CheckBox("Upload Map Tiles to your Web Map Server"){
+				{a = Utils.getprefb("uploadMapTiles", false);}
+				public void changed(boolean val) {
+					Utils.setprefb("uploadMapTiles", val);
+				}
+			}, prev.pos("bl").adds(0, 8).x(12));
+			uploadMapTilesCheckBox.tooltip = uploadMapTilesTooltip;
+
+			prev = add(sendLiveLocationCheckBox = new CheckBox("Send Live Location to your Web Map Server"){
+				{a = Utils.getprefb("enableLocationTracking", false);}
+				public void changed(boolean val) {
+					Utils.setprefb("enableLocationTracking", val);
+				}
+			}, prev.pos("bl").adds(0, 12));
+			sendLiveLocationCheckBox.tooltip = sendLiveLocationTooltip;
+
+			prev = add(new Label("Your Live Location Name (Req. Relog):"), prev.pos("bl").adds(20, 4));
+			prev.tooltip = liveLocationNameTooltip;
+			prev = add(liveLocationNameTextEntry = new TextEntry(UI.scale(96), Utils.getpref("liveLocationName", "")){
+				protected void changed() {
+					Utils.setpref("liveLocationName", this.buf.line());
+					super.changed();
+				}
+			}, prev.pos("ur").adds(6, 0));
+			liveLocationNameTextEntry.tooltip = liveLocationNameTooltip;
+
+			prev = add(new Label("Markers to upload:"), prev.pos("bl").adds(0, 20).x(0));
+
+			for (Map.Entry<Color, Boolean> entry : colorCheckboxesMap.entrySet()) {
+				Color color = entry.getKey();
+				boolean isChecked = entry.getValue();
+
+				CheckBox colorCheckbox = new CheckBox(""){
+					{a = isChecked;}
+					@Override
+					public void draw(GOut g) {
+						g.chcolor(color);
+						g.frect(Coord.z.add(0, (sz.y - box.sz().y) / 2), box.sz());
+						g.chcolor();
+						if(state())
+							g.image(mark, Coord.z.add(0, (sz.y - mark.sz().y) / 2));
+					}
+
+					public void set(boolean val) {
+						Utils.setprefb("enableMarkerUpload" + color.getRGB(), val);
+						colorCheckboxesMap.put(color, val);
+						a = val;
+					}
+				};
+				prev = add(colorCheckbox, prev.pos("ur").adds(10, 0));
+			}
+
+			Widget backButton;
+			add(backButton = new PButton(UI.scale(200), "Back", 27, back, "Advanced Settings"), prev.pos("bl").adds(0, 18).x(0));
+			pack();
+			centerBackButton(backButton, this);
+		}
+
+	}
+
 
     public static class PointBind extends Button {
 	public static final String msg = "Bind other elements...";
@@ -3885,6 +3970,7 @@ public class OptWnd extends Window {
 		Panel alarmsettings = add(new AlarmsAndSoundsSettingsPanel(advancedSettings));
 		Panel combatuipanel = add(new CombatUIPanel(advancedSettings));
 		Panel combataggrosettings = add(new AggroExclusionSettingsPanel(advancedSettings));
+		Panel serverintegrationsettings = add(new ServerIntegrationSettingsPanel(advancedSettings));
 
 		int y2 = UI.scale(6);
 		y2 = advancedSettings.add(new PButton(UI.scale(200), "Interface Settings", -1, interfacesettings, "Interface Settings"), 0, y2).pos("bl").adds(0, 5).y;
@@ -3899,6 +3985,7 @@ public class OptWnd extends Window {
 		y2 = advancedSettings.add(new PButton(UI.scale(200), "Alarms & Sounds Settings", -1, alarmsettings, "Alarms & Sounds Settings"), 0, y2).pos("bl").adds(0, 5).y;
 		y2 = advancedSettings.add(new PButton(UI.scale(200), "Gameplay Automation Settings", -1, gameplayautomationsettings, "Gameplay Automation Settings"), 0, y2).pos("bl").adds(0, 5).y;
 		y2 = advancedSettings.add(new PButton(UI.scale(200), "Altered Gameplay Settings", -1, alteredgameplaysettings, "Altered Gameplay Settings"), 0, y2).pos("bl").adds(0, 5).y;
+		y2 = advancedSettings.add(new PButton(UI.scale(200), "Server Integration Settings", -1, serverintegrationsettings, "Server Integration Settings"), 0, y2).pos("bl").adds(0, 5).y;
 
 		y2 += UI.scale(20);
 		y2 = advancedSettings.add(new PButton(UI.scale(200), "Back", 27, main, "Options            "), 0, y2).pos("bl").adds(0, 5).y;
@@ -4174,6 +4261,14 @@ public class OptWnd extends Window {
 	private final Object disableObjectAnimationsTooltip = RichText.render("This stops animations for the following: fires, trash stockpiles, beehives, dreamcatchers, kilns, cauldrons." +
 			"\n" +
 			"\n$col[185,185,185]{Ideally, in the future, I'll change this to allow you to pick exactly what you want to disable, from a list.}", UI.scale(300));
+
+	// Server Integration Settings Tooltips
+	private final Object uploadMapTilesTooltip = RichText.render("Enable this to upload your map tiles to your web map server.", UI.scale(300));
+	private final Object sendLiveLocationTooltip = RichText.render("Enable this to show your current location on your web map server.", UI.scale(320));
+	private final Object liveLocationNameTooltip = RichText.render("If you send your location to the server, your name will appear as whatever you set in this text entry + your current character name." +
+			"\n" +
+			"\n$col[218,163,0]{For example:} Nightdawg (VillageCrafter)$col[185,185,185]{, where }\"Nightdawg\" $col[185,185,185]{is the name I set in this text entry, and} \"VillageCrafter\" $col[185,185,185]{is the character's original name." +
+			"\nThe character's original name is the one you see in the character selection screen, NOT the presentation name.}", UI.scale(320));
 
 	// Misc/Other
 	private final Object resetButtonTooltip = RichText.render("Reset to default", UI.scale(300));

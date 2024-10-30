@@ -26,6 +26,8 @@
 
 package haven;
 
+import haven.automated.mapper.MappingClient;
+
 import java.util.*;
 import java.util.function.*;
 import java.io.*;
@@ -1012,6 +1014,22 @@ public class Config {
 		cures.put("paginae/wound/wretchedgore", new String[]{
 				"gfx/invobjs/stitchpatch"
 		});
+	}
+
+	private static String playername;
+
+	public static void setPlayerName(String playername) {
+		Config.playername = playername;
+	}
+
+	public static void initAutomapper(UI ui) {
+		if (MappingClient.initialized()) {
+			MappingClient.destroy();
+		}
+		MappingClient.init(ui.sess.glob);
+		MappingClient automapper = MappingClient.getInstance();
+		if (automapper != null)
+			automapper.SetPlayerName(OptWnd.liveLocationNameTextEntry.buf.line() + " (" + playername + ")");
 	}
 
 }
