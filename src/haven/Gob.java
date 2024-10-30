@@ -510,6 +510,9 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	this.id = id;
 	if(id < 0)
 	    virtual = true;
+	if(GobDamageInfo.has(this)) {
+		addDmg();
+	}
 	setupmods.add(customSizeAndRotation);
 	qualityInfo = new GobQualityInfo(this);
 	setattr(GobQualityInfo.class, qualityInfo);
