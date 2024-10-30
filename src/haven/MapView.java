@@ -58,8 +58,8 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
     private Selector selection;
     private Coord3f camoff = new Coord3f(Coord3f.o);
     public double shake = 0.0;
-    public static double plobpgran = Utils.getprefd("plobpgran", 8);
-    public static double plobagran = Utils.getprefd("plobagran", 12);
+    public static double plobpgran = Utils.getprefd("plobpgran", 32);
+    public static double plobagran = Utils.getprefd("plobagran", 8);
     private static final Map<String, Class<? extends Camera>> camtypes = new HashMap<String, Class<? extends Camera>>();
 	private static int cameraConsoleCommandReplyMessage = 1;
 	public static int currentCamera = 1;

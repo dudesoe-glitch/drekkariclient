@@ -81,9 +81,9 @@ public class MapWnd extends Window implements Console.Directory {
     public static final KeyBinding kb_mark = KeyBinding.get("mapwnd/mark", KeyMatch.nil);
     public static final KeyBinding kb_hmark = KeyBinding.get("mapwnd/hmark", KeyMatch.nil);
     public static final KeyBinding kb_compact = KeyBinding.get("mapwnd/compact", KeyMatch.forchar('W', KeyMatch.M));
-	public static final KeyBinding kb_claim = KeyBinding.get("mapwnd/pclaim", KeyMatch.forcode(KeyEvent.VK_F9, KeyMatch.M));
-	public static final KeyBinding kb_vil = KeyBinding.get("mapwnd/vclaim", KeyMatch.forcode(KeyEvent.VK_F10, KeyMatch.M));
-    public static final KeyBinding kb_prov = KeyBinding.get("mapwnd/prov", KeyMatch.forcode(KeyEvent.VK_F11, KeyMatch.M));
+	public static final KeyBinding kb_claim = KeyBinding.get("mapwnd/pclaim", KeyMatch.forcode(KeyEvent.VK_F9, KeyMatch.C | KeyMatch.S));
+	public static final KeyBinding kb_vil = KeyBinding.get("mapwnd/vclaim", KeyMatch.forcode(KeyEvent.VK_F10, KeyMatch.C | KeyMatch.S));
+    public static final KeyBinding kb_prov = KeyBinding.get("mapwnd/prov", KeyMatch.forcode(KeyEvent.VK_F11, KeyMatch.C | KeyMatch.S));
     public MapWnd(MapFile file, MapView mv, Coord sz, String title) {
 	super(sz, title, true);
 	this.file = file;
@@ -170,7 +170,7 @@ public class MapWnd extends Window implements Console.Directory {
 			markcfg = MarkerConfig.hideall;
 		})
 	    .settip("Hide markers").setgkey(kb_hmark);
-	if(Utils.getprefb("pclaim-claimMapState", false)) overlays.add("cplot");
+	if(Utils.getprefb("pclaim-claimMapState", true)) overlays.add("cplot");
 	toolbar.add(new ICheckBox("gfx/hud/mmap/pclaim", "", "-d", "-h", "-dh"))
 		.state(() -> visol("cplot"))
 		.click(() -> {
@@ -183,7 +183,7 @@ public class MapWnd extends Window implements Console.Directory {
 			}
 		})
 		.settip("Show Personal Claims on Map").setgkey(kb_claim);
-	if(Utils.getprefb("vclaim-claimMapState", false)) overlays.add("vlg");
+	if(Utils.getprefb("vclaim-claimMapState", true)) overlays.add("vlg");
 	toolbar.add(new ICheckBox("gfx/hud/mmap/vclaim", "", "-d", "-h", "-dh"))
 		.state(() -> visol("vlg"))
 		.click(() -> {

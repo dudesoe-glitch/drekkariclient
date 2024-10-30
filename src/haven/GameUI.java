@@ -989,8 +989,8 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 	    map.lower();
 //	    if(mmap != null)
 //		ui.destroy(mmap);
-		if (Utils.getprefb("lbtn-claimWorldState", false)) toggleol("cplot", true);
-		if (Utils.getprefb("lbtn-vilWorldState", false)) toggleol("vlg", true);
+		if (Utils.getprefb("lbtn-claimWorldState", true)) toggleol("cplot", true);
+		if (Utils.getprefb("lbtn-vilWorldState", true)) toggleol("vlg", true);
 		if (Utils.getprefb("lbtn-rlmWorldState", false)) toggleol("prov", true);
 	    if(mapfile != null) {
 		ui.destroy(mapfile);

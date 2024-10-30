@@ -26,6 +26,7 @@
 
 package haven;
 
+import java.awt.event.KeyEvent;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.Executors;
@@ -1052,7 +1053,12 @@ public class GobIcon extends GAttrib {
 		left.last(new Label(""), UI.scale(0));
 		Widget newPresetWidget = left.last(new Label("New Preset:"), UI.scale(8));
 		newPresetName = new TextEntry(UI.scale(120), ""){
-
+			public boolean keydown(KeyEvent e) {
+				if(e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+					setfocus(SettingsWindow.this.cont);
+				}
+				return(buf.key(e));
+			}
 		};
 		left.last(new Button(UI.scale(170), "Save New Preset", false).action(() -> {
 			if (newPresetName.text().equals(""))

@@ -145,7 +145,7 @@ public class Equipory extends Widget implements DTarget {
 	if (myOwnEquipory){
 		Widget prev;
 		prev = add(autoDropLeechesCheckBox = new CheckBox("Auto-Drop Leeches"){
-			{a = Utils.getprefb("autoDropLeeches", false);}
+			{a = Utils.getprefb("autoDropLeeches", true);}
 			public void set(boolean val) {
 				if (OptWnd.autoDropLeechesCheckBox != null)
 					OptWnd.autoDropLeechesCheckBox.set(val);

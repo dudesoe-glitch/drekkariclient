@@ -1158,7 +1158,7 @@ public class OptWnd extends Window {
 	public static CheckBox enableMineSweeperCheckBox;
 	public static OldDropBox<Integer> sweeperDurationDropbox;
 	public static final List<Integer> sweeperDurations = Arrays.asList(5, 10, 15, 30, 45, 60, 120);
-	public static int sweeperSetDuration = Utils.getprefi("sweeperSetDuration", 3);
+	public static int sweeperSetDuration = Utils.getprefi("sweeperSetDuration", 1);
 	public static CheckBox highlightPartyMembersCheckBox;
 	public static CheckBox showCirclesUnderPartyMembersCheckBox;
 	public static CheckBox showCirclesUnderCombatFoesCheckBox;
@@ -1927,7 +1927,7 @@ public class OptWnd extends Window {
 //	    y = addbtn(cont, "Quick chat", ChatUI.kb_quick, y);
 //	    y = addbtn(cont, "Take screenshot", GameUI.kb_shoot, y);
 	    y = addbtn(cont, "Minimap icons", GameUI.kb_ico, y);
-	    y = addbtn(cont, "Toggle UI", GameUI.kb_hide, y);
+//	    y = addbtn(cont, "Toggle UI", GameUI.kb_hide, y); // TODO: ND: Implement proper Toggle UI that hides everything
 	    y = addbtn(cont, "Log out", GameUI.kb_logout, y);
 	    y = addbtn(cont, "Switch character", GameUI.kb_switchchr, y);
 
@@ -1978,7 +1978,7 @@ public class OptWnd extends Window {
 		y = addbtnImproved(cont, "Aggro all Non-Friendly Players", "Tries to attack everyone in range. " +
 				"\n\n$col[185,185,185]{Party members will never be attacked by this button. You can exclude other specific player groups from being attacked in the Aggro Exclusion Settings.}", new Color(255, 0, 0,255), GameUI.kb_aggroAllNonFriendlyPlayers, y);
 		y = addbtnImproved(cont, "Re-Aggro Animal (Cheese)", "Use this to cheese animals and re-aggro them quickly when they flee." +
-				"\n $col[185,185,185]{This is useful when you use animal auto-peace. Also, it only works when you're fighting one single animal.}", new Color(255, 68, 0,255), GameUI.kb_aggroLastTarget, y);
+				"\n$col[185,185,185]{This is useful when you use animal auto-peace. Also, it only works when you're fighting one single animal.}", new Color(255, 68, 0,255), GameUI.kb_aggroLastTarget, y);
 		y = addbtnImproved(cont, "Peace Current Target", "", new Color(0, 255, 34,255), GameUI.kb_peaceCurrentTarget, y);
 
 		y = cont.adda(new Label("Other Custom features"), cont.sz.x / 2, y + UI.scale(10), 0.5, 0.0).pos("bl").adds(0, 5).y;
@@ -2085,26 +2085,26 @@ public class OptWnd extends Window {
 
 			Widget toggleLabel = add(new Label("Toggle on Login:"), 0, 0);
 			prev = add(toggleTrackingOnLoginCheckBox = new CheckBox("Tracking"){
-				{a = Utils.getprefb("toggleTrackingOnLogin", false);}
+				{a = Utils.getprefb("toggleTrackingOnLogin", true);}
 				public void changed(boolean val) {
 					Utils.setprefb("toggleTrackingOnLogin", val);
 				}
 			}, toggleLabel.pos("bl").adds(0, 6).x(UI.scale(0)));
 			prev = add(toggleSwimmingOnLoginCheckBox = new CheckBox("Swimming"){
-				{a = Utils.getprefb("toggleSwimmingOnLogin", false);}
+				{a = Utils.getprefb("toggleSwimmingOnLogin", true);}
 				public void changed(boolean val) {
 					Utils.setprefb("toggleSwimmingOnLogin", val);
 				}
 			}, prev.pos("bl").adds(0, 2));
 			prev = add(toggleCriminalActsOnLoginCheckBox = new CheckBox("Criminal Acts"){
-				{a = Utils.getprefb("toggleCriminalActsOnLogin", false);}
+				{a = Utils.getprefb("toggleCriminalActsOnLogin", true);}
 				public void changed(boolean val) {
 					Utils.setprefb("toggleCriminalActsOnLogin", val);
 				}
 			}, prev.pos("bl").adds(0, 2));
 
 			rightColumn = add(toggleSiegeEnginesOnLoginCheckBox = new CheckBox("Check for Siege Engines"){
-				{a = Utils.getprefb("toggleSiegeEnginesOnLogin", false);}
+				{a = Utils.getprefb("toggleSiegeEnginesOnLogin", true);}
 				public void changed(boolean val) {
 					Utils.setprefb("toggleSiegeEnginesOnLogin", val);
 				}
@@ -2712,7 +2712,7 @@ public class OptWnd extends Window {
 				}
 			}, prev.pos("bl").adds(0, 2));
 			prev = add(retractedCliffEdgesCheckBox = new CheckBox("Retracted Cliff Edges"){
-				{a = Utils.getprefb("retractedCliffEdges", true);}
+				{a = Utils.getprefb("retractedCliffEdges", false);}
 				public void changed(boolean val) {
 					Utils.setprefb("retractedCliffEdges", val);
 					if (ui.sess != null)
@@ -2723,7 +2723,7 @@ public class OptWnd extends Window {
 			}, prev.pos("bl").adds(0, 2));
 			retractedCliffEdgesCheckBox.tooltip = retractedCliffEdgesTooltip;
 			prev = add(straightCliffEdgesCheckBox = new CheckBox("Straight Cliff Edges"){
-				{a = Utils.getprefb("straightCliffEdges", true);}
+				{a = Utils.getprefb("straightCliffEdges", false);}
 				public void changed(boolean val) {
 					Utils.setprefb("straightCliffEdges", val);
 					if (ui.sess != null)
