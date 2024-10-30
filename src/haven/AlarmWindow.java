@@ -328,6 +328,7 @@ public class AlarmWindow extends Window {
 			this.alarmFilename = new TextEntry(UI.scale(100), alarmFilename.replace(".wav", "")){
 				@Override
 				protected void changed() {
+					this.settext(this.text().replaceAll(" ", ""));
 					AlarmManager.load(al);
 					AlarmManager.save();
 					super.changed();
