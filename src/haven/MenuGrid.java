@@ -777,6 +777,7 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 		makeLocal("customclient/menugrid/OtherScriptsAndTools/MiningSafetyAssistant");
 		makeLocal("customclient/menugrid/OtherScriptsAndTools/QuestgiverTriangulation");
 		makeLocal("customclient/menugrid/OtherScriptsAndTools/OreAndStoneCounter");
+		makeLocal("customclient/menugrid/OtherScriptsAndTools/GridHeightCalculator");
 
 		// Category: Quick Switch From Belt
 		makeLocal("customclient/menugrid/QuickSwitchFromBelt/Equip_B12");
@@ -1008,6 +1009,8 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 						gui.oreAndStoneCounterThread = null;
 					}
 				}
+			} else if (ad[2].equals("GridHeightCalculator")) {
+				AUtils.getGridHeightAvg(gui);
 			}
 		} else if (ad[1].equals("QuickSwitchFromBelt")) {
 			new Thread(new EquipFromBelt(gui, ad[2]), "EquipFromBelt").start();

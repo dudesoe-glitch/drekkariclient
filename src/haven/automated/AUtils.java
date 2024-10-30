@@ -1,9 +1,13 @@
 package haven.automated;
 
 import haven.*;
+import haven.Composite;
 
+import java.awt.*;
 import java.util.*;
 
+import static haven.MCache.cmaps;
+import static haven.MCache.tilesz;
 import static haven.OCache.posres;
 
 public class AUtils {
@@ -389,6 +393,35 @@ public class AUtils {
             }
         }
         return supports;
+    }
+
+    public static void getGridHeightAvg(GameUI gui){
+        try {
+            Coord playerCoord = gui.map.player().rc.floor(tilesz);
+            MCache.Grid grid = gui.ui.sess.glob.map.getgrid(playerCoord.div(cmaps));
+            float wholeGridHeight = 0;
+            float[] quarterHeights = new float[4];
+            int gridSize = 100;
+            int halfGridSize = gridSize / 2;
+            for (int i = 0; i < gridSize; i++) {
+                for (int j = 0; j < gridSize; j++) {
+                    wholeGridHeight += grid.z[i * gridSize + j];
+                    int quarterIndex;
+                    if(i < halfGridSize) {
+                        quarterIndex = (j < halfGridSize) ? 0 : 1;
+                    } else {
+                        quarterIndex = (j < halfGridSize) ? 2 : 3;
+                    }
+                    quarterHeights[quarterIndex] += grid.z[i * gridSize + j];
+                }
+            }
+            String[] quarterNames = {"N-W", "N-E", "S-W", "S-E"};
+            StringBuilder message = new StringBuilder("Whole grid average height is: " + wholeGridHeight / 10000 + ", ");
+            for (int i = 0; i < 4; i++) {
+                message.append("\n").append(quarterNames[i]).append(" quarter average height is: ").append(quarterHeights[i] / 2500).append(", ");
+            }
+            gui.msg(message.toString(), Color.WHITE);
+        } catch (Loading ignored) {}
     }
 
 }
