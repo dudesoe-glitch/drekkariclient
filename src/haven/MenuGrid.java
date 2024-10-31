@@ -795,6 +795,13 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 		makeLocal("customclient/menugrid/QuickSwitchFromBelt/Equip_WanderersBindles");
 		makeLocal("customclient/menugrid/QuickSwitchFromBelt/Equip_WoodenShovel");
 
+		// Category: Combat Decks
+		makeLocal("customclient/menugrid/CombatDecks/CombatDeck1");
+		makeLocal("customclient/menugrid/CombatDecks/CombatDeck2");
+		makeLocal("customclient/menugrid/CombatDecks/CombatDeck3");
+		makeLocal("customclient/menugrid/CombatDecks/CombatDeck4");
+		makeLocal("customclient/menugrid/CombatDecks/CombatDeck5");
+
 	}
 
 	public void useCustom(String[] ad) {
@@ -1014,6 +1021,8 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 			}
 		} else if (ad[1].equals("QuickSwitchFromBelt")) {
 			new Thread(new EquipFromBelt(gui, ad[2]), "EquipFromBelt").start();
+		} else if (ad[1].equals("CombatDecks")) {
+			gui.changeCombatDeck(Integer.parseInt(ad[2])-1);
 		}
 	}
 }

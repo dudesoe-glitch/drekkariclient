@@ -2791,4 +2791,9 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 		areaChatFuture.cancel(true);
 	}
 
+	public void changeCombatDeck(int deck) {
+		if (chrwdg != null && chrwdg.fight != null)
+			chrwdg.fight.changebutton(deck);
+	}
+
 }
