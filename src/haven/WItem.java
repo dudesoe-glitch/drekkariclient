@@ -54,6 +54,14 @@ public class WItem extends Widget implements DTarget {
 	private boolean holdingShift = false;
 	private boolean searchItemColorShiftUp = true;
 	private int searchItemColorValue = 0;
+	public static final Text.Foundry quantityFoundry = new Text.Foundry(Text.dfont, 10);
+	private static final Color quantityColor = new Color(255, 206, 45, 255);
+	public static final Coord TEXT_PADD_BOT = new Coord(1, 2);
+	public final AttrCache<Tex> heurnum = new AttrCache<Tex>(this::info, AttrCache.cache(info -> {
+		String num = ItemInfo.getCount(info);
+		if(num == null) return null;
+		return new TexI(PUtils.strokeImg(quantityFoundry.renderstroked2(num, quantityColor, Color.BLACK)));
+	}));
 
 	public static Color redDurability = new Color(255, 0, 0, 180);
 	public static Color orangeDurability = new Color(255, 153, 0, 180);
@@ -261,6 +269,7 @@ public class WItem extends Widget implements DTarget {
 		} catch (Exception e) {
 			/*CrashLogger.logCrash(e);*/
 		}
+		drawnum(g, sz);
 		if (isNotInStudy != null && isNotInStudy)
 			drawCircleProgress(g, sz);
 		else
@@ -488,5 +497,29 @@ public class WItem extends Widget implements DTarget {
 		Resource res = Resource.remote().load(resname).get();
 		BufferedImage bufferedimage = res.layer(Resource.imgc).img;
 		g.image(bufferedimage, new Coord(UI.scale(offset), sz.y-UI.scale(16)), new Coord(UI.scale(16),UI.scale(16)));
+	}
+
+	private void drawnum(GOut g, Coord sz) {
+		Tex tex;
+		if(item.num >= 0) {
+			tex = PUtils.strokeTex(quantityFoundry.renderstroked2(Integer.toString(item.num), quantityColor, Color.BLACK));
+		} else {
+			tex = chainattr(heurnum);
+		}
+
+		if(tex != null) {
+			g.aimage(tex, TEXT_PADD_BOT.add(sz), 1, 1);
+		}
+	}
+
+	@SafeVarargs //Ender: actually, method just assumes you'll feed it correctly typed var args
+	private static Tex chainattr(AttrCache<Tex> ...attrs){
+		for(AttrCache<Tex> attr : attrs){
+			Tex tex = attr.get();
+			if(tex != null){
+				return tex;
+			}
+		}
+		return null;
 	}
 }

@@ -40,6 +40,7 @@ import java.util.stream.Collectors;
 
 public abstract class ItemInfo {
     public final Owner owner;
+	static final Pattern count_pattern = Pattern.compile("(?:^|[\\s])([0-9]*\\.?[0-9]+\\s*%?)");
 
     public interface Owner extends OwnerContext {
 	public List<ItemInfo> info();
@@ -624,6 +625,40 @@ public abstract class ItemInfo {
 		for (ItemInfo info : infos) {
 			if (Reflect.hasField(info, "m") && Reflect.hasField(info, "d")) {
 				return new Pair<>(Reflect.getFieldValueInt(info, "d"), Reflect.getFieldValueInt(info, "m"));
+			}
+		}
+		return null;
+	}
+
+	public static String getCount(List<ItemInfo> infos) {
+		String res = null;
+		for (ItemInfo info : infos) {
+			if(info instanceof Contents) {
+				Contents cnt = (Contents) info;
+				res = getCount(cnt.sub);
+			} else if(info instanceof AdHoc) {
+				AdHoc ah = (AdHoc) info;
+				try {
+					Matcher m = count_pattern.matcher(ah.str.text);
+					if(m.find()) {
+						res = m.group(1);
+					}
+				} catch (Exception ignored) {
+				}
+			} else if(info instanceof Name) {
+				Name name = (Name) info;
+				if (!name.str.text.contains("seed")){ // ND: Seeds already show the quantity
+					try {
+						Matcher m = count_pattern.matcher(name.original);
+						if(m.find()) {
+							res = m.group(1);
+						}
+					} catch (Exception ignored) {
+					}
+				}
+			}
+			if(res != null) {
+				return res.trim();
 			}
 		}
 		return null;
