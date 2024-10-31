@@ -393,7 +393,7 @@ public class MapWnd extends Window implements Console.Directory {
 			g.chcolor(255, 255, 255, alpha);
 			g.image(img, ul, UI.scale(img.sz()).mul(dlvl).div(zoomlevel));
 		    }
-		} catch(Loading l) {
+		} catch(Exception ignored) {
 		}
 	    }
 	    g.chcolor();
