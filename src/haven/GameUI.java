@@ -110,6 +110,8 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 	public boolean areaChatLoaded = false;
 	private static ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 	private static Future<?> areaChatFuture;
+	public static boolean verifiedAccount = false;
+	public static boolean subscribedAccount = false;
 
 	// Script Threads
 	public Thread autoRepeatFlowerMenuScriptThread;

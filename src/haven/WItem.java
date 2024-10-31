@@ -122,6 +122,8 @@ public class WItem extends Widget implements DTarget {
 //	} else {
 //	    hoverstart = now;
 //	}
+	if (prev != this)
+		ttinfo = null;
 	try {
 	    List<ItemInfo> info = item.info();
 	    if(info.size() < 1)

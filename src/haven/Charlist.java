@@ -179,6 +179,17 @@ public class Charlist extends Widget {
 		}
 	}, parent.sz.x - UI.scale(230) , parent.sz.y - UI.scale(20));
 	parent.add(new Label("Background Music Volume"), parent.sz.x - UI.scale(184) , parent.sz.y - UI.scale(36));
+	for(Widget wdg : parent.children(Widget.class)) {
+		if (wdg instanceof Img) {
+			if (wdg.tooltip instanceof KeyboundTip) {
+				String tooltip = ((KeyboundTip) wdg.tooltip).base;
+				if (tooltip.startsWith("Verified"))
+					GameUI.verifiedAccount = true;
+				else if (tooltip.startsWith("Subscribed"))
+					GameUI.subscribedAccount = true;
+			}
+		}
+	}
     }
 
 	public void dispose() {
