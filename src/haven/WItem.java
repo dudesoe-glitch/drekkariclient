@@ -55,7 +55,7 @@ public class WItem extends Widget implements DTarget {
 	private boolean searchItemColorShiftUp = true;
 	private int searchItemColorValue = 0;
 	public static final Text.Foundry quantityFoundry = new Text.Foundry(Text.dfont, 10);
-	private static final Color quantityColor = new Color(255, 206, 45, 255);
+	private static final Color quantityColor = new Color(255, 255, 255, 255);
 	public static final Coord TEXT_PADD_BOT = new Coord(1, 2);
 	public final AttrCache<Tex> heurnum = new AttrCache<Tex>(this::info, AttrCache.cache(info -> {
 		String num = ItemInfo.getCount(info);

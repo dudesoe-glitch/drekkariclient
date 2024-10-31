@@ -150,7 +150,7 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 
 	@Override
 	public Color numcolor() {
-		return(new Color(255, 206, 45, 255));
+		return(new Color(255, 255, 255, 255));
 	}
 	}
 
