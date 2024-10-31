@@ -167,6 +167,7 @@ public class Glob {
 		lightang = olightang + a * Utils.cangle(tlightang - olightang);
 		lightelev = olightelev + a * Utils.cangle(tlightelev - olightelev);
 	    }
+		brighten();
 	}
     }
 
