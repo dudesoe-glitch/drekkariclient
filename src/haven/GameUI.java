@@ -1321,6 +1321,27 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 	if(!chat.visible()) {
 	    chat.drawsmall(g, new Coord(blpw + UI.scale(10), by), UI.scale(100));
 	}
+
+	int x = (int)(ui.gui.sz.x / 2.0);
+	int y = (int)(ui.gui.sz.y - ((ui.gui.sz.y / 500.0) * OptWnd.combatUITopPanelHeightSlider.val));
+	int bottom = (int)(ui.gui.sz.y - ((ui.gui.sz.y / 500.0) * OptWnd.combatUIBottomPanelHeightSlider.val));
+	if (OptWnd.alwaysShowCombatUIStaminaBarCheckBox.a) {
+		IMeter.Meter stam = ui.gui.getmeter("stam", 0);
+		if (stam != null) {
+			Coord msz = UI.scale(new Coord(234, 22));
+			Coord sc = OptWnd.stamBarLocationIsTop ? new Coord(x - msz.x/2,  y + UI.scale(70)) : new Coord(x - msz.x/2,  bottom - UI.scale(68));
+			drawStamMeterBar(g, stam, sc, msz);
+		}
+	}
+	if (OptWnd.alwaysShowCombatUIHealthBarCheckBox.a) {
+		IMeter.Meter hp = ui.gui.getmeter("hp", 0);
+		if (hp != null) {
+			Coord msz = UI.scale(new Coord(234, 22));
+			Coord sc = new Coord(x - msz.x/2,  y + UI.scale(44));
+			drawHealthMeterBar(g, hp, sc, msz);
+		}
+	}
+
     }
     
     private String iconconfname() {
@@ -2794,6 +2815,41 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 	public void changeCombatDeck(int deck) {
 		if (chrwdg != null && chrwdg.fight != null)
 			chrwdg.fight.changebutton(deck);
+	}
+
+	private void drawHealthMeterBar(GOut g, IMeter.Meter m, Coord sc, Coord msz) {
+		int w = msz.x;
+		int w1 = (int) Math.ceil(w * m.a);
+		int w2 = (int) Math.ceil(w * (IMeter.characterSoftHealthPercent/100));
+		g.chcolor(Fightsess.hpBarYellow);
+		g.frect(sc, new Coord(w1, msz.y));
+		g.chcolor(Fightsess.hpBarRed);
+		g.frect(sc, new Coord(w2, msz.y));
+		g.chcolor(Color.BLACK);
+		g.line(new Coord(sc.x+w1, sc.y), new Coord(sc.x+w1, sc.y+msz.y), 2);
+		g.rect(sc, new Coord(msz.x, msz.y));
+
+		g.chcolor(Color.WHITE);
+		String HHPpercentage = OptWnd.includeHHPTextHealthBarCheckBox.a ? " ("+(Fightsess.fmt1DecPlace((int)(m.a*100))) + "% HHP)" : "";
+		g.aimage(Text.renderstroked((IMeter.characterCurrentHealth + HHPpercentage), Text.num12boldFnd).tex(), new Coord(sc.x+msz.x/2, sc.y+msz.y/2), 0.5, 0.5);
+	}
+
+	private void drawStamMeterBar(GOut g, IMeter.Meter m, Coord sc, Coord msz) {
+		int w = msz.x;
+		int w1 = (int) Math.ceil(w * m.a);
+		g.chcolor(Fightsess.stamBarBlue);
+		g.frect(sc, new Coord(w1, msz.y));
+		g.chcolor(Color.BLACK);
+		g.line(new Coord(sc.x+w1, sc.y), new Coord(sc.x+w1, sc.y+msz.y), 2);
+		g.rect(sc, new Coord(msz.x, msz.y));
+		g.chcolor(Color.WHITE);
+		String staminaBarText = Fightsess.fmt1DecPlace((int)(m.a*100));
+		Gob myself = ui.gui.map.player();
+		if (myself != null && myself.imDrinking) {
+			g.chcolor(new Color(0, 222, 0));
+			staminaBarText = staminaBarText + " (Drinking)";
+		}
+		g.aimage(Text.renderstroked(staminaBarText, Text.num12boldFnd).tex(), new Coord(sc.x+msz.x/2, sc.y+msz.y/2), 0.5, 0.5);
 	}
 
 }

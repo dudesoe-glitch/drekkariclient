@@ -74,9 +74,9 @@ public class Fightsess extends Widget {
 		public String text(Integer v) {return("" + v);} // ND: Removed "IP" text. I only need to see the number, we already know it's the IP/Coins
 		public Integer value() {return(fv.current.oip);}
 	};
-	private static final Color stamBarBlue = new Color(47, 58, 207, 200);
-	private static final Color hpBarRed = new Color(168, 0, 0, 255);
-	private static final Color hpBarYellow = new Color(182, 165, 0, 255);
+	public static final Color stamBarBlue = new Color(47, 58, 207, 200);
+	public static final Color hpBarRed = new Color(168, 0, 0, 255);
+	public static final Color hpBarYellow = new Color(182, 165, 0, 255);
 	private static final Color barFrame = new Color(255, 255, 255, 111);
 
 	Map<String, Color> openingsColorMap = new HashMap<>() {{
@@ -610,17 +610,22 @@ public class Fightsess extends Widget {
 		}
 	    } catch(Loading l) {}
 	}
-	IMeter.Meter stam = ui.gui.getmeter("stam", 0);
-	IMeter.Meter hp = ui.gui.getmeter("hp", 0);
-	if (stam != null) {
-		Coord msz = UI.scale(new Coord(234, 22));
-		Coord sc = OptWnd.stamBarLocationIsTop ? new Coord(x - msz.x/2,  y + UI.scale(70)) : new Coord(x - msz.x/2,  bottom - UI.scale(68));
-		drawStamMeterBar(g, stam, sc, msz);
+	if (!OptWnd.alwaysShowCombatUIStaminaBarCheckBox.a) { // ND: Check if we're already drawing it in the gui
+		IMeter.Meter stam = ui.gui.getmeter("stam", 0);
+		if (stam != null) {
+			Coord msz = UI.scale(new Coord(234, 22));
+			Coord sc = OptWnd.stamBarLocationIsTop ? new Coord(x - msz.x/2,  y + UI.scale(70)) : new Coord(x - msz.x/2,  bottom - UI.scale(68));
+			drawStamMeterBar(g, stam, sc, msz);
+		}
 	}
-	if (hp != null) {
-		Coord msz = UI.scale(new Coord(234, 22));
-		Coord sc = new Coord(x - msz.x/2,  y + UI.scale(44));
-		drawHealthMeterBar(g, hp, sc, msz);
+
+	if (!OptWnd.alwaysShowCombatUIHealthBarCheckBox.a) { // ND: Check if we're already drawing it in the gui
+		IMeter.Meter hp = ui.gui.getmeter("hp", 0);
+		if (hp != null) {
+			Coord msz = UI.scale(new Coord(234, 22));
+			Coord sc = new Coord(x - msz.x / 2, y + UI.scale(44));
+			drawHealthMeterBar(g, hp, sc, msz);
+		}
 	}
     }
 

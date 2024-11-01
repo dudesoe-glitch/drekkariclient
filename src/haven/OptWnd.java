@@ -542,6 +542,9 @@ public class OptWnd extends Window {
 	public static CheckBox showStudyReportHistoryCheckBox;
 	public static CheckBox lockStudyReportCheckBox;
 	public static CheckBox soundAlertForFinishedCuriositiesCheckBox;
+	public static CheckBox alwaysShowCombatUIStaminaBarCheckBox;
+	public static CheckBox alwaysShowCombatUIHealthBarCheckBox;
+
     public class InterfaceSettingsPanel extends Panel {
 	public InterfaceSettingsPanel(Panel back) {
 	    Widget leftColumn = add(new Label("Interface scale (requires restart)"), 0, 0);
@@ -632,6 +635,21 @@ public class OptWnd extends Window {
 				a = val;
 			}
 		}, leftColumn.pos("bl").adds(0, 2));
+
+		leftColumn = add(alwaysShowCombatUIStaminaBarCheckBox = new CheckBox("Always Show Combat UI Stamina Bar"){
+			{a = (Utils.getprefb("alwaysShowCombatUIStaminaBar", false));}
+			public void changed(boolean val) {
+				Utils.setprefb("alwaysShowCombatUIStaminaBar", val);
+			}
+		}, leftColumn.pos("bl").adds(0, 12));
+		alwaysShowCombatUIStaminaBarCheckBox.tooltip = alwaysShowCombatUiBarTooltip;
+		leftColumn = add(alwaysShowCombatUIHealthBarCheckBox = new CheckBox("Always Show Combat UI Health Bar"){
+			{a = (Utils.getprefb("alwaysShowCombatUIHealthBar", false));}
+			public void changed(boolean val) {
+				Utils.setprefb("alwaysShowCombatUIHealthBar", val);
+			}
+		}, leftColumn.pos("bl").adds(0, 2));
+		alwaysShowCombatUIHealthBarCheckBox.tooltip = alwaysShowCombatUiBarTooltip;
 
 		Widget rightColumn;
 		rightColumn = add(simplifiedUIThemeCheckBox = new CheckBox("Simplified UI Theme"){
@@ -4087,6 +4105,7 @@ public class OptWnd extends Window {
 			"\n" +
 			"\n$col[185,185,185]{It doesn't work with Gems. Don't ask me why.}", UI.scale(300));
 	private final Object lockStudyReportTooltip = RichText.render("Enabling this will prevent moving or dropping items from the Study Report", UI.scale(300));
+	private final Object alwaysShowCombatUiBarTooltip = RichText.render("For more options for this bar, check the Combat UI Settings.", UI.scale(320));
 
 	// Combat UI Settings Tooltips
 	private final Object damageInfoClearTooltip = RichText.render("Clears all damage info." +
