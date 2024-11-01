@@ -2119,7 +2119,7 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
 					} else if (clickb == 3 && (!ui.modshift || !ui.modctrl)) {
 						if (chats.get("Party") != null)
 							chats.get("Party").send("@" + gob.id);
-					} else if (clickb == 2 && !(ui.modshift || ui.modctrl)){
+					} else if (OptWnd.objectPermanentHighlightingCheckBox.a && clickb == 2 && !(ui.modshift || ui.modctrl)){
 						if (Gob.permanentHighlightList.contains(gob.id)) {
 							Gob.permanentHighlightList.remove(gob.id);
 							gob.delattr(GobPermanentHighlight.class);
