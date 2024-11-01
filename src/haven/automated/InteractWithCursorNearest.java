@@ -95,6 +95,7 @@ public class InteractWithCursorNearest implements Runnable {
                                     gui.interactWithNearestObjectThread.interrupt();
                                     gui.interactWithNearestObjectThread = null;
                                 }
+                                return;
                             }
                         }
                     }
