@@ -5,32 +5,16 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public class GitHubVersionFetcher {
-    private static final int TIMEOUT_SECONDS = 5;
-    private static final AtomicBoolean isCancelled = new AtomicBoolean(false);
+    private static final ExecutorService executor = Executors.newCachedThreadPool();
 
     public static void fetchLatestVersion(String owner, String repo, VersionCallback callback) {
         // Set loading state
         callback.onVersionFetched("Loading...");
 
-        // Reset cancellation state
-        isCancelled.set(false);
-
-        // Use ExecutorService to manage the task
-        ExecutorService executor = Executors.newSingleThreadExecutor();
+        // Use the shared ExecutorService to manage the task
         java.util.concurrent.Future<String> future = executor.submit(() -> getLatestReleaseVersion(owner, repo));
-
-        // Set a timeout for the future task
-        ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-        scheduler.schedule(() -> {
-            if (!future.isDone()) {
-                callback.onVersionFetched("Failed"); // Update to failed if not completed
-                future.cancel(true); // Cancel the task if needed
-                isCancelled.set(true); // Mark as cancelled
-            }
-        }, TIMEOUT_SECONDS, TimeUnit.SECONDS);
 
         // Retrieve the result
         try {
@@ -41,18 +25,10 @@ public class GitHubVersionFetcher {
             callback.onVersionFetched("Failed"); // Update to failed on interruption
         } catch (ExecutionException e) {
             callback.onVersionFetched("Failed"); // Update to failed on exceptions
-        } finally {
-            executor.shutdown(); // Clean up the executor
-            scheduler.shutdown(); // Clean up the scheduler
         }
     }
 
     private static String getLatestReleaseVersion(String owner, String repo) throws Exception {
-        // Check if the task was cancelled before proceeding
-        if (isCancelled.get()) {
-            throw new InterruptedException("Task was cancelled");
-        }
-
         String urlString = String.format("https://api.github.com/repos/%s/%s/releases/latest", owner, repo);
         HttpURLConnection connection = null;
         BufferedReader br = null;
