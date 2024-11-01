@@ -2011,7 +2011,9 @@ public class OptWnd extends Window {
 		y = addbtn(cont, "Object search", GameUI.kb_searchObjectsButton, y);
 
 		y+=UI.scale(20);
-		y = addbtnImproved(cont, "Click Nearest Object","When this button is pressed, you will instantly click the nearest object, selected from below." +
+		y = addbtnImproved(cont, "Click Nearest Object (Cursor)","When this button is pressed, you will instantly click the nearest object to your cursor, selected from below." +
+				"\n$col[218,163,0]{Range:} $col[185,185,185]{4 tiles (approximately)}", new Color(255, 191, 0,255), GameUI.kb_clickNearestCursorObject, y);
+		y = addbtnImproved(cont, "Click Nearest Object (You)","When this button is pressed, you will instantly click the nearest object to you, selected from below." +
 				"\n$col[218,163,0]{Range:} $col[185,185,185]{12 tiles (approximately)}", new Color(255, 191, 0,255), GameUI.kb_clickNearestObject, y);
 		Widget objectsLeft, objectsRight;
 		y = cont.adda(objectsLeft = new Label("Objects to Click:"), UI.scale(20), y + UI.scale(2), 0, 0.0).pos("bl").adds(0, 5).y;

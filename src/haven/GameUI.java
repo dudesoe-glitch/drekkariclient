@@ -1750,6 +1750,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 	public static KeyBinding kb_leftQuickSlotButton  = KeyBinding.get("leftQuickSlotButtonKB",  KeyMatch.forchar('Z', KeyMatch.M));
 	public static KeyBinding kb_nightVision  = KeyBinding.get("nightVisionKB",  KeyMatch.forchar('N', KeyMatch.C));
 	public static KeyBinding kb_clickNearestObject  = KeyBinding.get("clickNearestObjectKB",  KeyMatch.forchar('Q', 0));
+	public static KeyBinding kb_clickNearestCursorObject  = KeyBinding.get("clickNearestCursorObjectKB",  KeyMatch.nil);
 	public static KeyBinding kb_enterNearestVehicle  = KeyBinding.get("enderNearestVehicle",  KeyMatch.forchar('Q', KeyMatch.C));
 	public static KeyBinding kb_toggleHidingBoxes  = KeyBinding.get("toggleHidingBoxesKB",  KeyMatch.forchar('H', KeyMatch.C));
 	public static KeyBinding kb_toggleCollisionBoxes  = KeyBinding.get("toggleCollisionBoxesKB",  KeyMatch.forchar('B', KeyMatch.S));
@@ -1841,6 +1842,17 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 			interactWithNearestObjectThread.interrupt();
 			interactWithNearestObjectThread = null;
 			interactWithNearestObjectThread = new Thread(new InteractWithNearestObject(this), "InteractWithNearestObject");
+			interactWithNearestObjectThread.start();
+		}
+		return (true);
+	} else if (kb_clickNearestCursorObject.key().match(ev)) {
+		if (interactWithNearestObjectThread == null) {
+			interactWithNearestObjectThread = new Thread(new InteractWithCursorNearest(this), "InteractWithCursorNearest");
+			interactWithNearestObjectThread.start();
+		} else {
+			interactWithNearestObjectThread.interrupt();
+			interactWithNearestObjectThread = null;
+			interactWithNearestObjectThread = new Thread(new InteractWithCursorNearest(this), "InteractWithCursorNearest");
 			interactWithNearestObjectThread.start();
 		}
 		return (true);
