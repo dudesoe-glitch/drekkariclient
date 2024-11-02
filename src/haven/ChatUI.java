@@ -1761,7 +1761,7 @@ public class ChatUI extends Widget {
 	if(dm != null) {
 	    dm.remove();
 	    dm = null;
-		Utils.setprefc("chatsize", UI.unscale(sz));
+		Utils.setprefc("chatsize", sz);
 		resizing = "none";
 	    return(true);
 	} else {
