@@ -2341,6 +2341,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 		checkIfObjectJustDied();
 		growthInfo.clear();
 		barrelContentsGobInfo.clear();
+		setGobSearchOverlay();
 	}
 
 }
