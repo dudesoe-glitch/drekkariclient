@@ -2239,6 +2239,8 @@ public class OptWnd extends Window {
 				{a = Utils.getprefb("autoEquipBunnySlippersPlateBoots", true);}
 				public void set(boolean val) {
 					Utils.setprefb("autoEquipBunnySlippersPlateBoots", val);
+					if (Equipory.autoEquipBunnySlippersPlateBootsCheckBox != null)
+						Equipory.autoEquipBunnySlippersPlateBootsCheckBox.a = val;
 					a = val;
 				}
 			}, prev.pos("bl").adds(0, 2));
