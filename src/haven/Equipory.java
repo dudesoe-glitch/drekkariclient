@@ -94,8 +94,10 @@ public class Equipory extends Widget implements DTarget {
 	private Button expandButton = null;
 	public boolean myOwnEquipory = false;
 	public static CheckBox autoDropLeechesCheckBox;
+	public static CheckBox autoDropTicksCheckBox;
 	public static CheckBox autoEquipBunnySlippersPlateBootsCheckBox;
 	boolean checkForLeeches = false;
+	boolean checkForTicks = false;
 
     @RName("epry")
     public static class $_ implements Factory {
@@ -161,6 +163,14 @@ public class Equipory extends Widget implements DTarget {
 			}
 		}, prev.pos("ur").adds(10, 0));
 		autoEquipBunnySlippersPlateBootsCheckBox.tooltip = OptWnd.autoEquipBunnySlippersPlateBootsCheckBox.tooltip;
+		prev = add(autoDropTicksCheckBox = new CheckBox("Auto-Drop Ticks"){
+			{a = Utils.getprefb("autoDropTicks", true);}
+			public void set(boolean val) {
+				if (OptWnd.autoDropTicksCheckBox != null)
+					OptWnd.autoDropTicksCheckBox.set(val);
+				a = val;
+			}
+		}, prev.pos("bl").adds(0, 2).x(UI.scale(10)));
 	}
 	pack();
     }
@@ -195,6 +205,7 @@ public class Equipory extends Widget implements DTarget {
 		updateBottomText = true;
 		delayedUpdateTime = System.currentTimeMillis();
 		checkForLeeches = true;
+		checkForTicks = true;
 		try {
 			if (g.resource() != null && g.resource().name.equals("gfx/invobjs/batcape")) {
 				Gob.batWingCapeEquipped = true;
@@ -221,6 +232,7 @@ public class Equipory extends Widget implements DTarget {
 	updateBottomText = true;
 	delayedUpdateTime = System.currentTimeMillis();
 	checkForLeeches = true;
+	checkForTicks = true;
 		try {
 			if (i.resource() != null && i.resource().name.equals("gfx/invobjs/batcape")) {
 				Gob.batWingCapeEquipped = false;
@@ -378,6 +390,17 @@ public class Equipory extends Widget implements DTarget {
 					}
 				}
 				checkForLeeches = false;
+			}
+		}
+		if (OptWnd.autoDropTicksCheckBox.a && myOwnEquipory && checkForTicks) {
+			long now = System.currentTimeMillis();
+			if ((now - delayedUpdateTime) > 200){
+				for (WItem equippedItem : slots) {
+					if (equippedItem != null && equippedItem.item != null && equippedItem.item.getname() != null && equippedItem.item.getname().contains("Tick")){
+						equippedItem.item.wdgmsg("drop", new Coord(equippedItem.sz.x / 2, equippedItem.sz.y / 2));
+					}
+				}
+				checkForTicks = false;
 			}
 		}
 	}

@@ -2093,6 +2093,7 @@ public class OptWnd extends Window {
 	public static CheckBox preventCutleryFromBreakingCheckBox = null;
 	public static CheckBox autoDropLeechesCheckBox;
 	public static CheckBox autoEquipBunnySlippersPlateBootsCheckBox;
+	public static CheckBox autoDropTicksCheckBox;
 	public static CheckBox autoPeaceAnimalsWhenCombatStartsCheckBox;
 	public static CheckBox autoDrinkingCheckBox;
 	public static TextEntry autoDrinkingThresholdTextEntry;
@@ -2235,6 +2236,20 @@ public class OptWnd extends Window {
 					}
 				}
 			}, prev.pos("bl").adds(0, 12));
+			prev = add(autoDropTicksCheckBox = new CheckBox("Auto-Drop Ticks"){
+				{a = Utils.getprefb("autoDropTicks", false);}
+				public void set(boolean val) {
+					Utils.setprefb("autoDropTicks", val);
+					a = val;
+					Equipory.autoDropTicksCheckBox.a = val;
+					if (ui != null && ui.gui != null) {
+						Equipory eq = ui.gui.getequipory();
+						if (eq != null && eq.myOwnEquipory) {
+							eq.checkForTicks = true;
+						}
+					}
+				}
+			}, prev.pos("bl").adds(0, 2));
 			prev = add(autoEquipBunnySlippersPlateBootsCheckBox = new CheckBox("Auto-Equip Bunny Slippers/Plate Boots"){
 				{a = Utils.getprefb("autoEquipBunnySlippersPlateBoots", true);}
 				public void set(boolean val) {
