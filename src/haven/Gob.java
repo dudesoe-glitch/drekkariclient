@@ -2123,7 +2123,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 							if (buddyInfo != null) {
 								if ((buddyInfo.customName != null && buddyInfo.customName.equals("Unknown"))) {
 									playPlayerColorAlarm(OptWnd.whitePlayerAlarmEnabledCheckbox.a, OptWnd.whitePlayerAlarmFilename.buf.line(), OptWnd.whitePlayerAlarmVolumeSlider.val);
-								} else if ((buddyInfo.customName != null && buddyInfo.customName.equals("Village/Realm Member") && isVillager) || (buddyInfo.customName == null && buddyInfo.b != null && buddyInfo.rgrp == 0)) {
+								} else if ((buddyInfo.customName != null && buddyInfo.customName.equals("Village/Realm Member") && isVillager)) {
 									playPlayerColorAlarm(OptWnd.whiteVillageOrRealmPlayerAlarmEnabledCheckbox.a, OptWnd.whiteVillageOrRealmPlayerAlarmFilename.buf.line(), OptWnd.whiteVillageOrRealmPlayerAlarmVolumeSlider.val);
 								} else if (buddyInfo.rgrp == 1) {
 									playPlayerColorAlarm(OptWnd.greenPlayerAlarmEnabledCheckbox.a, OptWnd.greenPlayerAlarmFilename.buf.line(), OptWnd.greenPlayerAlarmVolumeSlider.val);
