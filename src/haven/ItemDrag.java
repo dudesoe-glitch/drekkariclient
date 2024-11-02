@@ -93,14 +93,14 @@ public class ItemDrag extends WItem {
 		}
 	} else if (OptWnd.noCursorItemDroppingAnywhereCheckBox.a && !ui.modmeta){
 		if(button == 1) {
-			if (droponwindow(parent, c.add(this.c))) {
+			if (dropOnWidget(parent, c.add(this.c))) {
 				return(true);
 			} else
 				return(ui.gui.map.mousedown(ui.gui.map.rootxlate(c.add(rootpos())), button));
 		}
 	} else if (OptWnd.noCursorItemDroppingInWaterCheckBox.a && !ui.modmeta){
 		if(button == 1) {
-			if (droponwindow(parent, c.add(this.c))) {
+			if (dropOnWidget(parent, c.add(this.c))) {
 				return (true);
 			} else if (ui.gui.map.player() != null) {
 				int t = ui.gui.map.glob.map.gettile(ui.gui.map.player().rc.floor(tilesz));
@@ -130,7 +130,7 @@ public class ItemDrag extends WItem {
 	this.c = this.c.add(c.add(doff.inv()));
     }
 
-	public boolean droponwindow(Widget w, Coord c) {
+	public boolean dropOnWidget(Widget w, Coord c) {
 		if(w instanceof DTarget) {
 			if(((DTarget)w).drop(c, c.add(doff.inv())))
 				return(true);
@@ -139,10 +139,11 @@ public class ItemDrag extends WItem {
 			if((wdg == this) || !wdg.visible())
 				continue;
 			Coord cc = w.xlate(wdg.c, true);
-			if (wdg instanceof Window)
-			if(c.isect(cc, wdg.sz)) {
-				if(dropon(wdg, c.add(cc.inv())))
-					return(true);
+			if (wdg instanceof Window || wdg instanceof QuickSlotsWdg) {
+				if (c.isect(cc, wdg.sz)) {
+					if (dropon(wdg, c.add(cc.inv())))
+						return (true);
+				}
 			}
 		}
 		return(false);
