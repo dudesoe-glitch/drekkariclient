@@ -97,9 +97,6 @@ public class ItemDrag extends WItem {
 				return(true);
 			} else
 				return(ui.gui.map.mousedown(ui.gui.map.rootxlate(c.add(rootpos())), button));
-		} else if(button == 3) {
-			interact(parent, c.add(this.c));
-			return(ui.gui.map.mousedown(ui.gui.map.rootxlate(c.add(rootpos())), button));
 		}
 	} else if (OptWnd.noCursorItemDroppingInWaterCheckBox.a && !ui.modmeta){
 		if(button == 1) {
@@ -117,11 +114,6 @@ public class ItemDrag extends WItem {
 					return (ui.gui.map.mousedown(ui.gui.map.rootxlate(c.add(rootpos())), button));
 				}
 			}
-		} else if(button == 3) {
-			if(interact(parent, c.add(this.c))) {
-				return(true);
-			} else
-				return(ui.gui.map.mousedown(ui.gui.map.rootxlate(c.add(rootpos())), button));
 		}
 	}
 	if(button == 1) {

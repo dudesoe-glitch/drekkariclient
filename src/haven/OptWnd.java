@@ -4220,7 +4220,7 @@ public class OptWnd extends Window {
 			"\n$col[185,185,185]{Left click ignores the UI when you do this, so don't try to click on the map to walk while holding an item.}" +
 			"\n" +
 			"\n$col[200,0,0]{SETTING OVERRIDE:} This doesn't work with the \"No Cursor Dropping\" settings, and it will toggle them off when this is enabled.", UI.scale(320));
-	private final Object noCursorItemDroppingAnywhereTooltip = RichText.render("This will allow you to have an item on your cursor and still be able to left click to walk, or right click to interact with objects." +
+	private final Object noCursorItemDroppingAnywhereTooltip = RichText.render("This will allow you to have an item on your cursor and still be able to left click to walk." +
 			"\n" +
 			"\n$col[185,185,185]{You can drop the item from your cursor if you hold Alt.}" +
 			"\n" +
@@ -4229,7 +4229,7 @@ public class OptWnd extends Window {
 			"\n$col[218,163,0]{Action Button:} $col[185,185,185]{This setting can also be turned on/off using an action button from the menu grid (Custom Client Extras → Toggles).}" +
 			"\n" +
 			"\n$col[200,0,0]{SETTING OVERRIDE:} This doesn't work with the \"Override Cursor Item\" setting, and it will toggle it off when this is enabled.", UI.scale(320));
-	private final Object noCursorItemDroppingInWaterTooltip =  RichText.render("This will allow you to have an item on your cursor and still be able to left click to walk, or right click to interact with objects, while you are in water. " +
+	private final Object noCursorItemDroppingInWaterTooltip =  RichText.render("This will allow you to have an item on your cursor and still be able to left click to walk, while you are in water. " +
 			"\nIf the previous setting is Enabled, this one will be ignored." +
 			"\n" +
 			"\n$col[185,185,185]{You can drop the item from your cursor if you hold Alt.}" +
