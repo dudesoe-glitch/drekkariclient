@@ -36,6 +36,7 @@ import java.util.concurrent.Future;
 import java.util.function.*;
 import java.util.stream.Collectors;
 
+import haven.Fuzzy;
 import haven.automated.mapper.MappingClient;
 import haven.render.*;
 import haven.render.gl.GLObject;
@@ -1752,7 +1753,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 		if (getres() == null) return;
 		String resourceName = getres().basename().toLowerCase().replace("stockpile", "");
 		String searchKeyword = ObjectSearchWindow.objectSearchString.toLowerCase();
-		boolean result = resourceName.contains(searchKeyword) && searchKeyword.length() > 1;
+		boolean result = searchKeyword.length() > 1 && Fuzzy.fuzzyContains(resourceName, searchKeyword);
 		String barterStandOverlays = null;
 		if (resourceName.contains("barter")) {
 			try {
@@ -1776,7 +1777,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 			}
 		}
 		if (barterStandOverlays != null) {
-			if (searchKeyword.startsWith("@") && searchKeyword.length() > 2 && barterStandOverlays.contains(searchKeyword.replaceAll("@", ""))) {
+			if (searchKeyword.startsWith("@") && Fuzzy.fuzzyContains(barterStandOverlays, searchKeyword.replaceAll("@", "")) && searchKeyword.length() > 2) {
 				result = true;
 			}
 		}

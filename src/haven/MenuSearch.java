@@ -80,49 +80,8 @@ public class MenuSearch extends Window {
 	setroot(null);
     }
 
-    private double jaccardSimilarity(String str1, String str2) {
-	Set<Character> set1 = new HashSet<>();
-	Set<Character> set2 = new HashSet<>();
-
-	for (char ch : str1.toCharArray()) {
-	    set1.add(ch);
-	}
-	for (char ch : str2.toCharArray()) {
-	    set2.add(ch);
-	}
-
-	Set<Character> intersection = new HashSet<>(set1);
-	intersection.retainAll(set2);
-
-	Set<Character> union = new HashSet<>(set1);
-	union.addAll(set2);
-
-	return union.isEmpty() ? 0 : (double) intersection.size() / union.size();
-    }
-
     private void refilter() {
-	List<Result> found = new ArrayList<>();
-	String needle = sbox.text().toLowerCase();
-	// sequential substring matching
-	for(Result res : this.cur) {
-	    String haystack = res.btn.name().toLowerCase();
-	    int hayIndex = 0;
-	    boolean matches = true;
-
-	    for (char ch : needle.toCharArray()) {
-	        hayIndex = haystack.indexOf(ch, hayIndex);
-	        if (hayIndex == -1) {
-	            matches = false;
-	            break;
-	        }
-	        hayIndex++; // Move past the found character for the next search
-	    }
-
-	    if (matches)
-	        found.add(res);
-	}
-	// sort using jaccard similarity (common letters regardless relative positions)
-	found.sort(Comparator.comparingDouble(res -> -jaccardSimilarity(needle, res.btn.name().toLowerCase())));
+	List<Result> found = Fuzzy.fuzzyFilterAndSort(sbox.text().toLowerCase(), this.cur);
 	this.filtered = found;
 	int idx = filtered.indexOf(rls.sel);
 	if(idx < 0) {
