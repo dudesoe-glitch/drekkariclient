@@ -23,10 +23,8 @@ public class ObjectSearchWindow extends Window {
     }
 
     public void updateOverlays() {
-        synchronized (gui.ui.sess.glob.oc) {
-            for (Gob gob : gui.ui.sess.glob.oc) {
-                gob.setGobSearchOverlay();
-            }
+        if (ui != null && ui.gui != null) {
+            ui.sess.glob.oc.gobAction(Gob::setGobSearchOverlay);
         }
     }
 

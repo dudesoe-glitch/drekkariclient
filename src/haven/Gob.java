@@ -1786,10 +1786,9 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 
 	private void setSearchOl(boolean on) {
 		if (on) {
-			for (Overlay ol : ols) {
-				if (ol.spr instanceof haven.sprites.GobSearchHighlight) {
-					return;
-				}
+			if (customSearchOverlay != null) {
+				removeOl(customSearchOverlay);
+				customSearchOverlay = null;
 			}
 			customSearchOverlay = new Overlay(this, new haven.sprites.GobSearchHighlight(this, null));
 			synchronized (ols) {
