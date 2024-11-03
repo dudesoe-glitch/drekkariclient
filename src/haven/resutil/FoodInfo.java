@@ -86,9 +86,8 @@ public class FoodInfo extends ItemInfo.Tip {
 		double fepEfficiency = 100;
 		double satiation = 1;
 		boolean calculateEfficiency = ui != null && !ui.modshift;
-		boolean feastingTableFound = false;
 		double tableFoodEventBonus = 1.0;
-		double tableHungerMultiplier = 1.0;
+		Window feastingWindow = null;
 		if (ui != null) {
 			for(int i = 0; i < ui.gui.chrwdg.battr.cons.els.size(); i++) {
 				BAttrWnd.Constipations.El el = ui.gui.chrwdg.battr.cons.els.get(i);
@@ -104,35 +103,31 @@ public class FoodInfo extends ItemInfo.Tip {
 			if (GameUI.subscribedAccount && GameUI.verifiedAccount) fepEfficiency *= 1.5;
 			else if (GameUI.subscribedAccount) fepEfficiency *= 1.3;
 			else if (GameUI.verifiedAccount) fepEfficiency *= 1.2;
+			outerLoop:
 			for (Window wnd : ui.gui.getAllWindows()) {
-				if (wnd.cap.equals("Table") && !feastingTableFound) {
-					boolean feastingTable = false;
-					double foodEventBonus = 1.0;
-					double hungerMultiplier = 1.0;
-					for(Widget wdg : wnd.children(Widget.class)) {
-						if (wdg instanceof Label) {
-							String labelString = ((Label)wdg).texts;
-							if (labelString.startsWith("Food event bonus")){
-								foodEventBonus = (extractNumber(labelString) > 0.0) ? 1.0 + (extractNumber(labelString)/100) : 1.0;
-							}
-							else if (labelString.startsWith("Hunger modifier")) {
-								hungerMultiplier = (extractNumber(labelString) < 100 && extractNumber(labelString) > 0.0) ? (extractNumber(labelString)/100) : 1.0;
-							}
-						}
+				if (wnd.cap.equals("Table")) {
+					for (Widget wdg : wnd.children()) {
 						if (wdg instanceof Button) {
-							if (((Button)wdg).text.text.equals("Feast!"))
-								feastingTable = true;
+							feastingWindow = wnd;
+							break outerLoop; // Break out of both loops
 						}
-					}
-					if (feastingTable) {
-						tableFoodEventBonus = foodEventBonus;
-						tableHungerMultiplier = hungerMultiplier;
-						fepEfficiency *= tableFoodEventBonus;
-						hungerEfficiency *= tableHungerMultiplier;
-						feastingTableFound = true;
 					}
 				}
 			}
+			if (feastingWindow != null) {
+				for(Widget wdg : feastingWindow.children()) {
+					if (wdg instanceof Label) {
+						String labelString = ((Label)wdg).texts;
+						if (labelString.startsWith("Food event bonus")){
+							tableFoodEventBonus = (extractNumber(labelString) > 0.0) ? 1.0 + (extractNumber(labelString)/100) : 1.0;
+						}
+						else if (labelString.startsWith("Hunger modifier")) {
+							hungerEfficiency *= (extractNumber(labelString) < 100 && extractNumber(labelString) > 0.0) ? (extractNumber(labelString)/100) : 1.0;
+						}
+					}
+				}
+			}
+
 			head = String.format("\nFood Efficiency: $col[49,255,39]{%s%%}", Utils.odformat2(calculateEfficiency ? fepEfficiency : 100, 2));
 		}
 		else
@@ -186,7 +181,7 @@ public class FoodInfo extends ItemInfo.Tip {
 			else if (GameUI.verifiedAccount) imgs.add(RichText.render("x 1.2 - $col[185,185,185]{Verified}", 300).img);
 			imgs.add(RichText.render(String.format("x %s - $col[185,185,185]{FEP Multiplier (Hunger Bar)}", Utils.odformat2(ui.gui.chrwdg.battr.glut.gmod, 2)), 300).img);
 			imgs.add(RichText.render(String.format("x %s - $col[185,185,185]{Satiation}", Utils.odformat2(satiation, 2)), 300).img);
-			if (feastingTableFound) {
+			if (feastingWindow != null) {
 				imgs.add(RichText.render(String.format("x %s - $col[185,185,185]{Table Food Event Bonus}", Utils.odformat2(tableFoodEventBonus, 2)), 300).img);
 			}
 		}
