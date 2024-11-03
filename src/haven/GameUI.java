@@ -65,7 +65,6 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
     private double msgtime;
     private Window invwnd, equwnd, /*makewnd,*/ srchwnd, iconwnd;
 	public CraftWindow makewnd;
-    private Coord makewndc = Utils.getprefc("makewndc", new Coord(400, 200));
     public Inventory maininv;
     public CharWnd chrwdg;
     public MapWnd mapfile;
@@ -454,7 +453,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 	actionBar4.raise();
 	OptWnd.flowerMenuAutoSelectManagerWindow = null;
 
-	makewnd = add(new CraftWindow(), UI.scale(400, 200));
+	makewnd = add(new CraftWindow(), Utils.getprefc("wndc-makewnd", new Coord(400, 200)));
 	makewnd.hide();
     }
 
@@ -978,6 +977,8 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 		mapfile.fixAndSavePos(mapfile.compact);
 	if(quickslots != null)
 		Utils.setprefc("wndc-quickslots", quickslots.c);
+	if(makewnd != null)
+		Utils.setprefc("wndc-makewnd", makewnd.c);
 	}
     }
 
