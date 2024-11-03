@@ -27,7 +27,7 @@ public class GobCustomSizeAndRotation implements Gob.SetupMod {
     if (gob.getres() != null) {
         String resName = gob.getres().name;
         if(OptWnd.flatCupboardsCheckBox.a && resName.equals("gfx/terobjs/cupboard"))
-            return Pipe.Op.compose(Location.rot(new Coord3f(0, 1, 0), 4.71f), Location.scale(0.2f, 1, 0.55f), Location.xlate(new Coord3f(6,0,-9)));
+            return Pipe.Op.compose(Location.rot(new Coord3f(0, 1, 0), 4.712f), Location.scale(0.2f, 1, 0.62f), Location.xlate(new Coord3f(6,0,-8.8f)));
         else
             return null;
     } else
