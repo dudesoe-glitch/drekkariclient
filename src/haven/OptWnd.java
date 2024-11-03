@@ -2223,7 +2223,7 @@ public class OptWnd extends Window {
 			}, prev.pos("bl").adds(0, 2));
 			preventCutleryFromBreakingCheckBox.tooltip = preventCutleryFromBreakingTooltip;
 			prev = add(autoDropLeechesCheckBox = new CheckBox("Auto-Drop Leeches"){
-				{a = Utils.getprefb("autoDropLeeches", false);}
+				{a = Utils.getprefb("autoDropLeeches", true);}
 				public void set(boolean val) {
 					Utils.setprefb("autoDropLeeches", val);
 					a = val;
@@ -2237,7 +2237,7 @@ public class OptWnd extends Window {
 				}
 			}, prev.pos("bl").adds(0, 12));
 			prev = add(autoDropTicksCheckBox = new CheckBox("Auto-Drop Ticks"){
-				{a = Utils.getprefb("autoDropTicks", false);}
+				{a = Utils.getprefb("autoDropTicks", true);}
 				public void set(boolean val) {
 					Utils.setprefb("autoDropTicks", val);
 					a = val;
