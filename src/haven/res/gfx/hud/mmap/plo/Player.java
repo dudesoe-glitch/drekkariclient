@@ -21,7 +21,7 @@ public class Player extends GobIcon.Icon {
 	this.group = group;
 	if(gob != null) {
 	    Buddy buddy = gob.getattr(Buddy.class);
-	    if((buddy != null) && (buddy.buddy() == null))
+	    if((buddy != null) && (buddy.buddy() == null) && (buddy.customName == null))
 		throw(new Loading("Waiting for group-info..."));
 	}
     }
@@ -32,6 +32,8 @@ public class Player extends GobIcon.Icon {
 
     public int group() {
 	Buddy buddy = gob.getattr(Buddy.class);
+	if (buddy != null && buddy.customName != null)
+		return 0;
 	if((buddy != null) && (buddy.buddy() != null))
 	    return(buddy.buddy().group);
 	return(-1);

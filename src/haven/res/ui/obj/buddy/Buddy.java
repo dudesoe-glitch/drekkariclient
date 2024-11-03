@@ -33,6 +33,7 @@ public class Buddy extends GAttrib implements InfoPart {
 		info = Info.add(gob, this);
 		this.customName = customName;
 		this.customNameColor = customNameColor;
+		this.rgrp = 0;
 	}
 
     public static void parse(Gob gob, Message dat) {
