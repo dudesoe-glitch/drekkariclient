@@ -1918,7 +1918,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 		if (getres() != null) {
 			String resourceName = getres().name;
 			if (resourceName.equals("gfx/terobjs/beehive")){
-				setRadiusOverlay(OptWnd.showFoodTroughsRadiiCheckBox.a, new Color(255, 242, 0, 128), 150f);
+				setRadiusOverlay(OptWnd.showBeeSkepsRadiiCheckBox.a, new Color(255, 242, 0, 128), 150f);
 			}
 		}
 	}
