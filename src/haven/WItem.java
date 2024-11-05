@@ -35,6 +35,7 @@ import haven.render.*;
 import java.awt.image.BufferedImage;
 import java.util.List;
 
+import haven.Fuzzy;
 import haven.ItemInfo.AttrCache;
 import haven.res.ui.stackinv.ItemStack;
 import haven.resutil.Curiosity;
@@ -220,7 +221,7 @@ public class WItem extends Widget implements DTarget {
 		String itemName = item.getname().toLowerCase();
 		String searchKeyword = InventorySearchWindow.inventorySearchString.toLowerCase();
 		if (searchKeyword.length() > 1) {
-			if (itemName.contains(searchKeyword)) {
+			if (Fuzzy.fuzzyContains(itemName, searchKeyword)) {
 				int colorShiftSpeed = 800/GLPanel.Loop.fps;
 				if (searchItemColorShiftUp) {
 					if (searchItemColorValue + colorShiftSpeed <= 255) {

@@ -81,12 +81,7 @@ public class MenuSearch extends Window {
     }
 
     private void refilter() {
-	List<Result> found = new ArrayList<>();
-	String needle = sbox.text().toLowerCase();
-	for(Result res : this.cur) {
-	    if(res.btn.name().toLowerCase().indexOf(needle) >= 0)
-		found.add(res);
-	}
+	List<Result> found = Fuzzy.fuzzyFilterAndSort(sbox.text().toLowerCase(), this.cur);
 	this.filtered = found;
 	int idx = filtered.indexOf(rls.sel);
 	if(idx < 0) {
