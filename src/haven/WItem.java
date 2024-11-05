@@ -49,6 +49,7 @@ public class WItem extends Widget implements DTarget {
     private Message csdt = Message.nil;
 	private Boolean isNotInStudy = null;
 	public final AttrCache<Pair<String, String>> study = new AttrCache<Pair<String, String>>(this::info, AttrCache.map1(Curiosity.class, curio -> curio::remainingTip));
+	public static final Text.Foundry studyFnd = new Text.Foundry(Text.sans, 9);;
 	private String cachedStudyValue = null;
 	private String cachedTipValue = null;
 	private Tex cachedStudyTex = null;
@@ -395,9 +396,6 @@ public class WItem extends Widget implements DTarget {
 				tex.dispose();
 			}
 			if(studyTime != null) {
-				g.chcolor(0, 0, 0, 150);
-				int h = studyTime.sz().y;
-				g.frect(new Coord(0, sz.y - h+4), new Coord(sz.x+2, h));
 				g.chcolor();
 				g.aimage(studyTime, new Coord(sz.x / 2, sz.y), 0.5, 0.9);
 			}
@@ -422,7 +420,7 @@ public class WItem extends Widget implements DTarget {
 
 			if(cachedStudyTex == null) {
 				cachedStudyValue = value;
-				cachedStudyTex = Text.renderstroked(value).tex();
+				cachedStudyTex = PUtils.strokeTex(Text.renderstroked(value, Color.WHITE, Color.BLACK, studyFnd));
 			}
 			return cachedStudyTex;
 		}

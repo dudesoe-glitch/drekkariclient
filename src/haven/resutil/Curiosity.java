@@ -128,15 +128,28 @@ public class Curiosity extends ItemInfo.Tip implements GItem.ColorInfo {
 	}
 
 	private String remainingShortTip(int time) {
-		if(time < 0) {return null;}
-		time = (int) (time / 3.29f); //short tip is always in real time
-		if(time >= 60) {
-			if(time > 3600) {
-				time = time / 60;
-			}
-			return String.format("%d:%02d", time / 60, time % 60);
+		if (time < 0) {
+			return null;
+		}
+
+		// Convert seconds into "real time"
+		time = (int) (time / 3.29f);
+
+		// If time is greater than or equal to 10 hours
+		if (time >= 36000) {
+			// Show only hours, e.g., 10h, 12h, etc.
+			return String.format("%dh", time / 3600);
+		} else if (time >= 3600) {
+			// If time is less than 10 hours but greater than or equal to 1 hour
+			int hours = time / 3600;
+			int minutes = (time % 3600) / 60;
+			return String.format("%dh %dm", hours, minutes);
+		} else if (time >= 60) {
+			// If time is greater than or equal to 60 seconds but less than 1 hour
+			return String.format("%dm", time / 60);
 		} else {
-			return String.format("%02d", time);
+			// If time is less than 60 seconds
+			return "1m";
 		}
 	}
 	public Pair<String, String> remainingTip() {
