@@ -75,11 +75,11 @@ public class QuickSlotsWdg extends Widget implements DTarget {
         Equipory e = ui.gui.getequipory();
         if (e != null) {
             WItem w = null;
-            if (c.x <= UI.scale(44)) w = e.slots[6];
-            if (c.x > UI.scale(44) && c.x <= UI.scale(94) ) w = e.slots[7];
-            if (c.x > UI.scale(94) && c.x <= UI.scale(142) ) w = e.slots[5];
-            if (c.x > UI.scale(142) && c.x <= UI.scale(190) ) w = e.slots[11];
-            if (c.x > UI.scale(190) && c.x <= UI.scale(238) ) w = e.slots[14];
+            if (cc.x <= UI.scale(44)) w = e.slots[6];
+            if (cc.x > UI.scale(44) && cc.x <= UI.scale(94) ) w = e.slots[7];
+            if (cc.x > UI.scale(94) && cc.x <= UI.scale(142) ) w = e.slots[5];
+            if (cc.x > UI.scale(142) && cc.x <= UI.scale(190) ) w = e.slots[11];
+            if (cc.x > UI.scale(190) && cc.x <= UI.scale(238) ) w = e.slots[14];
             if (w != null) {
                 return w.iteminteract(cc, ul);
             }
