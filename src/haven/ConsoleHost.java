@@ -26,8 +26,10 @@
 
 package haven;
 
+import java.awt.*;
 import java.util.*;
 import java.awt.event.KeyEvent;
+import java.util.List;
 
 public abstract class ConsoleHost extends Widget implements Console.Host, ReadLine.Owner {
     public static Text.Foundry cmdfoundry = new Text.Foundry(Text.mono, 12, new java.awt.Color(245, 222, 179));
@@ -109,6 +111,12 @@ public abstract class ConsoleHost extends Widget implements Console.Host, ReadLi
 			 c.add(Math.max(mx, px) + UI.scale(1), UI.scale(14)));
 		g.chcolor();
 	    }
+		g.chcolor(Color.BLACK);
+		g.frect(c, cmdtext.tex().sz().add(5, 0));
+		g.chcolor();
+		g.chcolor(Color.GRAY);
+		g.rect(c.sub(1, 1), cmdtext.tex().sz().add(5, 0).add(2, 2));
+		g.chcolor();
 	    g.image(cmdtext.tex(), c);
 	    g.line(c.add(px + UI.scale(1), UI.scale(2)), c.add(px + UI.scale(1), UI.scale(14)), UI.scale(1));
 	}

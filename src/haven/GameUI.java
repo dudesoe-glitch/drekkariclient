@@ -1124,7 +1124,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 		    {add(cref);}
 
 		    protected Coord getc() {
-			return(new Coord(10, GameUI.this.sz.y - chat.sz.y - this.sz.y - UI.scale( 10)));
+			return(new Coord(10, GameUI.this.sz.y - chat.sz.y - this.sz.y - UI.scale( 26)));
 		    }
 
 		    public void cdestroy(Widget ch) {
@@ -1308,19 +1308,19 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 //	if(beltwdg.visible())
 //	    by = Math.min(by, beltwdg.c.y);
 	if(cmdline != null) {
-	    drawcmd(g, new Coord(blpw + UI.scale(10), by -= UI.scale(20)));
+	    drawcmd(g, new Coord(UI.scale(200), by -= UI.scale(40)));
 	} else if(lastmsg != null) {
 	    if((Utils.rtime() - msgtime) > 3.0) {
 		lastmsg = null;
 	    } else {
 		g.chcolor(0, 0, 0, 192);
-		g.frect(new Coord(blpw + UI.scale(8), by - UI.scale(22)), lastmsg.sz().add(UI.scale(4), UI.scale(4)));
+		g.frect(new Coord(UI.scale(18), by - UI.scale(22)), lastmsg.sz().add(UI.scale(4), UI.scale(4)));
 		g.chcolor();
-		g.image(lastmsg.tex(), new Coord(blpw + UI.scale(10), by -= UI.scale(20)));
+		g.image(lastmsg.tex(), new Coord(UI.scale(20), by -= UI.scale(20)));
 	    }
 	}
 	if(!chat.visible()) {
-	    chat.drawsmall(g, new Coord(blpw + UI.scale(10), by), UI.scale(100));
+	    chat.drawsmall(g, new Coord(UI.scale(10), by), UI.scale(100));
 	}
 
 	int x = (int)(ui.gui.sz.x / 2.0);
@@ -1939,7 +1939,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
     public void resize(Coord sz) {
 	super.resize(sz);
 //	chat.resize(sz.x - blpw - brpw);
-	chat.move(new Coord(blpw, sz.y));
+	chat.move(new Coord(0, sz.y));
 	if(map != null)
 	    map.resize(sz);
 	if(prog != null)
