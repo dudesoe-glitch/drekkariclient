@@ -560,9 +560,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	}
 	if (isMe != null) {
 		setCustomPlayerName();
-		if (!isLoftar) {
-			playPlayerAlarm();
-		}
+		playPlayerAlarm();
 	}
 	if (getattr(Moving.class) instanceof Following){
 		Following following = (Following) getattr(Moving.class);
