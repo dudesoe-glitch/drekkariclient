@@ -20,7 +20,7 @@ public class ClueSprite extends MapSprite {
         this.a2 = -a2;
         this.width = width;
         this.length = length;
-        timetolive = 100;
+        timetolive = 10;
     }
     
     @Override

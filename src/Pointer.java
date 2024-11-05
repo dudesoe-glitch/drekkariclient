@@ -1,5 +1,6 @@
 /* Preprocessed source code */
 import haven.*;
+import haven.automated.PointerTriangulation;
 import haven.render.*;
 import java.awt.Color;
 import static java.lang.Math.*;
@@ -196,6 +197,14 @@ public class Pointer extends Widget {
 		if ((lc != null) && (lc.dist(c) < 20) && this.ui.gui.map.player() != null) {
 			if (tooltip instanceof Widget.KeyboundTip) {
 				try {
+					try {
+						Coord2d playerCoord = ui.gui.map.player().rc;
+						Coord2d targetCoord = tc;
+						double dx = targetCoord.x - playerCoord.x;
+						double dy = playerCoord.y - targetCoord.y;
+						PointerTriangulation.pointerAngle = Math.atan2(dy, dx);
+						PointerTriangulation.pointerChecked = true;
+					} catch (Exception ignored){}
 					if (tt != null && tt.tex() != null)
 						tt.tex().dispose();
 					if (dist > 990) {
