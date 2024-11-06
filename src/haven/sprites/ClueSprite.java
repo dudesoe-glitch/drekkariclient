@@ -14,13 +14,13 @@ public class ClueSprite extends MapSprite {
     private final double a2;
     private double timetolive;
 
-    public ClueSprite(Coord2d rc, double a1, double a2, int width, int length) {
+    public ClueSprite(Coord2d rc, double a1, double a2, int width, int length, int duration) {
         this.rc = rc;
         this.a1 = -a1;
         this.a2 = -a2;
         this.width = width;
         this.length = length;
-        timetolive = 10;
+        timetolive = duration;
     }
     
     @Override
