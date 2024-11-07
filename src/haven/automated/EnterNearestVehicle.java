@@ -30,41 +30,42 @@ public class EnterNearestVehicle implements Runnable {
                     res = gob.getres();
                 } catch (Loading l) {
                 }
-                if (res != null) {
+                if (res != null) { // TODO: ND: Need to fix or do more rigorous testing. EDEN was going to
+                                   //  Either the gob.occupants don't properly update when one of them leaves the rowboat, or something else is wrong
                     int type = 0;
-                    if (res.name.equals("gfx/terobjs/vehicle/knarr") && gob.occupants.size() < 10) {
+                    if (res.name.equals("gfx/terobjs/vehicle/knarr") /*&& gob.occupants.size() < 10*/) {
                         type = 1;
-                    } else if ( res.name.equals("gfx/terobjs/vehicle/snekkja") && gob.occupants.size() < 4){
+                    } else if ( res.name.equals("gfx/terobjs/vehicle/snekkja") /*&& gob.occupants.size() < 4*/){
                         type = 1;
-                    } else if ((res.name.equals("gfx/kritter/horse/stallion") || res.name.equals("gfx/kritter/horse/mare")) && gob.occupants.isEmpty()) {
+                    } else if ((res.name.equals("gfx/kritter/horse/stallion") || res.name.equals("gfx/kritter/horse/mare")) /*&& gob.occupants.isEmpty()*/) {
                         type = 2;
                     } else if (res.name.equals("gfx/terobjs/vehicle/skis-wilderness")) {
                         int rbuf = getRbuf(gob);
-                        if (rbuf == 0 && gob.occupants.isEmpty())
+                        if (rbuf == 0 /*&& gob.occupants.isEmpty()*/)
                             type = 3;
                     } else if (res.name.equals("gfx/terobjs/vehicle/coracle")) {
                         int rbuf = getRbuf(gob);
-                        if (rbuf == 22 && gob.occupants.isEmpty())
+                        if (rbuf == 22 /*&& gob.occupants.isEmpty()*/)
                             type = 4;
                     } else if (res.name.equals("gfx/terobjs/vehicle/wagon")) {
                         int rbuf = getRbuf(gob);
-                        if ((rbuf == 4 || rbuf == 6) && gob.occupants.size() < 6)
+//                        if ((rbuf == 4 || rbuf == 6) && gob.occupants.size() < 6)
                             type = 5;
                     } else if (res.name.equals("gfx/terobjs/vehicle/rowboat")) {
                         int rbuf = getRbuf(gob);
                         // ND: Check if we can actually mount it. Is it in water? Is it occupied?
-                        if ((rbuf == 50 && gob.occupants.isEmpty()) // ND: The boat is in water, with 2 items in cargo, and 0 occupants.
-                        || ((rbuf == 18 || rbuf == 20 || rbuf == 24 || rbuf == 34 || rbuf == 36 || rbuf == 40) && gob.occupants.size() < 2) // ND: The boat is in water, with 1 item in cargo and < 2 occupants.
-                        || ((rbuf == 2 || rbuf == 4 || rbuf == 8) && gob.occupants.size() < 3)) // ND: The boat is in water, with no cargo and < 3 occupants (not full).
+                        if ((rbuf == 50 /*&& gob.occupants.isEmpty()*/) // ND: The boat is in water, with 2 items in cargo, and 0 occupants.
+                        || ((rbuf == 18 || rbuf == 20 || rbuf == 24 || rbuf == 34 || rbuf == 36 || rbuf == 40) /*&& gob.occupants.size() < 2*/) // ND: The boat is in water, with 1 item in cargo and < 2 occupants.
+                        || ((rbuf == 2 || rbuf == 4 || rbuf == 8) /*&& gob.occupants.size() < 3*/)) // ND: The boat is in water, with no cargo and < 3 occupants (not full).
                             type = 999;
                     } else if (res.name.equals("gfx/terobjs/vehicle/spark")){
                         int rbuf = getRbuf(gob);
-                        if ((rbuf == 0 && gob.occupants.size() < 2) || (rbuf == 1 && gob.occupants.isEmpty())){
+                        if ((rbuf == 0 /*&& gob.occupants.size() < 2*/) || (rbuf == 1/* && gob.occupants.isEmpty()*/)){
                             type = 999;
                         }
                     } else if (res.name.equals("gfx/terobjs/vehicle/dugout")) {
                         int rbuf = getRbuf(gob);
-                        if (rbuf == 6 && gob.occupants.isEmpty())
+                        if (rbuf == 6 /*&& gob.occupants.isEmpty()*/)
                             type = 999;
                     } else {
                         continue;
