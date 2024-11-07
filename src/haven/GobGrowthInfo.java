@@ -99,7 +99,7 @@ public class GobGrowthInfo extends GobInfo {
 	    if(data != null && !data.eom()) {
 		data.skip(1);
 		int growth = data.eom() ? -1 : data.uint8();
-		if(growth < 100 && growth >= 0) {
+		if(growth >= 0) {
 			if(res.name.contains("gfx/terobjs/trees") && !res.name.endsWith("log") && !res.name.endsWith("oldtrunk") && !(OptWnd.toggleGobHidingCheckBox.a && OptWnd.hideTreesCheckbox.a)) {
 			growth = (int) (TREE_MULT * (growth - TREE_START));
 			isHidden = false;
