@@ -1610,6 +1610,17 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 						else delattr(GobStateHighlight.class);
 					}
 					break;
+				case "gfx/terobjs/map/jotunclam":
+					if ((peekrbuf == 113) || (peekrbuf == 114)){
+						if (OptWnd.showContainerFullnessFullCheckBox.a) setGobStateHighlight(OptWnd.showContainerFullnessFullColorOptionWidget.currentColor);
+						else delattr(GobStateHighlight.class);
+					} else if (peekrbuf == 2 || peekrbuf == 1) {
+						if (OptWnd.showContainerFullnessEmptyCheckBox.a) setGobStateHighlight(OptWnd.showContainerFullnessEmptyColorOptionWidget.currentColor);
+						else delattr(GobStateHighlight.class);
+					} else {
+						if (OptWnd.showContainerFullnessPartialCheckBox.a) setGobStateHighlight(OptWnd.showContainerFullnessPartialColorOptionWidget.currentColor);
+						else delattr(GobStateHighlight.class);
+					}
 				default:
 					break;
 			}

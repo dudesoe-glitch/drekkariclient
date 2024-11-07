@@ -504,6 +504,7 @@ public class Config {
 			"gfx/terobjs/woodbox",
 			"gfx/terobjs/linencrate",
 			"gfx/terobjs/map/stonekist",
+			"gfx/terobjs/map/jotunclam",
 	};
 
 	public static final String[] workstationsResPaths = {
