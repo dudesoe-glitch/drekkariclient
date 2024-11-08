@@ -1559,6 +1559,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 					}
 					break;
 				case "gfx/terobjs/leatherbasket":
+				case "gfx/terobjs/thatchbasket":
 					if (peekrbuf == 4) {
 						if (OptWnd.showContainerFullnessFullCheckBox.a) setGobStateHighlight(OptWnd.showContainerFullnessFullColorOptionWidget.currentColor);
 						else delattr(GobStateHighlight.class);
