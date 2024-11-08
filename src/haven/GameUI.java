@@ -1995,7 +1995,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 		msgtime = Utils.rtime();
 		lastmsg = RootWidget.msgfoundry.render(msg.message(), color);
 		syslog.append(logged);
-		if (!msg.message().contains("There are no claims under siege"))
+		if (!msg.message().contains("There are no claims under siege") && !msg.message().contains("You gained"))
 			ui.sfxrl(msg.sfx());
 	}
 	Gob g = lastInspectedGob;
