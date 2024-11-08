@@ -1041,7 +1041,8 @@ public class GobIcon extends GAttrib {
 		left.last(new Button(UI.scale(170), "Delete Selected Preset", false).action(() -> {
 			if (!selectedPreset.equals("")) {
 				mapIconPresets.remove(selectedPreset);
-				ui.gui.msg(selectedPreset + " map icons preset has been deleted!", Color.WHITE, UI.MessageWidget.msgsfx);
+
+				ui.gui.msg(new UI.InfoMessage(selectedPreset + " map icons preset has been deleted!", Color.WHITE, UI.InfoMessage.sfx));
 				selectedPreset = "";
 				iconPresetsDropbox.change(0);
 				savePresetsToFile();
@@ -1154,7 +1155,7 @@ public class GobIcon extends GAttrib {
 					icon.conf.show = true;
 			});
 			conf.dsave();
-			ui.gui.msg(selectedPreset + " map icons preset has been set!", Color.WHITE, UI.MessageWidget.msgsfx);
+			ui.gui.msg(new UI.InfoMessage(selectedPreset + " map icons preset has been set!", Color.WHITE, UI.InfoMessage.sfx));
 		}
 	}
 
@@ -1169,7 +1170,7 @@ public class GobIcon extends GAttrib {
 					}
 				});
 			}});
-			ui.gui.msg(presetName + " map icons preset has been saved!", Color.WHITE, UI.MessageWidget.msgsfx);
+			ui.gui.msg(new UI.InfoMessage(presetName + " map icons preset has been saved!", Color.WHITE, UI.InfoMessage.sfx));
 			newPresetName.settext("");
 			savePresetsToFile();
 		}

@@ -1117,15 +1117,12 @@ public class FightWnd extends Widget {
 		try {
 			if (!saves[index].text.equals("Unused save")) {
 				schoolsDropdown.change(new Pair(saves[index], index));
-				ui.gui.msg("Switched to deck No." + (index+1) + ": " + saves[index].text, Color.orange);
-				ui.sfx(RootWidget.msgsfx);
+				ui.gui.msg("Switched to deck No." + (index+1) + ": " + saves[index].text, Color.orange, UI.InfoMessage.sfx);
 			} else {
-				ui.gui.msg("This is not a saved deck, not switching.", Color.red);
-				ui.sfx(RootWidget.errsfx);
+				ui.gui.msg("This is not a saved deck, not switching.", Color.red, UI.ErrorMessage.sfx);
 			}
 		} catch (Exception e) {
-			ui.gui.msg("Exception switching combat decks, exception ignored to avoid crash.", Color.white);
-			ui.sfx(RootWidget.errsfx);
+			ui.gui.msg("Exception switching combat decks, exception ignored to avoid crash.", Color.white, UI.ErrorMessage.sfx);
 		}
 	}
 

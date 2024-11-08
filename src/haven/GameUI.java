@@ -1951,78 +1951,74 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
     }
 
     public void msg(UI.Notice msg) {
+	Color color = msg.color();
+	if (msg.message().contains("There are no claims under siege"))
+		color = Color.green;
+	boolean noMsgTho = false;
+	if (msg.message().startsWith("Swimming is now turned")) {
+		togglebuff(msg.message(), Bufflist.buffswim);
+	} else if (msg.message().startsWith("Tracking is now turned")) {
+		togglebuff(msg.message(), Bufflist.bufftrack);
+	} else if (msg.message().startsWith("Criminal acts are now turned")) {
+		togglebuff(msg.message(), Bufflist.buffcrime);
+	} else if (msg.message().startsWith("Party permissions are now")) {
+		togglebuff(msg.message(), Bufflist.partyperm);
+		if (!partyPermsOnLoginToggleSet){
+			noMsgTho = true;
+			if((OptWnd.togglePartyPermissionsOnLoginCheckBox.a && msg.message().endsWith("off.")) || (!OptWnd.togglePartyPermissionsOnLoginCheckBox.a && msg.message().endsWith("on."))){
+				wdgmsg("act", "permshare"); // ND: set it again
+			} else {
+				partyPermsOnLoginToggleSet = true;
+			}
+		}
+	} else if (msg.message().startsWith("Stacking is now")) {
+		togglebuff(msg.message(), Bufflist.itemstacking);
+		if (!itemStackingOnLoginToggleSet){
+			noMsgTho = true;
+			if((OptWnd.toggleItemStackingOnLoginCheckBox.a && msg.message().endsWith("off.")) || (!OptWnd.toggleItemStackingOnLoginCheckBox.a && msg.message().endsWith("on."))){
+				wdgmsg("act", "itemcomb"); // ND: set it again
+			} else {
+				itemStackingOnLoginToggleSet = true;
+			}
+		}
+	}
 	ChatUI.Channel.Message logged;
 	if(msg instanceof LogMessage)
 	    logged = ((LogMessage)msg).logmessage();
 	else
-	    logged = new ChatUI.Channel.SimpleMessage(msg.message(), msg.color());
-	msgtime = Utils.rtime();
-	lastmsg = RootWidget.msgfoundry.render(msg.message(), msg.color());
-	syslog.append(logged);
-	ui.sfxrl(msg.sfx());
+	    logged = new ChatUI.Channel.SimpleMessage(msg.message(), color);
+	if ((!noMsgTho && partyPermsOnLoginToggleSet && itemStackingOnLoginToggleSet) || msg.message().contains("siege")){
+		msgtime = Utils.rtime();
+		lastmsg = RootWidget.msgfoundry.render(msg.message(), color);
+		syslog.append(logged);
+		if (!msg.message().contains("There are no claims under siege"))
+			ui.sfxrl(msg.sfx());
+	}
+	Gob g = lastInspectedGob;
+	if(g != null) {
+		Matcher m = GobQualityInfo.GOB_Q.matcher(msg.message());
+		if(m.matches()) {
+			try {
+				int q = Integer.parseInt(m.group(1));
+				g.setQualityInfo(q);
+			} catch (Exception ignored) {}
+			lastInspectedGob = null;
+		}
+	}
     }
 
-    public void msg(String msg, Color color, Color logcol) {
-        msgtime = Utils.rtime();
-        lastmsg = RootWidget.msgfoundry.render(msg, color);
-        syslog.append(msg, logcol);
-        Gob g = lastInspectedGob;
-        if(g != null) {
-            Matcher m = GobQualityInfo.GOB_Q.matcher(msg);
-            if(m.matches()) {
-                try {
-                    int q = Integer.parseInt(m.group(1));
-                    g.setQualityInfo(q);
-                } catch (Exception ignored) {}
-                lastInspectedGob = null;
-            }
-        }
-    }
+	public void msg(String msg, Color color, Audio.Clip sfx){
+		msg(new UI.SimpleMessage(msg, color, sfx));
+	}
 
-    public void msg(String msg, Color color) {
-        msg(msg, color, color);
-    }
-
-    public void msg(String msg, Color color, Audio.Clip sfx) {
-        if (msg.contains("There are no claims under siege"))
-            color = Color.green;
-        boolean noMsgTho = false;
-        if (msg.startsWith("Swimming is now turned")) {
-            togglebuff(msg, Bufflist.buffswim);
-        } else if (msg.startsWith("Tracking is now turned")) {
-            togglebuff(msg, Bufflist.bufftrack);
-        } else if (msg.startsWith("Criminal acts are now turned")) {
-            togglebuff(msg, Bufflist.buffcrime);
-        } else if (msg.startsWith("Party permissions are now")) {
-            togglebuff(msg, Bufflist.partyperm);
-            if (!partyPermsOnLoginToggleSet){
-                noMsgTho = true;
-                if((OptWnd.togglePartyPermissionsOnLoginCheckBox.a && msg.endsWith("off.")) || (!OptWnd.togglePartyPermissionsOnLoginCheckBox.a && msg.endsWith("on."))){
-                    wdgmsg("act", "permshare"); // ND: set it again
-                } else {
-                    partyPermsOnLoginToggleSet = true;
-                }
-            }
-        } else if (msg.startsWith("Stacking is now")) {
-            togglebuff(msg, Bufflist.itemstacking);
-            if (!itemStackingOnLoginToggleSet){
-                noMsgTho = true;
-                if((OptWnd.toggleItemStackingOnLoginCheckBox.a && msg.endsWith("off.")) || (!OptWnd.toggleItemStackingOnLoginCheckBox.a && msg.endsWith("on."))){
-                    wdgmsg("act", "itemcomb"); // ND: set it again
-                } else {
-                    itemStackingOnLoginToggleSet = true;
-                }
-            }
-        }
-        if ((!noMsgTho && partyPermsOnLoginToggleSet && itemStackingOnLoginToggleSet) || msg.contains("siege")){
-            msg(msg, color);
-            if (!msg.contains("There are no claims under siege"))
-                ui.sfxrl(sfx);
-        }
-    }
+	public void msg(String msg, Color color){
+		msg(new UI.SimpleMessage(msg, color, null));
+	}
 
 	public void optionInfoMsg(String msg, Color color, Audio.Clip sfx) {
-		msg(msg, color, color);
+		msgtime = Utils.rtime();
+		lastmsg = RootWidget.msgfoundry.render(msg, color);
+		syslog.append(msg, color);
 		double now = Utils.rtime();
 		if(now - lastmsgsfx > 0.1) {
 			ui.sfx(sfx);
