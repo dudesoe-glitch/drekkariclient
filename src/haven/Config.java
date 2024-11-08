@@ -921,17 +921,20 @@ public class Config {
 				"gfx/invobjs/hartshornsalve",
 				"gfx/invobjs/leech",
 				"gfx/invobjs/opium",
-				"gfx/invobjs/toadbutter"
+				"gfx/invobjs/toadbutter",
+				"gfx/invobjs/jar-willowweep"
 		});
 		cures.put("paginae/wound/bruise", new String[]{
-				"gfx/invobjs/leech"
+				"gfx/invobjs/leech",
+				"gfx/invobjs/jar-willowweep"
 		});
 		cures.put("paginae/wound/coalcough", new String[]{
 				"gfx/invobjs/opium"
 		});
 		cures.put("paginae/wound/concussion", new String[]{
 				"gfx/invobjs/coldcompress",
-				"gfx/invobjs/opium"
+				"gfx/invobjs/opium",
+				"gfx/invobjs/jar-willowweep"
 		});
 		cures.put("paginae/wound/crabcaressed", new String[]{
 				"gfx/invobjs/antpaste"
@@ -977,7 +980,8 @@ public class Config {
 		});
 		cures.put("paginae/wound/paginae/wound/punchsore", new String[]{
 				"gfx/invobjs/mudointment",
-				"gfx/invobjs/opium"
+				"gfx/invobjs/opium",
+				"gfx/invobjs/jar-willowweep"
 		});
 		cures.put("paginae/wound/sandfleabites", new String[]{
 				"gfx/invobjs/graygrease",
