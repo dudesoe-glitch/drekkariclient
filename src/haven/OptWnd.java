@@ -1132,6 +1132,8 @@ public class OptWnd extends Window {
 	public static CheckBox displayObjectHealthPercentageCheckBox;
 	public static CheckBox displayObjectQualityOnInspectionCheckBox;
 	public static CheckBox displayGrowthInfoCheckBox;
+	public static CheckBox alsoShowOversizedTreesAbovePercentageCheckBox;
+	public static TextEntry oversizedTreesPercentageTextEntry;
 	public static CheckBox showCritterAurasCheckBox;
 	public static ColorOptionWidget rabbitAuraColorOptionWidget;
 	public static String[] rabbitAuraColorSetting = Utils.getprefsa("rabbitAura" + "_colorSetting", new String[]{"88", "255", "0", "140"});
@@ -1537,7 +1539,7 @@ public class OptWnd extends Window {
 						Gob.permanentHighlightList.clear();
 					}
 				}
-			}, leftColumn.pos("bl").adds(0, 12));
+			}, leftColumn.pos("bl").adds(0, 32));
 
 			rightColumn = add(toggleGobCollisionBoxesCheckBox = new CheckBox("Show Object Collision Boxes"){
 				{a = (Utils.getprefb("gobCollisionBoxesDisplayToggle", false));}
@@ -1587,6 +1589,23 @@ public class OptWnd extends Window {
 				}
 			}, rightColumn.pos("bl").adds(0, 2));
 			displayGrowthInfoCheckBox.tooltip = displayGrowthInfoTooltip;
+			rightColumn = add(alsoShowOversizedTreesAbovePercentageCheckBox = new CheckBox("Also Show Trees Above %:"){
+				{a = (Utils.getprefb("alsoShowOversizedTreesAbovePercentage", true));}
+				public void changed(boolean val) {
+					Utils.setprefb("alsoShowOversizedTreesAbovePercentage", val);
+				}
+			}, rightColumn.pos("bl").adds(12, 2));
+			add(oversizedTreesPercentageTextEntry = new TextEntry(UI.scale(36), Utils.getpref("oversizedTreesPercentage", "150")){
+				protected void changed() {
+					this.settext(this.text().replaceAll("[^\\d]", "")); // Only numbers
+					this.settext(this.text().replaceAll("(?<=^.{3}).*", "")); // No more than 3 digits
+					Utils.setpref("oversizedTreesPercentage", this.buf.line());
+					if (ui != null && ui.gui != null) {
+						ui.sess.glob.oc.gobAction(Gob::refreshGrowthInfo);
+					}
+					super.changed();
+				}
+			}, alsoShowOversizedTreesAbovePercentageCheckBox.pos("ur").adds(4, 0));
 
 			rightColumn = add(showCritterAurasCheckBox = new CheckBox("Show Critter Circle Auras (Clickable)"){
 				{a = (Utils.getprefb("showCritterAuras", true));}
@@ -1596,7 +1615,7 @@ public class OptWnd extends Window {
 						ui.sess.glob.oc.gobAction(Gob::updateCritterAuras);
 					}
 				}
-			}, rightColumn.pos("bl").adds(0, 18));
+			}, rightColumn.pos("bl").adds(0, 17).x(UI.scale(230)));
 			rightColumn = add(rabbitAuraColorOptionWidget = new ColorOptionWidget("Rabbit Aura:", "rabbitAura", 115, Integer.parseInt(rabbitAuraColorSetting[0]), Integer.parseInt(rabbitAuraColorSetting[1]), Integer.parseInt(rabbitAuraColorSetting[2]), Integer.parseInt(rabbitAuraColorSetting[3]), (Color col) -> {
 				if (ui != null && ui.gui != null) {
 					ui.sess.glob.oc.gobAction(Gob::updateCritterAuras);
