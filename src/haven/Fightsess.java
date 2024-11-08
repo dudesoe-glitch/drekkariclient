@@ -682,7 +682,7 @@ public class Fightsess extends Widget {
 	    Indir<Resource> lastact = this.lastact1;
 	    if(lastact != null) {
 		Coord usesz = lastact.get().flayer(Resource.imgc).sz;
-		Coord lac = pcc.add(usec1);
+		Coord lac = new Coord(x - UI.scale(69), y - UI.scale(80)).add(usesz.div(2));
 		if(c.isect(lac.sub(usesz.div(2)), usesz)) {
 		    if(lastacttip1 == null)
 			lastacttip1 = Text.render(lastact.get().flayer(Resource.tooltip).t);
