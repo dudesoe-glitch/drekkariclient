@@ -787,6 +787,7 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 		makeLocal("customclient/menugrid/OtherScriptsAndTools/CustomAlarmManager");
 		makeLocal("customclient/menugrid/OtherScriptsAndTools/AutoDropManager");
 		makeLocal("customclient/menugrid/OtherScriptsAndTools/FlowerMenuAutoSelectManager");
+		makeLocal("customclient/menugrid/OtherScriptsAndTools/QuestHelper");
 
 		// Category: Quick Switch From Belt
 		makeLocal("customclient/menugrid/QuickSwitchFromBelt/Equip_B12");
@@ -1053,6 +1054,14 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 				} else {
 					gui.opts.flowerMenuAutoSelectManagerWindow.show(!gui.opts.flowerMenuAutoSelectManagerWindow.visible);
 					gui.opts.flowerMenuAutoSelectManagerWindow.refresh();
+				}
+			} else if (ad[2].equals("QuestHelper")) {
+				if(gui.questhelper.visible){
+					gui.questhelper.hide();
+					gui.questhelper.active = false;
+				} else {
+					gui.questhelper.show();
+					gui.questhelper.active = true;
 				}
 			}
 		} else if (ad[1].equals("QuickSwitchFromBelt")) {
