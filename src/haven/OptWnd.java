@@ -1530,6 +1530,20 @@ public class OptWnd extends Window {
 						ui.gui.miningSafetyAssistantWindow.sweeperDurationDropbox.change2(item);
 				}
 			}, leftColumn.pos("ul").adds(160, 2));
+
+			leftColumn = add(displayGrowthInfoCheckBox = new CheckBox("Display Growth Info on Plants and Trees"){
+				{a = (Utils.getprefb("displayGrowthInfo", false));}
+				public void changed(boolean val) {
+					Utils.setprefb("displayGrowthInfo", val);
+				}
+			}, leftColumn.pos("bl").adds(0, 2));
+			displayGrowthInfoCheckBox.tooltip = displayGrowthInfoTooltip;
+			leftColumn = add(alsoShowOversizedTreesAbovePercentageCheckBox = new CheckBox("Also Show Trees Above %:"){
+				{a = (Utils.getprefb("alsoShowOversizedTreesAbovePercentage", true));}
+				public void changed(boolean val) {
+					Utils.setprefb("alsoShowOversizedTreesAbovePercentage", val);
+				}
+			}, leftColumn.pos("bl").adds(12, 2));
 			leftColumn = add(objectPermanentHighlightingCheckBox = new CheckBox("Permanently Highlight Objects with on Alt + Middle Click (Mouse Scroll Click)"){
 				{a = (Utils.getprefb("objectPermanentHighlighting", false));}
 				public void changed(boolean val) {
@@ -1540,7 +1554,7 @@ public class OptWnd extends Window {
 						Gob.permanentHighlightList.clear();
 					}
 				}
-			}, leftColumn.pos("bl").adds(0, 32));
+			}, leftColumn.pos("bl").adds(0, 12).x(0));
 
 			rightColumn = add(toggleGobCollisionBoxesCheckBox = new CheckBox("Show Object Collision Boxes"){
 				{a = (Utils.getprefb("gobCollisionBoxesDisplayToggle", false));}
@@ -1583,19 +1597,6 @@ public class OptWnd extends Window {
 					Utils.setprefb("displayObjectQualityOnInspection", val);
 				}
 			}, rightColumn.pos("bl").adds(0, 2));
-			rightColumn = add(displayGrowthInfoCheckBox = new CheckBox("Display Growth Info on Plants and Trees"){
-				{a = (Utils.getprefb("displayGrowthInfo", false));}
-				public void changed(boolean val) {
-					Utils.setprefb("displayGrowthInfo", val);
-				}
-			}, rightColumn.pos("bl").adds(0, 2));
-			displayGrowthInfoCheckBox.tooltip = displayGrowthInfoTooltip;
-			rightColumn = add(alsoShowOversizedTreesAbovePercentageCheckBox = new CheckBox("Also Show Trees Above %:"){
-				{a = (Utils.getprefb("alsoShowOversizedTreesAbovePercentage", true));}
-				public void changed(boolean val) {
-					Utils.setprefb("alsoShowOversizedTreesAbovePercentage", val);
-				}
-			}, rightColumn.pos("bl").adds(12, 2));
 			add(oversizedTreesPercentageTextEntry = new TextEntry(UI.scale(36), Utils.getpref("oversizedTreesPercentage", "150")){
 				protected void changed() {
 					this.settext(this.text().replaceAll("[^\\d]", "")); // Only numbers
