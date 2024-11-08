@@ -696,8 +696,10 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 
     public void move(Coord2d c, double a) {
 	Moving m = getattr(Moving.class);
-	if(m != null)
-	    m.move(c);
+	if(m != null) {
+		m.move(c);
+		System.out.println(m);
+	}
 	this.gobSpeed = m != null ? m.getv() : 0;
 		if(isMe != null && isMe && MappingClient.getInstance() != null) {
 			if (OptWnd.uploadMapTilesCheckBox.a)

@@ -76,6 +76,7 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
 	private AreaSelectCallback areaSelectCallback;
 	public boolean areaSelect = false;
 	public Coord currentCursorLocation;
+	public Coord3f gobPathLastClick;
 
     public interface Delayed {
 	public void run(GOut g);
@@ -607,6 +608,7 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
 	if (OptWnd.showWorkstationProgressCheckBox.a) updatePlobWorkstationProgressHighlight();
 	this.partyHighlight = new PartyHighlight(glob.party, plgob);
 	this.partyCircles = new PartyCircles(glob.party, plgob);
+	this.gobPathLastClick = null;
     }
     
     protected void envdispose() {
@@ -1769,6 +1771,34 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
 	    g.chcolor(Color.WHITE);
 	    g.atext(text, sz.div(2), 0.5, 0.5);
 	}
+	if (OptWnd.drawYourCurrentPathCheckBox.a) {
+		try {
+			MapView mapView = ui.gui.map;
+			Gob player = player();
+			if (player != null && mapView != null && mapView.gobPathLastClick != null) {
+				Coord playerc = null;
+				Coord clickc = null;
+				if (player.getattr(Moving.class) instanceof LinMove) {
+					playerc = mapView.screenxf(player.getc()).round2();
+					clickc = mapView.screenxf(gobPathLastClick).round2();
+				}
+				if (player.getattr(Moving.class) instanceof Following) {
+					if (player.occupiedGobID != null) {
+						Gob occupiedGob = glob.oc.getgob(player.occupiedGobID);
+						playerc = mapView.screenxf(occupiedGob.getc()).round2();
+						clickc = mapView.screenxf(gobPathLastClick).round2();
+					}
+				}
+				if (playerc != null && clickc != null) {
+					g.chcolor(Color.BLACK);
+					g.line(playerc, clickc, 4);
+					g.chcolor(Color.WHITE);
+					g.line(playerc, clickc, 2);
+				}
+			}
+		} catch (Exception ignored) {
+		}
+	}
     }
     
     private double initload = -2;
@@ -2139,11 +2169,13 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
 					if (OptWnd.autoEquipBunnySlippersPlateBootsCheckBox.a) {
 						switchToPlateBoots();
 					}
+					gobPathLastClick = new Coord3f((float)mc.x, (float)mc.y, glob.map.getzp(mc).z);
 				}
 				if (clickb == 3) { // Right Click
 					if (OptWnd.autoEquipBunnySlippersPlateBootsCheckBox.a) {
 						switchBunnySlippersAndPlateBoots(gob);
 					}
+					gobPathLastClick = new Coord3f((float)mc.x, (float)mc.y, glob.map.getzp(mc).z);
 					wdgmsg("click", args);
 					if (OptWnd.autoSelect1stFlowerMenuCheckBox.a) {
 						if (ui.modctrl) {
@@ -2163,6 +2195,10 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
 					switchToPlateBoots();
 				}
 			}
+			if (clickb == 1) {
+				gobPathLastClick = new Coord3f((float)mc.x, (float)mc.y, glob.map.getzp(mc).z);
+			} else if (clickb == 3)
+				gobPathLastClick = null;
 		}
 		if(checkpointManager != null && checkpointManagerThread != null && clickb == 1){
 			checkpointManager.pauseIt();

@@ -1147,6 +1147,7 @@ public class OptWnd extends Window {
 	public static CheckBox showFoodTroughsRadiiCheckBox;
 	public static CheckBox showBarrelContentsTextCheckBox;
 	public static CheckBox drawChaseVectorsCheckBox;
+	public static CheckBox drawYourCurrentPathCheckBox;
 	public static CheckBox highlightCliffsCheckBox;
 	public static ColorOptionWidget highlightCliffsColorOptionWidget;
 	public static String[] highlightCliffsColorSetting = Utils.getprefsa("highlightCliffs" + "_colorSetting", new String[]{"255", "0", "0", "200"});
@@ -1711,6 +1712,12 @@ public class OptWnd extends Window {
 					Utils.setprefb("drawChaseVectors", val);
 				}
 			}, rightColumn.pos("bl").adds(0, 12));
+			rightColumn = add(drawYourCurrentPathCheckBox = new CheckBox("Draw Your Current Path"){
+				{a = Utils.getprefb("drawYourCurrentPath", false);}
+				public void changed(boolean val) {
+					Utils.setprefb("drawYourCurrentPath", val);
+				}
+			}, rightColumn.pos("bl").adds(0, 2));
 			drawChaseVectorsCheckBox.tooltip = drawChaseVectorsTooltip;
 			rightColumn = add(highlightPartyMembersCheckBox = new CheckBox("Highlight Party Members"){
 				{a = Utils.getprefb("highlightPartyMembers", false);}
