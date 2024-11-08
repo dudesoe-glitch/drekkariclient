@@ -75,6 +75,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
     public HelpWnd help;
     public OptWnd opts;
     public Collection<DraggedItem> hand = new LinkedList<DraggedItem>();
+	private Collection<DraggedItem> handSave = new LinkedList<>();
     public WItem vhand;
     public ChatUI chat;
     public ChatUI.Channel syslog;
@@ -1750,6 +1751,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 	public static KeyBinding kb_toggleHidingBoxes  = KeyBinding.get("toggleHidingBoxesKB",  KeyMatch.forchar('H', KeyMatch.C));
 	public static KeyBinding kb_toggleCollisionBoxes  = KeyBinding.get("toggleCollisionBoxesKB",  KeyMatch.forchar('B', KeyMatch.S));
 	public static KeyBinding kb_toggleGrowthInfo  = KeyBinding.get("toggleGrowthInfoKB",  KeyMatch.forchar('I',  KeyMatch.C | KeyMatch.S));
+	public static KeyBinding kb_toggleCursorItem = KeyBinding.get("toggleCursorItemKB",  KeyMatch.nil);
 	public static KeyBinding kb_aggroNearestTargetButton = KeyBinding.get("AggroNearestTargetButtonKB",  KeyMatch.forcode(KeyEvent.VK_SPACE, KeyMatch.S));
 	public static KeyBinding kb_aggroOrTargetNearestCursor = KeyBinding.get("AggroOrTargetNearestCursorButtonKB",  KeyMatch.nil);
 	public static KeyBinding kb_aggroNearestPlayerButton = KeyBinding.get("AggroNearestPlayerButtonKB",  KeyMatch.nil);
@@ -1870,6 +1872,9 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 		return(true);
 	} else if(kb_toggleGrowthInfo.key().match(ev)) {
 		OptWnd.displayGrowthInfoCheckBox.set(!OptWnd.displayGrowthInfoCheckBox.a);
+		return(true);
+	} else if(kb_toggleCursorItem.key().match(ev)) {
+		toggleCursorItem();
 		return(true);
 	} else if(kb_aggroNearestTargetButton.key().match(ev)) {
 		this.runActionThread(new Thread(new AggroNearestTarget(this), "AggroNearestTarget"));
@@ -2869,6 +2874,18 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 			staminaBarText = staminaBarText + " (Drinking)";
 		}
 		g.aimage(Text.renderstroked(staminaBarText, Text.num12boldFnd).tex(), new Coord(sc.x+msz.x/2, sc.y+msz.y/2), 0.5, 0.5);
+	}
+
+	public void toggleCursorItem() {
+		if (hand.isEmpty()) {
+			hand.addAll(handSave);
+			handSave.clear();
+			updhand();
+		} else {
+			handSave.addAll(hand);
+			hand.clear();
+			updhand();
+		}
 	}
 
 }
