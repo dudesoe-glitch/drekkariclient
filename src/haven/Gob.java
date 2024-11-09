@@ -808,11 +808,15 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 		Homing homing = (Homing) a;
 		if (gobChaseVector == null && homing != null) {
 			gobChaseVector = new Overlay(this, new ChaseVectorSprite(this, homing));
-			addol(gobChaseVector);
+			synchronized (ols) {
+				addol(gobChaseVector);
+			}
 		} else if (gobChaseVector != null && homing != null) {
 			gobChaseVector.remove();
 			gobChaseVector = new Overlay(this, new ChaseVectorSprite(this, homing));
-			addol(gobChaseVector);
+			synchronized (ols) {
+				addol(gobChaseVector);
+			}
 		} else if (gobChaseVector != null) {
 			gobChaseVector.remove();
 			gobChaseVector = null;
@@ -1458,7 +1462,9 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 					HidingBox hidingBoxHollow = HidingBox.forGob(this, false);
 					if (hidingBoxHollow != null) {
 						this.hidingBoxHollow = new HitBoxGobSprite<>(this, hidingBoxHollow);
-						addol(this.hidingBoxHollow);
+						synchronized (ols) {
+							addol(this.hidingBoxHollow);
+						}
 					}
 				}
 			} else if (hidingBoxHollow != null) {
@@ -1474,7 +1480,9 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 					HidingBox hidingBoxFilled = HidingBox.forGob(this, true);
 					if (hidingBoxFilled != null) {
 						this.hidingBoxFilled = new HitBoxGobSprite<>(this, hidingBoxFilled);
-						addol(this.hidingBoxFilled);
+						synchronized (ols) {
+							addol(this.hidingBoxFilled);
+						}
 					}
 				}
 			} else if(hidingBoxFilled != null) {
@@ -1498,7 +1506,9 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 					CollisionBox collisionBox = CollisionBox.forGob(this);
 					if (collisionBox != null) {
 						this.collisionBox = new HitBoxGobSprite<>(this, collisionBox);
-						addol(this.collisionBox);
+						synchronized (ols) {
+							addol(this.collisionBox);
+						}
 					}
 				}
 			} else if (collisionBox != null) {

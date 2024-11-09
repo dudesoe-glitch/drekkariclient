@@ -53,7 +53,9 @@ public class PartyCircles {
         if (existingOverlay != null)
             gob.removeOl(existingOverlay);
         Gob.Overlay overlay = new Gob.Overlay(gob, new PartyCircleSprite(gob, color));
-        gob.addol(overlay);
+        synchronized (gob.ols) {
+            gob.addol(overlay);
+        }
         overlays.put(gob, overlay);
     }
 
