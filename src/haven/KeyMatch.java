@@ -133,7 +133,7 @@ public class KeyMatch {
     }
 
     public static KeyMatch forchar(char chr, int modmask, int modmatch) {
-	return(new KeyMatch(chr, false, VK_UNDEFINED, false, Character.toString(chr), modmask, modmatch));
+	return(new KeyMatch('\0', false, KeyEvent.getExtendedKeyCodeForChar(chr), false, Character.toString(chr), modmask, modmatch));
     }
     public static KeyMatch forchar(char chr, int mods) {
 	return(forchar(chr, S | C | M, mods));
@@ -149,21 +149,18 @@ public class KeyMatch {
     public static KeyMatch forevent(KeyEvent ev, int modmask) {
 	int mod = mods(ev) & modmask;
 	char key = Character.toUpperCase(ev.getKeyChar());
-	int code = ev.getExtendedKeyCode();
-	if(key == KeyEvent.CHAR_UNDEFINED)
-	    key = 0;
-	if(code != VK_UNDEFINED) {
-	    String nm;
-	    if(ev.getKeyCode() != VK_UNDEFINED)
-		nm = KeyEvent.getKeyText(ev.getKeyCode());
-	    else if(!Character.isISOControl(key))
+	int extended = ev.getExtendedKeyCode();
+	int code = ev.getKeyCode();
+	if(code != VK_UNDEFINED){
+		return(new KeyMatch('\0', false, code, false, KeyEvent.getKeyText(code), modmask, mod));
+	} else if(extended != VK_UNDEFINED){
+		String nm;
+		if(!Character.isISOControl(key))
 		nm = Character.toString(key);
 	    else
 		nm = String.format("%X", code);
-	    return(new KeyMatch('\0', false, code, true, nm, modmask, mod));
+	    return(new KeyMatch('\0', false, extended, true, nm, modmask, mod));
 	}
-	if(!Character.isISOControl(key))
-	    return(new KeyMatch(key, false, VK_UNDEFINED, false, Character.toString(key), modmask, mod));
 	return(null);
     }
 
