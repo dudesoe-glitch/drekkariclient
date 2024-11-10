@@ -513,7 +513,7 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 	if(pag != null) {
 	    if(prev != this)
 		hoverstart = now;
-	    boolean ttl = (now - hoverstart) > 0.5;
+	    boolean ttl = (now - hoverstart) > 0.0;
 	    if((pag != curttp) || (ttl != curttl)) {
 		try {
 		    BufferedImage ti = pag.rendertt(ttl);
