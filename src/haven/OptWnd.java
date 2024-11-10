@@ -170,6 +170,7 @@ public class OptWnd extends Window {
 				   try {
 				       float val = (float)Math.pow(2, this.val / (double)steps);
 				       ui.setgprefs(prefs = prefs.update(null, prefs.rscale, val));
+					   if(ui.gui != null && ui.gui.map != null) {ui.gui.map.updateGridMat();}
 				   } catch(GSettings.SettingException e) {
 				       error(e.getMessage());
 				       return;

@@ -967,9 +967,28 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
 	    ol.tick();
     }
 
-    private static final Material gridmat = new Material(new BaseColor(255, 255, 255, 48), States.maskdepth, new MapMesh.OLOrder(null),
-							 Location.xlate(new Coord3f(0, 0, 0.5f))   /* Apparently, there is no depth bias for lines. :P */
-							 );
+	private static Material gridmat = null;
+	private static Material gridMat(UI ui) {
+		if(gridmat != null) {return gridmat;}
+		float w = 1f;
+		if(ui != null) {
+			if (ui.gprefs.rscale.val > 1.01f)
+				w = 2f;
+			if (ui.gprefs.rscale.val > 1.99f)
+				w = 3f;
+		}
+		return gridmat = new Material(new BaseColor(255, 255, 255, 96), States.maskdepth, new MapMesh.OLOrder(null),
+				new States.LineWidth(w),
+				Location.xlate(new Coord3f(0, 0, 0.5f))   /* Apparently, there is no depth bias for lines. :P */
+		);
+	}
+	public void updateGridMat() {
+		gridmat = null;
+		if(gridlines != null) {
+			showgrid(false);
+			showgrid(true);
+		}
+	}
     private class GridLines extends MapRaster {
 	final Grid grid = new Grid<RenderTree.Node>() {
 		RenderTree.Node getcut(Coord cc) {
@@ -986,7 +1005,7 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
 	}
 
 	public void added(RenderTree.Slot slot) {
-	    slot.ostate(gridmat);
+		slot.ostate(gridMat(ui));
 	    slot.add(grid);
 	    super.added(slot);
 	}
