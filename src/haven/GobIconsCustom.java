@@ -27,7 +27,6 @@ public class GobIconsCustom {
 
 		put("gfx/terobjs/minehole", "customclient/mapicons/minehole");
 		put("gfx/terobjs/ladder", "customclient/mapicons/mineladder");
-		put("gfx/terobjs/wonders/wellspring", "customclient/mapicons/wellspring");
 
 		put("gfx/terobjs/items/mandrakespirited", "customclient/mapicons/mandrakespirited");
 		put("gfx/kritter/opiumdragon/opiumdragon", "customclient/mapicons/opiumdragon");
