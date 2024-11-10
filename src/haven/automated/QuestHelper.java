@@ -16,10 +16,10 @@ public class QuestHelper extends Window {
     public HashMap<String, Coord2d> questGiverLocations = new HashMap<>();
 
     public QuestHelper() {
-        super(new Coord(300, 380), "Quest Helper");
-        add(new PButton(80, "Refresh", questList), new Coord(20, 10));
-        questList = new QuestList(270, 13,this);
-        add(questList, new Coord(10, 55));
+        super(UI.scale(300, 380), "Quest Helper", false);
+        add(new PButton(160, "Refresh List", questList), UI.scale(20, 10));
+        questList = new QuestList(UI.scale(270), 13,this);
+        add(questList, UI.scale(16, 55));
     }
 
     @Override
@@ -108,7 +108,7 @@ public class QuestHelper extends Window {
         private QuestHelper questHelper;
 
         public QuestList(int w, int h, QuestHelper questHelper) {
-            super(w, h, 24);
+            super(w, h, UI.scale(24));
             this.questHelper = questHelper;
         }
 
