@@ -441,6 +441,8 @@ public class CheckpointManager extends Window implements Runnable {
             }
         } catch (Loading e) {
             gui.error("You must be in the same or neighbouring grid with first checkpoint to save your route.");
+        } catch (IllegalMonitorStateException e) {
+            gui.error("Something went wrong with map while saving your route.");
         }
     }
 
