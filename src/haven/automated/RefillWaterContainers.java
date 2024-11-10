@@ -46,9 +46,8 @@ public class RefillWaterContainers implements Runnable {
                                     item.getKey().item.wdgmsg("take", Coord.z);
                                     Thread.sleep(5);
                                     gui.map.wdgmsg("itemact", Coord.z, gui.map.player().rc.floor(posres), 0);
-                                    Thread.sleep(30);
+                                    Thread.sleep(40);
                                     belt.wdgmsg("drop", item.getValue());
-                                    gui.maininv.wdgmsg("drop", item.getValue());
                                     Thread.sleep(5);
                                 } catch (InterruptedException ignored) {
                                     return;
@@ -90,11 +89,6 @@ public class RefillWaterContainers implements Runnable {
                             if (entry.getValue().c.equals(calculatedCoord)) {
                                 String resName = entry.getKey().res.get().name;
                                 ItemInfo.Contents.Content content = getContent(entry.getKey());
-//                                if(content != null){
-//                                    System.out.println(resName + " - " + content.count + " - " + content.name + " _ " + content.unit);
-//                                } else {
-//                                    System.out.println(resName);
-//                                }
                                 if (resName.equals("gfx/invobjs/small/waterskin") && shouldAddToContainers(content, 3.0F)) {
                                     containers.put(entry.getValue(), indexCoord);
                                 } else if (resName.equals("gfx/invobjs/waterflask") && shouldAddToContainers(content, 2.0F)) {
@@ -115,6 +109,7 @@ public class RefillWaterContainers implements Runnable {
         Inventory belt = null;
         for (Widget w = gui.lchild; w != null; w = w.prev) {
             if (!(w instanceof GItem.ContentsWindow) || !((GItem.ContentsWindow) w).myOwnEquipory) continue;
+            if (!((GItem.ContentsWindow) w).cap.contains("Belt")) continue;
             for (Widget ww : w.children()) {
                 if (!(ww instanceof Inventory)) continue;
                 belt = (Inventory) ww;
