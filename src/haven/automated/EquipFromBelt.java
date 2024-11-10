@@ -98,6 +98,7 @@ public class EquipFromBelt implements Runnable {
         Coord sqsz = UI.scale(new Coord(33, 33));
         for (Widget w = gui.lchild; w != null; w = w.prev) {
             if (!(w instanceof GItem.ContentsWindow) || !((GItem.ContentsWindow) w).myOwnEquipory) continue;
+            if (!((GItem.ContentsWindow) w).cap.contains("Belt")) continue;
             for (Widget ww : w.children()) {
                 if (!(ww instanceof Inventory)) continue;
                 Coord inventorySize = ((Inventory) ww).isz;
@@ -162,6 +163,7 @@ public class EquipFromBelt implements Runnable {
         Coord sqsz = UI.scale(new Coord(33, 33));
         for (Widget w = gui.lchild; w != null; w = w.prev) {
             if (!(w instanceof GItem.ContentsWindow) || !((GItem.ContentsWindow) w).myOwnEquipory) continue;
+            if (!((GItem.ContentsWindow) w).cap.contains("Belt")) continue;
             for (Widget ww : w.children()) {
                 if (!(ww instanceof Inventory)) continue;
                 Coord inventorySize = ((Inventory) ww).isz;
@@ -267,6 +269,7 @@ public class EquipFromBelt implements Runnable {
         Coord sqsz = UI.scale(new Coord(33, 33));
         for (Widget w = gui.lchild; w != null; w = w.prev) {
             if (!(w instanceof GItem.ContentsWindow) || !((GItem.ContentsWindow) w).myOwnEquipory) continue;
+            if (!((GItem.ContentsWindow) w).cap.contains("Belt")) continue;
             for (Widget ww : w.children()) {
                 if (!(ww instanceof Inventory)) continue;
                 Coord inventorySize = ((Inventory) ww).isz;
