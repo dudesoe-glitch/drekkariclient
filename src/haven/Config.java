@@ -978,7 +978,7 @@ public class Config {
 				"gfx/invobjs/herbs/yarrow",
 				"gfx/invobjs/honeybroadaid"
 		});
-		cures.put("paginae/wound/paginae/wound/punchsore", new String[]{
+		cures.put("paginae/wound/punchsore", new String[]{
 				"gfx/invobjs/mudointment",
 				"gfx/invobjs/opium",
 				"gfx/invobjs/jar-willowweep"
