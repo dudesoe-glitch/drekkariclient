@@ -2850,16 +2850,18 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
 	}
 
 	public void addCheckpoint(Coord2d coord){
-		if(checkpointManager != null && checkpointManagerThread != null){
-			checkpointManager.addCoord(coord);
-		} else {
-			GameUI gameUI = ui.gui;
-			checkpointManager = new CheckpointManager(gameUI);
-			Window window = checkpointManager;
-			gameUI.add(window, new Coord(gameUI.sz.x/2 - window.sz.x/2 + 100, gameUI.sz.y - window.sz.y));
-			checkpointManagerThread = new Thread(checkpointManager, "CheckpointManager");
-			checkpointManagerThread.start();
-			checkpointManager.addCoord(coord);
+		if (OptWnd.enableQueuedMovementCheckBox.a) {
+			if(checkpointManager != null && checkpointManagerThread != null){
+				checkpointManager.addCoord(coord);
+			} else {
+				GameUI gameUI = ui.gui;
+				checkpointManager = new CheckpointManager(gameUI);
+				Window window = checkpointManager;
+				gameUI.add(window, new Coord(gameUI.sz.x/2 - window.sz.x/2 + 100, gameUI.sz.y - window.sz.y));
+				checkpointManagerThread = new Thread(checkpointManager, "CheckpointManager");
+				checkpointManagerThread.start();
+				checkpointManager.addCoord(coord);
+			}
 		}
 	}
 

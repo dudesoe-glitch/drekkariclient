@@ -2136,6 +2136,7 @@ public class OptWnd extends Window {
 	public static CheckBox autoPeaceAnimalsWhenCombatStartsCheckBox;
 	public static CheckBox autoDrinkingCheckBox;
 	public static TextEntry autoDrinkingThresholdTextEntry;
+	public static CheckBox enableQueuedMovementCheckBox;
 
 	public class GameplayAutomationSettingsPanel extends Panel {
 
@@ -2331,6 +2332,20 @@ public class OptWnd extends Window {
 					}
 				}
 			}, prev.pos("bl").adds(0, 12));
+
+			prev = add(enableQueuedMovementCheckBox = new CheckBox("Enable Queued Movement - Checkpoint Route Window"){
+				{a = Utils.getprefb("enableQueuedMovement", true);}
+				public void set(boolean val) {
+					Utils.setprefb("enableQueuedMovement", val);
+					a = val;
+					if (ui != null && ui.gui != null) {
+						ui.gui.optionInfoMsg("Queued Movement - Checkpoint Route Window is now " + (val ? "ENABLED" : "DISABLED") + ".", (val ? msgGreen : msgRed), Audio.resclip(val ? Toggle.sfxon : Toggle.sfxoff));
+						if (!val)
+							ui.gui.map.checkpointManager.wdgmsg("close");
+					}
+				}
+			}, prev.pos("bl").adds(0, 12));
+			enableQueuedMovementCheckBox.tooltip = enableQueuedMovementTooltip;
 			autoDrinkingCheckBox.tooltip = autoDrinkingTooltip;
 			add(autoDrinkingThresholdTextEntry = new TextEntry(UI.scale(40), Utils.getpref("autoDrinkingThreshold", "75")){
 				protected void changed() {
@@ -4267,7 +4282,7 @@ public class OptWnd extends Window {
 			"\nDrinking Tea doesn't stop when you reach 100% Stamina! So be careful with it." +
 			"\n" +
 			"\n$col[218,163,0]{Action Button:} $col[185,185,185]{This setting can also be turned on/off using an action button from the menu grid (Custom Client Extras → Toggles).}", UI.scale(320));
-
+	private final Object enableQueuedMovementTooltip = RichText.render("$col[218,163,0]{Action Button:} $col[185,185,185]{This setting can also be turned on/off using an action button from the menu grid (Custom Client Extras → Toggles).}", UI.scale(300));
 
 	// Altered Gameplay Settings Tooltips
 	private final Object overrideCursorItemWhenHoldingAltTooltip = RichText.render("Holding Alt while having an item on your cursor will allow you to left click to walk, or right click to interact with objects, rather than drop it on the ground." +
