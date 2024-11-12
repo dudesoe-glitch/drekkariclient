@@ -90,7 +90,7 @@ public class CollisionBox extends SlottedNode implements Rendered {
 				}
 			}
 		}
-		boolean aurochsSpecialCase = false;
+		boolean specialCase = false;
 		if(res.name.endsWith("/cattle")){
 			for (GAttrib g : gob.attr.values()) {
 				if (g instanceof Drawable) {
@@ -100,7 +100,23 @@ public class CollisionBox extends SlottedNode implements Rendered {
 							for (Composited.MD item : c.comp.cmod) {
 								if (item.mod.get().basename().equals("aurochs")){
 									growingTreeOrBush = true;
-									aurochsSpecialCase = true;
+									specialCase = true;
+								}
+							}
+						}
+					}
+				}
+			}
+		} else if(res.name.endsWith("/sheep")){
+			for (GAttrib g : gob.attr.values()) {
+				if (g instanceof Drawable) {
+					if (g instanceof Composite) {
+						Composite c = (Composite) g;
+						if (c.comp.cmod.size() > 0) {
+							for (Composited.MD item : c.comp.cmod) {
+								if (item.mod.get().basename().equals("mouflon")){
+									growingTreeOrBush = true;
+									specialCase = true;
 								}
 							}
 						}
@@ -126,7 +142,7 @@ public class CollisionBox extends SlottedNode implements Rendered {
 						bboxa.y = neg.ac.y;
 						bboxb.x = neg.bc.x;
 						bboxb.y = neg.bc.y;
-						if (!aurochsSpecialCase) {
+						if (!specialCase) {
 							polygons.add(box);
 						}
 					}
@@ -154,7 +170,7 @@ public class CollisionBox extends SlottedNode implements Rendered {
 							bboxa.y = (int) minY.get().getX();
 							bboxb.x = (int) maxX.get().getX();
 							bboxb.y = (int) maxY.get().getY();
-							if (!aurochsSpecialCase) {
+							if (!specialCase) {
 								polygons.add(Arrays.stream(polygon)
 										.map(coord2d -> new Coord3f((float) coord2d.x * boxScaleFinal, (float) -coord2d.y * boxScaleFinal, Z))
 										.collect(Collectors.toList()));
@@ -176,9 +192,11 @@ public class CollisionBox extends SlottedNode implements Rendered {
 						ax = -6F; bx = 6F; ay = -3F; by = 3F;
 					} else if (res.name.startsWith("gfx/kritter/horse/")) {
 						ax = -8F; bx = 8F; ay = -4F; by = 4F;
-					} else if (res.name.startsWith("gfx/kritter/cattle/cattle")) {
-						if (aurochsSpecialCase){
+					} else if (specialCase) {
+						if (res.name.startsWith("gfx/kritter/cattle/cattle")){
 							ax = -11.8F; bx = 11.8F; ay = -3.8F; by = 3.8F;
+						} else if (res.name.startsWith("gfx/kritter/sheep/sheep")) {
+							ax = -5.9F; bx = 5.9F; ay = -2F; by = 2F;
 						}
 					}
 					if (ax != 0 && bx != 0 && ay != 0 && by != 0) {
