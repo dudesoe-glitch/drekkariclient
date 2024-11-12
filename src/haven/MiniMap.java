@@ -348,6 +348,10 @@ public class MiniMap extends Widget {
 		return(true);
 	    return(false);
 	}
+
+		public Object tooltip() {
+			return icon.tooltip();
+		}
     }
 
     public static class MarkerID extends GAttrib {
@@ -998,6 +1002,11 @@ public class MiniMap extends Widget {
 	    if(mark != null) {
 		return(mark.tip);
 	    }
+
+		DisplayIcon icon = iconat(c);
+		if(icon != null) {
+			return icon.tooltip();
+		}
 	}
 	return(super.tooltip(c, prev));
     }
