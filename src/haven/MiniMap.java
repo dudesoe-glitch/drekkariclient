@@ -36,6 +36,7 @@ import haven.MapFile.GridInfo;
 import haven.MapFile.Marker;
 import haven.MapFile.PMarker;
 import haven.MapFile.SMarker;
+import haven.res.ui.obj.buddy.Buddy;
 import haven.sprites.MapSprite;
 
 import static haven.MCache.cmaps;
@@ -728,9 +729,27 @@ public class MiniMap extends Widget {
 		Coord2d ppc = m.getc();
 		if(ppc == null)
 		    continue;
+		Coord p2cppc = p2c(ppc);
 		g.chcolor(m.col.getRed(), m.col.getGreen(), m.col.getBlue(), 255);
 		g.rotimage(plp, p2c(ppc), plp.sz().div(2), -m.geta() - (Math.PI / 2));
 		g.chcolor();
+			if (!compact) {
+				String name;
+				if (GameUI.gobIdToKinName.containsKey(m.gobid)) {
+					name = GameUI.gobIdToKinName.get(m.gobid);
+					g.image(Text.renderstroked(name, Color.white, Color.BLACK, Text.num12boldFnd).tex(),p2cppc.add(-name.length()*4,-30));
+				} else if (m.getgob() != null) {
+					Buddy buddyInfo = m.getgob().getattr(Buddy.class);
+					if (buddyInfo != null) {
+						name = buddyInfo.rnm;
+						if (name == null && buddyInfo.customName!= null)
+							name = buddyInfo.customName;
+						if (!GameUI.gobIdToKinName.containsKey(m.gobid) && name != null) {
+							GameUI.gobIdToKinName.put(m.gobid, name);
+						}
+					}
+				}
+			}
 	    } catch(Loading l) {}
 	}
     }

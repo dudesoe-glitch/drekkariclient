@@ -34,10 +34,8 @@ import java.util.*;
 import java.awt.Color;
 import java.awt.event.KeyEvent;
 import java.awt.image.WritableRaster;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
 import java.util.concurrent.Future;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -113,6 +111,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Message
 	public static boolean verifiedAccount = false;
 	public static boolean subscribedAccount = false;
 	public QuestHelper questhelper;
+	public static Map<Long,String> gobIdToKinName = new ConcurrentHashMap<>();
 
 	// Script Threads
 	public Thread autoRepeatFlowerMenuScriptThread;
