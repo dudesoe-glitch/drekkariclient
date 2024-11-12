@@ -102,7 +102,7 @@ public class GobGrowthInfo extends GobInfo {
 		if(growth >= 0) {
 			if(res.name.contains("gfx/terobjs/trees") && !res.name.endsWith("log") && !res.name.endsWith("oldtrunk") && !(OptWnd.toggleGobHidingCheckBox.a && OptWnd.hideTreesCheckbox.a)) {
 			growth = (int) (TREE_MULT * (growth - TREE_START));
-			if (growth <= 0)
+			if (growth <= 100)
 				isHidden = false;
 			int oversizedTreesPercentage = OptWnd.oversizedTreesPercentageTextEntry.text().isEmpty() ? 1 : Integer.parseInt(OptWnd.oversizedTreesPercentageTextEntry.text());
 			if (OptWnd.alsoShowOversizedTreesAbovePercentageCheckBox.a && growth >= oversizedTreesPercentage)
