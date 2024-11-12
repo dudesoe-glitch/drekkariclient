@@ -1800,8 +1800,7 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
 				if (player.getattr(Moving.class) instanceof LinMove) {
 					playerc = mapView.screenxf(player.getc()).round2();
 					clickc = mapView.screenxf(gobPathLastClick).round2();
-				}
-				if (player.getattr(Moving.class) instanceof Following) {
+				} else if (player.getattr(Moving.class) instanceof Following) {
 					if (player.occupiedGobID != null) {
 						Gob occupiedGob = glob.oc.getgob(player.occupiedGobID);
 						playerc = mapView.screenxf(occupiedGob.getc()).round2();
@@ -2188,13 +2187,11 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
 					if (OptWnd.autoEquipBunnySlippersPlateBootsCheckBox.a) {
 						switchToPlateBoots();
 					}
-					gobPathLastClick = new Coord3f((float)mc.x, (float)mc.y, glob.map.getzp(mc).z);
 				}
 				if (clickb == 3) { // Right Click
 					if (OptWnd.autoEquipBunnySlippersPlateBootsCheckBox.a) {
 						switchBunnySlippersAndPlateBoots(gob);
 					}
-					gobPathLastClick = new Coord3f((float)mc.x, (float)mc.y, glob.map.getzp(mc).z);
 					wdgmsg("click", args);
 					if (OptWnd.autoSelect1stFlowerMenuCheckBox.a) {
 						if (ui.modctrl) {
@@ -2214,10 +2211,6 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
 					switchToPlateBoots();
 				}
 			}
-			if (clickb == 1) {
-				gobPathLastClick = new Coord3f((float)mc.x, (float)mc.y, glob.map.getzp(mc).z);
-			} else if (clickb == 3)
-				gobPathLastClick = null;
 		}
 		if(checkpointManager != null && checkpointManagerThread != null && clickb == 1){
 			checkpointManager.pauseIt();
@@ -2970,5 +2963,31 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
 		areaSelect = false;
 		selection.destroy();
 		selection = null;
+	}
+
+	@Override
+	public void wdgmsg(String msg, Object... args) {
+		super.wdgmsg(msg, args);
+		if (msg.equals("click")){
+			try {
+				int clickb = (Integer)args[2];
+				Coord2d mc = ((Coord)args[1]).mul(OCache.posres);
+				if (clickb == 1) {
+					if (!ui.modshift)
+						gobPathLastClick = new Coord3f((float)mc.x, (float)mc.y, glob.map.getzp(mc).z);
+					else
+						gobPathLastClick = null;
+				} else if (clickb == 3) {
+					if (args.length > 4) {
+						Long gobid = new Long((Integer) args[5]);
+						Gob gob = glob.oc.getgob(gobid);
+						if (gob != null) {
+							gobPathLastClick = new Coord3f((float)mc.x, (float)mc.y, glob.map.getzp(mc).z);
+						}
+					} else
+						gobPathLastClick = null;
+				}
+			} catch (Exception ignored){}
+		}
 	}
 }

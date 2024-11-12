@@ -797,6 +797,8 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 				occupiedGobID = null;
 			}
 		}
+		if (isMe != null && isMe)
+			glob.sess.ui.gui.map.gobPathLastClick = null;
 	}
 	if (a instanceof Moving) {
 		if (gobChaseVector != null) {
