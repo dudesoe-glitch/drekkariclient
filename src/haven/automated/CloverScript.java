@@ -26,7 +26,7 @@ public class CloverScript implements Runnable {
                 } catch (Loading l) {
                 }
                 if (res != null) {
-                    if (((res.name.equals("gfx/kritter/horse/horse")) || (res.name.equals("gfx/kritter/goat/wildgoat")) || (res.name.equals("gfx/kritter/boar/boar")))) {
+                    if (((res.name.equals("gfx/kritter/horse/horse")) || (res.name.equals("gfx/kritter/goat/wildgoat")) || (res.name.equals("gfx/kritter/boar/boar")) || (res.name.equals("gfx/kritter/reindeer/reindeer")))) {
                         double distFromPlayer = gob.rc.dist(gui.map.player().rc);
                         if (distFromPlayer < maxDistance) {
                             if (animal == null)
