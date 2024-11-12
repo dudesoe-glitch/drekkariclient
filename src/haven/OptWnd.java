@@ -418,6 +418,7 @@ public class OptWnd extends Window {
 	}
     }
 
+	public static HSlider instrumentsSoundVolumeSlider;
 	public static HSlider clapSoundVolumeSlider;
 	public static HSlider quernSoundVolumeSlider;
 	public static HSlider cauldronSoundVolumeSlider;
@@ -483,6 +484,15 @@ public class OptWnd extends Window {
 	    }
 
 		prev = add(new Label("Other Sound Settings"), prev.pos("bl").adds(52, 20));
+		prev = add(new Label("Music Instruments Volume"), prev.pos("bl").adds(0, 5).x(0));
+		prev = add(instrumentsSoundVolumeSlider = new HSlider(UI.scale(audioSliderWidth), 0, 100, Utils.getprefi("instrumentsSoundVolume", 70)) {
+			protected void attach(UI ui) {
+				super.attach(ui);
+			}
+			public void changed() {
+				Utils.setprefi("instrumentsSoundVolume", val);
+			}
+		}, prev.pos("bl").adds(0, 2));
 		prev = add(new Label("Clap Sound Effect Volume"), prev.pos("bl").adds(0, 5).x(0));
 		prev = add(clapSoundVolumeSlider = new HSlider(UI.scale(audioSliderWidth), 0, 100, Utils.getprefi("clapSoundVolume", 10)) {
 			protected void attach(UI ui) {
