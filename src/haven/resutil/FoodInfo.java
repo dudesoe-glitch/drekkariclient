@@ -120,6 +120,7 @@ public class FoodInfo extends ItemInfo.Tip {
 						String labelString = ((Label)wdg).texts;
 						if (labelString.startsWith("Food event bonus")){
 							tableFoodEventBonus = (extractNumber(labelString) > 0.0) ? 1.0 + (extractNumber(labelString)/100) : 1.0;
+							fepEfficiency *= tableFoodEventBonus;
 						}
 						else if (labelString.startsWith("Hunger modifier")) {
 							hungerEfficiency *= (extractNumber(labelString) < 100 && extractNumber(labelString) > 0.0) ? (extractNumber(labelString)/100) : 1.0;
