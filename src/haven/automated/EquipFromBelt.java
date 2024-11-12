@@ -95,7 +95,7 @@ public class EquipFromBelt implements Runnable {
         }
         Inventory belt = null;
         Map<GItem, Coord> items = new HashMap<>();
-        Coord sqsz = UI.scale(new Coord(33, 33));
+        Coord sqsz = Inventory.sqsz;
         for (Widget w = gui.lchild; w != null; w = w.prev) {
             if (!(w instanceof GItem.ContentsWindow) || !((GItem.ContentsWindow) w).myOwnEquipory) continue;
             if (!((GItem.ContentsWindow) w).cap.contains("Belt")) continue;
@@ -160,7 +160,7 @@ public class EquipFromBelt implements Runnable {
         }
         Inventory belt = null;
         Map<GItem, Coord> items = new HashMap<>();
-        Coord sqsz = UI.scale(new Coord(33, 33));
+        Coord sqsz = Inventory.sqsz;
         for (Widget w = gui.lchild; w != null; w = w.prev) {
             if (!(w instanceof GItem.ContentsWindow) || !((GItem.ContentsWindow) w).myOwnEquipory) continue;
             if (!((GItem.ContentsWindow) w).cap.contains("Belt")) continue;
@@ -266,7 +266,7 @@ public class EquipFromBelt implements Runnable {
         Inventory belt = null;
         Map<GItem, Coord> firstItemInBelt = new HashMap<>();
         Map<GItem, Coord> secondItemInBelt = new HashMap<>();
-        Coord sqsz = UI.scale(new Coord(33, 33));
+        Coord sqsz = Inventory.sqsz;
         for (Widget w = gui.lchild; w != null; w = w.prev) {
             if (!(w instanceof GItem.ContentsWindow) || !((GItem.ContentsWindow) w).myOwnEquipory) continue;
             if (!((GItem.ContentsWindow) w).cap.contains("Belt")) continue;

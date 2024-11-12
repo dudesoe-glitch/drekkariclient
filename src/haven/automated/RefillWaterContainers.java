@@ -75,7 +75,7 @@ public class RefillWaterContainers implements Runnable {
 
     public Map<WItem, Coord> getBeltContainers() {
         Map<WItem, Coord> containers = new HashMap<>();
-        Coord sqsz = UI.scale(new Coord(33, 33));
+        Coord sqsz = Inventory.sqsz;
         for (Widget w = gui.lchild; w != null; w = w.prev) {
             if (!(w instanceof GItem.ContentsWindow) || !((GItem.ContentsWindow) w).myOwnEquipory) continue;
             for (Widget ww : w.children()) {
@@ -121,7 +121,7 @@ public class RefillWaterContainers implements Runnable {
     public Map<WItem, Coord> getInventoryContainers() {
         Inventory playerInventory = gui.maininv;
         Coord inventorySize = playerInventory.isz;
-        Coord sqsz = UI.scale(new Coord(33, 33));
+        Coord sqsz = Inventory.sqsz;
         Map<WItem, Coord> containers = new HashMap<>();
         for (int i = 0; i < inventorySize.x; i++) {
             for (int j = 0; j < inventorySize.y; j++) {
