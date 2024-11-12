@@ -1656,14 +1656,18 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 			if (collisionBox != null) {
 				collisionBox.fx.updateState();
 			}
-			for (Overlay ol : ols){
-				if (ol.spr != null && ol.spr.res != null && ol.spr.res.name.equals("gfx/terobjs/items/parchment-decal") && ol.slots != null){
-					for (RenderTree.Slot slot : ol.slots){
-						if (OptWnd.flatCupboardsCheckBox.a) {
-							slot.cstate(Pipe.Op.compose(Location.scale(1, 1, 2), Location.xlate(new Coord3f(0, 0, -6.5f))));
+			synchronized (ols) {
+				for (Overlay ol : ols) {
+					if (ol.spr != null && ol.spr.res != null && ol.spr.res.name.equals("gfx/terobjs/items/parchment-decal") && ol.slots != null) {
+						synchronized (ol.slots) {
+							for (RenderTree.Slot slot : ol.slots) {
+								if (OptWnd.flatCupboardsCheckBox.a) {
+									slot.cstate(Pipe.Op.compose(Location.scale(1, 1, 2), Location.xlate(new Coord3f(0, 0, -6.5f))));
+								} else {
+									slot.cstate(Pipe.Op.compose(Location.scale(1, 1, 1), Location.xlate(new Coord3f(0, 0, 0))));
+								}
+							}
 						}
-						else
-							slot.cstate(Pipe.Op.compose(Location.scale(1, 1, 1), Location.xlate(new Coord3f(0, 0, 0))));
 					}
 				}
 			}
