@@ -315,7 +315,7 @@ public class MiniMap extends Widget {
 	}
 
 	public void dispupdate() {
-	    if((this.rc == null) || (sessloc == null) || (dloc == null) || (dloc.seg != sessloc.seg))
+	    if((this.rc == null) || (sessloc == null) || (dloc == null) || (dloc.seg.id != sessloc.seg.id))
 		this.sc = null;
 	    else
 		this.sc = p2c(this.rc);
@@ -700,7 +700,7 @@ public class MiniMap extends Widget {
     }
 
     public void drawicons(GOut g) {
-	if((sessloc == null) || (dloc.seg != sessloc.seg))
+	if((sessloc == null) || (dloc.seg.id != sessloc.seg.id))
 	    return;
 	for(DisplayIcon disp : icons) {
 	    if((disp.sc == null) || filter(disp))
@@ -769,9 +769,9 @@ public class MiniMap extends Widget {
 	drawparty(g);
 	drawbiome(g);
 	drawsprites(g);
-	if (dloc.seg != sessloc.seg){ // ND: Attempts to fix the bug where the segments desync, idk why they desync and it's annoying me alot
-		sessloc.seg = dloc.seg;
-	}
+//	if (dloc.seg != sessloc.seg){ // ND: Attempts to fix the bug where the segments desync, idk why they desync and it's annoying me alot
+//		sessloc.seg = dloc.seg;
+//	}
     }
 
     public void draw(GOut g) {
