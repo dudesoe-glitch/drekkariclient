@@ -560,7 +560,8 @@ public class Config {
 			"pumice",
 			"serpentine",
 			"chert",
-			"graywacke"
+			"graywacke",
+			"halite" // rock salt
 	));
 
 	public final static Set<String> oreItemBaseNames = new HashSet<String>(Arrays.asList(

@@ -206,6 +206,7 @@ public class GobIconCategoryList extends OldListBox<GobIconCategoryList.GobCateg
                 "gfx/invobjs/sodalite",
                 "gfx/invobjs/sunstone",
                 "gfx/invobjs/zincspar",
+                "gfx/invobjs/halite", // rock salt
         };
         private static final String[] LOCALRESOURCES_PATH = {
                 "/terobjs/mm/abyssalchasm",
