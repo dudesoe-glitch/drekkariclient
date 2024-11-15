@@ -583,7 +583,8 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	Drawable d = getattr(Drawable.class);
 	if(d != null)
 	    d.gtick(g);
-	for(Overlay ol : ols) {
+	List<Overlay> olsSnapshot = new ArrayList<>(ols); // ND: Idk if this will break anything, but THIS PIECE OF SHIT SEEMS TO BE THE ROOT CAUSE OF ALL OLS CRASHES
+	for(Overlay ol : olsSnapshot) {
 	    if(ol.spr != null)
 		ol.spr.gtick(g);
 	}
