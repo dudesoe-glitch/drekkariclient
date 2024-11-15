@@ -2332,6 +2332,15 @@ public class OptWnd extends Window {
 					}
 				}
 			}, prev.pos("bl").adds(0, 12));
+			autoDrinkingCheckBox.tooltip = autoDrinkingTooltip;
+			add(autoDrinkingThresholdTextEntry = new TextEntry(UI.scale(40), Utils.getpref("autoDrinkingThreshold", "75")){
+				protected void changed() {
+					this.settext(this.text().replaceAll("[^\\d]", "")); // Only numbers
+					this.settext(this.text().replaceAll("(?<=^.{2}).*", "")); // No more than 2 digits
+					Utils.setpref("autoDrinkingThreshold", this.buf.line());
+					super.changed();
+				}
+			}, prev.pos("ur").adds(10, 0));
 
 			prev = add(enableQueuedMovementCheckBox = new CheckBox("Enable Queued Movement - Checkpoint Route Window"){
 				{a = Utils.getprefb("enableQueuedMovement", true);}
@@ -2346,15 +2355,6 @@ public class OptWnd extends Window {
 				}
 			}, prev.pos("bl").adds(0, 12));
 			enableQueuedMovementCheckBox.tooltip = enableQueuedMovementTooltip;
-			autoDrinkingCheckBox.tooltip = autoDrinkingTooltip;
-			add(autoDrinkingThresholdTextEntry = new TextEntry(UI.scale(40), Utils.getpref("autoDrinkingThreshold", "75")){
-				protected void changed() {
-					this.settext(this.text().replaceAll("[^\\d]", "")); // Only numbers
-					this.settext(this.text().replaceAll("(?<=^.{2}).*", "")); // No more than 2 digits
-					Utils.setpref("autoDrinkingThreshold", this.buf.line());
-					super.changed();
-				}
-			}, prev.pos("ur").adds(10, 0));
 
 			Widget backButton;
 			add(backButton = new PButton(UI.scale(200), "Back", 27, back, "Advanced Settings"), prev.pos("bl").adds(0, 18));
