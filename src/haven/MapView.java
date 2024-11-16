@@ -2161,6 +2161,14 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
 		Long gobid = new Long((Integer) inf.clickargs()[1]);
 		Gob gob = glob.oc.getgob(gobid);
 			if(gob != null) {
+				if (OptWnd.clickThroughCupboardDecalCheckBox.a && !ui.modctrl) {
+					try {
+						if (gob.getres().name.contains("cupboard") && (int)args[2] == 3) {
+							args[4] = 0;
+							args[7] = 0;
+						}
+					} catch (Exception ignored){}
+				}
 				if (ui.modmeta && ui.gui.vhand == null) {
 					Map<String, ChatUI.MultiChat> chats = ui.gui.chat.getMultiChannels();
 					if (clickb == 1 && (!ui.modshift || !ui.modctrl)) {
