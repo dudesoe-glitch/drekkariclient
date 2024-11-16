@@ -203,7 +203,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	    slots.add(slot);
 		if (this.spr != null && this.spr.res != null && this.spr.res.name.contains("decal")){
 			if (OptWnd.flatCupboardsCheckBox.a && this.spr.owner.getres().name.equals("gfx/terobjs/cupboard"))
-				slot.cstate(Pipe.Op.compose(Location.scale(1, 1, 1.8f), Location.xlate(new Coord3f(0, 0, -6.3f))));
+				slot.cstate(Pipe.Op.compose(Location.scale(1, 1, 1.6f), Location.xlate(new Coord3f(0, 0, -5.4f))));
 			slot.ostate(new MixColor(new Color(255, 255, 255, 0)));
 		}
 	}
@@ -1665,7 +1665,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 						synchronized (ol.slots) {
 							for (RenderTree.Slot slot : ol.slots) {
 								if (OptWnd.flatCupboardsCheckBox.a) {
-									slot.cstate(Pipe.Op.compose(Location.scale(1, 1, 2), Location.xlate(new Coord3f(0, 0, -6.5f))));
+									slot.cstate(Pipe.Op.compose(Location.scale(1, 1, 1.6f), Location.xlate(new Coord3f(0, 0, -5.4f))));
 								} else {
 									slot.cstate(Pipe.Op.compose(Location.scale(1, 1, 1), Location.xlate(new Coord3f(0, 0, 0))));
 								}
