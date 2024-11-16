@@ -805,6 +805,8 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 		makeLocal("customclient/menugrid/QuickSwitchFromBelt/Equip_TravelersSacks");
 		makeLocal("customclient/menugrid/QuickSwitchFromBelt/Equip_WanderersBindles");
 		makeLocal("customclient/menugrid/QuickSwitchFromBelt/Equip_WoodenShovel");
+		makeLocal("customclient/menugrid/QuickSwitchFromBelt/Equip_HuntersBow");
+		makeLocal("customclient/menugrid/QuickSwitchFromBelt/Equip_RangersBow");
 
 		// Category: Combat Decks
 		makeLocal("customclient/menugrid/CombatDecks/CombatDeck1");
