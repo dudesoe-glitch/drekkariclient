@@ -38,7 +38,8 @@ public class InteractWithNearestObject implements Runnable {
             "truffle-white1",
             "truffle-white2",
             "truffle-white3",
-            "gemstone"
+            "gemstone",
+            "boarspear"
     ));
 
     public final static HashSet<String> mines = new HashSet<String>(Arrays.asList(
