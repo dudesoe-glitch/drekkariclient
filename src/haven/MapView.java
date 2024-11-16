@@ -3002,9 +3002,7 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
 				safe = MiningSafetyAssistant.isAreaInSupportRange((Coord) args[0], (Coord) args[1], ui.gui);
 			}
 		}
-		if(safe){
-			super.wdgmsg(msg, args);
-		} else {
+		if(!safe){
 			ui.error("Tile outside all (visible) support range. Preventing mining command");
 		}
 		if (msg.equals("click")){
