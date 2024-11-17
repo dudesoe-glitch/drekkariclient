@@ -235,29 +235,29 @@ public class AlarmWindow extends Window {
 		}
 
 		@Override
-		public boolean mousewheel(Coord c, int amount) {
-			sb.ch(amount);
+		public boolean mousewheel(MouseWheelEvent ev) {
+			sb.ch(ev.a);
 			return true;
 		}
 
 		@Override
-		public boolean mousedown(Coord c, int button) {
-			int row = c.y / rowHeight + sb.val;
+		public boolean mousedown(MouseDownEvent ev) {
+			int row = ev.c.y / rowHeight + sb.val;
 			if(row >= items.size())
-				return super.mousedown(c, button);
-			if(items.get(row).mousedown(c.sub(UI.scale(15), c.y / rowHeight * rowHeight), button))
+				return super.mousedown(ev);
+			if(items.get(row).mousedown(new MouseDownEvent(ev.c.sub(UI.scale(15), ev.c.y / rowHeight * rowHeight), ev.b)))
 				return true;
-			return super.mousedown(c, button);
+			return super.mousedown(ev);
 		}
 
 		@Override
-		public boolean mouseup(Coord c, int button) {
-			int row = c.y / rowHeight + sb.val;
+		public boolean mouseup(MouseUpEvent ev) {
+			int row = ev.c.y / rowHeight + sb.val;
 			if(row >= items.size())
-				return super.mouseup(c, button);
-			if(items.get(row).mouseup(c.sub(UI.scale(15), c.y / rowHeight * rowHeight), button))
+				return super.mouseup(ev);
+			if(items.get(row).mouseup(new MouseUpEvent(ev.c.sub(UI.scale(15), ev.c.y / rowHeight * rowHeight), ev.b)))
 				return true;
-			return super.mouseup(c, button);
+			return super.mouseup(ev);
 		}
 
 		@Override
@@ -347,9 +347,9 @@ public class AlarmWindow extends Window {
 			prev = add(this.knocked = new CheckBox("") {
 				{a = knocked;}
 				@Override
-				public boolean mousedown(Coord c, int button) {
+				public boolean mousedown(MouseDownEvent ev) {
 					//Config.toggleTracking.setVal(!this.a);
-					return super.mousedown(c, button);
+					return super.mousedown(ev);
 				}
 				@Override
 				public void changed(boolean val) {
@@ -360,14 +360,14 @@ public class AlarmWindow extends Window {
 			}, prev.pos("ul").adds(130,0));
 			prev = add(new Button(UI.scale(70), "Preview") {
 				@Override
-				public boolean mousedown(Coord c, int button) {
-					if(button != 1)
+				public boolean mousedown(MouseDownEvent ev) {
+					if(ev.b != 1)
 						return true;
 					File file = new File("AlarmSounds/" + getAlarmFilename());
 					if(!file.exists() || file.isDirectory()) {
 						if (ui != null && ui.gui != null)
 							ui.gui.msg("Error while playing an alarm, file " + file.getAbsolutePath() + " does not exist!", Color.WHITE);
-						return super.mousedown(c, button);
+						return super.mousedown(ev);
 					}
 					try {
 						AudioInputStream in = AudioSystem.getAudioInputStream(file);
@@ -380,19 +380,19 @@ public class AlarmWindow extends Window {
 					} catch(IOException e) {
 						e.printStackTrace();
 					}
-					return super.mousedown(c, button);
+					return super.mousedown(ev);
 
 				}
 			}, prev.pos("ul").adds(45,-4));
 			prev = add(new Button(UI.scale(26), "X") {
 				@Override
-				public boolean mousedown(Coord c, int button) {
-					if(button != 1)
-						return super.mousedown(c, button);
+				public boolean mousedown(MouseDownEvent ev) {
+					if(ev.b != 1)
+						return super.mousedown(ev);
 					wdgmsg(this.parent, "delete");
 					AlarmManager.load(al);
 					AlarmManager.save();
-					return super.mousedown(c, button);
+					return super.mousedown(ev);
 				}
 			}, prev.pos("ul").adds(80,0));
 		}
@@ -432,16 +432,16 @@ public class AlarmWindow extends Window {
 		}
 
 		@Override
-		public void mousemove(Coord c) {
-			if(c.x > 470)
-				super.mousemove(c.sub(UI.scale(15), 0));
+		public void mousemove(MouseMoveEvent ev) {
+			if(ev.c.x > 470)
+				super.mousemove(new MouseMoveEvent(ev.c.sub(UI.scale(15), 0)));
 			else
-				super.mousemove(c);
+				super.mousemove(ev);
 		}
 
 		@Override
-		public boolean mousedown(Coord c, int button) {
-			if(super.mousedown(c, button))
+		public boolean mousedown(MouseDownEvent ev) {
+			if(super.mousedown(ev))
 				return true;
 			return false;
 		}

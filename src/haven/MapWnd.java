@@ -94,12 +94,12 @@ public class MapWnd extends Window implements Console.Directory {
 	recenter();
 	toolbarTop = add(new Widget(Coord.z));
 	toolbarTop.add(new Img(Resource.loadtex("gfx/hud/mmap/topfgwdg")) {
-		public boolean mousedown(Coord c, int button) {
-			if((button == 1) && checkhit(c)) {
-				MapWnd.this.drag(parentpos(MapWnd.this, c));
+		public boolean mousedown(MouseDownEvent ev) {
+			if((ev.b == 1) && checkhit(ev.c)) {
+				MapWnd.this.drag(parentpos(MapWnd.this, ev.c));
 				return(true);
 			}
-			return(super.mousedown(c, button));
+			return(super.mousedown(ev));
 		}
 	}, Coord.z);
 	toolbarTop.add(new ICheckBox("gfx/hud/mmap/viewrange", "", "-d", "-h", "-dh") {
@@ -887,23 +887,23 @@ public class MapWnd extends Window implements Console.Directory {
     protected Deco makedeco() {
 	return(new DefaultDeco(true){
 		@Override
-		public boolean mouseup(Coord c, int button) {
+		public boolean mouseup(MouseUpEvent ev) {
 			fixAndSavePos(compact);
 			compact(compact);
-			if((button == 1) && (szdrag != null)) {
+			if((ev.b == 1) && (szdrag != null)) {
 				szdrag.remove();
 				szdrag = null;
 				return(true);
 			}
-			return(super.mouseup(c, button));
+			return(super.mouseup(ev));
 		}
 	}.dragsize(true));
     }
 
-	public boolean mouseup(Coord c, int button) {
+	public boolean mouseup(MouseUpEvent ev) {
 		fixAndSavePos(compact);
 		compact(compact);
-		return(super.mouseup(c, button));
+		return(super.mouseup(ev));
 	}
 
     public void markobj(long gobid, long oid, Indir<Resource> resid, String nm) {

@@ -90,29 +90,29 @@ public class FlowerMenuAutoSelectManagerWindow extends Window {
         }
 
         @Override
-        public boolean mousewheel(Coord c, int amount) {
-            sb.ch(amount);
+        public boolean mousewheel(MouseWheelEvent ev) {
+            sb.ch(ev.a);
             return true;
         }
 
         @Override
-        public boolean mousedown(Coord c, int button) {
-            int row = c.y / rowHeight + sb.val;
+        public boolean mousedown(MouseDownEvent ev) {
+            int row = ev.c.y / rowHeight + sb.val;
             if(row >= items.size())
-                return super.mousedown(c, button);
-            if(items.get(row).mousedown(c.sub(UI.scale(15), c.y / rowHeight * rowHeight), button))
+                return super.mousedown(ev);
+            if(items.get(row).mousedown(new MouseDownEvent(ev.c.sub(UI.scale(15), ev.c.y / rowHeight * rowHeight), ev.b)))
                 return true;
-            return super.mousedown(c, button);
+            return super.mousedown(ev);
         }
 
         @Override
-        public boolean mouseup(Coord c, int button) {
-            int row = c.y / rowHeight + sb.val;
+        public boolean mouseup(MouseUpEvent ev) {
+            int row = ev.c.y / rowHeight + sb.val;
             if(row >= items.size())
-                return super.mouseup(c, button);
-            if(items.get(row).mouseup(c.sub(UI.scale(15), c.y / rowHeight * rowHeight), button))
+                return super.mouseup(ev);
+            if(items.get(row).mouseup(new MouseUpEvent(ev.c.sub(UI.scale(15), ev.c.y / rowHeight * rowHeight), ev.b)))
                 return true;
-            return super.mouseup(c, button);
+            return super.mouseup(ev);
         }
 
         @Override
@@ -152,16 +152,16 @@ public class FlowerMenuAutoSelectManagerWindow extends Window {
         }
 
         @Override
-        public void mousemove(Coord c) {
-            if(c.x > 470)
-                super.mousemove(c.sub(UI.scale(15), 0));
+        public void mousemove(MouseMoveEvent ev) {
+            if(ev.c.x > 470)
+                super.mousemove(new MouseMoveEvent(ev.c.sub(UI.scale(15), 0)));
             else
-                super.mousemove(c);
+                super.mousemove(ev);
         }
 
         @Override
-        public boolean mousedown(Coord c, int button) {
-            if(super.mousedown(c, button))
+        public boolean mousedown(MouseDownEvent ev) {
+            if(super.mousedown(ev))
                 return true;
             return false;
         }

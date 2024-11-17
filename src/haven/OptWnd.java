@@ -3179,14 +3179,14 @@ public class OptWnd extends Window {
 			}, prev.pos("ur").adds(6,3));
 			prev = add(new Button(UI.scale(70), "Preview") {
 				@Override
-				public boolean mousedown(Coord c, int button) {
-					if(button != 1)
+				public boolean mousedown(MouseDownEvent ev) {
+					if(ev.b != 1)
 						return true;
 					File file = new File("AlarmSounds/" + whitePlayerAlarmFilename.buf.line() + ".wav");
 					if(!file.exists() || file.isDirectory()) {
 						if (ui != null && ui.gui != null)
 							ui.gui.msg("Error while playing an alarm, file " + file.getAbsolutePath() + " does not exist!", Color.WHITE);
-						return super.mousedown(c, button);
+						return super.mousedown(ev);
 					}
 					try {
 						AudioInputStream in = AudioSystem.getAudioInputStream(file);
@@ -3199,7 +3199,7 @@ public class OptWnd extends Window {
 					} catch(IOException e) {
 						e.printStackTrace();
 					}
-					return super.mousedown(c, button);
+					return super.mousedown(ev);
 				}
 			}, prev.pos("ur").adds(6,-5));
 
@@ -3226,14 +3226,14 @@ public class OptWnd extends Window {
 			}, prev.pos("ur").adds(6,3));
 			prev = add(new Button(UI.scale(70), "Preview") {
 				@Override
-				public boolean mousedown(Coord c, int button) {
-					if(button != 1)
+				public boolean mousedown(MouseDownEvent ev) {
+					if(ev.b != 1)
 						return true;
 					File file = new File("AlarmSounds/" + whiteVillageOrRealmPlayerAlarmFilename.buf.line() + ".wav");
 					if(!file.exists() || file.isDirectory()) {
 						if (ui != null && ui.gui != null)
 							ui.gui.msg("Error while playing an alarm, file " + file.getAbsolutePath() + " does not exist!", Color.WHITE);
-						return super.mousedown(c, button);
+						return super.mousedown(ev);
 					}
 					try {
 						AudioInputStream in = AudioSystem.getAudioInputStream(file);
@@ -3246,7 +3246,7 @@ public class OptWnd extends Window {
 					} catch(IOException e) {
 						e.printStackTrace();
 					}
-					return super.mousedown(c, button);
+					return super.mousedown(ev);
 				}
 			}, prev.pos("ur").adds(6,-5));
 
@@ -3274,14 +3274,14 @@ public class OptWnd extends Window {
 			}, prev.pos("ur").adds(6,3));
 			prev = add(new Button(UI.scale(70), "Preview") {
 				@Override
-				public boolean mousedown(Coord c, int button) {
-					if(button != 1)
+				public boolean mousedown(MouseDownEvent ev) {
+					if(ev.b != 1)
 						return true;
 					File file = new File("AlarmSounds/" + greenPlayerAlarmFilename.buf.line() + ".wav");
 					if(!file.exists() || file.isDirectory()) {
 						if (ui != null && ui.gui != null)
 							ui.gui.msg("Error while playing an alarm, file " + file.getAbsolutePath() + " does not exist!", Color.WHITE);
-						return super.mousedown(c, button);
+						return super.mousedown(ev);
 					}
 					try {
 						AudioInputStream in = AudioSystem.getAudioInputStream(file);
@@ -3294,7 +3294,7 @@ public class OptWnd extends Window {
 					} catch(IOException e) {
 						e.printStackTrace();
 					}
-					return super.mousedown(c, button);
+					return super.mousedown(ev);
 				}
 			}, prev.pos("ur").adds(6,-5));
 
@@ -3322,14 +3322,14 @@ public class OptWnd extends Window {
 			}, prev.pos("ur").adds(6,3));
 			prev = add(new Button(UI.scale(70), "Preview") {
 				@Override
-				public boolean mousedown(Coord c, int button) {
-					if(button != 1)
+				public boolean mousedown(MouseDownEvent ev) {
+					if(ev.b != 1)
 						return true;
 					File file = new File("AlarmSounds/" + redPlayerAlarmFilename.buf.line() + ".wav");
 					if(!file.exists() || file.isDirectory()) {
 						if (ui != null && ui.gui != null)
 							ui.gui.msg("Error while playing an alarm, file " + file.getAbsolutePath() + " does not exist!", Color.WHITE);
-						return super.mousedown(c, button);
+						return super.mousedown(ev);
 					}
 					try {
 						AudioInputStream in = AudioSystem.getAudioInputStream(file);
@@ -3342,7 +3342,7 @@ public class OptWnd extends Window {
 					} catch(IOException e) {
 						e.printStackTrace();
 					}
-					return super.mousedown(c, button);
+					return super.mousedown(ev);
 				}
 			}, prev.pos("ur").adds(6,-5));
 
@@ -3370,14 +3370,14 @@ public class OptWnd extends Window {
 			}, prev.pos("ur").adds(6,3));
 			prev = add(new Button(UI.scale(70), "Preview") {
 				@Override
-				public boolean mousedown(Coord c, int button) {
-					if(button != 1)
+				public boolean mousedown(MouseDownEvent ev) {
+					if(ev.b != 1)
 						return true;
 					File file = new File("AlarmSounds/" + bluePlayerAlarmFilename.buf.line() + ".wav");
 					if(!file.exists() || file.isDirectory()) {
 						if (ui != null && ui.gui != null)
 							ui.gui.msg("Error while playing an alarm, file " + file.getAbsolutePath() + " does not exist!", Color.WHITE);
-						return super.mousedown(c, button);
+						return super.mousedown(ev);
 					}
 					try {
 						AudioInputStream in = AudioSystem.getAudioInputStream(file);
@@ -3390,7 +3390,7 @@ public class OptWnd extends Window {
 					} catch(IOException e) {
 						e.printStackTrace();
 					}
-					return super.mousedown(c, button);
+					return super.mousedown(ev);
 				}
 			}, prev.pos("ur").adds(6,-5));
 
@@ -3418,14 +3418,14 @@ public class OptWnd extends Window {
 			}, prev.pos("ur").adds(6,3));
 			prev = add(new Button(UI.scale(70), "Preview") {
 				@Override
-				public boolean mousedown(Coord c, int button) {
-					if(button != 1)
+				public boolean mousedown(MouseDownEvent ev) {
+					if(ev.b != 1)
 						return true;
 					File file = new File("AlarmSounds/" + tealPlayerAlarmFilename.buf.line() + ".wav");
 					if(!file.exists() || file.isDirectory()) {
 						if (ui != null && ui.gui != null)
 							ui.gui.msg("Error while playing an alarm, file " + file.getAbsolutePath() + " does not exist!", Color.WHITE);
-						return super.mousedown(c, button);
+						return super.mousedown(ev);
 					}
 					try {
 						AudioInputStream in = AudioSystem.getAudioInputStream(file);
@@ -3438,7 +3438,7 @@ public class OptWnd extends Window {
 					} catch(IOException e) {
 						e.printStackTrace();
 					}
-					return super.mousedown(c, button);
+					return super.mousedown(ev);
 				}
 			}, prev.pos("ur").adds(6,-5));
 
@@ -3466,14 +3466,14 @@ public class OptWnd extends Window {
 			}, prev.pos("ur").adds(6,3));
 			prev = add(new Button(UI.scale(70), "Preview") {
 				@Override
-				public boolean mousedown(Coord c, int button) {
-					if(button != 1)
+				public boolean mousedown(MouseDownEvent ev) {
+					if(ev.b != 1)
 						return true;
 					File file = new File("AlarmSounds/" + yellowPlayerAlarmFilename.buf.line() + ".wav");
 					if(!file.exists() || file.isDirectory()) {
 						if (ui != null && ui.gui != null)
 							ui.gui.msg("Error while playing an alarm, file " + file.getAbsolutePath() + " does not exist!", Color.WHITE);
-						return super.mousedown(c, button);
+						return super.mousedown(ev);
 					}
 					try {
 						AudioInputStream in = AudioSystem.getAudioInputStream(file);
@@ -3486,7 +3486,7 @@ public class OptWnd extends Window {
 					} catch(IOException e) {
 						e.printStackTrace();
 					}
-					return super.mousedown(c, button);
+					return super.mousedown(ev);
 				}
 			}, prev.pos("ur").adds(6,-5));
 
@@ -3514,14 +3514,14 @@ public class OptWnd extends Window {
 			}, prev.pos("ur").adds(6,3));
 			prev = add(new Button(UI.scale(70), "Preview") {
 				@Override
-				public boolean mousedown(Coord c, int button) {
-					if(button != 1)
+				public boolean mousedown(MouseDownEvent ev) {
+					if(ev.b != 1)
 						return true;
 					File file = new File("AlarmSounds/" + purplePlayerAlarmFilename.buf.line() + ".wav");
 					if(!file.exists() || file.isDirectory()) {
 						if (ui != null && ui.gui != null)
 							ui.gui.msg("Error while playing an alarm, file " + file.getAbsolutePath() + " does not exist!", Color.WHITE);
-						return super.mousedown(c, button);
+						return super.mousedown(ev);
 					}
 					try {
 						AudioInputStream in = AudioSystem.getAudioInputStream(file);
@@ -3534,7 +3534,7 @@ public class OptWnd extends Window {
 					} catch(IOException e) {
 						e.printStackTrace();
 					}
-					return super.mousedown(c, button);
+					return super.mousedown(ev);
 				}
 			}, prev.pos("ur").adds(6,-5));
 
@@ -3562,14 +3562,14 @@ public class OptWnd extends Window {
 			}, prev.pos("ur").adds(6,3));
 			prev = add(new Button(UI.scale(70), "Preview") {
 				@Override
-				public boolean mousedown(Coord c, int button) {
-					if(button != 1)
+				public boolean mousedown(MouseDownEvent ev) {
+					if(ev.b != 1)
 						return true;
 					File file = new File("AlarmSounds/" + orangePlayerAlarmFilename.buf.line() + ".wav");
 					if(!file.exists() || file.isDirectory()) {
 						if (ui != null && ui.gui != null)
 							ui.gui.msg("Error while playing an alarm, file " + file.getAbsolutePath() + " does not exist!", Color.WHITE);
-						return super.mousedown(c, button);
+						return super.mousedown(ev);
 					}
 					try {
 						AudioInputStream in = AudioSystem.getAudioInputStream(file);
@@ -3582,7 +3582,7 @@ public class OptWnd extends Window {
 					} catch(IOException e) {
 						e.printStackTrace();
 					}
-					return super.mousedown(c, button);
+					return super.mousedown(ev);
 				}
 			}, prev.pos("ur").adds(6,-5));
 
@@ -3613,14 +3613,14 @@ public class OptWnd extends Window {
 			}, prev.pos("ur").adds(6,3));
 			prev = add(new Button(UI.scale(70), "Preview") {
 				@Override
-				public boolean mousedown(Coord c, int button) {
-					if(button != 1)
+				public boolean mousedown(MouseDownEvent ev) {
+					if(ev.b != 1)
 						return true;
 					File file = new File("AlarmSounds/" + combatStartSoundFilename.buf.line() + ".wav");
 					if(!file.exists() || file.isDirectory()) {
 						if (ui != null && ui.gui != null)
 							ui.gui.msg("Error while playing an alarm, file " + file.getAbsolutePath() + " does not exist!", Color.WHITE);
-						return super.mousedown(c, button);
+						return super.mousedown(ev);
 					}
 					try {
 						AudioInputStream in = AudioSystem.getAudioInputStream(file);
@@ -3633,7 +3633,7 @@ public class OptWnd extends Window {
 					} catch(IOException e) {
 						e.printStackTrace();
 					}
-					return super.mousedown(c, button);
+					return super.mousedown(ev);
 
 				}
 			}, prev.pos("ur").adds(6,-5));
@@ -3661,14 +3661,14 @@ public class OptWnd extends Window {
 			}, prev.pos("ur").adds(6,3));
 			prev = add(new Button(UI.scale(70), "Preview") {
 				@Override
-				public boolean mousedown(Coord c, int button) {
-					if(button != 1)
+				public boolean mousedown(MouseDownEvent ev) {
+					if(ev.b != 1)
 						return true;
 					File file = new File("AlarmSounds/" + cleaveSoundFilename.buf.line() + ".wav");
 					if(!file.exists() || file.isDirectory()) {
 						if (ui != null && ui.gui != null)
 							ui.gui.msg("Error while playing an alarm, file " + file.getAbsolutePath() + " does not exist!", Color.WHITE);
-						return super.mousedown(c, button);
+						return super.mousedown(ev);
 					}
 					try {
 						AudioInputStream in = AudioSystem.getAudioInputStream(file);
@@ -3681,7 +3681,7 @@ public class OptWnd extends Window {
 					} catch(IOException e) {
 						e.printStackTrace();
 					}
-					return super.mousedown(c, button);
+					return super.mousedown(ev);
 
 				}
 			}, prev.pos("ur").adds(6,-5));
@@ -3709,14 +3709,14 @@ public class OptWnd extends Window {
 			}, prev.pos("ur").adds(6,3));
 			prev = add(new Button(UI.scale(70), "Preview") {
 				@Override
-				public boolean mousedown(Coord c, int button) {
-					if(button != 1)
+				public boolean mousedown(MouseDownEvent ev) {
+					if(ev.b != 1)
 						return true;
 					File file = new File("AlarmSounds/" + opkSoundFilename.buf.line() + ".wav");
 					if(!file.exists() || file.isDirectory()) {
 						if (ui != null && ui.gui != null)
 							ui.gui.msg("Error while playing an alarm, file " + file.getAbsolutePath() + " does not exist!", Color.WHITE);
-						return super.mousedown(c, button);
+						return super.mousedown(ev);
 					}
 					try {
 						AudioInputStream in = AudioSystem.getAudioInputStream(file);
@@ -3729,7 +3729,7 @@ public class OptWnd extends Window {
 					} catch(IOException e) {
 						e.printStackTrace();
 					}
-					return super.mousedown(c, button);
+					return super.mousedown(ev);
 
 				}
 			}, prev.pos("ur").adds(6,-5));
@@ -3757,14 +3757,14 @@ public class OptWnd extends Window {
 			}, prev.pos("ur").adds(6,3));
 			prev = add(new Button(UI.scale(70), "Preview") {
 				@Override
-				public boolean mousedown(Coord c, int button) {
-					if(button != 1)
+				public boolean mousedown(MouseDownEvent ev) {
+					if(ev.b != 1)
 						return true;
 					File file = new File("AlarmSounds/" + ponyPowerSoundFilename.buf.line() + ".wav");
 					if(!file.exists() || file.isDirectory()) {
 						if (ui != null && ui.gui != null)
 							ui.gui.msg("Error while playing an alarm, file " + file.getAbsolutePath() + " does not exist!", Color.WHITE);
-						return super.mousedown(c, button);
+						return super.mousedown(ev);
 					}
 					try {
 						AudioInputStream in = AudioSystem.getAudioInputStream(file);
@@ -3777,7 +3777,7 @@ public class OptWnd extends Window {
 					} catch(IOException e) {
 						e.printStackTrace();
 					}
-					return super.mousedown(c, button);
+					return super.mousedown(ev);
 				}
 			}, prev.pos("ur").adds(6,-5));
 
@@ -3804,14 +3804,14 @@ public class OptWnd extends Window {
 			}, prev.pos("ur").adds(6,3));
 			prev = add(new Button(UI.scale(70), "Preview") {
 				@Override
-				public boolean mousedown(Coord c, int button) {
-					if(button != 1)
+				public boolean mousedown(MouseDownEvent ev) {
+					if(ev.b != 1)
 						return true;
 					File file = new File("AlarmSounds/" + lowEnergySoundFilename.buf.line() + ".wav");
 					if(!file.exists() || file.isDirectory()) {
 						if (ui != null && ui.gui != null)
 							ui.gui.msg("Error while playing an alarm, file " + file.getAbsolutePath() + " does not exist!", Color.WHITE);
-						return super.mousedown(c, button);
+						return super.mousedown(ev);
 					}
 					try {
 						AudioInputStream in = AudioSystem.getAudioInputStream(file);
@@ -3824,7 +3824,7 @@ public class OptWnd extends Window {
 					} catch(IOException e) {
 						e.printStackTrace();
 					}
-					return super.mousedown(c, button);
+					return super.mousedown(ev);
 				}
 			}, prev.pos("ur").adds(6,-5));
 
