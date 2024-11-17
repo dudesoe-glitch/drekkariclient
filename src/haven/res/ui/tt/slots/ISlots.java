@@ -145,7 +145,9 @@ public class ISlots extends ItemInfo.Tip implements GItem.NumberInfo {
     }
 
 	public static BufferedImage longtip(List<ItemInfo> info) { // ND: Added this here to overwrite method from ItemInfo and prevent an extra text stroke on contents tooltip
-		Layout l = new Layout();
+		if(info.isEmpty())
+			return(null);
+		Layout l = new Layout(info.get(0).owner);
 		for(ItemInfo ii : info) {
 			if(ii instanceof Tip) {
 				Tip tip = (Tip)ii;

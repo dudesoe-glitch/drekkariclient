@@ -54,10 +54,8 @@ public class BAttrWnd extends Widget {
 	}
     }
 
-    public static class Attr extends Widget {
-	public final String nm;
+    public static class Attr extends CharWnd.AttrWdg {
 	public final Tex rnm;
-	public final Glob.CAttr attr;
 	public final Tex img;
 	public final Color bg;
 	private double lvlt = 0.0;
@@ -68,12 +66,10 @@ public class BAttrWnd extends Widget {
 	private Tex baseStatTex = null;
 
 	private Attr(Glob glob, String attr, Color bg) {
-	    super(new Coord(attrw, attrf.height() + UI.scale(2)));
-	    res = Resource.local().loadwait("gfx/hud/chr/" + attr);
-	    this.nm = attr;
-	    this.rnm = PUtils.strokeTex(attrf.render(res.layer(Resource.tooltip).t));
+	    super(Coord.of(attrw, attrf.height() + UI.scale(2)), glob, attr);
+	    res = Loading.waitfor(this.attr.res());
+	    this.rnm = PUtils.strokeTex(attrf.render(res.flayer(Resource.tooltip).t));
 	    this.img = new TexI(convolve(res.flayer(Resource.imgc).img, new Coord(this.sz.y, this.sz.y), iconfilter));
-	    this.attr = glob.getcattr(attr);
 	    this.bg = bg;
 	}
 
@@ -81,10 +77,8 @@ public class BAttrWnd extends Widget {
 	    if((attr.base != cbv) || (attr.comp != ccv)) {
 		cbv = attr.base; ccv = attr.comp;
 		if(ccv > cbv) {
-		    tooltip = String.format("%d + %d", cbv, ccv - cbv);
 			totalStatTex = PUtils.strokeTex(attrf.render(Integer.toString(ccv), buff));
 		} else if(ccv < cbv) {
-		    tooltip = String.format("%d - %d", cbv, cbv - ccv);
 			totalStatTex = PUtils.strokeTex(attrf.render(Integer.toString(ccv), debuff));
 		} else {
 			tooltip = null;

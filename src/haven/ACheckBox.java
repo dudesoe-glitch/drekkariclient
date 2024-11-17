@@ -64,7 +64,7 @@ public abstract class ACheckBox extends Widget {
     public ACheckBox rclick(Runnable rclick) {this.rclick = rclick; return(this);}
     public void rclick() {if(rclick != null) {rclick.run();}}
 
-    public boolean gkeytype(java.awt.event.KeyEvent ev) {
+    public boolean gkeytype(GlobKeyEvent ev) {
 	click();
 	return(true);
     }

@@ -286,9 +286,9 @@ public class WItem extends Widget implements DTarget {
 	}
     }
 
-    public boolean mousedown(Coord c, int btn) {
+    public boolean mousedown(MouseDownEvent ev) {
 	boolean inv = parent instanceof Inventory;
-	if(btn == 1) {
+	if(ev.b == 1) {
 		if (OptWnd.useImprovedInventoryTransferControlsCheckBox.a && ui.modmeta && !ui.modctrl) {
 			if (inv) {
 				wdgmsg("transfer-ordered", item, false);
@@ -297,15 +297,15 @@ public class WItem extends Widget implements DTarget {
 		}
 	    if(ui.modshift) {
 		int n = ui.modctrl ? -1 : 1;
-		item.wdgmsg("transfer", c, n);
+		item.wdgmsg("transfer", ev.c, n);
 	    } else if(ui.modctrl) {
 		int n = ui.modmeta ? -1 : 1;
-		item.wdgmsg("drop", c, n);
+		item.wdgmsg("drop", ev.c, n);
 	    } else {
-		item.wdgmsg("take", c);
+		item.wdgmsg("take", ev.c);
 	    }
 	    return(true);
-	} else if(btn == 3) {
+	} else if(ev.b == 3) {
 		if (OptWnd.useImprovedInventoryTransferControlsCheckBox.a && ui.modmeta && !ui.modctrl) {
 			if (inv) {
 				wdgmsg("transfer-ordered", item, true);
@@ -318,7 +318,7 @@ public class WItem extends Widget implements DTarget {
 			if (itemname.equals("Head of Lettuce")) { // ND: Don't eat it, rather split it.
 				option = 1;
 			}
-			item.wdgmsg("iact", c, ui.modflags());
+			item.wdgmsg("iact", ev.c, ui.modflags());
 			ui.rcvr.rcvmsg(ui.lastWidgetID + 1, "cl", option, 0);
 		}
 		if(ui.modctrl && ui.modshift && OptWnd.autoRepeatFlowerMenuCheckBox.a){
@@ -334,10 +334,10 @@ public class WItem extends Widget implements DTarget {
 				}
 			} catch (Loading ignored){}
 		}
-	    item.wdgmsg("iact", c, ui.modflags());
+	    item.wdgmsg("iact", ev.c, ui.modflags());
 	    return(true);
 	}
-	return(false);
+	return(super.mousedown(ev));
     }
 
     public boolean drop(Coord cc, Coord ul) {
@@ -349,13 +349,12 @@ public class WItem extends Widget implements DTarget {
 	return(true);
     }
 
-    public boolean mousehover(Coord c, boolean on) {
-	boolean ret = super.mousehover(c, on);
+    public boolean mousehover(MouseHoverEvent ev, boolean on) {
 	if(on && (item.contents != null && (!OptWnd.showHoverInventoriesWhenHoldingShiftCheckBox.a || ui.modshift))) {
 	    item.hovering(this);
 	    return(true);
 	}
-	return(ret);
+	return(super.mousehover(ev, on));
     }
 
 	public Window parentWindow() {

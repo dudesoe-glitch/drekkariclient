@@ -48,60 +48,37 @@ public class ItemDrag extends WItem {
 	g.chcolor();
     }
 
-    public boolean dropon(Widget w, Coord c) {
-	if(w instanceof DTarget) {
-	    if(((DTarget)w).drop(c, c.add(doff.inv())))
-		return(true);
-	}
-	for(Widget wdg = w.lchild; wdg != null; wdg = wdg.prev) {
-	    if((wdg == this) || !wdg.visible())
-		continue;
-	    Coord cc = w.xlate(wdg.c, true);
-	    if(c.isect(cc, wdg.sz)) {
-		if(dropon(wdg, c.add(cc.inv())))
-		    return(true);
-	    }
-	}
-	return(false);
-    }
-	
-    public boolean interact(Widget w, Coord c) {
-	if(w instanceof DTarget) {
-	    if(((DTarget)w).iteminteract(c, c.add(doff.inv())))
-		return(true);
-	}
-	for(Widget wdg = w.lchild; wdg != null; wdg = wdg.prev) {
-	    if((wdg == this) || !wdg.visible())
-		continue;
-	    Coord cc = w.xlate(wdg.c, true);
-	    if(c.isect(cc, wdg.sz)) {
-		if(interact(wdg, c.add(cc.inv())))
-		    return(true);
-	    }
-	}
-	return(false);
-    }
-	
-    public boolean mousedown(Coord c, int button) {
+    public boolean mousedown(MouseDownEvent ev) {
+	if(!ev.grabbed)
+	    return(false);
 	if(OptWnd.overrideCursorItemWhenHoldingAltCheckBox.a && ui.modmeta) {
-		if(button == 1) {
-			interact(parent, c.add(this.c));
-			return(ui.gui.map.mousedown(ui.gui.map.rootxlate(c.add(rootpos())), button));
-		} else if(button == 3) {
-			interact(parent, c.add(this.c));
-			return(ui.gui.map.mousedown(ui.gui.map.rootxlate(c.add(rootpos())), button));
+		if(ev.b == 1) {
+			if(ui.dispatchq(parent, new Interact(ev.c.add(this.c), this)).handled)
+				return(true);
+			else
+				return (ui.gui.map.mousedown(ui.gui.map.rootxlate(ev.c.add(rootpos())), ev.b));
+		} else if(ev.b == 3) {
+			if(ui.dispatchq(parent, new Interact(ev.c.add(this.c), this)).handled)
+				return(true);
+			else
+				return (ui.gui.map.mousedown(ui.gui.map.rootxlate(ev.c.add(rootpos())), ev.b));
 		}
 	} else if (OptWnd.noCursorItemDroppingAnywhereCheckBox.a && !ui.modmeta){
-		if(button == 1) {
-			if (dropOnWidget(parent, c.add(this.c))) {
-				return(true);
-			} else
-				return(ui.gui.map.mousedown(ui.gui.map.rootxlate(c.add(rootpos())), button));
+		if(ev.b == 1) {
+			if (parent instanceof Window || parent instanceof QuickSlotsWdg) {
+				if(ui.dispatchq(parent, new Drop(ev.c.add(this.c), this)).handled)
+					return(true);
+				else
+					return (ui.gui.map.mousedown(ui.gui.map.rootxlate(ev.c.add(rootpos())), ev.b));
+			}
 		}
 	} else if (OptWnd.noCursorItemDroppingInWaterCheckBox.a && !ui.modmeta){
-		if(button == 1) {
-			if (dropOnWidget(parent, c.add(this.c))) {
-				return (true);
+		if(ev.b == 1) {
+			if (parent instanceof Window || parent instanceof QuickSlotsWdg) {
+				if(ui.dispatchq(parent, new Drop(ev.c.add(this.c), this)).handled)
+					return(true);
+				else
+					return (ui.gui.map.mousedown(ui.gui.map.rootxlate(ev.c.add(rootpos())), ev.b));
 			} else if (ui.gui.map.player() != null) {
 				int t = ui.gui.map.glob.map.gettile(ui.gui.map.player().rc.floor(tilesz));
 				Resource res = ui.gui.map.glob.map.tilesetr(t);
@@ -111,42 +88,23 @@ public class ItemDrag extends WItem {
 								|| res.name.equals("gfx/tiles/owater")
 								|| res.name.equals("gfx/tiles/odeep")
 								|| res.name.equals("gfx/tiles/odeeper"))) {
-					return (ui.gui.map.mousedown(ui.gui.map.rootxlate(c.add(rootpos())), button));
+					return (ui.gui.map.mousedown(ui.gui.map.rootxlate(ev.c.add(rootpos())), ev.b));
 				}
 			}
 		}
 	}
-	if(button == 1) {
-	    dropon(parent, c.add(this.c));
-	    return(true);
-	} else if(button == 3) {
-	    interact(parent, c.add(this.c));
-	    return(true);
+	if(ev.b == 1) {
+	    if(ui.dispatchq(parent, new Drop(ev.c.add(this.c), this)).handled)
+		return(true);
+	} else if(ev.b == 3) {
+	    if(ui.dispatchq(parent, new Interact(ev.c.add(this.c), this)).handled)
+		return(true);
 	}
 	return(false);
     }
 
-    public void mousemove(Coord c) {
-	this.c = this.c.add(c.add(doff.inv()));
+    public void mousemove(MouseMoveEvent ev) {
+	this.c = this.c.add(ev.c.sub(doff));
     }
-
-	public boolean dropOnWidget(Widget w, Coord c) {
-		if(w instanceof DTarget) {
-			if(((DTarget)w).drop(c, c.add(doff.inv())))
-				return(true);
-		}
-		for(Widget wdg = w.lchild; wdg != null; wdg = wdg.prev) {
-			if((wdg == this) || !wdg.visible())
-				continue;
-			Coord cc = w.xlate(wdg.c, true);
-			if (wdg instanceof Window || wdg instanceof QuickSlotsWdg) {
-				if (c.isect(cc, wdg.sz)) {
-					if (dropon(wdg, c.add(cc.inv())))
-						return (true);
-				}
-			}
-		}
-		return(false);
-	}
 
 }

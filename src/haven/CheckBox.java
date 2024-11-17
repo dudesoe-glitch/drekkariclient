@@ -92,12 +92,12 @@ public class CheckBox extends ACheckBox {
             g.image(mark, Coord.z.add(0, (sz.y - mark.sz().y) / 2));
         super.draw(g);
     }
-    public boolean mousedown(Coord c, int button) {
-	if(button == 1) {
+    public boolean mousedown(MouseDownEvent ev) {
+	if(ev.b == 1) {
 	    click();
 	    return(true);
 	}
-	return(super.mousedown(c, button));
+	return(super.mousedown(ev));
     }
 
 	public void setTextColor(String text, Color color){

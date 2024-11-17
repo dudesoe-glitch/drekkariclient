@@ -52,10 +52,8 @@ public class SAttrWnd extends Widget {
 	}
     }
 
-    public class SAttr extends Widget {
-	public final String nm;
+    public class SAttr extends CharWnd.AttrWdg {
 	public final Tex rnm;
-	public final Glob.CAttr attr;
 	public final Tex img;
 	public final Color bg;
 	public int tbv, tcv;
@@ -68,12 +66,10 @@ public class SAttrWnd extends Widget {
 	private Tex buffedTex = null;
 
 	private SAttr(Glob glob, String attr, Color bg) {
-	    super(new Coord(attrw, attrf.height() + UI.scale(2)));
-	    res = Resource.local().loadwait("gfx/hud/chr/" + attr);
-	    this.nm = attr;
+	    super(Coord.of(attrw, attrf.height() + UI.scale(2)), glob, attr);
+	    res = Loading.waitfor(this.attr.res());
 	    this.img = new TexI(convolve(res.flayer(Resource.imgc).img, new Coord(this.sz.y, this.sz.y), iconfilter));
 	    this.rnm = changedSAttrNameTex(res.flayer(Resource.tooltip).t);
-	    this.attr = glob.getcattr(attr);
 	    this.bg = bg;
 	    add = adda(new IButton("gfx/hud/buttons/add", "u", "d", "h").action(() -> adj(1)),
 		       sz.x, sz.y / 2, 1, 0.5);
@@ -96,17 +92,17 @@ public class SAttrWnd extends Widget {
 			} else {
 				buffedTex = PUtils.strokeTex(attrf.render(Integer.toString(ccv), buff));
 			}
-		    tooltip = String.format("%d + %d", cbv, ccv - cbv);
+//		    tooltip = String.format("%d + %d", cbv, ccv - cbv);
 		} else if (ccv < cbv) {
 			if (tbv > cbv) {
 				buffedTex = PUtils.strokeTex(attrf.render(Integer.toString(ccv + (tbv - cbv)), tbuff));
 			} else {
 				buffedTex = PUtils.strokeTex(attrf.render(Integer.toString(ccv), debuff));
 			}
-		    tooltip = String.format("%d - %d", cbv, cbv - ccv);
+//		    tooltip = String.format("%d - %d", cbv, cbv - ccv);
 		} else {
 			buffedTex = null;
-		    tooltip = null;
+//		    tooltip = null;
 		}
 		if (tbv > cbv) {
 			baseTex = PUtils.strokeTex(attrf.render(Integer.toString(tbv), tbuff));
@@ -152,8 +148,8 @@ public class SAttrWnd extends Widget {
 	    updcost();
 	}
 
-	public boolean mousewheel(Coord c, int a) {
-	    adj(-a);
+	public boolean mousewheel(MouseWheelEvent ev) {
+	    adj(-ev.a);
 	    return(true);
 	}
 
