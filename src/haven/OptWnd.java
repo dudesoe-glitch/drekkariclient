@@ -2342,7 +2342,7 @@ public class OptWnd extends Window {
 				}
 			}, prev.pos("ur").adds(10, 0));
 
-			prev = add(enableQueuedMovementCheckBox = new CheckBox("Enable Queued Movement - Checkpoint Route Window"){
+			prev = add(enableQueuedMovementCheckBox = new CheckBox("Enable Queued Movement Window (Alt+Click)"){
 				{a = Utils.getprefb("enableQueuedMovement", true);}
 				public void set(boolean val) {
 					Utils.setprefb("enableQueuedMovement", val);
