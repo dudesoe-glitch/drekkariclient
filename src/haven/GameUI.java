@@ -2377,7 +2377,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 			super.draw(g);
 		}
 
-		public boolean globtype(char key, KeyEvent ev) {
+		public boolean globtype(GlobKeyEvent ev) {
 			if (this.visible()) {
 				for (int i = 0; i < beltkeys.length; i++) {
 					if (beltkeys[i].key().match(ev)) {
@@ -2435,32 +2435,32 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 		}
 
 		@Override
-		public boolean mousedown(Coord c, int button) {
-			if (button == 2) {
+		public boolean mousedown(MouseDownEvent ev) {
+			if (ev.b == 2) {
 				if((dragging != null)) { // ND: I need to do this extra check and remove it in case you do another click before the mouseup. Idk why it has to be done like this, but it solves the issue.
 					dragging.remove();
 					dragging = null;
 				}
 				dragging = ui.grabmouse(this);
-				dc = c;
+				dc = ev.c;
 				return true;
 			}
-			int slot = beltslot(c);
+			int slot = beltslot(ev.c);
 			if (slot != -1) {
-				if (button == 1) {
+				if (ev.b == 1) {
 					use(slot);
-				} else if (button == 3) {
+				} else if (ev.b == 3) {
 					GameUI.this.wdgmsg("setbelt", slot, null);
 					belt[slot] = null;
 					saveLocally();
 				}
 				return(true);
 			}
-			return(super.mousedown(c, button));
+			return(super.mousedown(ev));
 		}
 
 		@Override
-		public boolean mouseup(Coord c, int button) {
+		public boolean mouseup(MouseUpEvent ev) {
 			checkIfOutsideOfUI(); // ND: Prevent the widget from being dragged outside the current window size
 			if((dragging != null)) {
 				dragging.remove();
@@ -2468,16 +2468,16 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 				Utils.setprefc("wndc-actionBar" + barNumber, this.c);
 				return true;
 			}
-			return super.mouseup(c, button);
+			return super.mouseup(ev);
 		}
 
 		@Override
-		public void mousemove(Coord c) {
+		public void mousemove(MouseMoveEvent ev) {
 			if (dragging != null) {
-				this.c = this.c.add(c.x, c.y).sub(dc);
+				this.c = this.c.add(ev.c.x, ev.c.y).sub(dc);
 				return;
 			}
-			super.mousemove(c);
+			super.mousemove(ev);
 		}
 
 		private void use(int slot) {

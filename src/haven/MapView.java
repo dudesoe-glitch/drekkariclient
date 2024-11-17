@@ -2275,7 +2275,7 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
 				modflags = modflags + 2;
 			}
 		}
-		wdgmsg("place", placing.rc.floor(posres), (int)Math.round(placing.a * 32768 / Math.PI), ev.b, ui.modflags());
+		wdgmsg("place", placing.rc.floor(posres), (int)Math.round(placing.a * 32768 / Math.PI), ev.b, modflags);
 		}
 	} else if((grab != null) && grab.mmousedown(ev.c, ev.b)) {
 	} else {

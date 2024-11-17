@@ -5,6 +5,7 @@ import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import java.awt.*;
 import java.io.File;
+import java.util.Arrays;
 
 public class StudyInventory extends Inventory {
     private Tex[] histtex = null;
@@ -181,13 +182,8 @@ public class StudyInventory extends Inventory {
     }
 
     @Override
-    public boolean mousedown(Coord c, int button) {
-        return OptWnd.lockStudyReportCheckBox.a ? false : super.mousedown(c, button);
-    }
-
-    @Override
     public void wdgmsg(Widget sender, String msg, Object... args) {
-        if (OptWnd.lockStudyReportCheckBox.a && msg.equals("invxf")) {
+        if (OptWnd.lockStudyReportCheckBox.a && (msg.equals("invxf") || msg.equals("take") || msg.equals("transfer") || (msg.equals("drop") && args.length > 1))) {
             return;
         } else if (OptWnd.lockStudyReportCheckBox.a && msg.equals("drop")) {
             Coord c = (Coord) args[0];
