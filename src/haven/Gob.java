@@ -1223,7 +1223,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 
 	public void updPose(HashSet<String> poses) {
 		isComposite = true;
-		knocked = (poses.contains("knock") || poses.contains("dead") || poses.contains("waterdead") || poses.contains("chicken-knock"));
+		knocked = (poses.contains("knock") || poses.contains("dead") || poses.contains("deadskeletonpose") || poses.contains("waterdead") || poses.contains("chicken-knock"));
 		if (this.getres().name.equals("gfx/borka/body"))
 			isMannequin = (poses.contains("mannequinlift"));
 		updateCritterAuras();
