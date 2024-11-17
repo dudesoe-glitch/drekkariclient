@@ -2298,11 +2298,11 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
 	    }
 	}  else if (ui.modshift && ui.modctrl) {
 		long now = System.currentTimeMillis();
-		if ((now - lastmmhittest > 500 || lasthittestc.dist(c) > tilesz.x) && ui.gui.hand.isEmpty()) {
+		if ((now - lastmmhittest > 500 || lasthittestc.dist(ev.c) > tilesz.x) && ui.gui.hand.isEmpty()) {
 			lastmmhittest = now;
-			lasthittestc = c;
+			lasthittestc = ev.c;
 
-			delayB(new Hittest(c) {
+			delayB(new Hittest(ev.c) {
 				@Override
 				protected void hit(Coord pc, Coord2d mc, ClickData inf) {
 					if (inf != null) {

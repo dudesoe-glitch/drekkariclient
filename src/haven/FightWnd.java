@@ -554,7 +554,7 @@ public class FightWnd extends Widget {
 	}
 
 	public void mousemove(MouseMoveEvent ev) {
-	    super.mousemove(ev.c);
+	    super.mousemove(ev);
 	    if(drag != null && dp != null) {
 		if(ev.c.dist(dp) > 5)
 		    dp = null;

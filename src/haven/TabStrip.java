@@ -198,8 +198,8 @@ public class TabStrip<T> extends Widget {
 	}
 
 	@Override
-	public boolean mousedown(Coord c, int button) {
-	    if(button == 1) {
+	public boolean mousedown(MouseDownEvent ev) {
+	    if(ev.b == 1) {
 		click();
 		return true;
 	    }
