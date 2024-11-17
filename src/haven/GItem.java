@@ -594,6 +594,10 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 	private void checkAutoDropItem() {
 		if (!checkedAutodrop) {
 			if (AutoDropManagerWindow.autoDropItemsCheckBox.a) {
+				if(!AutoDropManagerWindow.includeOtherContainerInventoriesCheckBox.a && this.parent != ui.gui.maininv) {
+					checkedAutodrop = true;
+					return;
+				}
 				String itemBaseName = this.resource().basename();
 				double quality = 0.0;
 				if(this.rawinfo != null){
