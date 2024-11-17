@@ -132,10 +132,11 @@ public class FlowerMenuAutoSelectManagerWindow extends Window {
     public static class PetalItem extends Widget {
 
         public String name;
+        public CheckBox checkBox;
 
         public PetalItem(String name, boolean value) {
             this.name = name;
-            add(new CheckBox(name) {
+            add(checkBox = new CheckBox(name) {
                 {
                     a = value;
                 }
@@ -161,6 +162,7 @@ public class FlowerMenuAutoSelectManagerWindow extends Window {
 
         @Override
         public boolean mousedown(MouseDownEvent ev) {
+            checkBox.click();
             if(super.mousedown(ev))
                 return true;
             return false;

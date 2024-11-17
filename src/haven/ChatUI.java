@@ -1742,11 +1742,11 @@ public class ChatUI extends Widget {
 	super.mousemove(ev);
         if(dm != null) {
             if (resizing.equals("both")) {
-                resize(Math.max(UI.scale(410), Math.min(parent.sz.x - UI.scale(226), c.x + UI.scale(5))), Math.max(UI.scale(minh), Math.min(parent.sz.y - UI.scale(120), sz.y + UI.scale(5) - c.y)));
+                resize(Math.max(UI.scale(410), Math.min(parent.sz.x - UI.scale(226), ev.c.x + UI.scale(5))), Math.max(UI.scale(minh), Math.min(parent.sz.y - UI.scale(120), sz.y + UI.scale(5) - ev.c.y)));
             } else if (resizing.equals("horizontally")) {
-                resize(Math.max(UI.scale(410), Math.min(parent.sz.x - UI.scale(226), c.x + UI.scale(5))), sz.y);
+                resize(Math.max(UI.scale(410), Math.min(parent.sz.x - UI.scale(226), ev.c.x + UI.scale(5))), sz.y);
             } else if (resizing.equals("vertically")) {
-                resize(sz.x, Math.max(UI.scale(minh), Math.min(parent.sz.y - UI.scale(120), sz.y + UI.scale(5) - c.y)));
+                resize(sz.x, Math.max(UI.scale(minh), Math.min(parent.sz.y - UI.scale(120), sz.y + UI.scale(5) - ev.c.y)));
             }
             if (GameUI.questObjectivesPanel != null){ // ND: IF IT EXISTS.
                 GameUI.questObjectivesPanel.presize(); // ND: move the quest objectives panel as we resize the chat

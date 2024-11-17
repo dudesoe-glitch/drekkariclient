@@ -579,7 +579,7 @@ public class FightWnd extends Widget {
 			}
 		}
 
-		s = cadd(c);
+		s = cadd(ev.c);
 		if (s >= 0) {
 			Action act = order[s];
 			if (act != null) {
@@ -593,7 +593,7 @@ public class FightWnd extends Widget {
 			d = null;
 			if (drag != null) {
 				if (dp == null)
-					DropTarget.dropthing(ui.root, c.add(rootpos()), drag);
+					DropTarget.dropthing(ui.root, ev.c.add(rootpos()), drag);
 				drag = null;
 			}
 			return true;
