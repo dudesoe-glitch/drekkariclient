@@ -2996,9 +2996,11 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
 		}
 		boolean safe = true;
 		if(MiningSafetyAssistant.preventMiningOutsideSupport){
-			Resource curs = ui.root.cursor.get();
-			if (curs != null && curs.name.equals("gfx/hud/curs/mine") && msg.equals("sel")) {
-				safe = MiningSafetyAssistant.isAreaInSupportRange((Coord) args[0], (Coord) args[1], ui.gui);
+			if (ui.root.cursor != null) {
+				Resource curs = ui.root.cursor.get();
+				if (curs != null && curs.name.equals("gfx/hud/curs/mine") && msg.equals("sel")) {
+					safe = MiningSafetyAssistant.isAreaInSupportRange((Coord) args[0], (Coord) args[1], ui.gui);
+				}
 			}
 		}
 		if(!safe){
