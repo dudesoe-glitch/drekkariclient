@@ -368,8 +368,8 @@ public class TileHighlight {
 		return (item.name.toLowerCase().contains(filter.toLowerCase()));
 	    }
 	    
-	    public boolean keydown(java.awt.event.KeyEvent ev) {
-		if(ev.getKeyCode() == java.awt.event.KeyEvent.VK_SPACE) {
+	    public boolean keydown(KeyDownEvent ev) {
+		if(ev.awt.getKeyCode() == java.awt.event.KeyEvent.VK_SPACE) {
 		    if(sel != null) {
 			toggle(sel.res);
 			Utils.setprefsa("savedHighlightedMapTiles_2", savedHighlightedMapTiles.toArray(new String[0]));

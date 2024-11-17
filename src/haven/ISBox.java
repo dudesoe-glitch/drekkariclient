@@ -243,10 +243,10 @@ public class ISBox extends Widget implements DTarget {
         }
 
         @Override
-        public boolean keydown(KeyEvent ev) {
-            int keyCode = ev.getKeyCode();
+        public boolean keydown(KeyDownEvent ev) {
+            int keyCode = ev.awt.getKeyCode();
             if(keyCode == 0){
-                keyCode = ev.getKeyChar();
+                keyCode = ev.awt.getKeyChar();
             }
             if (ALLOWED_KEYS.contains(keyCode)) {
                 return super.keydown(ev);

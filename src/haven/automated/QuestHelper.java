@@ -33,13 +33,13 @@ public class QuestHelper extends Window {
     }
 
     @Override
-    public boolean globtype(char key, java.awt.event.KeyEvent ev) {
-        if (key == 27) {
+    public boolean globtype(GlobKeyEvent ev) {
+        if (ev.awt.getKeyCode() == 27) {
             hide();
             disable();
             return true;
         }
-        return super.globtype(key, ev);
+        return super.globtype(ev);
     }
 
     public void addConds(List<QuestWnd.Quest.Condition> ncond, int id) {

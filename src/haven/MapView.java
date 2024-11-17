@@ -358,7 +358,7 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
 			}
 		}
 
-		public boolean keydown(KeyEvent ev) {
+		public boolean keydown(KeyDownEvent ev) {
 			if(kb_camSnapNorth.key().match(ev)) {
 				snapCamera("N");
 				return(true);

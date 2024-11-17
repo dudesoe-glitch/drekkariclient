@@ -1142,7 +1142,7 @@ public class MapWnd extends Window implements Console.Directory {
     }
 
 	@Override
-	public boolean keydown(java.awt.event.KeyEvent ev) { // ND: do this to override the escape key being able to close the window
+	public boolean keydown(KeyDownEvent ev) { // ND: do this to override the escape key being able to close the window
 		if(key_esc.match(ev)) {
 			return(false);
 		}

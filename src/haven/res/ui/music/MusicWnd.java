@@ -159,9 +159,9 @@ public class MusicWnd extends Window
 		}
 	}
 
-	public boolean keydown(final KeyEvent keyEvent) {
-		final double n = keyEvent.getWhen() / 1000.0 + this.latcomp;
-		final Integer n2 = MusicWnd.keys.get(keyEvent.getKeyCode());
+	public boolean keydown(KeyDownEvent ev) {
+		final double n = ev.awt.getWhen() / 1000.0 + this.latcomp;
+		final Integer n2 = MusicWnd.keys.get(ev.awt.getKeyCode());
 		if (n2 != null) {
 			int n3 = n2;
 			if (!this.cur[n3]) {
@@ -177,7 +177,7 @@ public class MusicWnd extends Window
 				this.act[this.actn++] = n3;
 			}
 		}
-		super.keydown(keyEvent);
+		super.keydown(ev);
 		return true;
 	}
 
@@ -198,9 +198,9 @@ public class MusicWnd extends Window
 		}
 	}
 
-	public boolean keyup(final KeyEvent keyEvent) {
-		final double n = keyEvent.getWhen() / 1000.0 + this.latcomp;
-		final Integer n2 = MusicWnd.keys.get(keyEvent.getKeyCode());
+	public boolean keyup(KeyUpEvent ev) {
+		final double n = ev.awt.getWhen() / 1000.0 + this.latcomp;
+		final Integer n2 = MusicWnd.keys.get(ev.awt.getKeyCode());
 		if (n2 != null) {
 			final int intValue = n2;
 			this.stopnote(n, intValue);
