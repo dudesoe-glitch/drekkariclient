@@ -71,6 +71,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	private boolean thisGobAnimationsCanBeDisabled = false;
 	public Boolean isMe = null;
 	public Boolean isMannequin = null;
+	public Boolean isSkeleton = null;
 	private boolean isLoftar = false;
 	public boolean playerNameChecked = false;
 	public final ArrayList<Gob> occupants = new ArrayList<Gob>(); // ND: The "passengers" of this gob
@@ -1223,12 +1224,14 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 
 	public void updPose(HashSet<String> poses) {
 		isComposite = true;
-		knocked = (poses.contains("knock") || poses.contains("dead") || poses.contains("deadskeletonpose") || poses.contains("waterdead") || poses.contains("chicken-knock"));
-		if (this.getres().name.equals("gfx/borka/body"))
+		knocked = (poses.contains("knock") || poses.contains("dead") || poses.contains("waterdead") || poses.contains("chicken-knock"));
+		if (this.getres().name.equals("gfx/borka/body")) {
 			isMannequin = (poses.contains("mannequinlift"));
+			isSkeleton = (poses.contains("deadskeletonpose"));
+		}
 		updateCritterAuras();
 		updateBeastDangerRadii();
-		if (this.getres().name.equals("gfx/borka/body") && isMannequin != null && !isMannequin){
+		if (this.getres().name.equals("gfx/borka/body") && isMannequin != null && !isMannequin && isSkeleton != null && !isSkeleton){
 			setPlayerGender();
 			if  (!isDeadPlayer){
 				checkIfPlayerIsDead(poses);
@@ -1332,7 +1335,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 
 	public void setCustomPlayerName() {
 		if (!playerNameChecked) {
-			if (getattr(Buddy.class) == null && getattr(haven.res.ui.obj.buddy_n.Named.class) == null && isMannequin != null && !isMannequin && glob.sess.ui.gui != null && glob.sess.ui.gui.map != null) {
+			if (getattr(Buddy.class) == null && getattr(haven.res.ui.obj.buddy_n.Named.class) == null && isMannequin != null && !isMannequin && isSkeleton != null && !isSkeleton && glob.sess.ui.gui != null && glob.sess.ui.gui.map != null) {
 				if (getres() != null) {
 					if (getres().name.equals("gfx/borka/body")) {
 						long plgobid = glob.sess.ui.gui.map.plgob;
@@ -1341,8 +1344,9 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 								setattr(new Buddy(this, -1, "Loftar", Color.WHITE));
 							else if ((getattr(Vilmate.class) != null))
 								setattr(new Buddy(this, -1, "Village/Realm Member", Color.WHITE));
-							else
+							else {
 								setattr(new Buddy(this, -1, "Unknown", Color.GRAY));
+							}
 						}
 					}
 				}
@@ -2142,7 +2146,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	public void playPlayerAlarm() {
 		if (!alarmPlayed.contains(id)){
 			if (getres() != null) {
-				if (isMannequin != null && isMannequin == false){
+				if (isMannequin != null && !isMannequin && isSkeleton != null && !isSkeleton){
 					if (getres().name.equals("gfx/borka/body")) {
 						Buddy buddyInfo = getattr(Buddy.class);
 						boolean isVillager = getattr(Vilmate.class) != null;
