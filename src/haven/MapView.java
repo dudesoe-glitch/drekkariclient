@@ -1902,11 +1902,11 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
 	}
 
 	public boolean rotate(Plob plob, int amount, int modflags) {
-	    if((!OptWnd.useOGControlsForBuildingAndPlacingCheckBox.a && ((modflags & (UI.MOD_CTRL | UI.MOD_SHIFT)) == 0)) || (OptWnd.useOGControlsForBuildingAndPlacingCheckBox.a && ((modflags & UI.MOD_CTRL) == 0)) )
+	    if((!OptWnd.useOGControlsForBuildingAndPlacingCheckBox.a && ((modflags & (UI.MOD_CTRL | UI.MOD_SHIFT)) == 0)) || (OptWnd.useOGControlsForBuildingAndPlacingCheckBox.a && ((modflags & UI.MOD_SHIFT) == 0)) )
 		return(false);
 	    freerot = true;
 	    double na;
-	    if((!OptWnd.useOGControlsForBuildingAndPlacingCheckBox.a && ((modflags & UI.MOD_SHIFT) == 0)) || (OptWnd.useOGControlsForBuildingAndPlacingCheckBox.a && ((modflags & UI.MOD_SHIFT) == 0)))
+	    if((!OptWnd.useOGControlsForBuildingAndPlacingCheckBox.a && ((modflags & UI.MOD_SHIFT) == 0)) || (OptWnd.useOGControlsForBuildingAndPlacingCheckBox.a && ((modflags & UI.MOD_CTRL) == 0)))
 		na = (Math.PI / 4) * Math.round((plob.a + (amount * Math.PI / 4)) / (Math.PI / 4));
 	    else
 		na = plob.a + amount * Math.PI / plobagran;
