@@ -76,42 +76,40 @@ public class QuickSlotsWdg extends Widget implements DTarget {
     }
 
     @Override
-    public boolean mousedown(Coord c, int button) {
-        if (super.mousedown(c, button))
-            return true;
+    public boolean mousedown(MouseDownEvent ev) {
         if (ui.modmeta || ui.modctrl)
             return true;
-        if (button == 2) {
+        if (ev.b == 2) {
             if((dragging != null)) { // ND: I need to do this extra check and remove it in case you do another click before the mouseup. Idk why it has to be done like this, but it solves the issue.
                 dragging.remove();
                 dragging = null;
             }
             dragging = ui.grabmouse(this);
-            dc = c;
+            dc = ev.c;
             return true;
         }
         Equipory e = ui.gui.getequipory();
         if (e != null) {
             WItem w = null;
-            if (c.x <= UI.scale(44)) w = e.slots[6];
-            if (c.x > UI.scale(44) && c.x <= UI.scale(94) ) w = e.slots[7];
-            if (c.x > UI.scale(94) && c.x <= UI.scale(142) ) w = e.slots[5];
-            if (c.x > UI.scale(142) && c.x <= UI.scale(190) ) w = e.slots[11];
-            if (c.x > UI.scale(190) && c.x <= UI.scale(238) ) w = e.slots[14];
+            if (ev.c.x <= UI.scale(44)) w = e.slots[6];
+            if (ev.c.x > UI.scale(44) && ev.c.x <= UI.scale(94) ) w = e.slots[7];
+            if (ev.c.x > UI.scale(94) && ev.c.x <= UI.scale(142) ) w = e.slots[5];
+            if (ev.c.x > UI.scale(142) && ev.c.x <= UI.scale(190) ) w = e.slots[11];
+            if (ev.c.x > UI.scale(190) && ev.c.x <= UI.scale(238) ) w = e.slots[14];
             if (w != null) {
-                w.mousedown(new Coord(w.sz.x / 2, w.sz.y / 2), button);
+                w.mousedown(new MouseDownEvent(new Coord(w.sz.x / 2, w.sz.y / 2), ev.b));
                 return true;
-            } else if (button == 1) {
+            } else if (ev.b == 1) {
                 if((dragging != null)) { // ND: Same here
                     dragging.remove();
                     dragging = null;
                 }
                 dragging = ui.grabmouse(this);
-                dc = c;
+                dc = ev.c;
                 return true;
             }
         }
-        return false;
+        return (super.mousedown(ev));
     }
 
     public void simulateclick(Coord c) { // ND: Used for Quick-Switch keybinds
@@ -126,7 +124,7 @@ public class QuickSlotsWdg extends Widget implements DTarget {
     }
 
     @Override
-    public boolean mouseup(Coord c, int button) {
+    public boolean mouseup(MouseUpEvent ev) {
         checkIfOutsideOfUI(); // ND: Prevent the widget from being dragged outside the current window size
         if((dragging != null)) {
             dragging.remove();
@@ -134,16 +132,16 @@ public class QuickSlotsWdg extends Widget implements DTarget {
             Utils.setprefc("wndc-quickslots", this.c);
             return true;
         }
-        return super.mouseup(c, button);
+        return super.mouseup(ev);
     }
 
     @Override
-    public void mousemove(Coord c) {
+    public void mousemove(MouseMoveEvent ev) {
         if (dragging != null) {
-            this.c = this.c.add(c.x, c.y).sub(dc);
+            this.c = this.c.add(ev.c.x, ev.c.y).sub(dc);
             return;
         }
-        super.mousemove(c);
+        super.mousemove(ev);
     }
 
     public void checkIfOutsideOfUI() {

@@ -54,31 +54,22 @@ public class ItemDrag extends WItem {
 	if(OptWnd.overrideCursorItemWhenHoldingAltCheckBox.a && ui.modmeta) {
 		if(ev.b == 1) {
 			if(ui.dispatchq(parent, new Interact(ev.c.add(this.c), this)).handled)
-				return(true);
-			else
-				return (ui.gui.map.mousedown(ui.gui.map.rootxlate(ev.c.add(rootpos())), ev.b));
+				return(ev.derive(ui.gui.map.rootxlate(ev.c.add(rootpos()))).dispatch(ui.gui.map));
 		} else if(ev.b == 3) {
 			if(ui.dispatchq(parent, new Interact(ev.c.add(this.c), this)).handled)
-				return(true);
-			else
-				return (ui.gui.map.mousedown(ui.gui.map.rootxlate(ev.c.add(rootpos())), ev.b));
+				return(ev.derive(ui.gui.map.rootxlate(ev.c.add(rootpos()))).dispatch(ui.gui.map));
 		}
 	} else if (OptWnd.noCursorItemDroppingAnywhereCheckBox.a && !ui.modmeta){
 		if(ev.b == 1) {
-			if (parent instanceof Window || parent instanceof QuickSlotsWdg) {
-				if(ui.dispatchq(parent, new Drop(ev.c.add(this.c), this)).handled)
-					return(true);
-				else
-					return (ui.gui.map.mousedown(ui.gui.map.rootxlate(ev.c.add(rootpos())), ev.b));
-			}
+			if (dropOnWidget(parent, ev.c.add(this.c))) {
+				return(true);
+			} else
+				return(ev.derive(ui.gui.map.rootxlate(ev.c.add(rootpos()))).dispatch(ui.gui.map));
 		}
 	} else if (OptWnd.noCursorItemDroppingInWaterCheckBox.a && !ui.modmeta){
 		if(ev.b == 1) {
-			if (parent instanceof Window || parent instanceof QuickSlotsWdg) {
-				if(ui.dispatchq(parent, new Drop(ev.c.add(this.c), this)).handled)
-					return(true);
-				else
-					return (ui.gui.map.mousedown(ui.gui.map.rootxlate(ev.c.add(rootpos())), ev.b));
+			if (dropOnWidget(parent, ev.c.add(this.c))) {
+				return(true);
 			} else if (ui.gui.map.player() != null) {
 				int t = ui.gui.map.glob.map.gettile(ui.gui.map.player().rc.floor(tilesz));
 				Resource res = ui.gui.map.glob.map.tilesetr(t);
@@ -88,7 +79,7 @@ public class ItemDrag extends WItem {
 								|| res.name.equals("gfx/tiles/owater")
 								|| res.name.equals("gfx/tiles/odeep")
 								|| res.name.equals("gfx/tiles/odeeper"))) {
-					return (ui.gui.map.mousedown(ui.gui.map.rootxlate(ev.c.add(rootpos())), ev.b));
+					return(ev.derive(ui.gui.map.rootxlate(ev.c.add(rootpos()))).dispatch(ui.gui.map));
 				}
 			}
 		}
@@ -106,5 +97,44 @@ public class ItemDrag extends WItem {
     public void mousemove(MouseMoveEvent ev) {
 	this.c = this.c.add(ev.c.sub(doff));
     }
+
+
+
+	public boolean dropon(Widget w, Coord c) {
+		if(w instanceof DTarget) {
+			if(((DTarget)w).drop(c, c.add(doff.inv())))
+				return(true);
+		}
+		for(Widget wdg = w.lchild; wdg != null; wdg = wdg.prev) {
+			if((wdg == this) || !wdg.visible())
+				continue;
+			Coord cc = w.xlate(wdg.c, true);
+			if(c.isect(cc, wdg.sz)) {
+				if(dropon(wdg, c.add(cc.inv())))
+					return(true);
+			}
+		}
+		return(false);
+	}
+
+	public boolean dropOnWidget(Widget w, Coord c) {
+		if(w instanceof DTarget) {
+			if(((DTarget)w).drop(c, c.add(doff.inv())))
+				return(true);
+		}
+		for(Widget wdg = w.lchild; wdg != null; wdg = wdg.prev) {
+			if((wdg == this) || !wdg.visible())
+				continue;
+			Coord cc = w.xlate(wdg.c, true);
+			if (wdg instanceof Window || wdg instanceof QuickSlotsWdg) {
+				if (c.isect(cc, wdg.sz)) {
+					if (dropon(wdg, c.add(cc.inv())))
+						return (true);
+				}
+			}
+		}
+		return(false);
+	}
+
 
 }
