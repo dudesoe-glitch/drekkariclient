@@ -181,20 +181,25 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 	if(spr == null) {
 	    try {
 		spr = this.spr = GSprite.create(this, res.get(), sdt.clone());
-		if (OptWnd.autoDropManagerWindow != null) {
-			checkAutoDropItem();
-		}
 	    } catch(Loading l) {
 	    }
 	}
+	try {
+		if (spr != null) {
+			if (OptWnd.autoDropManagerWindow != null) {
+				checkAutoDropItem();
+			}
+		}
+	} catch (Exception ignored) {}
 	return(spr);
     }
 
     public void tick(double dt) {
 	super.tick(dt);
 	GSprite spr = spr();
-	if(spr != null)
-	    spr.tick(dt);
+	if(spr != null) {
+		spr.tick(dt);
+	}
 	updcontinfo();
 	if(!hoverset)
 	    hovering = null;
@@ -593,17 +598,34 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 
 	private void checkAutoDropItem() {
 		if (!checkedAutodrop) {
+			if (this.parent instanceof Equipory || // ND: Don't drop from the equipment window
+					this.parent instanceof StudyInventory || // ND: Don't drop from the study report window
+					this.parent instanceof GameUI) { // ND: Don't drop from the cursor
+				checkedAutodrop = true;
+				return;
+			}
 			if (AutoDropManagerWindow.autoDropItemsCheckBox.a) {
-				if(!AutoDropManagerWindow.includeOtherContainerInventoriesCheckBox.a && this.parent != ui.gui.maininv) {
+				if (contentswnd != null) { // ND: If it has a contents window, it means that this is a stack GItem. We don't drop whole stacks (cause they have an averaged quality). We only drop from inside the stacks.
 					checkedAutodrop = true;
-					return;
+				}
+				if(!AutoDropManagerWindow.includeOtherContainerInventoriesCheckBox.a) {
+					if (this.parent instanceof haven.res.ui.stackinv.ItemStack) {
+						GItem stackItem = ((GItem.ContentsWindow) this.parent.parent).cont;
+						if (stackItem.parent != ui.gui.maininv) {
+							checkedAutodrop = true;
+							return;
+						}
+					} else if (this.parent != ui.gui.maininv) {
+						checkedAutodrop = true;
+						return;
+					}
 				}
 				String itemBaseName = this.resource().basename();
 				double quality = 0.0;
 				if(this.rawinfo != null){
 					quality = this.info().stream().filter(info -> info instanceof Quality).mapToDouble(info -> ((Quality) info).q).findFirst().orElse(0.0);
 				}
-				if (quality > 0.1) { // ND: Workaround to ignore stack gitems, cause they don't instantly get thee quality, and we shouldn't drop the entire stack anyway, only individual items inside the stack
+				if (quality > 0.1 && contentswnd == null) {
 					if (AutoDropManagerWindow.autoDropStonesCheckbox.a && Config.stoneItemBaseNames.contains(itemBaseName) && parseTextEntryInt(AutoDropManagerWindow.autoDropStonesQualityTextEntry) > quality) {
 						this.wdgmsg("drop", Coord.z);
 					} else if (AutoDropManagerWindow.autoDropOresCheckbox.a && Config.oreItemBaseNames.contains(itemBaseName) && parseTextEntryInt(AutoDropManagerWindow.autoDropOresQualityTextEntry) > quality) {
@@ -615,8 +637,8 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 					} else if (AutoDropManagerWindow.autoDropQuarryartzCheckbox.a && itemBaseName.equals("quarryquartz") && parseTextEntryInt(AutoDropManagerWindow.autoDropQuarryartzQualityTextEntry) > quality) {
 						this.wdgmsg("drop", Coord.z);
 					}
+					checkedAutodrop = true;
 				}
-				checkedAutodrop = true;
 			}
 		}
 	}
