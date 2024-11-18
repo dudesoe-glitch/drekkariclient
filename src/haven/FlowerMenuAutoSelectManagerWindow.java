@@ -132,11 +132,10 @@ public class FlowerMenuAutoSelectManagerWindow extends Window {
     public static class PetalItem extends Widget {
 
         public String name;
-        public CheckBox checkBox;
 
         public PetalItem(String name, boolean value) {
             this.name = name;
-            add(checkBox = new CheckBox(name) {
+            add(new CheckBox(name) {
                 {
                     a = value;
                 }
@@ -162,10 +161,21 @@ public class FlowerMenuAutoSelectManagerWindow extends Window {
 
         @Override
         public boolean mousedown(MouseDownEvent ev) {
-            checkBox.click();
-            if(super.mousedown(ev))
-                return true;
-            return false;
+            // ND: This is the old mousedown method basically.
+            // Child widgets of widgets can't be clicked anymore for some reason but idk how to fix it for now, so just use this old one.
+            Coord c = ev.c;
+            int button = ev.b;
+            for(Widget wdg = lchild; wdg != null; wdg = wdg.prev) {
+                if(!wdg.visible())
+                    continue;
+                Coord cc = xlate(wdg.c, true);
+                if(c.isect(cc, wdg.sz)) {
+                    if(wdg.mousedown(new MouseDownEvent(c.add(cc.inv()), button))) {
+                        return(true);
+                    }
+                }
+            }
+            return(false);
         }
     }
 }
