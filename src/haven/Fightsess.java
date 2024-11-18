@@ -250,7 +250,8 @@ public class Fightsess extends Widget {
 			} catch (NullPointerException ignore) {}
 		}
 	}
-	int alphaShiftSpeed = 2400/GLPanel.Loop.fps;
+	int fps = GLPanel.Loop.fps > 0 ? GLPanel.Loop.fps : 1;
+	int alphaShiftSpeed = 2400/fps;
 	if (combatMedAlphaShiftUp) {
 		if (combatMedColorShift + alphaShiftSpeed <= 255) {
 			combatMedColorShift += alphaShiftSpeed;
