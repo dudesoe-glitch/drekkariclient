@@ -26,6 +26,8 @@
 
 package haven;
 
+import haven.automated.QuestHelper;
+
 import java.util.*;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
@@ -272,7 +274,9 @@ public class QuestWnd extends Widget {
 		    }
 		    this.cond = ncond.toArray(new Condition[0]);
 			if(cqv != null && cqv.info != null){
-				ui.gui.questhelper.addConds(ncond,cqv.info.id());
+				if (!title().startsWith("Beginning of") || !QuestHelper.ignoreBeginningOfQuestsCheckBox.a) {
+					ui.gui.questhelper.addConds(ncond, cqv.info.id());
+				}
 			}
 		    refresh();
 		    if(cqv != null)

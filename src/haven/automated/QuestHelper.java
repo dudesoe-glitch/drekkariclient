@@ -14,12 +14,20 @@ public class QuestHelper extends Window {
     public boolean active = false;
     public QuestList questList;
     public HashMap<String, Coord2d> questGiverLocations = new HashMap<>();
+    public static CheckBox ignoreBeginningOfQuestsCheckBox;
 
     public QuestHelper() {
         super(UI.scale(300, 380), "Quest Helper", false);
         add(new PButton(160, "Refresh List", questList), UI.scale(20, 10));
-        questList = new QuestList(UI.scale(270), 13,this);
-        add(questList, UI.scale(16, 55));
+        add(ignoreBeginningOfQuestsCheckBox = new CheckBox("Ignore \"Beginning of...\" Quests"){
+            {a = (Utils.getprefb("ignoreBeginningOfQuests", true));}
+            public void changed(boolean val) {
+                Utils.setprefb("ignoreBeginningOfQuests", val);
+                refresh();
+            }
+        }, UI.scale(20, 50));
+        questList = new QuestList(UI.scale(290), 13,this);
+        add(questList, UI.scale(16, 75));
     }
 
     @Override
@@ -132,7 +140,8 @@ public class QuestHelper extends Window {
                     try {
                         for (QuestWnd.Quest quest : ui.gui.chrwdg.quest.cqst.quests) {
                             if (quest.id != ui.gui.chrwdg.skill.credos.pqid) {
-                                ui.gui.chrwdg.wdgmsg("qsel", quest.id);
+                                if (!quest.title().startsWith("Beginning of") || !ignoreBeginningOfQuestsCheckBox.a)
+                                    ui.gui.chrwdg.wdgmsg("qsel", quest.id);
                             }
                         }
                     } catch (NullPointerException e) {
