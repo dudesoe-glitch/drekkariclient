@@ -506,6 +506,7 @@ public class Config {
 			"gfx/terobjs/map/stonekist",
 			"gfx/terobjs/map/jotunclam",
 			"gfx/terobjs/thatchbasket",
+			"gfx/terobjs/barrel",
 	};
 
 	public static final String[] workstationsResPaths = {
