@@ -3,6 +3,8 @@ package haven;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executors;
@@ -31,7 +33,11 @@ public class StatusWdg extends Widget {
     public final HttpStatus stat;
 
     public StatusWdg() {
-        this.stat = new HttpStatus(Bootstrap.defserv.get());
+        try {
+            this.stat = new HttpStatus(new URI("http", Bootstrap.defserv.get(), "/mt/srv-mon", null));
+        } catch(URISyntaxException e) {
+            throw(new RuntimeException(e));
+        }
         if (future != null)
             future.cancel(true);
         future = executor.scheduleWithFixedDelay(this::startUpdater, 0, 5, TimeUnit.SECONDS);

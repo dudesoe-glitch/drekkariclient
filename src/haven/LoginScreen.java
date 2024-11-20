@@ -35,6 +35,8 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.util.*;
 import java.util.List;
 import java.net.URI;
@@ -81,8 +83,8 @@ public class LoginScreen extends Widget {
 	add(new Img(bg), Coord.z);
 	optbtn = adda(new Button(UI.scale(100), "Options"), pos("cbl").add(10, -10), 0, 1);
 	optbtn.setgkey(GameUI.kb_opt);
-	if(HttpStatus.mond.get() != null)
-	    adda(new StatusLabel(HttpStatus.mond.get(), 1.0), sz.x - UI.scale(10), UI.scale(10), 1.0, 0.0);
+//	if(HttpStatus.mond.get() != null)
+//	    adda(new StatusLabel(HttpStatus.mond.get(), 1.0), sz.x - UI.scale(10), UI.scale(10), 1.0, 0.0);
 	switch(authmech.get()) {
 	case "native":
 	    login = new Credbox();
@@ -95,7 +97,11 @@ public class LoginScreen extends Widget {
 	}
 	adda(login, bgc.adds(0, 10), 0.5, 0.0).hide();
 	accounts = add(new AccountList(16));
-	adda(new StatusLabel(hostname, 0.5), bgc.x, bg.sz().y, 0.5, 1.4); // ND: This adds the server status and player count
+	try {
+		adda(new StatusLabel(new URI("http", hostname, "/mt/srv-mon", null), 0.5), bgc.x, bg.sz().y, 0.5, 1.4); // ND: This adds the server status and player count
+	} catch(URISyntaxException e) {
+		throw(new RuntimeException(e));
+	}
 	mainThemeStopped = false;
 	playMainTheme();
 	add(themeSongVolumeSlider = new HSlider(UI.scale(220), 0, 100, Utils.getprefi("themeSongVolume", 40)) {
