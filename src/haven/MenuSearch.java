@@ -60,6 +60,7 @@ public class MenuSearch extends Window {
 
 		@Override
 		public Object tooltip(Coord c, Widget prev) {
+		try {
 			int slot = slotat(c);
 			final Result item = items().get(slot);
 			if (item != null) {
@@ -67,6 +68,8 @@ public class MenuSearch extends Window {
 			} else {
 				return super.tooltip(c, prev);
 			}
+		} catch (Exception ignored){}
+		return null;
 		}
     }
 
