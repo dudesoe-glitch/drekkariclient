@@ -1468,7 +1468,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 		if (getmeter("stam", 0).a < meterFullness) {
 			if(System.currentTimeMillis() > lastAutoDrinkTime + 1000 || System.currentTimeMillis() > lastAutoDrinkTime + 3500){
 				lastAutoDrinkTime = System.currentTimeMillis();
-				drink(0.99);
+				wdgmsg("act", "drink");
 			}
 		}
 	}

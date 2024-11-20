@@ -2320,7 +2320,7 @@ public class OptWnd extends Window {
 				}
 			}, prev.pos("bl").adds(0, 12));
 			autoPeaceAnimalsWhenCombatStartsCheckBox.tooltip = autoPeaceAnimalsWhenCombatStartsTooltip;
-			prev = add(autoDrinkingCheckBox = new CheckBox("Auto-Drink Water/Tea below threshold:"){
+			prev = add(autoDrinkingCheckBox = new CheckBox("Auto-Drink Water threshold:"){
 				{a = Utils.getprefb("autoDrinkTeaOrWater", false);}
 				public void set(boolean val) {
 					Utils.setprefb("autoDrinkTeaOrWater", val);
@@ -2328,7 +2328,7 @@ public class OptWnd extends Window {
 					if (ui != null && ui.gui != null) {
 						String threshold = "75";
 						if (!autoDrinkingThresholdTextEntry.text().isEmpty()) threshold = autoDrinkingThresholdTextEntry.text();
-						ui.gui.optionInfoMsg("Auto-Drinking Water and Tea is now " + (val ? "ENABLED, with a " + threshold + "% treshhold!" : "DISABLED") + "!", (val ? msgGreen : msgRed), Audio.resclip(val ? Toggle.sfxon : Toggle.sfxoff));
+						ui.gui.optionInfoMsg("Auto-Drinking Water is now " + (val ? "ENABLED, with a " + threshold + "% treshhold!" : "DISABLED") + "!", (val ? msgGreen : msgRed), Audio.resclip(val ? Toggle.sfxon : Toggle.sfxoff));
 					}
 				}
 			}, prev.pos("bl").adds(0, 12));
@@ -4282,10 +4282,7 @@ public class OptWnd extends Window {
 	private final Object autoPeaceAnimalsWhenCombatStartsTooltip = RichText.render("Enabling this will automatically set your status to 'Peace' when combat is initiated with a new target (animals only). " +
 			"\nToggling this on, while in combat, will also autopeace all animals you are currently fighting." +
 			"\n\n$col[218,163,0]{Action Button:} $col[185,185,185]{This setting can also be turned on/off using an action button from the menu grid (Custom Client Extras → Toggles).}", UI.scale(320));
-	private final Object autoDrinkingTooltip = RichText.render("When your Stamina Bar goes below the set threshold, try to drink Water or Tea. If the threshold box is empty, it defaults to 75%." +
-			"\nIf your Energy Bar is below 8500%, it will prioritize Tea over Water, if you have any." +
-			"\n" +
-			"\nDrinking Tea doesn't stop when you reach 100% Stamina! So be careful with it." +
+	private final Object autoDrinkingTooltip = RichText.render("When your Stamina Bar goes below the set threshold, try to drink Water. If the threshold box is empty, it defaults to 75%." +
 			"\n" +
 			"\n$col[218,163,0]{Action Button:} $col[185,185,185]{This setting can also be turned on/off using an action button from the menu grid (Custom Client Extras → Toggles).}", UI.scale(320));
 	private final Object enableQueuedMovementTooltip = RichText.render("$col[218,163,0]{Action Button:} $col[185,185,185]{This setting can also be turned on/off using an action button from the menu grid (Custom Client Extras → Toggles).}", UI.scale(300));
