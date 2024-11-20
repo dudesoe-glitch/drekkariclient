@@ -1214,6 +1214,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 		updateCustomIcons();
 		updateCritterAuras();
 		updateSpeedBuffAuras();
+		updateMidgesAuras();
 		updateBeastDangerRadii();
 		updateTroughsRadius();
 		updateBeeSkepRadius();
@@ -1889,6 +1890,14 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 			String resourceName = getres().name;
 			if (resourceName.equals("gfx/terobjs/boostspeed"))
 				setAuraCircleOverlay(OptWnd.showSpeedBuffAurasCheckBox.a, OptWnd.speedBuffAuraColorOptionWidget.currentColor, 6f);
+		}
+	}
+
+	public void updateMidgesAuras() {
+		if (getres() != null) {
+			String resourceName = getres().name;
+			if (resourceName.equals("gfx/kritter/midgeswarm/midgeswarm"))
+				setAuraCircleOverlay(OptWnd.showMidgesCircleAurasCheckBox.a, new Color(192, 0, 0, 140), 6f);
 		}
 	}
 
