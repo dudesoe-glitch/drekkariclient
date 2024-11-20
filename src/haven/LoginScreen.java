@@ -37,6 +37,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import java.util.List;
+import java.net.URI;
 
 public class LoginScreen extends Widget {
     public static final Config.Variable<String> authmech = Config.Variable.prop("haven.authmech", "native");
@@ -80,6 +81,8 @@ public class LoginScreen extends Widget {
 	add(new Img(bg), Coord.z);
 	optbtn = adda(new Button(UI.scale(100), "Options"), pos("cbl").add(10, -10), 0, 1);
 	optbtn.setgkey(GameUI.kb_opt);
+	if(HttpStatus.mond.get() != null)
+	    adda(new StatusLabel(HttpStatus.mond.get(), 1.0), sz.x - UI.scale(10), UI.scale(10), 1.0, 0.0);
 	switch(authmech.get()) {
 	case "native":
 	    login = new Credbox();
@@ -391,9 +394,9 @@ public class LoginScreen extends Widget {
 	public final HttpStatus stat;
 	public final double ax;
 
-	public StatusLabel(String host, double ax) {
+	public StatusLabel(URI svc, double ax) {
 	    super(new Coord(UI.scale(150), FastText.h * 2));
-	    this.stat = new HttpStatus(host);
+	    this.stat = new HttpStatus(svc);
 	    this.ax = ax;
 	}
 
