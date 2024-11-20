@@ -1640,6 +1640,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 						if (OptWnd.showContainerFullnessPartialCheckBox.a) setGobStateHighlight(OptWnd.showContainerFullnessPartialColorOptionWidget.currentColor);
 						else delattr(GobStateHighlight.class);
 					}
+					break;
 				case "gfx/terobjs/barrel":
 					int olsSize = ols.size();
 					if(collisionBox != null)
@@ -1648,6 +1649,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 						if (OptWnd.showContainerFullnessEmptyCheckBox.a) setGobStateHighlight(OptWnd.showContainerFullnessEmptyColorOptionWidget.currentColor);
 						else delattr(GobStateHighlight.class);
 					} else delattr(GobStateHighlight.class);
+					break;
 				default:
 					break;
 			}
