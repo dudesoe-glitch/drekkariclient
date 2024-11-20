@@ -57,6 +57,17 @@ public class MenuSearch extends Window {
 		    }
 		});
 	}
+
+		@Override
+		public Object tooltip(Coord c, Widget prev) {
+			int slot = slotat(c);
+			final Result item = items().get(slot);
+			if (item != null) {
+				return new TexI(item.btn.rendertt(true));
+			} else {
+				return super.tooltip(c, prev);
+			}
+		}
     }
 
     public MenuSearch(MenuGrid menu) {
