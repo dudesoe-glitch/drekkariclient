@@ -53,7 +53,7 @@ public class AUtils {
         add("gfx/kritter/wolf/wolf");
         add("gfx/kritter/wolverine/wolverine");
         add("gfx/kritter/woodgrouse/woodgrouse-m");
-        add("gfx/jrutter/garefowl/garefowl");
+        add("gfx/kritter/garefowl/garefowl");
 
         add("gfx/kritter/ants/queenant");
         add("gfx/kritter/ants/royalguardant");
