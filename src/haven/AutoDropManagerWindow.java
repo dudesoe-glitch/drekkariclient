@@ -6,6 +6,7 @@ public class AutoDropManagerWindow extends Window {
 
     public static CheckBox autoDropItemsCheckBox;
     public static CheckBox includeOtherContainerInventoriesCheckBox;
+    public static CheckBox onlyDropWhenPickaxeCursorIsActiveCheckBox;
     public static CheckBox autoDropStonesCheckbox;
     public static TextEntry autoDropStonesQualityTextEntry;
     public static CheckBox autoDropCoalsCheckbox;
@@ -34,8 +35,14 @@ public class AutoDropManagerWindow extends Window {
             public void changed(boolean val) {
                 Utils.setprefb("includeOtherContainerInventories", val);
             }
-        }, prev.pos("bl").adds(16, 2));
-        prev = add(new Label("Mining specific items:"), prev.pos("bl").adds(0, 12).x(0));
+        }, prev.pos("bl").adds(0, 12));
+        prev = add(onlyDropWhenPickaxeCursorIsActiveCheckBox = new CheckBox("Only Drop when Pickaxe Cursor is Active") {
+            {a = (Utils.getprefb("onlyDropWhenPickaxeCursorIsActive", false));}
+            public void changed(boolean val) {
+                Utils.setprefb("onlyDropWhenPickaxeCursorIsActive", val);
+            }
+        }, prev.pos("bl").adds(0, 2).x(0));
+        prev = add(new Label("Mining specific items:"), prev.pos("bl").adds(0, 12));
         prev = add(autoDropStonesCheckbox = new CheckBox("Stones"){
             {a = Utils.getprefb("autoDropStones", false);}
             public void changed(boolean val) {

@@ -598,6 +598,10 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 
 	private void checkAutoDropItem() {
 		if (!checkedAutodrop) {
+			if (AutoDropManagerWindow.onlyDropWhenPickaxeCursorIsActiveCheckBox.a && !ui.checkCursorImage("gfx/hud/curs/mine")){
+				checkedAutodrop = true;
+				return;
+			}
 			if (this.parent instanceof Equipory || // ND: Don't drop from the equipment window
 					this.parent instanceof StudyInventory || // ND: Don't drop from the study report window
 					this.parent instanceof GameUI) { // ND: Don't drop from the cursor
