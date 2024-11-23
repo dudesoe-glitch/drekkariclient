@@ -8,6 +8,8 @@ public class AutoDropManagerWindow extends Window {
     public static CheckBox includeOtherContainerInventoriesCheckBox;
     public static CheckBox autoDropStonesCheckbox;
     public static TextEntry autoDropStonesQualityTextEntry;
+    public static CheckBox autoDropCoalsCheckbox;
+    public static TextEntry autoDropCoalsQualityTextEntry;
     public static CheckBox autoDropOresCheckbox;
     public static TextEntry autoDropOresQualityTextEntry;
     public static CheckBox autoDropPreciousOresCheckbox;
@@ -44,6 +46,20 @@ public class AutoDropManagerWindow extends Window {
         add(autoDropStonesQualityTextEntry = new TextEntry(UI.scale(36), Utils.getpref("autoDropStonesQuality", "30")){
             protected void changed() {
                 Utils.setpref("autoDropStonesQuality", this.buf.line());
+                this.settext(this.text().replaceAll("[^\\d]", ""));
+                super.changed();
+            }
+        }, prev.pos("ur").adds(6, -2).x(UI.scale(156)));
+        prev = add(autoDropCoalsCheckbox = new CheckBox("Coals"){
+            {a = Utils.getprefb("autoDropCoals", false);}
+            public void changed(boolean val) {
+                Utils.setprefb("autoDropCoals", val);
+            }
+        }, prev.pos("bl").adds(0, 6));
+        add(new Label("Q <"), prev.pos("ur").adds(0, 0).x(UI.scale(134)));
+        add(autoDropCoalsQualityTextEntry = new TextEntry(UI.scale(36), Utils.getpref("autoDropCoalsQuality", "30")){
+            protected void changed() {
+                Utils.setpref("autoDropCoalsQuality", this.buf.line());
                 this.settext(this.text().replaceAll("[^\\d]", ""));
                 super.changed();
             }

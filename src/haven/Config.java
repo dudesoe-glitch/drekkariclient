@@ -533,8 +533,6 @@ public class Config {
 			"quartz",
 			"sandstone",
 			"schist",
-			"blackcoal",
-			"coal",
 			"zincspar",
 			"apatite",
 			"sodalite",
@@ -563,6 +561,11 @@ public class Config {
 			"chert",
 			"graywacke",
 			"halite" // rock salt
+	));
+
+	public final static Set<String> coalItemBaseNames = new HashSet<String>(Arrays.asList(
+			"blackcoal",
+			"coal"
 	));
 
 	public final static Set<String> oreItemBaseNames = new HashSet<String>(Arrays.asList(
