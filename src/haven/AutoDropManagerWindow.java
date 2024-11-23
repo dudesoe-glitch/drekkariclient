@@ -127,7 +127,7 @@ public class AutoDropManagerWindow extends Window {
                 super.changed();
             }
         }, prev.pos("ur").adds(6, -2).x(UI.scale(156)));
-        this.c = new Coord (200, 100);
+        this.c = Utils.getprefc("wndc-autoDropManagerWindow", UI.unscale(new Coord(200, 100)));
         pack();
     }
 
@@ -135,11 +135,16 @@ public class AutoDropManagerWindow extends Window {
     public void wdgmsg(Widget sender, String msg, Object... args) {
         if((sender == this) && (Objects.equals(msg, "close"))) {
             hide();
+            Utils.setprefc("wndc-autoDropManagerWindow", this.c);
         } else {
             super.wdgmsg(sender, msg, args);
         }
     }
 
-
+    @Override
+    public boolean show(boolean show) {
+        Utils.setprefc("wndc-autoDropManagerWindow", this.c);
+        return super.show(show);
+    }
 
 }
