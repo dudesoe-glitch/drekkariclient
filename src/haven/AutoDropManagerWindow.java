@@ -1,5 +1,7 @@
 package haven;
 
+import haven.res.ui.pag.toggle.Toggle;
+
 import java.util.Objects;
 
 public class AutoDropManagerWindow extends Window {
@@ -26,8 +28,12 @@ public class AutoDropManagerWindow extends Window {
         Widget prev;
         prev = add(autoDropItemsCheckBox = new CheckBox("Enable Auto-Drop Items from Inventory") {
             {a = (Utils.getprefb("autoDropItems", false));}
-            public void changed(boolean val) {
+            public void set(boolean val) {
                 Utils.setprefb("autoDropItems", val);
+                a = val;
+                if (ui != null && ui.gui != null) {
+                    ui.gui.optionInfoMsg("Auto-Drop Items from Inventory now " + (val ? "ENABLED" : "DISABLED") + "!", (val ? OptWnd.msgGreen : OptWnd.msgRed), Audio.resclip(val ? Toggle.sfxon : Toggle.sfxoff));
+                }
             }
         }, 0, 6);
         prev = add(includeOtherContainerInventoriesCheckBox = new CheckBox("Include Other Container Inventories") {

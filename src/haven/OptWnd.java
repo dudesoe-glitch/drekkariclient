@@ -4394,6 +4394,12 @@ public class OptWnd extends Window {
 	private final Object resetButtonTooltip = RichText.render("Reset to default", UI.scale(300));
 	private final Object genericHasKeybindTooltip = RichText.render("$col[218,163,0]{Keybind:} $col[185,185,185]{This can also be toggled using a keybind.}", UI.scale(300));
 
-
-
+	@Override
+	protected void attached() {
+		super.attached();
+		if (ui.gui != null) {
+			ui.gui.add(autoDropManagerWindow); // ND: this.parent.parent is root widget in login screen or gui in game.
+			autoDropManagerWindow.hide();
+		}
+	}
 }
