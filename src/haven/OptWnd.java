@@ -2783,7 +2783,7 @@ public class OptWnd extends Window {
 					if (ui.sess != null)
 						ui.sess.glob.map.invalidateAll();
 					if (ui != null && ui.gui != null) {
-						ui.gui.optionInfoMsg("Flavor Objects are now now " + (val ? "HIDDEN" : "SHOWN") + "!", (val ? msgGray : msgGreen), Audio.resclip(val ? Toggle.sfxoff : Toggle.sfxon));
+						ui.gui.optionInfoMsg("Flavor Objects are now " + (val ? "HIDDEN" : "SHOWN") + "!", (val ? msgGray : msgGreen), Audio.resclip(val ? Toggle.sfxoff : Toggle.sfxon));
 					}
 				}
 			}, prev.pos("bl").adds(0, 2));
