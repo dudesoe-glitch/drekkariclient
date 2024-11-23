@@ -2508,6 +2508,7 @@ public class OptWnd extends Window {
 	public static CheckBox reverseOrthoCameraAxesCheckBox;
 	public static CheckBox reverseFreeCamXAxisCheckBox;
 	public static CheckBox reverseFreeCamYAxisCheckBox;
+	public static CheckBox lockVerticalAngleAt45DegreesCheckBox;
 	public static CheckBox allowLowerFreeCamTiltCheckBox;
 
 	public class CameraSettingsPanel extends Panel {
@@ -2599,6 +2600,15 @@ public class OptWnd extends Window {
 					Utils.setprefb("reverseFreeCamYAxis", val);
 				}
 			}, FreePrev.pos("ul").adds(110, 0));
+			FreePrev = add(lockVerticalAngleAt45DegreesCheckBox = new CheckBox("Lock Vertical Angle at 45°"){
+				{a = (Utils.getprefb("lockVerticalAngleAt45Degrees", false));}
+				public void changed(boolean val) {
+					Utils.setprefb("lockVerticalAngleAt45Degrees", val);
+					if (ui.gui.map != null)
+						if (ui.gui.map.camera instanceof MapView.FreeCam)
+							((MapView.FreeCam)ui.gui.map.camera).telev = (float)Math.PI / 4.0f;
+				}
+			}, FreePrev.pos("bl").adds(0, 2));
 			FreePrev = add(allowLowerFreeCamTiltCheckBox = new CheckBox("Enable Lower Tilting Angle", Color.RED){
 				{a = (Utils.getprefb("allowLowerTiltBool", false));}
 				public void changed(boolean val) {
@@ -2676,6 +2686,7 @@ public class OptWnd extends Window {
 			freeCamHeightLabel.visible = bool;
 			freeCamHeightSlider.visible = bool;
 			freeCamHeightResetButton.visible = bool;
+			lockVerticalAngleAt45DegreesCheckBox.visible = bool;
 			allowLowerFreeCamTiltCheckBox.visible = bool;
 			reverseFreeCamXAxisCheckBox.visible = bool;
 			reverseFreeCamYAxisCheckBox.visible = bool;
