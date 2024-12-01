@@ -2850,7 +2850,7 @@ public class OptWnd extends Window {
 				public void changed(boolean val) {
 					Utils.setprefb("straightCliffEdges", val);
 					if (ui.sess != null)
-						ui.sess.glob.map.invalidateAll();
+						ui.sess.glob.map.resetMap();
 					if (ui != null && ui.gui != null)
 						ui.gui.optionInfoMsg("Straight Cliff Edges are now " + (val ? "ENABLED" : "DISABLED") + "!", (val ? msgGreen : msgRed), Audio.resclip(val ? Toggle.sfxon : Toggle.sfxoff));
 				}
