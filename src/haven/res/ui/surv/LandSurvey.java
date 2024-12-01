@@ -12,7 +12,7 @@ import static haven.MCache.tilesz;
 public class LandSurvey extends Window {
     final Coord ul, br;
     MapView mv;
-    Display dsp;
+    public Display dsp;
     RenderTree.Slot s_dsp, s_ol;
     final FastMesh ol;
     final Location dloc;
@@ -70,7 +70,7 @@ public class LandSurvey extends Window {
 	return(new LandSurvey(ul, br, gran, tz));
     }
 
-    protected void attached() {
+    public void attached() {
 	super.attached();
 	this.mv = getparent(GameUI.class).map;
 	this.dsp = new Display();
@@ -80,10 +80,10 @@ public class LandSurvey extends Window {
 	new VertexArray.Layout(new VertexArray.Layout.Input(Homo3D.vertex,     new VectorFormat(3, NumberFormat.FLOAT32), 0,  0, 16),
 			       new VertexArray.Layout.Input(VertexColor.color, new VectorFormat(4, NumberFormat.UNORM8),  0, 12, 16));
     class Display implements Rendered, RenderTree.Node, TickList.Ticking, TickList.TickNode {
-	final Pipe.Op ptsz = new PointSize(3);
+//	final Pipe.Op ptsz = new PointSize(3);
 	final MCache map;
 	final int area;
-	final Model model;
+	Model model;
 	boolean update = true;
 
 	Display() {
@@ -140,7 +140,7 @@ public class LandSurvey extends Window {
 	public TickList.Ticking ticker() {return(this);}
 
 	public void added(RenderTree.Slot slot) {
-	    slot.ostate(Pipe.Op.compose(dloc, ptsz, new States.Depthtest(States.Depthtest.Test.TRUE), Rendered.last, VertexColor.instance));
+	    slot.ostate(Pipe.Op.compose(dloc, pointSize(ui), new States.Depthtest(States.Depthtest.Test.TRUE), Rendered.last, VertexColor.instance));
 	}
     }
 
@@ -236,4 +236,15 @@ public class LandSurvey extends Window {
 	}
 	super.destroy();
     }
+
+	private Pipe.Op pointSize(UI ui){
+		float size = 3f;
+		if(ui != null) {
+			if (ui.gprefs.rscale.val > 1.01f)
+				size = 6f;
+			if (ui.gprefs.rscale.val > 1.99f)
+				size = 8f;
+		}
+		return new PointSize(size);
+	}
 }
