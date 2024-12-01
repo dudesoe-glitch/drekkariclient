@@ -2726,7 +2726,6 @@ public class OptWnd extends Window {
 	public static CheckBox disableTileSmoothingCheckBox;
 	public static CheckBox disableTileTransitionsCheckBox;
 	public static CheckBox flatCaveWallsCheckBox;
-	public static CheckBox retractedCliffEdgesCheckBox;
 	public static CheckBox straightCliffEdgesCheckBox;
 	public static HSlider treeAndBushScaleSlider;
 	private Button treeAndBushScaleResetButton;
@@ -2846,17 +2845,6 @@ public class OptWnd extends Window {
 						ui.gui.optionInfoMsg("Flat Cave Walls are now " + (val ? "ENABLED" : "DISABLED") + "!", (val ? msgGreen : msgRed), Audio.resclip(val ? Toggle.sfxon : Toggle.sfxoff));
 				}
 			}, prev.pos("bl").adds(0, 2));
-			prev = add(retractedCliffEdgesCheckBox = new CheckBox("Retracted Cliff Edges"){
-				{a = Utils.getprefb("retractedCliffEdges", false);}
-				public void changed(boolean val) {
-					Utils.setprefb("retractedCliffEdges", val);
-					if (ui.sess != null)
-						ui.sess.glob.map.invalidateAll();
-					if (ui != null && ui.gui != null)
-						ui.gui.optionInfoMsg("Retracted Cliff Edges are now " + (val ? "ENABLED" : "DISABLED") + "!", (val ? msgGreen : msgRed), Audio.resclip(val ? Toggle.sfxon : Toggle.sfxoff));
-				}
-			}, prev.pos("bl").adds(0, 2));
-			retractedCliffEdgesCheckBox.tooltip = retractedCliffEdgesTooltip;
 			prev = add(straightCliffEdgesCheckBox = new CheckBox("Straight Cliff Edges"){
 				{a = Utils.getprefb("straightCliffEdges", false);}
 				public void changed(boolean val) {
@@ -4386,10 +4374,6 @@ public class OptWnd extends Window {
 			"\n$col[218,163,0]{Action Button:} $col[185,185,185]{This setting can also be turned on/off using an action button from the menu grid (Custom Client Extras → Toggles).}", UI.scale(320));
 	private final Object disableTileSmoothingTooltip = RichText.render("$col[218,163,0]{Action Button:} $col[185,185,185]{This setting can also be turned on/off using an action button from the menu grid (Custom Client Extras → Toggles).}", UI.scale(320));
 	private final Object disableTileTransitionsTooltip = RichText.render("$col[218,163,0]{Action Button:} $col[185,185,185]{This setting can also be turned on/off using an action button from the menu grid (Custom Client Extras → Toggles).}", UI.scale(320));
-	private final Object retractedCliffEdgesTooltip = RichText.render("Makes the cliff edges a bit more visible." +
-			"\nBetter than nothing... I guess." +
-			"\n" +
-			"\n$col[185,185,185]{This setting doesn't work with Flat World. Cliffs are already visible when using that anyway.}", UI.scale(280));
 	private final Object disableObjectAnimationsTooltip = RichText.render("This stops animations for the following: fires, trash stockpiles, beehives, dreamcatchers, kilns, cauldrons." +
 			"\n" +
 			"\n$col[185,185,185]{Ideally, in the future, I'll change this to allow you to pick exactly what you want to disable, from a list.}", UI.scale(300));

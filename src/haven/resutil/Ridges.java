@@ -214,7 +214,7 @@ public class Ridges implements MapMesh.ConsHooks {
 	    lo = OptWnd.flatWorldCheckBox.a ? 0 : Math.min(z1, z2); hi = OptWnd.flatWorldCheckBox.a ? (float) (10f*Math.sqrt((Math.max(z1, z2)-Math.min(z1, z2))/10f)): Math.max(z1, z2);
 	}
 	int nseg = Math.max((int)Math.round((hi - lo) / segh), 2) - 1;
-	Vertex[] ret = OptWnd.retractedCliffEdgesCheckBox.a ? new Vertex[nseg + 2] : new Vertex[nseg + 1];
+	Vertex[] ret = new Vertex[nseg + 1];
 	Coord3f base = new Coord3f(tc.add(tccs[e]).add(tc.add(tccs[(e + 1) % 4])).mul(tilesz).mul(1, -1)).div(2); base.z = lo;
 	float segi = (hi - lo) / nseg;
 	Random rnd = m.grnd(m.ul.add(tc));
@@ -230,7 +230,6 @@ public class Ridges implements MapMesh.ConsHooks {
 	    if((v > 0) && (v < nseg))
 		ret[v].z +=!OptWnd.straightCliffEdgesCheckBox.a ? segi * 0.5f : ((rnd.nextFloat() - 0.5f) * segi * 0.5f);
 	}
-	if (OptWnd.retractedCliffEdgesCheckBox.a) ret[nseg+1] = ms.new Vertex(ret[nseg-1].x, ret[nseg-1].y, ret[nseg].z+0.2f);
 	return(ret);
     }
 
