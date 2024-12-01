@@ -127,7 +127,7 @@ public class RidgeEdge implements Tileset.Flavor {
     }
 
     public void flavor2(Buffer buf, Terrain trn, Random seed) {
-	float oz = (float)trn.map.getfz(trn.area.ul);
+	float oz = OptWnd.flatWorldCheckBox.a ? 0 : (float)trn.map.getfz(trn.area.ul);
 	Map<Coord3f, Point> points = new IdentityHashMap<>();
 	for(Coord tc : trn.tiles()) {
 	    RPart desc = getdesc(trn, tc);
