@@ -1406,6 +1406,18 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 		if (updateseq == 0) {
 			return;
 		}
+		boolean mapIconVisible = false;
+		if (OptWnd.dontHideObjectsThatHaveTheirMapIconEnabledCheckBox.a) {
+			// TODO: ND: I've spent 3 hours trying to figure out how to make this map icon thing work on login (if you're already hiding objects and have an icon enabled)
+			//  It's probably something to do with this conf.show changing at some point somewhere, AFTER the hiding boxes are updated, BUT WHERE?. Seems to only happen on login.
+			GobIcon icon = getattr(GobIcon.class);
+			if (icon != null && glob.sess.ui.gui != null && glob.sess.ui.gui.iconconf != null) {
+				GobIcon.Setting conf = glob.sess.ui.gui.iconconf.get(icon.icon());
+				if (conf != null && conf.show) {
+					mapIconVisible = true;
+				}
+			}
+		}
 		boolean doHide = false;
 		boolean doShowHidingBox = false;
 		Resource res = Gob.this.getres();
@@ -1436,9 +1448,11 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 				doHide = OptWnd.toggleGobHidingCheckBox.a;
 				doShowHidingBox = false; // ND: You can walk through them anyway, so it doesn't matter. Their resource doesn't have an actual hitbox layer and we'll have an endless lag loop of trying to draw one.
 			}
+			doHide = (doHide && !mapIconVisible);
+			doShowHidingBox = (doShowHidingBox && !mapIconVisible);
 			isHidden = doHide;
 			Drawable d = getattr(Drawable.class);
-			if (d != null && d.skipRender != doHide) {
+			if (d != null && d.skipRender != (doHide) ) {
 				d.skipRender = doHide;
 				if (doHide) {
 					if (d.slots != null) {

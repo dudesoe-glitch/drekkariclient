@@ -2958,6 +2958,7 @@ public class OptWnd extends Window {
 
 	public static CheckBox toggleGobHidingCheckBox;
 	public static CheckBox alsoFillTheHidingBoxesCheckBox;
+	public static CheckBox dontHideObjectsThatHaveTheirMapIconEnabledCheckBox;
 	public static CheckBox hideTreesCheckbox;
 	public static CheckBox hideBushesCheckbox;
 	public static CheckBox hideBouldersCheckbox;
@@ -3003,6 +3004,17 @@ public class OptWnd extends Window {
 				}
 			}, prev.pos("ur").adds(50, 0));
 			alsoFillTheHidingBoxesCheckBox.tooltip = RichText.render("Fills in the boxes. Only the outer lines will remain visible through other objects (like cliffs).");
+
+			prev = add(dontHideObjectsThatHaveTheirMapIconEnabledCheckBox = new CheckBox("Don't hide Objects that have their Map Icon Enabled"){
+				{a = (Utils.getprefb("dontHideObjectsThatHaveTheirMapIconEnabled", true));}
+				public void changed(boolean val) {
+					Utils.setprefb("dontHideObjectsThatHaveTheirMapIconEnabled", val);
+					if (ui != null && ui.gui != null) {
+						ui.sess.glob.oc.gobAction(Gob::updateHidingBoxes);
+						ui.gui.map.updatePlobHidingBox();
+					}
+				}
+			}, prev.pos("bl").adds(0, 2));
 
 			Scrollport scroll = add(new Scrollport(UI.scale(new Coord(300, 40))), prev.pos("bl").adds(14, 16));
 			Widget cont = scroll.cont;

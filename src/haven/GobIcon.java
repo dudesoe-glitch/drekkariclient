@@ -790,6 +790,10 @@ public class GobIcon extends GAttrib {
 							}
 							SettingsWindow.this.conf.dsave();
 							updateSelectAllCheckbox();
+							if (ui != null && ui.gui != null) {
+								ui.sess.glob.oc.gobAction(Gob::updateHidingBoxes);
+								ui.gui.map.updatePlobHidingBox();
+							}
 						}
 					}.state(() -> icon.conf.show).settip("Show icon on map"),
 				prev.c.x - UI.scale(2) - (sz.y / 2), sz.y / 2, 0.5, 0.5);
@@ -879,6 +883,10 @@ public class GobIcon extends GAttrib {
 						}
 						SettingsWindow.this.conf.dsave();
 						updateSelectAllCheckbox();
+						if (ui != null && ui.gui != null) {
+							ui.sess.glob.oc.gobAction(Gob::updateHidingBoxes);
+							ui.gui.map.updatePlobHidingBox();
+						}
 					}
 				}.state(() -> conf.show),
 				  0, 0);
@@ -983,6 +991,10 @@ public class GobIcon extends GAttrib {
 							icon.conf.show = val;
 					});
 					conf.dsave();
+					if (ui != null && ui.gui != null) {
+						ui.sess.glob.oc.gobAction(Gob::updateHidingBoxes);
+						ui.gui.map.updatePlobHidingBox();
+					}
 				} catch (Loading ignored){} // ND: It crashes if you click on "Select all" while some buttons are still loading. This should prevent it.
 			}}, 0);
 	    list = cont.last(new IconList(UI.scale(280, 500)), 0);
@@ -1165,6 +1177,10 @@ public class GobIcon extends GAttrib {
 			});
 			conf.dsave();
 			ui.gui.msg(new UI.InfoMessage(selectedPreset + " map icons preset has been set!", Color.WHITE, UI.InfoMessage.sfx));
+			if (ui != null && ui.gui != null) {
+				ui.sess.glob.oc.gobAction(Gob::updateHidingBoxes);
+				ui.gui.map.updatePlobHidingBox();
+			}
 		}
 	}
 
