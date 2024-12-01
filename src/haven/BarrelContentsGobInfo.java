@@ -11,8 +11,7 @@ public class BarrelContentsGobInfo extends GobInfo {
     private static final Color BG = new Color(0, 0, 0, 84);
     private static final Map<Pair<Color, String>, Text.Line> TEXT_CACHE = new HashMap<>();
     private String contents = null;
-
-
+	private Tex barrelInfoTex;
 
     protected BarrelContentsGobInfo(Gob owner) {
 	super(owner);
@@ -30,9 +29,12 @@ public class BarrelContentsGobInfo extends GobInfo {
 	up(6);
 	BufferedImage content = content();
 	if(content == null) {
+		barrelInfoTex = null;
 		return null;
 	}
-	return new TexI(ItemInfo.catimgsh(3, 0, BG, content));
+	if (barrelInfoTex != null)
+		return barrelInfoTex;
+	return barrelInfoTex = new TexI(ItemInfo.catimgsh(3, 0, BG, content));
     }
 
     private BufferedImage content() {
