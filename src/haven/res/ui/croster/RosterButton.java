@@ -29,7 +29,7 @@ public class RosterButton extends MenuGrid.PagButton {
 	if(wnd == null) {
 	    wnd = new RosterWindow();
 	    wnd.addroster(rost);
-	    gui.addchild(wnd, "misc", new Coord2d(0.3, 0.3), new Object[] {"id", "croster"});
+	    gui.addchild(wnd, "misc", new Coord(0, 0), new Object[] {"id", "croster"});
 	    synchronized(RosterWindow.rosters) {
 		RosterWindow.rosters.put(pag.scm.ui.sess.glob, wnd);
 	    }
