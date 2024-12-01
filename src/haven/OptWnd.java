@@ -1724,8 +1724,13 @@ public class OptWnd extends Window {
 			showFoodTroughsRadiiCheckBox.tooltip = showFoodThroughsRadiiTooltip;
 			rightColumn = add(showBarrelContentsTextCheckBox = new CheckBox("Show Barrel Contents Text"){
 				{a = (Utils.getprefb("showBarrelContentsText", true));}
-				public void changed(boolean val) {
+				public void set(boolean val) {
 					Utils.setprefb("showBarrelContentsText", val);
+					a = val;
+					if (ui != null && ui.gui != null){
+						ui.sess.glob.oc.gobAction(Gob::updateTroughsRadius);
+						ui.gui.optionInfoMsg("Barrel Contents Text is now " + (val ? "SHOWN" : "HIDDEN") + "!", (val ? msgGreen : msgGray), Audio.resclip(val ? Toggle.sfxon : Toggle.sfxoff));
+					}
 				}
 			}, rightColumn.pos("bl").adds(0, 2));
 
