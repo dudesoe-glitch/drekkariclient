@@ -1994,7 +1994,7 @@ public class OptWnd extends Window {
 //	    y = addbtn(cont, "Quick chat", ChatUI.kb_quick, y);
 //	    y = addbtn(cont, "Take screenshot", GameUI.kb_shoot, y);
 	    y = addbtn(cont, "Minimap icons", GameUI.kb_ico, y);
-//	    y = addbtn(cont, "Toggle UI", GameUI.kb_hide, y); // TODO: ND: Implement proper Toggle UI that hides everything
+	    y = addbtn(cont, "Toggle UI", GameUI.kb_hide, y);
 	    y = addbtn(cont, "Log out", GameUI.kb_logout, y);
 	    y = addbtn(cont, "Switch character", GameUI.kb_switchchr, y);
 

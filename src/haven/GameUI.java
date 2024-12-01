@@ -112,6 +112,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 	public static boolean subscribedAccount = false;
 	public QuestHelper questhelper;
 	public static Map<Long,String> gobIdToKinName = new ConcurrentHashMap<>();
+	public static boolean showUI = true;
 
 	// Script Threads
 	public Thread autoRepeatFlowerMenuScriptThread;
@@ -383,6 +384,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 	add(new Widget(new Coord(360, umpanel.sz.y)) {
 		@Override
 		public void draw(GOut g) {
+			if (showUI) {
 				if (c.x != umpanel.c.x - (int) (this.sz.x * 0.98))
 					c.x = umpanel.c.x - (int) (this.sz.x * 0.98);
 				Tex mtime = ui.sess.glob.mservertimetex.get().b;
@@ -408,12 +410,14 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 					y += btime.sz().y;
 				}
 				if (sz.y != y) resize(sz.x, y);
+			}
 		}
 	}, new Coord(umpanel.c.x - (int)(this.sz.x*0.98), UI.scale(1)));
 
 	add(new StatusWdg(){
 		@Override
 		public void draw(GOut g) {
+			if (showUI){
 				if (c.x != umpanel.c.x + umpanel.sz.x - UI.scale(10))
 					c.x = umpanel.c.x + umpanel.sz.x - UI.scale(10);
 				g.image(players, Coord.z);
@@ -422,6 +426,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 				if (pingtime.sz().x > w)
 					w = pingtime.sz().x;
 				this.sz = new Coord(w, players.sz().y + pingtime.sz().y);
+			}
 		}
 	}, new Coord(umpanel.sz.x, UI.scale(11)));
 
@@ -1126,6 +1131,19 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 			qqview = null;
 			destroy();
 		    }
+
+			@Override
+			public void draw(GOut g) {
+				if (showUI)
+					super.draw(g);
+			}
+
+			@Override
+			public boolean mousedown(MouseDownEvent ev) {
+				if (!showUI)
+					return(false);
+				return super.mousedown(ev);
+			}
 		});
 	} else if(place == "misc") {
 	    Coord c;
@@ -1314,7 +1332,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 	int x = (int)(ui.gui.sz.x / 2.0);
 	int y = (int)(ui.gui.sz.y - ((ui.gui.sz.y / 500.0) * OptWnd.combatUITopPanelHeightSlider.val));
 	int bottom = (int)(ui.gui.sz.y - ((ui.gui.sz.y / 500.0) * OptWnd.combatUIBottomPanelHeightSlider.val));
-	if (OptWnd.alwaysShowCombatUIStaminaBarCheckBox.a) {
+	if (OptWnd.alwaysShowCombatUIStaminaBarCheckBox.a && showUI) {
 		IMeter.Meter stam = ui.gui.getmeter("stam", 0);
 		if (stam != null) {
 			Coord msz = UI.scale(new Coord(234, 22));
@@ -1322,7 +1340,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 			drawStamMeterBar(g, stam, sc, msz);
 		}
 	}
-	if (OptWnd.alwaysShowCombatUIHealthBarCheckBox.a) {
+	if (OptWnd.alwaysShowCombatUIHealthBarCheckBox.a && showUI) {
 		IMeter.Meter hp = ui.gui.getmeter("hp", 0);
 		if (hp != null) {
 			Coord msz = UI.scale(new Coord(234, 22));
@@ -1936,7 +1954,11 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
     }
 
     public void toggleui() {
-	toggleui((uimode + 1) % 3);
+		chat.show(!showUI);
+		Hidepanel[] panels = {brpanel, ulpanel, umpanel, urpanel, menupanel};
+		for(Hidepanel p : panels)
+			p.mshow(!showUI);
+		showUI = !showUI;
     }
 
     public void resize(Coord sz) {
@@ -2378,19 +2400,22 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 		}
 
 		public void draw(GOut g) {
-			for(int i = 0; i < 10; i++) {
-				int slot = i + (curbelt * 12);
-				Coord c = beltc(i);
-				g.image(invsq, beltc(i));
-				try {
-					if(belt[slot] != null) {
-						belt[slot].draw(g.reclip(c.add(UI.scale(1), UI.scale(1)), invsq.sz().sub(UI.scale(2), UI.scale(2))));
+			if (showUI) {
+				for (int i = 0; i < 10; i++) {
+					int slot = i + (curbelt * 12);
+					Coord c = beltc(i);
+					g.image(invsq, beltc(i));
+					try {
+						if (belt[slot] != null) {
+							belt[slot].draw(g.reclip(c.add(UI.scale(1), UI.scale(1)), invsq.sz().sub(UI.scale(2), UI.scale(2))));
+						}
+					} catch (Exception ignored) {
 					}
-				} catch(Exception ignored) {}
-				String keybindString = beltkeys[i].key().name();
-				g.aimage(new TexI(Utils.outline2(actBarKeybindsFoundry.render(keybindString).img, Color.BLACK, true)), c.add(invsq.sz().sub(UI.scale(2), 0)), 1, 1);
+					String keybindString = beltkeys[i].key().name();
+					g.aimage(new TexI(Utils.outline2(actBarKeybindsFoundry.render(keybindString).img, Color.BLACK, true)), c.add(invsq.sz().sub(UI.scale(2), 0)), 1, 1);
+				}
+				super.draw(g);
 			}
-			super.draw(g);
 		}
 
 		public boolean globtype(GlobKeyEvent ev) {
@@ -2452,6 +2477,8 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 
 		@Override
 		public boolean mousedown(MouseDownEvent ev) {
+			if (!showUI)
+				return(false);
 			if (ev.b == 2) {
 				if((dragging != null)) { // ND: I need to do this extra check and remove it in case you do another click before the mouseup. Idk why it has to be done like this, but it solves the issue.
 					dragging.remove();

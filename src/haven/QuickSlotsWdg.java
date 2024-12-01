@@ -17,6 +17,8 @@ public class QuickSlotsWdg extends Widget implements DTarget {
 
     @Override
     public void draw(GOut g) {
+        if (!GameUI.showUI)
+            return;
         Equipory e = ui.gui.getequipory();
         if (e != null) {
             g.image(sbg, Coord.z);
@@ -77,6 +79,8 @@ public class QuickSlotsWdg extends Widget implements DTarget {
 
     @Override
     public boolean mousedown(MouseDownEvent ev) {
+        if (!GameUI.showUI)
+            return false;
         if (ui.modmeta || ui.modctrl)
             return true;
         if (ev.b == 2) {
