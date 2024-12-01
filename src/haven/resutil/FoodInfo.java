@@ -155,8 +155,8 @@ public class FoodInfo extends ItemInfo.Tip {
 	    imgs.add(efi);
 	}
 		imgs.add(RichText.render(String.format("\nTotal FEPs: $col[0,180,0]{%s}", Utils.odformat2(calculateEfficiency ? (totalFeps * (fepEfficiency/100)) : totalFeps, 2)), 0).img);
-		imgs.add(RichText.render(String.format("FEPs/Hunger: $col[0,180,0]{%s}", Utils.odformat2(calculateEfficiency ? totalFeps * (fepEfficiency/100) / (glut * 1000 * (hungerEfficiency/100)) : totalFeps / (glut * 1000), 2)), 0).img);
-
+		if (glut > 0)
+			imgs.add(RichText.render(String.format("FEPs/Hunger: $col[0,180,0]{%s}", Utils.odformat2(calculateEfficiency ? totalFeps * (fepEfficiency/100) / (glut * 1000 * (hungerEfficiency/100)) : totalFeps / (glut * 1000), 2)), 0).img);
 		if (calculateEfficiency){
 			List<BAttrWnd.FoodMeter.El> els = ui.gui.chrwdg.battr.feps.els;
 			BufferedImage cur = null;
