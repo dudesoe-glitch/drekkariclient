@@ -27,6 +27,7 @@ public class RefillWaterContainers implements Runnable {
                     if (res != null) {
                         if (res.name.equals("gfx/tiles/water") || res.name.equals("gfx/tiles/deep")) {
                             Inventory belt = returnBelt();
+                            Equipory equipory = gui.getequipory();
                             Map<WItem, Coord> inventoryItems = getInventoryContainers();
                             for (Map.Entry<WItem, Coord> item : inventoryItems.entrySet()) {
                                 try {
@@ -53,6 +54,19 @@ public class RefillWaterContainers implements Runnable {
                                     return;
                                 }
                             }
+                            Map<WItem, Integer> equiporyPouchItems = getEquiporyPouchContainers();
+                            for (Map.Entry<WItem, Integer> item : equiporyPouchItems.entrySet()) {
+                                try {
+                                    item.getKey().item.wdgmsg("take", Coord.z);
+                                    Thread.sleep(5);
+                                    gui.map.wdgmsg("itemact", Coord.z, gui.map.player().rc.floor(posres), 0);
+                                    Thread.sleep(40);
+                                    equipory.wdgmsg("drop", item.getValue());
+                                    Thread.sleep(5);
+                                } catch (InterruptedException ignored) {
+                                    return;
+                                }
+                            }
                         } else if (res.name.equals("gfx/tiles/owater") || res.name.equals("gfx/tiles/odeep") || res.name.equals("gfx/tiles/odeeper")){
                             gui.ui.error("Refill Water Script: This is salt water, you can't drink this!");
                             return;
@@ -65,7 +79,7 @@ public class RefillWaterContainers implements Runnable {
                     gui.ui.error("Refill Water Script: You must be on a water tile, in order to refill your containers!");
                     return;
                 }
-            } while (getInventoryContainers().size() != 0 || getBeltContainers().size() != 0);
+            } while (getInventoryContainers().size() != 0 || getBeltContainers().size() != 0 || getEquiporyPouchContainers().size() != 0);
             gui.ui.msg("Water Refilled!");
         } catch (Exception e) {
 //            gui.ui.error("Refill Water Containers Script: An Unknown Error has occured.");
@@ -141,6 +155,31 @@ public class RefillWaterContainers implements Runnable {
                         }
                     }
                 }
+            }
+        }
+        return containers;
+    }
+
+    public Map<WItem, Integer> getEquiporyPouchContainers() {
+        WItem leftPouch = gui.getequipory().slots[19];
+        WItem rightPouch = gui.getequipory().slots[20];
+        Map<WItem, Integer> containers = new HashMap<>();
+        if (leftPouch != null) {
+            String resName = leftPouch.item.res.get().name;
+            ItemInfo.Contents.Content content = getContent(leftPouch.item);
+            if ((resName.equals("gfx/invobjs/small/waterskin") && shouldAddToContainers(content, 3.0F))
+                    || (resName.equals("gfx/invobjs/waterflask") && shouldAddToContainers(content, 2.0F))
+                    || (resName.equals("gfx/invobjs/small/glassjug") && shouldAddToContainers(content, 5.0F))) {
+                containers.put(leftPouch, 19);
+            }
+        }
+        if (rightPouch != null) {
+            String resName = rightPouch.item.res.get().name;
+            ItemInfo.Contents.Content content = getContent(rightPouch.item);
+            if ((resName.equals("gfx/invobjs/small/waterskin") && shouldAddToContainers(content, 3.0F))
+                    || (resName.equals("gfx/invobjs/waterflask") && shouldAddToContainers(content, 2.0F))
+                    || (resName.equals("gfx/invobjs/small/glassjug") && shouldAddToContainers(content, 5.0F))) {
+                containers.put(rightPouch, 20);
             }
         }
         return containers;
