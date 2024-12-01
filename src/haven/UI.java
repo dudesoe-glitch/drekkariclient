@@ -1046,7 +1046,7 @@ public class UI {
 			initStudydeskUi(pwdg, (Inventory) wdg);
 		}
 		if (wdg instanceof Inventory && cap.equals("Table")) {
-			if (((Inventory)wdg).isz.equals(6, 6))
+			if (!((Inventory)wdg).isz.equals(3, 3) && !((Inventory)wdg).isz.equals(1, 2))
 				initTableUi(pwdg, (Inventory) wdg);
 			if (((Inventory)wdg).isz.equals(3, 3) || ((Inventory)wdg).isz.equals(1, 2) ) {
 				wdg.add(new WidgetChildActor<Inventory>((Inventory)wdg) {
