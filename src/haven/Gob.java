@@ -1407,17 +1407,19 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 			return;
 		}
 		boolean mapIconVisible = false;
-		if (OptWnd.dontHideObjectsThatHaveTheirMapIconEnabledCheckBox.a) {
-			// TODO: ND: I've spent 3 hours trying to figure out how to make this map icon thing work on login (if you're already hiding objects and have an icon enabled)
-			//  It's probably something to do with this conf.show changing at some point somewhere, AFTER the hiding boxes are updated, BUT WHERE?. Seems to only happen on login.
-			GobIcon icon = getattr(GobIcon.class);
-			if (icon != null && glob.sess.ui.gui != null && glob.sess.ui.gui.iconconf != null) {
-				GobIcon.Setting conf = glob.sess.ui.gui.iconconf.get(icon.icon());
-				if (conf != null && conf.show) {
-					mapIconVisible = true;
+		try { // ND: If we don't try catch this, "Tried to wait for unwaitable event" is thrown and the gob (noticed with players) is loaded but won't move around. Spooky.
+			if (OptWnd.dontHideObjectsThatHaveTheirMapIconEnabledCheckBox.a) {
+				// TODO: ND: I've spent 3 hours trying to figure out how to make this map icon thing work on login (if you're already hiding objects and have an icon enabled)
+				//  It's probably something to do with this conf.show changing at some point somewhere, AFTER the hiding boxes are updated, BUT WHERE?. Seems to only happen on login.
+				GobIcon icon = getattr(GobIcon.class);
+				if (icon != null && glob.sess.ui.gui != null && glob.sess.ui.gui.iconconf != null) {
+					GobIcon.Setting conf = glob.sess.ui.gui.iconconf.get(icon.icon());
+					if (conf != null && conf.show) {
+						mapIconVisible = true;
+					}
 				}
 			}
-		}
+		} catch (Loading ignored) {}
 		boolean doHide = false;
 		boolean doShowHidingBox = false;
 		Resource res = Gob.this.getres();
