@@ -32,7 +32,7 @@ public class AutoDropManagerWindow extends Window {
                 Utils.setprefb("autoDropItems", val);
                 a = val;
                 if (ui != null && ui.gui != null) {
-                    ui.gui.optionInfoMsg("Auto-Drop Items from Inventory now " + (val ? "ENABLED" : "DISABLED") + "!", (val ? OptWnd.msgGreen : OptWnd.msgRed), Audio.resclip(val ? Toggle.sfxon : Toggle.sfxoff));
+                    ui.gui.optionInfoMsg("Auto-Drop Items from Inventory is now " + (val ? "ENABLED" : "DISABLED") + "!", (val ? OptWnd.msgGreen : OptWnd.msgRed), Audio.resclip(val ? Toggle.sfxon : Toggle.sfxoff));
                 }
             }
         }, 0, 6);
