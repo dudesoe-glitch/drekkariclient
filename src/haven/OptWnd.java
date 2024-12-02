@@ -1212,6 +1212,7 @@ public class OptWnd extends Window {
 	public class DisplaySettingsPanel extends Panel {
 		public DisplaySettingsPanel(Panel back) {
 			Widget leftColumn;
+			Widget middleColumn;
 			Widget rightColumn;
 			leftColumn = add(new Label("Object fine-placement granularity"), 0, 0);
 			{
@@ -1555,19 +1556,6 @@ public class OptWnd extends Window {
 				}
 			}, leftColumn.pos("ul").adds(160, 2));
 
-			leftColumn = add(displayGrowthInfoCheckBox = new CheckBox("Display Growth Info on Plants and Trees"){
-				{a = (Utils.getprefb("displayGrowthInfo", false));}
-				public void changed(boolean val) {
-					Utils.setprefb("displayGrowthInfo", val);
-				}
-			}, leftColumn.pos("bl").adds(0, 2));
-			displayGrowthInfoCheckBox.tooltip = displayGrowthInfoTooltip;
-			leftColumn = add(alsoShowOversizedTreesAbovePercentageCheckBox = new CheckBox("Also Show Trees Above %:"){
-				{a = (Utils.getprefb("alsoShowOversizedTreesAbovePercentage", true));}
-				public void changed(boolean val) {
-					Utils.setprefb("alsoShowOversizedTreesAbovePercentage", val);
-				}
-			}, leftColumn.pos("bl").adds(12, 2));
 			leftColumn = add(objectPermanentHighlightingCheckBox = new CheckBox("Permanently Highlight Objects with on Alt + Middle Click (Mouse Scroll Click)"){
 				{a = (Utils.getprefb("objectPermanentHighlighting", false));}
 				public void changed(boolean val) {
@@ -1580,7 +1568,7 @@ public class OptWnd extends Window {
 				}
 			}, leftColumn.pos("bl").adds(0, 12).x(0));
 
-			rightColumn = add(toggleGobCollisionBoxesCheckBox = new CheckBox("Show Object Collision Boxes"){
+			middleColumn = add(toggleGobCollisionBoxesCheckBox = new CheckBox("Show Object Collision Boxes"){
 				{a = (Utils.getprefb("gobCollisionBoxesDisplayToggle", false));}
 				public void set(boolean val) {
 					Utils.setprefb("gobCollisionBoxesDisplayToggle", val);
@@ -1590,15 +1578,15 @@ public class OptWnd extends Window {
 						ui.gui.map.updatePlobCollisionBox();
 					}
 				}
-			}, UI.scale(230, 0));
+			}, UI.scale(240, 0));
 			toggleGobCollisionBoxesCheckBox.tooltip = genericHasKeybindTooltip;
-			rightColumn = add(collisionBoxColorOptionWidget = new ColorOptionWidget("Collision Box Color:", "collisionBox", 115, Integer.parseInt(collisionBoxColorSetting[0]), Integer.parseInt(collisionBoxColorSetting[1]), Integer.parseInt(collisionBoxColorSetting[2]), Integer.parseInt(collisionBoxColorSetting[3]), (Color col) -> {
+			middleColumn = add(collisionBoxColorOptionWidget = new ColorOptionWidget("Collision Box Color:", "collisionBox", 115, Integer.parseInt(collisionBoxColorSetting[0]), Integer.parseInt(collisionBoxColorSetting[1]), Integer.parseInt(collisionBoxColorSetting[2]), Integer.parseInt(collisionBoxColorSetting[3]), (Color col) -> {
 				CollisionBox.SOLID_HOLLOW = Pipe.Op.compose(new ColorMask(col), new States.LineWidth(CollisionBox.WIDTH), CollisionBox.TOP);
 				if (ui != null && ui.gui != null) {
 					ui.sess.glob.oc.gobAction(Gob::updateCollisionBoxes);
 					ui.gui.map.updatePlobCollisionBox();
 				}
-			}){}, rightColumn.pos("bl").adds(1, 0));
+			}){}, middleColumn.pos("bl").adds(1, 0));
 			add(new Button(UI.scale(70), "Reset", false).action(() -> {
 				Utils.setprefsa("collisionBox" + "_colorSetting", new String[]{"255", "255", "255", "210"});
 				collisionBoxColorOptionWidget.cb.colorChooser.setColor(collisionBoxColorOptionWidget.currentColor = new Color(255, 255, 255, 210));
@@ -1609,18 +1597,145 @@ public class OptWnd extends Window {
 				}
 			}), collisionBoxColorOptionWidget.pos("ur").adds(10, 0));
 
-			rightColumn = add(displayObjectHealthPercentageCheckBox = new CheckBox("Display Object Health Percentage"){
+			middleColumn = add(displayObjectHealthPercentageCheckBox = new CheckBox("Display Object Health Percentage"){
 				{a = (Utils.getprefb("displayObjectHealthPercentage", true));}
 				public void changed(boolean val) {
 					Utils.setprefb("displayObjectHealthPercentage", val);
 				}
-			}, rightColumn.pos("bl").adds(0, 12).x(UI.scale(230)));
-			rightColumn = add(displayObjectQualityOnInspectionCheckBox = new CheckBox("Display Object Quality on Inspection"){
+			}, middleColumn.pos("bl").adds(0, 12).x(UI.scale(240)));
+			middleColumn = add(displayObjectQualityOnInspectionCheckBox = new CheckBox("Display Object Quality on Inspection"){
 				{a = (Utils.getprefb("displayObjectQualityOnInspection", true));}
 				public void changed(boolean val) {
 					Utils.setprefb("displayObjectQualityOnInspection", val);
 				}
-			}, rightColumn.pos("bl").adds(0, 2));
+			}, middleColumn.pos("bl").adds(0, 2));
+
+			middleColumn = add(showCritterAurasCheckBox = new CheckBox("Show Critter Circle Auras (Clickable)"){
+				{a = (Utils.getprefb("showCritterAuras", true));}
+				public void changed(boolean val) {
+					Utils.setprefb("showCritterAuras", val);
+					if (ui != null && ui.gui != null) {
+						ui.sess.glob.oc.gobAction(Gob::updateCritterAuras);
+					}
+				}
+			}, middleColumn.pos("bl").adds(0, 17));
+			middleColumn = add(rabbitAuraColorOptionWidget = new ColorOptionWidget("Rabbit Aura:", "rabbitAura", 115, Integer.parseInt(rabbitAuraColorSetting[0]), Integer.parseInt(rabbitAuraColorSetting[1]), Integer.parseInt(rabbitAuraColorSetting[2]), Integer.parseInt(rabbitAuraColorSetting[3]), (Color col) -> {
+				if (ui != null && ui.gui != null) {
+					ui.sess.glob.oc.gobAction(Gob::updateCritterAuras);
+				}
+			}){}, middleColumn.pos("bl").adds(1, 1));
+			add(new Button(UI.scale(70), "Reset", false).action(() -> {
+				Utils.setprefsa("rabbitAura" + "_colorSetting", new String[]{"88", "255", "0", "140"});
+				rabbitAuraColorOptionWidget.cb.colorChooser.setColor(rabbitAuraColorOptionWidget.currentColor = new Color(88, 255, 0, 140));
+				if (ui != null && ui.gui != null) {
+					ui.sess.glob.oc.gobAction(Gob::updateCritterAuras);
+				}
+			}), rabbitAuraColorOptionWidget.pos("ur").adds(10, 0));
+			middleColumn = add(genericCritterAuraColorOptionWidget = new ColorOptionWidget("Generic Critter Aura:", "genericCritterAura", 115, Integer.parseInt(genericCritterAuraColorSetting[0]), Integer.parseInt(genericCritterAuraColorSetting[1]), Integer.parseInt(genericCritterAuraColorSetting[2]), Integer.parseInt(genericCritterAuraColorSetting[3]), (Color col) -> {
+				if (ui != null && ui.gui != null) {
+					ui.sess.glob.oc.gobAction(Gob::updateCritterAuras);
+				}
+			}){}, middleColumn.pos("bl").adds(0, 4));
+			add(new Button(UI.scale(70), "Reset", false).action(() -> {
+				Utils.setprefsa("genericCritterAura" + "_colorSetting", new String[]{"193", "0", "255", "140"});
+				genericCritterAuraColorOptionWidget.cb.colorChooser.setColor(genericCritterAuraColorOptionWidget.currentColor = new Color(193, 0, 255, 140));
+				if (ui != null && ui.gui != null) {
+					ui.sess.glob.oc.gobAction(Gob::updateCritterAuras);
+				}
+			}), genericCritterAuraColorOptionWidget.pos("ur").adds(10, 0));
+
+			middleColumn = add(showSpeedBuffAurasCheckBox = new CheckBox("Show Speed Buff Circle Auras"){
+				{a = (Utils.getprefb("showSpeedBuffAuras", true));}
+				public void set(boolean val) {
+					Utils.setprefb("showSpeedBuffAuras", val);
+					a = val;
+					if (ui != null && ui.gui != null) {
+						ui.sess.glob.oc.gobAction(Gob::updateSpeedBuffAuras);
+					}
+				}
+			}, middleColumn.pos("bl").adds(0, 18).x(UI.scale(240)));
+			middleColumn = add(speedBuffAuraColorOptionWidget = new ColorOptionWidget("Speed Buff Aura:", "speedBuffAura", 115, Integer.parseInt(speedBuffAuraColorSetting[0]), Integer.parseInt(speedBuffAuraColorSetting[1]), Integer.parseInt(speedBuffAuraColorSetting[2]), Integer.parseInt(speedBuffAuraColorSetting[3]), (Color col) -> {
+				if (ui != null && ui.gui != null) {
+					ui.sess.glob.oc.gobAction(Gob::updateSpeedBuffAuras);
+				}
+			}){}, middleColumn.pos("bl").adds(1, 1));
+			add(new Button(UI.scale(70), "Reset", false).action(() -> {
+				Utils.setprefsa("speedBuffAura" + "_colorSetting", new String[]{"255", "255", "255", "140"});
+				speedBuffAuraColorOptionWidget.cb.colorChooser.setColor(speedBuffAuraColorOptionWidget.currentColor = new Color(255, 255, 255, 140));
+				if (ui != null && ui.gui != null) {
+					ui.sess.glob.oc.gobAction(Gob::updateSpeedBuffAuras);
+				}
+			}), speedBuffAuraColorOptionWidget.pos("ur").adds(10, 0));
+
+			middleColumn = add(showMidgesCircleAurasCheckBox = new CheckBox("Show Midges Circle Auras"){
+				{a = (Utils.getprefb("showMidgesCircleAuras", true));}
+				public void changed(boolean val) {
+					Utils.setprefb("showMidgesCircleAuras", val);
+					if (ui != null && ui.gui != null) {
+						ui.sess.glob.oc.gobAction(Gob::updateMidgesAuras);
+					}
+				}
+			}, middleColumn.pos("bl").adds(0, 18).x(UI.scale(240)));
+
+			middleColumn = add(showBeastDangerRadiiCheckBox = new CheckBox("Show Beast Danger Radii"){
+				{a = (Utils.getprefb("showBeastDangerRadii", true));}
+				public void changed(boolean val) {
+					Utils.setprefb("showBeastDangerRadii", val);
+					if (ui != null && ui.gui != null) {
+						ui.sess.glob.oc.gobAction(Gob::updateBeastDangerRadii);
+					}
+				}
+			}, middleColumn.pos("bl").adds(0, 2));
+
+			middleColumn = add(showBeeSkepsRadiiCheckBox = new CheckBox("Show Bee Skep Radii"){
+				{a = (Utils.getprefb("showBeeSkepsRadii", false));}
+				public void set(boolean val) {
+					Utils.setprefb("showBeeSkepsRadii", val);
+					a = val;
+					if (ui != null && ui.gui != null){
+						ui.sess.glob.oc.gobAction(Gob::updateBeeSkepRadius);
+						ui.gui.optionInfoMsg("Bee Skep Radii are now " + (val ? "SHOWN" : "HIDDEN") + "!", (val ? msgGreen : msgGray), Audio.resclip(val ? Toggle.sfxon : Toggle.sfxoff));
+					}
+				}
+			}, middleColumn.pos("bl").adds(0, 2));
+			showBeeSkepsRadiiCheckBox.tooltip = showBeeSkepsRadiiTooltip;
+			middleColumn = add(showFoodTroughsRadiiCheckBox = new CheckBox("Show Food Trough Radii"){
+				{a = (Utils.getprefb("showFoodTroughsRadii", false));}
+				public void set(boolean val) {
+					Utils.setprefb("showFoodTroughsRadii", val);
+					a = val;
+					if (ui != null && ui.gui != null){
+						ui.sess.glob.oc.gobAction(Gob::updateTroughsRadius);
+						ui.gui.optionInfoMsg("Food Trough Radii are now " + (val ? "SHOWN" : "HIDDEN") + "!", (val ? msgGreen : msgGray), Audio.resclip(val ? Toggle.sfxon : Toggle.sfxoff));
+					}
+				}
+			}, middleColumn.pos("bl").adds(0, 2));
+			showFoodTroughsRadiiCheckBox.tooltip = showFoodThroughsRadiiTooltip;
+			middleColumn = add(showBarrelContentsTextCheckBox = new CheckBox("Show Barrel Contents Text"){
+				{a = (Utils.getprefb("showBarrelContentsText", true));}
+				public void set(boolean val) {
+					Utils.setprefb("showBarrelContentsText", val);
+					a = val;
+					if (ui != null && ui.gui != null){
+						ui.sess.glob.oc.gobAction(Gob::updateTroughsRadius);
+						ui.gui.optionInfoMsg("Barrel Contents Text is now " + (val ? "SHOWN" : "HIDDEN") + "!", (val ? msgGreen : msgGray), Audio.resclip(val ? Toggle.sfxon : Toggle.sfxoff));
+					}
+				}
+			}, middleColumn.pos("bl").adds(0, 12));
+
+			middleColumn = add(displayGrowthInfoCheckBox = new CheckBox("Display Growth Info on Plants and Trees"){
+				{a = (Utils.getprefb("displayGrowthInfo", false));}
+				public void changed(boolean val) {
+					Utils.setprefb("displayGrowthInfo", val);
+				}
+			}, middleColumn.pos("bl").adds(0, 2));
+			displayGrowthInfoCheckBox.tooltip = displayGrowthInfoTooltip;
+			middleColumn = add(alsoShowOversizedTreesAbovePercentageCheckBox = new CheckBox("Also Show Trees Above %:"){
+				{a = (Utils.getprefb("alsoShowOversizedTreesAbovePercentage", true));}
+				public void changed(boolean val) {
+					Utils.setprefb("alsoShowOversizedTreesAbovePercentage", val);
+				}
+			}, middleColumn.pos("bl").adds(12, 2));
 			add(oversizedTreesPercentageTextEntry = new TextEntry(UI.scale(36), Utils.getpref("oversizedTreesPercentage", "150")){
 				protected void changed() {
 					this.settext(this.text().replaceAll("[^\\d]", "")); // Only numbers
@@ -1633,125 +1748,12 @@ public class OptWnd extends Window {
 				}
 			}, alsoShowOversizedTreesAbovePercentageCheckBox.pos("ur").adds(4, 0));
 
-			rightColumn = add(showCritterAurasCheckBox = new CheckBox("Show Critter Circle Auras (Clickable)"){
-				{a = (Utils.getprefb("showCritterAuras", true));}
-				public void changed(boolean val) {
-					Utils.setprefb("showCritterAuras", val);
-					if (ui != null && ui.gui != null) {
-						ui.sess.glob.oc.gobAction(Gob::updateCritterAuras);
-					}
-				}
-			}, rightColumn.pos("bl").adds(0, 17).x(UI.scale(230)));
-			rightColumn = add(rabbitAuraColorOptionWidget = new ColorOptionWidget("Rabbit Aura:", "rabbitAura", 115, Integer.parseInt(rabbitAuraColorSetting[0]), Integer.parseInt(rabbitAuraColorSetting[1]), Integer.parseInt(rabbitAuraColorSetting[2]), Integer.parseInt(rabbitAuraColorSetting[3]), (Color col) -> {
-				if (ui != null && ui.gui != null) {
-					ui.sess.glob.oc.gobAction(Gob::updateCritterAuras);
-				}
-			}){}, rightColumn.pos("bl").adds(1, 1));
-			add(new Button(UI.scale(70), "Reset", false).action(() -> {
-				Utils.setprefsa("rabbitAura" + "_colorSetting", new String[]{"88", "255", "0", "140"});
-				rabbitAuraColorOptionWidget.cb.colorChooser.setColor(rabbitAuraColorOptionWidget.currentColor = new Color(88, 255, 0, 140));
-				if (ui != null && ui.gui != null) {
-					ui.sess.glob.oc.gobAction(Gob::updateCritterAuras);
-				}
-			}), rabbitAuraColorOptionWidget.pos("ur").adds(10, 0));
-			rightColumn = add(genericCritterAuraColorOptionWidget = new ColorOptionWidget("Generic Critter Aura:", "genericCritterAura", 115, Integer.parseInt(genericCritterAuraColorSetting[0]), Integer.parseInt(genericCritterAuraColorSetting[1]), Integer.parseInt(genericCritterAuraColorSetting[2]), Integer.parseInt(genericCritterAuraColorSetting[3]), (Color col) -> {
-				if (ui != null && ui.gui != null) {
-					ui.sess.glob.oc.gobAction(Gob::updateCritterAuras);
-				}
-			}){}, rightColumn.pos("bl").adds(0, 4));
-			add(new Button(UI.scale(70), "Reset", false).action(() -> {
-				Utils.setprefsa("genericCritterAura" + "_colorSetting", new String[]{"193", "0", "255", "140"});
-				genericCritterAuraColorOptionWidget.cb.colorChooser.setColor(genericCritterAuraColorOptionWidget.currentColor = new Color(193, 0, 255, 140));
-				if (ui != null && ui.gui != null) {
-					ui.sess.glob.oc.gobAction(Gob::updateCritterAuras);
-				}
-			}), genericCritterAuraColorOptionWidget.pos("ur").adds(10, 0));
-
-			rightColumn = add(showSpeedBuffAurasCheckBox = new CheckBox("Show Speed Buff Circle Auras"){
-				{a = (Utils.getprefb("showSpeedBuffAuras", true));}
-				public void set(boolean val) {
-					Utils.setprefb("showSpeedBuffAuras", val);
-					a = val;
-					if (ui != null && ui.gui != null) {
-						ui.sess.glob.oc.gobAction(Gob::updateSpeedBuffAuras);
-					}
-				}
-			}, rightColumn.pos("bl").adds(0, 18).x(UI.scale(230)));
-			rightColumn = add(speedBuffAuraColorOptionWidget = new ColorOptionWidget("Speed Buff Aura:", "speedBuffAura", 115, Integer.parseInt(speedBuffAuraColorSetting[0]), Integer.parseInt(speedBuffAuraColorSetting[1]), Integer.parseInt(speedBuffAuraColorSetting[2]), Integer.parseInt(speedBuffAuraColorSetting[3]), (Color col) -> {
-				if (ui != null && ui.gui != null) {
-					ui.sess.glob.oc.gobAction(Gob::updateSpeedBuffAuras);
-				}
-			}){}, rightColumn.pos("bl").adds(1, 1));
-			add(new Button(UI.scale(70), "Reset", false).action(() -> {
-				Utils.setprefsa("speedBuffAura" + "_colorSetting", new String[]{"255", "255", "255", "140"});
-				speedBuffAuraColorOptionWidget.cb.colorChooser.setColor(speedBuffAuraColorOptionWidget.currentColor = new Color(255, 255, 255, 140));
-				if (ui != null && ui.gui != null) {
-					ui.sess.glob.oc.gobAction(Gob::updateSpeedBuffAuras);
-				}
-			}), speedBuffAuraColorOptionWidget.pos("ur").adds(10, 0));
-
-			rightColumn = add(showMidgesCircleAurasCheckBox = new CheckBox("Show Midges Circle Auras"){
-				{a = (Utils.getprefb("showMidgesCircleAuras", true));}
-				public void changed(boolean val) {
-					Utils.setprefb("showMidgesCircleAuras", val);
-					if (ui != null && ui.gui != null) {
-						ui.sess.glob.oc.gobAction(Gob::updateMidgesAuras);
-					}
-				}
-			}, rightColumn.pos("bl").adds(0, 18).x(UI.scale(230)));
-
-			rightColumn = add(showBeastDangerRadiiCheckBox = new CheckBox("Show Beast Danger Radii"){
-				{a = (Utils.getprefb("showBeastDangerRadii", true));}
-				public void changed(boolean val) {
-					Utils.setprefb("showBeastDangerRadii", val);
-					if (ui != null && ui.gui != null) {
-						ui.sess.glob.oc.gobAction(Gob::updateBeastDangerRadii);
-					}
-				}
-			}, rightColumn.pos("bl").adds(0, 2).x(UI.scale(230)));
-
-			rightColumn = add(showBeeSkepsRadiiCheckBox = new CheckBox("Show Bee Skep Radii"){
-				{a = (Utils.getprefb("showBeeSkepsRadii", false));}
-				public void set(boolean val) {
-					Utils.setprefb("showBeeSkepsRadii", val);
-					a = val;
-					if (ui != null && ui.gui != null){
-						ui.sess.glob.oc.gobAction(Gob::updateBeeSkepRadius);
-						ui.gui.optionInfoMsg("Bee Skep Radii are now " + (val ? "SHOWN" : "HIDDEN") + "!", (val ? msgGreen : msgGray), Audio.resclip(val ? Toggle.sfxon : Toggle.sfxoff));
-					}
-				}
-			}, rightColumn.pos("bl").adds(0, 2));
-			showBeeSkepsRadiiCheckBox.tooltip = showBeeSkepsRadiiTooltip;
-			rightColumn = add(showFoodTroughsRadiiCheckBox = new CheckBox("Show Food Trough Radii"){
-				{a = (Utils.getprefb("showFoodTroughsRadii", false));}
-				public void set(boolean val) {
-					Utils.setprefb("showFoodTroughsRadii", val);
-					a = val;
-					if (ui != null && ui.gui != null){
-						ui.sess.glob.oc.gobAction(Gob::updateTroughsRadius);
-						ui.gui.optionInfoMsg("Food Trough Radii are now " + (val ? "SHOWN" : "HIDDEN") + "!", (val ? msgGreen : msgGray), Audio.resclip(val ? Toggle.sfxon : Toggle.sfxoff));
-					}
-				}
-			}, rightColumn.pos("bl").adds(0, 2));
-			showFoodTroughsRadiiCheckBox.tooltip = showFoodThroughsRadiiTooltip;
-			rightColumn = add(showBarrelContentsTextCheckBox = new CheckBox("Show Barrel Contents Text"){
-				{a = (Utils.getprefb("showBarrelContentsText", true));}
-				public void set(boolean val) {
-					Utils.setprefb("showBarrelContentsText", val);
-					a = val;
-					if (ui != null && ui.gui != null){
-						ui.sess.glob.oc.gobAction(Gob::updateTroughsRadius);
-						ui.gui.optionInfoMsg("Barrel Contents Text is now " + (val ? "SHOWN" : "HIDDEN") + "!", (val ? msgGreen : msgGray), Audio.resclip(val ? Toggle.sfxon : Toggle.sfxoff));
-					}
-				}
-			}, rightColumn.pos("bl").adds(0, 2));
-
 			rightColumn = add(drawChaseVectorsCheckBox = new CheckBox("Draw Chase Vectors"){
 				{a = Utils.getprefb("drawChaseVectors", true);}
 				public void changed(boolean val) {
 					Utils.setprefb("drawChaseVectors", val);
 				}
-			}, rightColumn.pos("bl").adds(0, 12));
+			}, UI.scale(480, 0));
 			rightColumn = add(drawYourCurrentPathCheckBox = new CheckBox("Draw Your Current Path"){
 				{a = Utils.getprefb("drawYourCurrentPath", false);}
 				public void changed(boolean val) {
@@ -1766,7 +1768,7 @@ public class OptWnd extends Window {
 					if (ui != null && ui.gui != null && ui.gui.map != null && ui.gui.map.partyHighlight != null)
 						ui.gui.map.partyHighlight.update();
 				}
-			}, rightColumn.pos("bl").adds(0, 2));
+			}, rightColumn.pos("bl").adds(0, 12));
 			highlightPartyMembersCheckBox.tooltip = highlightPartyMembersTooltip;
 			rightColumn = add(showCirclesUnderPartyMembersCheckBox = new CheckBox("Show Circles under Party Members"){
 				{a = Utils.getprefb("showCirclesUnderPartyMembers", true);}
