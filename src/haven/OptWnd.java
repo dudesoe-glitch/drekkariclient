@@ -1218,6 +1218,11 @@ public class OptWnd extends Window {
 	public static ColorOptionWidget combatFoeColorOptionWidget;
 	public static String[] combatFoeColorSetting = Utils.getprefsa("combatFoe" + "_colorSetting", new String[]{"160", "0", "0", "164"});
 
+	public static ColorOptionWidget areaChatPingColorOptionWidget;
+	public static String[] areaChatPingColorSetting = Utils.getprefsa("areaChatPing" + "_colorSetting", new String[]{"255", "183", "0", "255"});
+	public static ColorOptionWidget partyChatPingColorOptionWidget;
+	public static String[] partyChatPingColorSetting = Utils.getprefsa("partyChatPing" + "_colorSetting", new String[]{"243", "0", "0", "255"});
+
 	public static CheckBox objectPermanentHighlightingCheckBox;
 
 	public class DisplaySettingsPanel extends Panel {
@@ -1854,6 +1859,19 @@ public class OptWnd extends Window {
 				}
 			}), combatFoeColorOptionWidget.pos("ur").adds(10, 0));
 
+			rightColumn = add(new Label("Object Pinging Colors:"), rightColumn.pos("bl").adds(0, 12).x(480));
+			rightColumn = add(areaChatPingColorOptionWidget = new ColorOptionWidget("Area Chat (Alt+LClick):", "areaChatPing", 115, Integer.parseInt(areaChatPingColorSetting[0]), Integer.parseInt(areaChatPingColorSetting[1]), Integer.parseInt(areaChatPingColorSetting[2]), Integer.parseInt(areaChatPingColorSetting[3]), (Color col) -> {
+			}){}, rightColumn.pos("bl").adds(1, 1));
+			add(new Button(UI.scale(70), "Reset", false).action(() -> {
+				Utils.setprefsa("areaChatPing" + "_colorSetting", new String[]{"255", "183", "0", "255"});
+				areaChatPingColorOptionWidget.cb.colorChooser.setColor(areaChatPingColorOptionWidget.currentColor = new Color(255, 183, 0, 255));
+			}), areaChatPingColorOptionWidget.pos("ur").adds(10, 0));
+			rightColumn = add(partyChatPingColorOptionWidget = new ColorOptionWidget("Party Chat (Alt+RClick):", "partyChatPing", 115, Integer.parseInt(partyChatPingColorSetting[0]), Integer.parseInt(partyChatPingColorSetting[1]), Integer.parseInt(partyChatPingColorSetting[2]), Integer.parseInt(partyChatPingColorSetting[3]), (Color col) -> {
+			}){}, rightColumn.pos("bl").adds(0, 4));
+			add(new Button(UI.scale(70), "Reset", false).action(() -> {
+				Utils.setprefsa("partyChatPing" + "_colorSetting", new String[]{"243", "0", "0", "255"});
+				partyChatPingColorOptionWidget.cb.colorChooser.setColor(partyChatPingColorOptionWidget.currentColor = new Color(243, 0, 0, 255));
+			}), partyChatPingColorOptionWidget.pos("ur").adds(10, 0));
 
 			Widget backButton;
 			add(backButton = new PButton(UI.scale(200), "Back", 27, back, "Advanced Settings"), leftColumn.pos("bl").adds(0, 18).x(0));
