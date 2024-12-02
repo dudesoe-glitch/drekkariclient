@@ -6,7 +6,7 @@ import haven.render.Pipe;
 import java.awt.*;
 
 public class GobCombatHighlight extends GAttrib implements Gob.SetupMod {
-    public final Color COMBAT_FOE_COLOR = new Color(160, 0, 0, 164);
+    public static Color COMBAT_FOE_COLOR = OptWnd.combatFoeColorOptionWidget.currentColor;
 
     public GobCombatHighlight(Gob g) {
 	super(g);

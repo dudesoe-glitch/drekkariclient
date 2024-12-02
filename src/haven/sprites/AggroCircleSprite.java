@@ -3,17 +3,16 @@ package haven.sprites;
 import haven.Gob;
 import haven.OptWnd;
 import haven.render.RenderTree;
-import haven.sprites.ColoredCircleSprite;
 
 import java.awt.*;
 
 
 public class AggroCircleSprite extends ColoredCircleSprite {
-    public static Color col = new Color(255, 0, 0, 140);
+    public static Color COMBAT_FOE_COLOR = OptWnd.combatFoeColorOptionWidget.currentColor;
     private boolean alive = true;
 
     public AggroCircleSprite(final Gob g) {
-        super(g, col, 4.6f, 6.1f, 0.5f);
+        super(g, COMBAT_FOE_COLOR, 4.6f, 6.1f, 0.5f);
     }
 
     public void rem() {

@@ -30,6 +30,7 @@ import haven.render.*;
 import haven.res.gfx.fx.msrad.MSRad;
 import haven.res.ui.pag.toggle.Toggle;
 import haven.resutil.Ridges;
+import haven.sprites.AggroCircleSprite;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
@@ -1214,6 +1215,9 @@ public class OptWnd extends Window {
 	public static String[] memberPartyColorSetting = Utils.getprefsa("memberParty" + "_colorSetting", new String[]{"0", "160", "0", "164"});
 	public static CheckBox highlightCombatFoesCheckBox;
 	public static CheckBox showCirclesUnderCombatFoesCheckBox;
+	public static ColorOptionWidget combatFoeColorOptionWidget;
+	public static String[] combatFoeColorSetting = Utils.getprefsa("combatFoe" + "_colorSetting", new String[]{"160", "0", "0", "164"});
+
 	public static CheckBox objectPermanentHighlightingCheckBox;
 
 	public class DisplaySettingsPanel extends Panel {
@@ -1823,13 +1827,33 @@ public class OptWnd extends Window {
 				public void changed(boolean val) {
 					Utils.setprefb("highlightCombatFoes", val);
 				}
-			}, rightColumn.pos("bl").adds(0, 12));
+			}, rightColumn.pos("bl").adds(0, 12).x(UI.scale(480)));
 			rightColumn = add(showCirclesUnderCombatFoesCheckBox = new CheckBox("Show Circles under Combat Foes"){
 				{a = Utils.getprefb("showCirclesUnderCombatFoes", true);}
 				public void changed(boolean val) {
 					Utils.setprefb("showCirclesUnderCombatFoes", val);
 				}
 			}, rightColumn.pos("bl").adds(0, 2));
+
+			rightColumn = add(combatFoeColorOptionWidget = new ColorOptionWidget("Combat Foes:", "combatFoes", 115, Integer.parseInt(combatFoeColorSetting[0]), Integer.parseInt(combatFoeColorSetting[1]), Integer.parseInt(combatFoeColorSetting[2]), Integer.parseInt(combatFoeColorSetting[3]), (Color col) -> {
+				GobCombatHighlight.COMBAT_FOE_COLOR = col;
+				AggroCircleSprite.COMBAT_FOE_COLOR = col;
+				if (ui != null && ui.gui != null) {
+					ui.sess.glob.oc.gobAction(Gob::removeCombatFoeCircleOverlay);
+					ui.sess.glob.oc.gobAction(Gob::removeCombatFoeHighlight);
+				}
+			}){}, rightColumn.pos("bl").adds(1, 1));
+			add(new Button(UI.scale(70), "Reset", false).action(() -> {
+				Utils.setprefsa("combatFoes" + "_colorSetting", new String[]{"160", "0", "0", "164"});
+				combatFoeColorOptionWidget.cb.colorChooser.setColor(combatFoeColorOptionWidget.currentColor = new Color(160, 0, 0, 164));
+				GobCombatHighlight.COMBAT_FOE_COLOR = combatFoeColorOptionWidget.currentColor;
+				AggroCircleSprite.COMBAT_FOE_COLOR = combatFoeColorOptionWidget.currentColor;
+				if (ui != null && ui.gui != null) {
+					ui.sess.glob.oc.gobAction(Gob::removeCombatFoeCircleOverlay);
+					ui.sess.glob.oc.gobAction(Gob::removeCombatFoeHighlight);
+				}
+			}), combatFoeColorOptionWidget.pos("ur").adds(10, 0));
+
 
 			Widget backButton;
 			add(backButton = new PButton(UI.scale(200), "Back", 27, back, "Advanced Settings"), leftColumn.pos("bl").adds(0, 18).x(0));
