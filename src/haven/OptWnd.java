@@ -1777,7 +1777,7 @@ public class OptWnd extends Window {
 				}
 			}, rightColumn.pos("bl").adds(0, 2));
 			showCirclesUnderPartyMembersCheckBox.tooltip = showCirclesUnderPartyMembersTooltip;
-			rightColumn = add(showCirclesUnderCombatFoesCheckBox = new CheckBox("Show Circles under Combat Foes (Players/Mobs)"){
+			rightColumn = add(showCirclesUnderCombatFoesCheckBox = new CheckBox("Show Circles under Combat Foes"){
 				{a = Utils.getprefb("showCirclesUnderCombatFoes", true);}
 				public void changed(boolean val) {
 					Utils.setprefb("showCirclesUnderCombatFoes", val);
