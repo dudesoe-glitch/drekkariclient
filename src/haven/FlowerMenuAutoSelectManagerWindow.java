@@ -1,16 +1,19 @@
 package haven;
 
+import haven.res.ui.pag.toggle.Toggle;
+
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Objects;
 
 public class FlowerMenuAutoSelectManagerWindow extends Window {
     private PetalList petalList;
+    public static CheckBox flowerMenuAutoSelectCheckBox;
 
     public FlowerMenuAutoSelectManagerWindow() {
         super(UI.scale(300, 350), "Auto-Select Manager (Flower Menus)");
 
-        add(new CheckBox("Enable Flower-Menu Auto-Select") {
+        add(flowerMenuAutoSelectCheckBox = new CheckBox("Enable Flower-Menu Auto-Select") {
             {
                 a = Utils.getprefb("flowerMenuAutoSelect", false);
             }
@@ -18,6 +21,9 @@ public class FlowerMenuAutoSelectManagerWindow extends Window {
                 a = val;
                 GameUI.flowerMenuAutoSelect = val;
                 Utils.setprefb("flowerMenuAutoSelect", val);
+                if (ui != null && ui.gui != null) {
+                    ui.gui.optionInfoMsg("Flower-Menu Auto-Select is now " + (val ? "ENABLED" : "DISABLED") + "!", (val ? OptWnd.msgGreen : OptWnd.msgRed), Audio.resclip(val ? Toggle.sfxon : Toggle.sfxoff));
+                }
             }
         }, UI.scale(10, 10));
 

@@ -451,7 +451,6 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 	actionBar3.raise();
 	actionBar4.c = Utils.getprefc("wndc-actionBar4", UI.unscale(new Coord(0, 620)));
 	actionBar4.raise();
-	OptWnd.flowerMenuAutoSelectManagerWindow = null;
 
 	makewnd = add(new CraftWindow(), Utils.getprefc("wndc-makewnd", new Coord(400, 200)));
 	makewnd.hide();

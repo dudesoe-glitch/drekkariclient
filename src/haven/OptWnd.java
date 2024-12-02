@@ -2265,12 +2265,11 @@ public class OptWnd extends Window {
 			}, prev.pos("bl").adds(16, 2));
 			alsoUseContainersWithRepeaterCheckBox.tooltip = alsoUseContainersWithRepeaterTooltip;
 			prev = add(new Button(UI.scale(250), "Flower-Menu Auto-Select Manager", false, () -> {
-				if(flowerMenuAutoSelectManagerWindow == null) {
-					flowerMenuAutoSelectManagerWindow = this.parent.parent.add(new FlowerMenuAutoSelectManagerWindow()); // ND: this.parent.parent is root widget in login screen or gui in game.
+				if(!flowerMenuAutoSelectManagerWindow.attached) {
+					this.parent.parent.add(flowerMenuAutoSelectManagerWindow); // ND: this.parent.parent is root widget in login screen or gui in game.
 					flowerMenuAutoSelectManagerWindow.show();
 				} else {
 					flowerMenuAutoSelectManagerWindow.show(!flowerMenuAutoSelectManagerWindow.visible);
-					flowerMenuAutoSelectManagerWindow.refresh();
 				}
 			}),prev.pos("bl").adds(0, 4).x(0));
 			prev.tooltip = flowerMenuAutoSelectManagerTooltip;
@@ -4080,6 +4079,7 @@ public class OptWnd extends Window {
     public OptWnd(boolean gopts) {
 	super(Coord.z, "Options            ", true); // ND: Added a bunch of spaces to the caption(title) in order avoid text cutoff when changing it
 	autoDropManagerWindow = new AutoDropManagerWindow();
+	flowerMenuAutoSelectManagerWindow = new FlowerMenuAutoSelectManagerWindow();
 	if (simpleUIFuture != null)
 		simpleUIFuture.cancel(true);
 	main = add(new Panel());
@@ -4413,6 +4413,8 @@ public class OptWnd extends Window {
 		if (ui.gui != null) {
 			ui.gui.add(autoDropManagerWindow); // ND: this.parent.parent is root widget in login screen or gui in game.
 			autoDropManagerWindow.hide();
+			ui.gui.add(flowerMenuAutoSelectManagerWindow);
+			flowerMenuAutoSelectManagerWindow.hide();
 		}
 	}
 }

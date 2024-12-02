@@ -761,6 +761,8 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 		makeLocal("customclient/menugrid/Toggles/QueuedMovementWindow");
 		makeLocal("customclient/menugrid/Toggles/AutoDrop");
 		makeLocal("customclient/menugrid/Toggles/BarrelContentsText");
+		makeLocal("customclient/menugrid/Toggles/FlowerMenuAutoSelect");
+
 		// Category: Bots
 		makeLocal("customclient/menugrid/Bots/OceanScoutBot");
 		makeLocal("customclient/menugrid/Bots/TarKilnEmptierBot");
@@ -857,6 +859,8 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 				AutoDropManagerWindow.autoDropItemsCheckBox.set(!AutoDropManagerWindow.autoDropItemsCheckBox.a);
 			} else if (ad[2].equals("BarrelContentsText")) {
 				OptWnd.showBarrelContentsTextCheckBox.set(!OptWnd.showBarrelContentsTextCheckBox.a);
+			} else if (ad[2].equals("FlowerMenuAutoSelect")) {
+				FlowerMenuAutoSelectManagerWindow.flowerMenuAutoSelectCheckBox.set(!FlowerMenuAutoSelectManagerWindow.flowerMenuAutoSelectCheckBox.a);
 			}
 		} else if (ad[1].equals("Bots")) { // Category: Toggles
 			if (ad[2].equals("OceanScoutBot")) {
