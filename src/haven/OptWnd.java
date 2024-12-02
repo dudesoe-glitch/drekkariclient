@@ -1206,6 +1206,12 @@ public class OptWnd extends Window {
 	public static int sweeperSetDuration = Utils.getprefi("sweeperSetDuration", 1);
 	public static CheckBox highlightPartyMembersCheckBox;
 	public static CheckBox showCirclesUnderPartyMembersCheckBox;
+	public static ColorOptionWidget yourselfPartyColorOptionWidget;
+	public static String[] yourselfPartyColorSetting = Utils.getprefsa("yourselfParty" + "_colorSetting", new String[]{"255", "255", "255", "128"});
+	public static ColorOptionWidget leaderPartyColorOptionWidget;
+	public static String[] leaderPartyColorSetting = Utils.getprefsa("leaderParty" + "_colorSetting", new String[]{"0", "74", "208", "164"});
+	public static ColorOptionWidget memberPartyColorOptionWidget;
+	public static String[] memberPartyColorSetting = Utils.getprefsa("memberParty" + "_colorSetting", new String[]{"0", "160", "0", "164"});
 	public static CheckBox highlightCombatFoesCheckBox;
 	public static CheckBox showCirclesUnderCombatFoesCheckBox;
 	public static CheckBox objectPermanentHighlightingCheckBox;
@@ -1780,6 +1786,37 @@ public class OptWnd extends Window {
 				}
 			}, rightColumn.pos("bl").adds(0, 2));
 			showCirclesUnderPartyMembersCheckBox.tooltip = showCirclesUnderPartyMembersTooltip;
+
+			rightColumn = add(yourselfPartyColorOptionWidget = new ColorOptionWidget("Yourself (Party Color):", "yourselfParty", 115, Integer.parseInt(yourselfPartyColorSetting[0]), Integer.parseInt(yourselfPartyColorSetting[1]), Integer.parseInt(yourselfPartyColorSetting[2]), Integer.parseInt(yourselfPartyColorSetting[3]), (Color col) -> {
+				PartyHighlight.YOURSELF_OL_COLOR = col;
+				PartyCircles.YOURSELF_OL_COLOR = col;
+			}){}, rightColumn.pos("bl").adds(1, 1));
+			add(new Button(UI.scale(70), "Reset", false).action(() -> {
+				Utils.setprefsa("yourselfParty" + "_colorSetting", new String[]{"255", "255", "255", "128"});
+				yourselfPartyColorOptionWidget.cb.colorChooser.setColor(yourselfPartyColorOptionWidget.currentColor = new Color(255, 255, 255, 128));
+				PartyHighlight.YOURSELF_OL_COLOR = yourselfPartyColorOptionWidget.currentColor;
+				PartyCircles.YOURSELF_OL_COLOR = yourselfPartyColorOptionWidget.currentColor;
+			}), yourselfPartyColorOptionWidget.pos("ur").adds(10, 0));
+			rightColumn = add(leaderPartyColorOptionWidget = new ColorOptionWidget("Leader (Party Color):", "leaderParty", 115, Integer.parseInt(leaderPartyColorSetting[0]), Integer.parseInt(leaderPartyColorSetting[1]), Integer.parseInt(leaderPartyColorSetting[2]), Integer.parseInt(leaderPartyColorSetting[3]), (Color col) -> {
+				PartyHighlight.LEADER_OL_COLOR = col;
+				PartyCircles.LEADER_OL_COLOR = col;
+			}){}, rightColumn.pos("bl").adds(0, 4));
+			add(new Button(UI.scale(70), "Reset", false).action(() -> {
+				Utils.setprefsa("leaderParty" + "_colorSetting", new String[]{"0", "74", "208", "164"});
+				leaderPartyColorOptionWidget.cb.colorChooser.setColor(leaderPartyColorOptionWidget.currentColor = new Color(0, 74, 208, 164));
+				PartyHighlight.LEADER_OL_COLOR = leaderPartyColorOptionWidget.currentColor;
+				PartyCircles.LEADER_OL_COLOR = leaderPartyColorOptionWidget.currentColor;
+			}), leaderPartyColorOptionWidget.pos("ur").adds(10, 0));
+			rightColumn = add(memberPartyColorOptionWidget = new ColorOptionWidget("Member (Party Color):", "memberParty", 115, Integer.parseInt(memberPartyColorSetting[0]), Integer.parseInt(memberPartyColorSetting[1]), Integer.parseInt(memberPartyColorSetting[2]), Integer.parseInt(memberPartyColorSetting[3]), (Color col) -> {
+				PartyHighlight.MEMBER_OL_COLOR = col;
+				PartyCircles.MEMBER_OL_COLOR = col;
+			}){}, rightColumn.pos("bl").adds(0, 4));
+			add(new Button(UI.scale(70), "Reset", false).action(() -> {
+				Utils.setprefsa("memberParty" + "_colorSetting", new String[]{"0", "160", "0", "164"});
+				memberPartyColorOptionWidget.cb.colorChooser.setColor(memberPartyColorOptionWidget.currentColor = new Color(0, 160, 0, 164));
+				PartyHighlight.MEMBER_OL_COLOR = memberPartyColorOptionWidget.currentColor;
+				PartyCircles.MEMBER_OL_COLOR = memberPartyColorOptionWidget.currentColor;
+			}), memberPartyColorOptionWidget.pos("ur").adds(10, 0));
 
 			rightColumn = add(highlightCombatFoesCheckBox = new CheckBox("Highlight Combat Foes"){
 				{a = Utils.getprefb("highlightCombatFoes", false);}
@@ -4297,15 +4334,11 @@ public class OptWnd extends Window {
 			"\n$col[200,0,0]{NOTE:} $col[185,185,185]{There's a bug with the falling dust particles, that we can't really \"fix\". If you mine them out on a level, the same particles can also show up on different levels or the overworld. If you want them to vanish, you can just relog, but they will despawn from their original location too.}" +
 			"\n$col[218,163,0]{Action Button:} $col[185,185,185]{This setting can also be turned on/off using an action button from the menu grid (Custom Client Extras → Toggles).}", UI.scale(320));
 	private final Object highlightPartyMembersTooltip = RichText.render("Enabling this will put a color highlight over all party members." +
-			"\n=====================" +
-			"\n$col[255,255,255]{White: }$col[185,185,185]{Yourself}\n$col[0,74,208]{Blue: }$col[185,185,185]{Party Leader}\n$col[0,160,0]{Green: }$col[185,185,185]{Other Members}" +
-			"\n=====================" +
-			"\n$col[185,185,185]{If you are the party leader, your color highlight will always be $col[0,74,208]{Blue}, rather than $col[255,255,255]{White}.}", UI.scale(310));
+			"\n" +
+			"\n$col[185,185,185]{If you are the party leader, your color highlight will always be the $col[255,255,255]{Leader's Color}.}", UI.scale(310));
 	private final Object showCirclesUnderPartyMembersTooltip = RichText.render("Enabling this will put a colored circle under all party members." +
-			"\n=====================" +
-			"\n$col[255,255,255]{White: }$col[185,185,185]{Yourself}\n$col[0,74,208]{Blue: }$col[185,185,185]{Party Leader}\n$col[0,160,0]{Green: }$col[185,185,185]{Other Members}" +
-			"\n=====================" +
-			"\n$col[185,185,185]{If you are the party leader, your circle's color will always be $col[0,74,208]{Blue}, rather than $col[255,255,255]{White}.}", UI.scale(300));
+			"\n" +
+			"\n$col[185,185,185]{If you are the party leader, your circle's color will always be the $col[255,255,255]{Leader's Color}.}", UI.scale(300));
 
 	// Quality Display Settings Tooltips
 	private final Object customQualityColorsTooltip = RichText.render("These numbers and colors are completely arbitrary, and you can change them to whatever you like." +

@@ -9,9 +9,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 public class PartyCircles {
-    public static Color MEMBER_OL_COLOR = new Color(0, 160, 0, 164);
-    public static Color LEADER_OL_COLOR = new Color(0, 74, 208, 164);
-    public static Color MYSELF_OL_COLOR = new Color(255, 255, 255, 128);
+    public static Color MEMBER_OL_COLOR = OptWnd.memberPartyColorOptionWidget.currentColor;
+    public static Color LEADER_OL_COLOR = OptWnd.leaderPartyColorOptionWidget.currentColor;
+    public static Color YOURSELF_OL_COLOR = OptWnd.yourselfPartyColorOptionWidget.currentColor;
 
     private final Party party;
     private final long playerId;
@@ -33,7 +33,7 @@ public class PartyCircles {
                 if (OptWnd.showCirclesUnderPartyMembersCheckBox.a && m == party.leader)
                     highlight(gob, LEADER_OL_COLOR);
                 else if (OptWnd.showCirclesUnderPartyMembersCheckBox.a && m.gobid == playerId && m != party.leader)
-                    highlight(gob, MYSELF_OL_COLOR);
+                    highlight(gob, YOURSELF_OL_COLOR);
                 else if (OptWnd.showCirclesUnderPartyMembersCheckBox.a && m != party.leader)
                     highlight(gob, MEMBER_OL_COLOR);
                 else
