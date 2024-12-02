@@ -881,6 +881,7 @@ public class OptWnd extends Window {
 	public static CheckBox showCombatManeuverCombatInfoCheckBox;
 	public static CheckBox onlyShowOpeningsAbovePercentageCombatInfoCheckBox;
 	public static CheckBox onlyShowCoinsAbove4CombatInfoCheckBox;
+	public static CheckBox drawFloatingCombatOpeningsAboveYourselfCheckBox;
 	public static TextEntry minimumOpeningTextEntry;
 	public static HSlider combatUITopPanelHeightSlider;
 	public static HSlider combatUIBottomPanelHeightSlider;
@@ -1016,6 +1017,14 @@ public class OptWnd extends Window {
 					Utils.setprefb("onlyShowCoinsAbove4", val);
 				}
 			}, prev.pos("bl").adds(0, 6));
+
+			prev = add(drawFloatingCombatOpeningsAboveYourselfCheckBox = new CheckBox("Display Combat Openings above Yourself"){
+				{a = Utils.getprefb("drawFloatingCombatDataAboveYourself", true);}
+				public void changed(boolean val) {
+					Utils.setprefb("drawFloatingCombatDataAboveYourself", val);
+				}
+			}, prev.pos("bl").adds(0, 12).x(0));
+
 			prev = add(new HRuler(UI.scale(280)), prev.pos("bl").adds(0, 12).x(0));
 
 			prev = add(toggleGobDamageInfoCheckBox = new CheckBox("Display Damage Info:"){

@@ -36,7 +36,6 @@ import java.awt.*;
 import java.io.File;
 import java.util.*;
 import java.awt.Color;
-import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.util.List;
 
@@ -287,6 +286,11 @@ public class Fightsess extends Widget {
 				}
 			} catch (NullPointerException ignored) {}
 		}
+	}
+	if (OptWnd.drawFloatingCombatOpeningsAboveYourselfCheckBox.a) {
+		try {
+			drawSelfCombatOpenings(g);
+		} catch (Exception ignored) {}
 	}
 
 	int x = (int)(ui.gui.sz.x / 2.0);
@@ -869,7 +873,6 @@ public class Fightsess extends Widget {
 	private void drawCombatData(GOut g, Fightview.Relation rels, Coord sc, boolean showAllOpenings, boolean alwaysShowCoins) {
 		int scaledY = sc.y - UI.scale(90);
 		Coord topLeft = new Coord(sc.x - UI.scale(32), scaledY);
-		Coord bgTopLeftFrame = new Coord(sc.x - UI.scale(41), scaledY);
 		boolean openings;
 		boolean cleaveUsed = false;
 		long cleaveDuration = 4300;
@@ -1028,6 +1031,62 @@ public class Fightsess extends Widget {
 			g.frect(new Coord(topLeft.x + UI.scale(4), topLeft.y - UI.scale(3)), UI.scale(new Coord((int) ((76 * timer)/rels.lastDefenceDuration), 11)));
 			g.chcolor(new Color(255, 255, 255, 255));
 			g.aimage(Text.renderstroked(getCooldownTime(timer), cleaveAdditionalFont).tex(), new Coord(topLeft.x + UI.scale(52), topLeft.y + UI.scale(2)), 1, 0.5);
+		}
+		g.chcolor(255, 255, 255, 255);
+	}
+
+	private void drawSelfCombatOpenings(GOut g) {
+		Coord3f rawc = ui.gui.map.player().getc();
+		rawc.z += 15;
+		Coord sc = getparent(GameUI.class).map.screenxf(rawc).round2();
+		int scaledY = sc.y - UI.scale(86);
+		Coord topLeft = new Coord(sc.x - UI.scale(32), scaledY);
+
+		ArrayList<Buff> myOpenings = new ArrayList<>(fv.buffs.children(Buff.class));
+		myOpenings.sort((o2, o1) -> Integer.compare(getOpeningValue(o1), getOpeningValue(o2)));
+		Buff myManeuver = null;
+		for (Buff buff : myOpenings) {
+			try {
+				if (buff.res != null && buff.res.get() != null) {
+					String name = buff.res.get().name;
+					if (Config.maneuvers.contains(name)) {
+						myManeuver = buff;
+						break;
+					}
+				}
+			} catch (Loading ignored) {
+			}
+		}
+		if (myManeuver != null && myOpenings.size() > 1) {
+			myOpenings.remove(myManeuver);
+		}
+		topLeft.x -= UI.scale(3) * myOpenings.size();
+
+		List<TemporaryOpening> openingList = new ArrayList<>();
+		for (Buff buff : fv.buffs.children(Buff.class)) {
+			try {
+				if (buff.res != null && buff.res.get() != null) {
+					String name = buff.res.get().name;
+					if (openingsColorMap.containsKey(name)) {
+						int meterValue = getOpeningValue(buff);
+						openingList.add(new TemporaryOpening(meterValue, openingsColorMap.get(name)));
+					}
+				}
+			} catch (Loading ignored) {
+			}
+		}
+		openingList.sort((o2, o1) -> Integer.compare(o1.value, o2.value));
+		int openingOffsetX = 4;
+		for (TemporaryOpening opening : openingList) {
+			g.chcolor(0, 0, 0, 255);
+			g.frect(new Coord(topLeft.x + UI.scale(openingOffsetX) - UI.scale(1), topLeft.y + UI.scale(30) - UI.scale(1)), UI.scale(new Coord(20, 20)));
+			g.chcolor(opening.color);
+			g.frect(new Coord(topLeft.x + UI.scale(openingOffsetX), topLeft.y + UI.scale(30)), UI.scale(new Coord(18, 18)));
+			g.chcolor(255, 255, 255, 255);
+
+			int valueOffset = opening.value < 10 ? 15 : opening.value< 100 ? 18 : 20;
+			g.aimage(Text.renderstroked(String.valueOf(opening.value), openingAdditionalFont).tex(), new Coord(topLeft.x + UI.scale(openingOffsetX) + UI.scale(valueOffset) - UI.scale(1), topLeft.y + UI.scale(39)), 1, 0.5);
+			openingOffsetX += 19;
 		}
 		g.chcolor(255, 255, 255, 255);
 	}
