@@ -871,7 +871,7 @@ public class Fightsess extends Widget {
 	}
 
 	private void drawCombatData(GOut g, Fightview.Relation rels, Coord sc, boolean showAllOpenings, boolean alwaysShowCoins) {
-		int scaledY = sc.y - UI.scale(90);
+		int scaledY = sc.y - UI.scale(86);
 		Coord topLeft = new Coord(sc.x - UI.scale(32), scaledY);
 		boolean openings;
 		boolean cleaveUsed = false;
@@ -916,6 +916,8 @@ public class Fightsess extends Widget {
 		} else {
 			openings = rels.buffs.children(Buff.class).size() > 1;
 		}
+
+		topLeft.x -= UI.scale(2) * rels.buffs.children(Buff.class).size();
 
 		// IP / OIP Text
 		boolean showCoins = true;
