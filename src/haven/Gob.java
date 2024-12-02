@@ -110,6 +110,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	private Overlay archeryVector;
 	private Overlay archeryRadius;
 	BarrelContentsGobInfo barrelContentsGobInfo;
+	public boolean combatFoeHighlighted = false;
 
     public static class Overlay implements RenderTree.Node {
 	public final int id;
@@ -2291,10 +2292,27 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 		}
 	}
 
+	public void setCombatFoeHighlightOverlay() {
+		if (OptWnd.highlightCombatFoesCheckBox.a && !combatFoeHighlighted) {
+			combatFoeHighlighted = true;
+			setattr(new GobCombatHighlight(this));
+		} else if (!OptWnd.highlightCombatFoesCheckBox.a && combatFoeHighlighted) {
+			combatFoeHighlighted = false;
+			delattr(GobCombatHighlight.class);
+		}
+	}
+
 	public void removeCombatFoeCircleOverlay(){
 		if (combatFoeCircleOverlay != null) {
 			removeOl(combatFoeCircleOverlay);
 			combatFoeCircleOverlay = null;
+		}
+	}
+
+	public void removeCombatFoeHighlight(){
+		if (combatFoeHighlighted) {
+			combatFoeHighlighted = false;
+			delattr(GobCombatHighlight.class);
 		}
 	}
 

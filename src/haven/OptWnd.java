@@ -1206,6 +1206,7 @@ public class OptWnd extends Window {
 	public static int sweeperSetDuration = Utils.getprefi("sweeperSetDuration", 1);
 	public static CheckBox highlightPartyMembersCheckBox;
 	public static CheckBox showCirclesUnderPartyMembersCheckBox;
+	public static CheckBox highlightCombatFoesCheckBox;
 	public static CheckBox showCirclesUnderCombatFoesCheckBox;
 	public static CheckBox objectPermanentHighlightingCheckBox;
 
@@ -1779,6 +1780,13 @@ public class OptWnd extends Window {
 				}
 			}, rightColumn.pos("bl").adds(0, 2));
 			showCirclesUnderPartyMembersCheckBox.tooltip = showCirclesUnderPartyMembersTooltip;
+
+			rightColumn = add(highlightCombatFoesCheckBox = new CheckBox("Highlight Combat Foes"){
+				{a = Utils.getprefb("highlightCombatFoes", false);}
+				public void changed(boolean val) {
+					Utils.setprefb("highlightCombatFoes", val);
+				}
+			}, rightColumn.pos("bl").adds(0, 12));
 			rightColumn = add(showCirclesUnderCombatFoesCheckBox = new CheckBox("Show Circles under Combat Foes"){
 				{a = Utils.getprefb("showCirclesUnderCombatFoes", true);}
 				public void changed(boolean val) {

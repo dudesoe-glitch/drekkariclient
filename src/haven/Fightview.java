@@ -86,7 +86,10 @@ public class Fightview extends Widget {
 	    relbuffs.destroy();
 	    invalid = true;
 		final Gob g = ui.sess.glob.oc.getgob(gobid);
-		if (g != null) g.removeCombatFoeCircleOverlay();
+		if (g != null) {
+			g.removeCombatFoeCircleOverlay();
+			g.removeCombatFoeHighlight();
+		}
 	}
 
 	public void use(Indir<Resource> act) {
@@ -127,6 +130,7 @@ public class Fightview extends Widget {
 		final Gob g = ui.sess.glob.oc.getgob(gobid);
 		if (g != null) {
 			g.setCombatFoeCircleOverlay();
+			g.setCombatFoeHighlightOverlay();
 		}
 	}
     }
