@@ -15,20 +15,14 @@ import static haven.OCache.posres;
 public class MiningSafetyAssistant extends Window implements Runnable {
     private final GameUI gui;
     private boolean stop;
-    public static boolean preventMiningOutsideSupport = Utils.getprefb("preventMiningOutsideSupport", false);
-    private final CheckBox preventUnsafeMiningCb;
-    private boolean stopMiningWhenOutsideSupport = Utils.getprefb("stopMiningWhenOutsideSupport", false);
-    private final CheckBox stopUnsafeMiningCb;
-    private boolean stopMiningFifty = Utils.getprefb("stopMiningFifty", false);
-    private final CheckBox stopMiningFiftyCb;
-    private boolean stopMiningTwentyFive = Utils.getprefb("stopMiningTwentyFive", false);
-    private final CheckBox stopMiningTwentyFiveCb;
-    private boolean stopMiningLooseRock = Utils.getprefb("stopMiningLooseRock", false);
-    private final CheckBox stopMiningLooseRockCb;
+    public static CheckBox preventUnsafeMiningCheckBox;
+    public static CheckBox stopUnsafeMiningCheckBox;
+    public static CheckBox stopMiningFiftyCheckBox;
+    public static CheckBox stopMiningTwentyFiveCheckBox;
+    public static CheckBox stopMiningLooseRockCHeckBox;
 
-    public CheckBox enableMineSweeperCheckBox;
+    public static CheckBox enableMineSweeperCheckBox;
     public OldDropBox<Integer> sweeperDurationDropbox;
-
 
     ArrayList<Gob> supports = new ArrayList<>();
     ArrayList<Gob> looseRocks = new ArrayList<>();
@@ -40,76 +34,56 @@ public class MiningSafetyAssistant extends Window implements Runnable {
         this.stop = false;
         Widget prev;
 
-        preventUnsafeMiningCb = new CheckBox("Prevent unsafe mining.") {
-            {
-                a = preventMiningOutsideSupport;
-            }
-
+        preventUnsafeMiningCheckBox = new CheckBox("Prevent unsafe mining.") {
+            {a = Utils.getprefb("preventMiningOutsideSupport", false);}
             public void set(boolean val) {
-                preventMiningOutsideSupport = val;
                 Utils.setprefb("preventMiningOutsideSupport", val);
                 a = val;
             }
         };
-        prev = add(preventUnsafeMiningCb, UI.scale(new Coord(10, 12)));
-        preventUnsafeMiningCb.tooltip = RichText.render("This option will prevent selecting mining area even \npartially outside (visible) mining supports range. \n(Cannot select area outside view range)", UI.scale(300));
+        prev = add(preventUnsafeMiningCheckBox, UI.scale(new Coord(10, 12)));
+        preventUnsafeMiningCheckBox.tooltip = RichText.render("This option will prevent selecting mining area even \npartially outside (visible) mining supports range. \n(Cannot select area outside view range)", UI.scale(300));
 
-        stopUnsafeMiningCb = new CheckBox("Stop unsafe mining.") {
-            {
-                a = stopMiningWhenOutsideSupport;
-            }
-
+        stopUnsafeMiningCheckBox = new CheckBox("Stop unsafe mining.") {
+            {a = Utils.getprefb("stopMiningWhenOutsideSupport", false);}
             public void set(boolean val) {
-                stopMiningWhenOutsideSupport = val;
                 Utils.setprefb("stopMiningWhenOutsideSupport", val);
                 a = val;
             }
         };
-        prev = add(stopUnsafeMiningCb, prev.pos("bl").adds(0, 6));
-        stopUnsafeMiningCb.tooltip = RichText.render("If currently mined tile is outside support range \nmining will stop. (Drinking animation overrides mining \nand delay bot reaction - not 100% safe)", UI.scale(300));
+        prev = add(stopUnsafeMiningCheckBox, prev.pos("bl").adds(0, 6));
+        stopUnsafeMiningCheckBox.tooltip = RichText.render("If currently mined tile is outside support range \nmining will stop. (Drinking animation overrides mining \nand delay bot reaction - not 100% safe)", UI.scale(300));
 
-        stopMiningFiftyCb = new CheckBox("Stop mining <50.") {
-            {
-                a = stopMiningFifty;
-            }
-
+        stopMiningFiftyCheckBox = new CheckBox("Stop mining <50.") {
+            {a = Utils.getprefb("stopMiningFifty", false);}
             public void set(boolean val) {
-                stopMiningFifty = val;
                 Utils.setprefb("stopMiningFifty", val);
                 a = val;
             }
         };
-        prev = add(stopMiningFiftyCb, prev.pos("bl").adds(0, 6));
-        stopMiningFiftyCb.tooltip = RichText.render("If currently mined tile is withing support range \nbelow 50% hp mining will stop.", UI.scale(300));
+        prev = add(stopMiningFiftyCheckBox, prev.pos("bl").adds(0, 6));
+        stopMiningFiftyCheckBox.tooltip = RichText.render("If currently mined tile is withing support range \nbelow 50% hp mining will stop.", UI.scale(300));
 
 
-        stopMiningTwentyFiveCb = new CheckBox("Stop mining <25.") {
-            {
-                a = stopMiningTwentyFive;
-            }
-
+        stopMiningTwentyFiveCheckBox = new CheckBox("Stop mining <25.") {
+            {a = Utils.getprefb("stopMiningTwentyFive", false);}
             public void set(boolean val) {
-                stopMiningTwentyFive = val;
                 Utils.setprefb("stopMiningTwentyFive", val);
                 a = val;
             }
         };
-        prev = add(stopMiningTwentyFiveCb, prev.pos("bl").adds(0, 6));
-        stopMiningTwentyFiveCb.tooltip = RichText.render("If currently mined tile is withing support range \nbelow 25% hp mining will stop.", UI.scale(300));
+        prev = add(stopMiningTwentyFiveCheckBox, prev.pos("bl").adds(0, 6));
+        stopMiningTwentyFiveCheckBox.tooltip = RichText.render("If currently mined tile is withing support range \nbelow 25% hp mining will stop.", UI.scale(300));
 
-        stopMiningLooseRockCb = new CheckBox("Stop mining near loose rock.") {
-            {
-                a = stopMiningLooseRock;
-            }
-
+        stopMiningLooseRockCHeckBox = new CheckBox("Stop mining near loose rock.") {
+            {a = Utils.getprefb("stopMiningLooseRock", false);}
             public void set(boolean val) {
-                stopMiningLooseRock = val;
                 Utils.setprefb("stopMiningLooseRock", val);
                 a = val;
             }
         };
-        prev = add(stopMiningLooseRockCb, prev.pos("bl").adds(0, 6));
-        stopMiningLooseRockCb.tooltip = RichText.render("If currently mined tile is withing ~9 tiles from any \nloose rock mining will stop.", UI.scale(300));
+        prev = add(stopMiningLooseRockCHeckBox, prev.pos("bl").adds(0, 6));
+        stopMiningLooseRockCHeckBox.tooltip = RichText.render("If currently mined tile is withing ~9 tiles from any \nloose rock mining will stop.", UI.scale(300));
 
         prev = add(enableMineSweeperCheckBox = new CheckBox("Show Mine Sweeper Numbers"){
             {a = (Utils.getprefb("enableMineSweeper", true));}
@@ -248,11 +222,11 @@ public class MiningSafetyAssistant extends Window implements Runnable {
     @Override
     public void run() {
         while (!stop) {
-            if (counter == 0 && (stopMiningWhenOutsideSupport || stopMiningFifty || stopMiningTwentyFive)) {
+            if (counter == 0 && (stopUnsafeMiningCheckBox.a || stopMiningFiftyCheckBox.a || stopMiningTwentyFiveCheckBox.a)) {
                 supports = AUtils.getAllSupports(gui);
             }
             if(gui.map.player() != null){
-                if (stopMiningWhenOutsideSupport && (gui.map.player().getPoses().contains("pickan") || gui.map.player().getPoses().contains("gfx/borka/choppan"))) {
+                if (stopUnsafeMiningCheckBox.a && (gui.map.player().getPoses().contains("pickan") || gui.map.player().getPoses().contains("gfx/borka/choppan"))) {
                     Gob player = gui.map.player();
                     Coord2d minedTile = new Coord2d(player.rc.x + (Math.cos(player.a) * 13.75), player.rc.y + Math.sin(player.a) * 13.75);
                     Set<Gob> gobsInRange = new HashSet<>();
@@ -278,7 +252,7 @@ public class MiningSafetyAssistant extends Window implements Runnable {
                     }
                 }
 
-                if (stopMiningLooseRock && (gui.map.player().getPoses().contains("pickan") || gui.map.player().getPoses().contains("gfx/borka/choppan"))) {
+                if (stopMiningLooseRockCHeckBox.a && (gui.map.player().getPoses().contains("pickan") || gui.map.player().getPoses().contains("gfx/borka/choppan"))) {
                     Gob player = gui.map.player();
                     Coord2d minedTile = new Coord2d(player.rc.x + (Math.cos(player.a) * 13.75), player.rc.y + Math.sin(player.a) * 13.75);
                     if (counter == 0) {
@@ -293,7 +267,7 @@ public class MiningSafetyAssistant extends Window implements Runnable {
                     }
                 }
 
-                if ((stopMiningFifty || stopMiningTwentyFive) && (gui.map.player().getPoses().contains("pickan") || gui.map.player().getPoses().contains("gfx/borka/choppan"))) {
+                if ((stopMiningFiftyCheckBox.a || stopMiningTwentyFiveCheckBox.a) && (gui.map.player().getPoses().contains("pickan") || gui.map.player().getPoses().contains("gfx/borka/choppan"))) {
                     Gob player = gui.map.player();
                     Coord2d minedTile = new Coord2d(player.rc.x + (Math.cos(player.a) * 13.75), player.rc.y + Math.sin(player.a) * 13.75);
                     for (Gob support : supports) {
@@ -301,11 +275,11 @@ public class MiningSafetyAssistant extends Window implements Runnable {
                         if (res.equals("gfx/terobjs/ladder") || res.equals("gfx/terobjs/minesupport")) {
                             if (support.rc.dist(minedTile) <= 100) {
                                 if (support.getattr(GobHealth.class) != null) {
-                                    if (support.getattr(GobHealth.class).hp <= 0.5 && stopMiningFifty) {
+                                    if (support.getattr(GobHealth.class).hp <= 0.5 && stopMiningFiftyCheckBox.a) {
                                         ui.root.wdgmsg("gk", 27);
                                         gui.error("Support nearby below 50%..");
                                         support.highlight(Color.red);
-                                    } else if (support.getattr(GobHealth.class).hp <= 0.25 && stopMiningTwentyFive) {
+                                    } else if (support.getattr(GobHealth.class).hp <= 0.25 && stopMiningTwentyFiveCheckBox.a) {
                                         ui.root.wdgmsg("gk", 27);
                                         gui.error("Support nearby below 25%..");
                                         support.highlight(Color.red);
@@ -315,11 +289,11 @@ public class MiningSafetyAssistant extends Window implements Runnable {
                         } else if (res.equals("gfx/terobjs/column")) {
                             if (support.rc.dist(minedTile) <= 125) {
                                 if (support.getattr(GobHealth.class) != null) {
-                                    if (support.getattr(GobHealth.class).hp <= 0.5 && stopMiningFifty) {
+                                    if (support.getattr(GobHealth.class).hp <= 0.5 && stopMiningFiftyCheckBox.a) {
                                         ui.root.wdgmsg("gk", 27);
                                         gui.error("Support nearby below 50%..");
                                         support.highlight(Color.red);
-                                    } else if (support.getattr(GobHealth.class).hp <= 0.25 && stopMiningTwentyFive) {
+                                    } else if (support.getattr(GobHealth.class).hp <= 0.25 && stopMiningTwentyFiveCheckBox.a) {
                                         ui.root.wdgmsg("gk", 27);
                                         gui.error("Support nearby below 25%..");
                                         support.highlight(Color.red);
@@ -329,11 +303,11 @@ public class MiningSafetyAssistant extends Window implements Runnable {
                         } else if (res.equals("gfx/terobjs/minebeam")) {
                             if (support.rc.dist(minedTile) <= 150) {
                                 if (support.getattr(GobHealth.class) != null) {
-                                    if (support.getattr(GobHealth.class).hp <= 0.5 && stopMiningFifty) {
+                                    if (support.getattr(GobHealth.class).hp <= 0.5 && stopMiningFiftyCheckBox.a) {
                                         ui.root.wdgmsg("gk", 27);
                                         gui.error("Support nearby below 50%..");
                                         support.highlight(Color.red);
-                                    } else if (support.getattr(GobHealth.class).hp <= 0.25 && stopMiningTwentyFive) {
+                                    } else if (support.getattr(GobHealth.class).hp <= 0.25 && stopMiningTwentyFiveCheckBox.a) {
                                         ui.root.wdgmsg("gk", 27);
                                         gui.error("Support nearby below 25%..");
                                         support.highlight(Color.red);

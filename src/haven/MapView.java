@@ -2997,7 +2997,7 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
 			}
 		}
 		boolean safe = true;
-		if(MiningSafetyAssistant.preventMiningOutsideSupport){
+		if(gui != null && gui.miningSafetyAssistantWindow != null && MiningSafetyAssistant.preventUnsafeMiningCheckBox != null && MiningSafetyAssistant.preventUnsafeMiningCheckBox.a){
 			if (ui.root.cursor != null) {
 				Resource curs = ui.root.cursor.get();
 				if (curs != null && curs.name.equals("gfx/hud/curs/mine") && msg.equals("sel")) {
