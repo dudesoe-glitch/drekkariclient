@@ -555,6 +555,7 @@ public class OptWnd extends Window {
 	public static CheckBox soundAlertForFinishedCuriositiesCheckBox;
 	public static CheckBox alwaysShowCombatUIStaminaBarCheckBox;
 	public static CheckBox alwaysShowCombatUIHealthBarCheckBox;
+	public static HSlider mapZoomSpeedSlider;
 
     public class InterfaceSettingsPanel extends Panel {
 	public InterfaceSettingsPanel(Panel back) {
@@ -746,6 +747,17 @@ public class OptWnd extends Window {
 			}
 		}
 		expWindowLocationLabel.tooltip = experienceWindowLocationTooltip;
+
+		rightColumn = add(new Label("Map Window Zoom Speed:"), rightColumn.pos("bl").adds(0, 10).x(UI.scale(230)));
+		rightColumn = add(mapZoomSpeedSlider = new HSlider(UI.scale(110), 10, 30, Utils.getprefi("mapZoomSpeed", 15)) {
+			public void changed() {
+				Utils.setprefi("mapZoomSpeed", val);
+			}
+		}, rightColumn.pos("bl").adds(0, 4));
+		add(new Button(UI.scale(60), "Reset", false).action(() -> {
+			mapZoomSpeedSlider.val = 15;
+			Utils.setprefi("mapZoomSpeed", 15);
+		}), rightColumn.pos("ur").adds(6, -4));
 
 		Widget backButton;
 		add(backButton = new PButton(UI.scale(200), "Back", 27, back, "Advanced Settings"), leftColumn.pos("bl").adds(0, 30).x(0));

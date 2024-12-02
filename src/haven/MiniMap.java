@@ -989,7 +989,7 @@ public class MiniMap extends Widget {
 
     public boolean mousewheel(MouseWheelEvent ev) {
 	if (allowZooming){
-		zoomMomentum += (float) (1.5*Math.signum(ev.a));
+		zoomMomentum += (OptWnd.mapZoomSpeedSlider.val/10f*Math.signum(ev.a));
 		allowZooming = false;
 	}
 	return(true);
