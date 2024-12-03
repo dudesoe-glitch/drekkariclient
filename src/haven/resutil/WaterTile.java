@@ -242,7 +242,7 @@ public class WaterTile extends Tiler {
 		for(int x = ds.ul.x; x < ds.br.x; x++) {
 		    Tiler t = map.tiler(map.gettile(m.ul.add(x, y)));
 		    if(t instanceof WaterTile)
-			d[ds.o(x, y)] = ((WaterTile)t).depth;
+			d[ds.o(x, y)] = OptWnd.flatWorldCheckBox.a ? (((WaterTile)t).depth < 11 ? ((WaterTile)t).depth : 10) : ((WaterTile)t).depth;
 		    else
 			d[ds.o(x, y)] = 0;
 		}
