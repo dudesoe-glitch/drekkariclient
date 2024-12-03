@@ -557,6 +557,7 @@ public class OptWnd extends Window {
 	public static CheckBox alwaysShowCombatUIStaminaBarCheckBox;
 	public static CheckBox alwaysShowCombatUIHealthBarCheckBox;
 	public static HSlider mapZoomSpeedSlider;
+	public static CheckBox alwaysOpenMiniStudyOnLoginCheckBox;
 
     public class InterfaceSettingsPanel extends Panel {
 	public InterfaceSettingsPanel(Panel back) {
@@ -646,6 +647,13 @@ public class OptWnd extends Window {
 				SAttrWnd.soundAlertForFinishedCuriositiesCheckBox.a = val;
 				Utils.setprefb("soundAlertForFinishedCuriosities", val);
 				a = val;
+			}
+		}, leftColumn.pos("bl").adds(0, 2));
+
+		leftColumn = add(alwaysOpenMiniStudyOnLoginCheckBox = new CheckBox("Always Open Mini-Study on Login"){
+			{a = (Utils.getprefb("alwaysOpenMiniStudyOnLogin", false));}
+			public void changed(boolean val) {
+				Utils.setprefb("alwaysOpenMiniStudyOnLogin", val);
 			}
 		}, leftColumn.pos("bl").adds(0, 2));
 
@@ -2110,6 +2118,7 @@ public class OptWnd extends Window {
 //	    y = addbtn(cont, "Take screenshot", GameUI.kb_shoot, y);
 	    y = addbtn(cont, "Minimap icons", GameUI.kb_ico, y);
 	    y = addbtn(cont, "Toggle UI", GameUI.kb_hide, y);
+		y = addbtn(cont, "Toggle Mini-Study Window", GameUI.kb_miniStudy, y);
 	    y = addbtn(cont, "Log out", GameUI.kb_logout, y);
 	    y = addbtn(cont, "Switch character", GameUI.kb_switchchr, y);
 

@@ -113,6 +113,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 	public QuestHelper questhelper;
 	public static Map<Long,String> gobIdToKinName = new ConcurrentHashMap<>();
 	public static boolean showUI = true;
+	public MiniStudy miniStudy;
 
 	// Script Threads
 	public Thread autoRepeatFlowerMenuScriptThread;
@@ -978,6 +979,8 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 		Utils.setprefc("wndc-quickslots", quickslots.c);
 	if(makewnd != null)
 		Utils.setprefc("wndc-makewnd", makewnd.c);
+	if (miniStudy != null)
+		Utils.setprefc("wndc-miniStudy", miniStudy.c);
 	}
     }
 
@@ -1071,6 +1074,8 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 	    hand.add(new DraggedItem(g, lc));
 	    updhand();
 	} else if(place == "chr") {
+		miniStudy = add(new MiniStudy(), Utils.getprefc("wndc-miniStudy", new Coord(300, 50)));
+		if (!OptWnd.alwaysOpenMiniStudyOnLoginCheckBox.a) miniStudy.hide();
 	    chrwdg = add((CharWnd)child, Utils.getprefc("wndc-chr", new Coord(300, 50)));
 	    chrwdg.hide();
 	} else if(place == "craft") {
@@ -1770,6 +1775,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 	public static KeyBinding kb_aggroAllNonFriendlyPlayers = KeyBinding.get("AggroAllNonFriendlyPlayers",   KeyMatch.nil);
 	public static KeyBinding kb_aggroLastTarget = KeyBinding.get("aggroLastTarget",  KeyMatch.forchar('T', KeyMatch.S));
 	public static KeyBinding kb_peaceCurrentTarget  = KeyBinding.get("peaceCurrentTargetKB",  KeyMatch.forchar('P', KeyMatch.M));
+	public static KeyBinding kb_miniStudy = KeyBinding.get("miniStudyKB",  KeyMatch.forchar('S', KeyMatch.M));
     public boolean globtype(GlobKeyEvent ev) {
 	if(ev.c == ':') {
 	    entercmd();
@@ -1918,6 +1924,9 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 		return(true);
 	} else if(kb_peaceCurrentTarget.key().match(ev)) {
 		peaceCurrentTarget();
+		return(true);
+	} else if(kb_miniStudy.key().match(ev)) {
+		miniStudy.show(!miniStudy.visible);
 		return(true);
 	} else if((ev.c == 27) && (map != null) && !map.hasfocus) {
 	    setfocus(map);

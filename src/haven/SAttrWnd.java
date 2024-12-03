@@ -291,6 +291,7 @@ public class SAttrWnd extends Widget {
 		prevStudyCheckbox.tooltip = OptWnd.autoReloadCuriositiesFromInventoryCheckBox.tooltip;
 	    Widget inf = add(new StudyInfo(new Coord(attrw - child.sz.x - wbox.bisz().x - UI.scale(5), child.sz.y), child), child.pos("ur").add(wbox.bisz().x + UI.scale(5), 0));
 	    Frame.around(this, Collections.singletonList(inf));
+		getparent(GameUI.class).miniStudy.setStudy((Inventory) child);
 	    pack();
 	} else {
 	    super.addchild(child, args);
