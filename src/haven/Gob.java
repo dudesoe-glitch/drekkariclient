@@ -62,7 +62,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	public ConcurrentHashMap<Class<? extends GAttrib>, GAttrib> attr = new ConcurrentHashMap<>(); // ND: Make this ConcurrentHashMap to prevent concurrent modification exceptions. It doesn't seem to affect performance
     public final Collection<Overlay> ols = new ArrayList<Overlay>();
     public final Collection<RenderTree.Slot> slots = new CopyOnWriteArrayList<>(); // ND: Make this COW to prevent concurrent modification exceptions. It doesn't seem to affect performance
-    public int updateseq = 0;
+    public int updateseq = 0, lastolid = 0;
     private final Collection<SetupMod> setupmods = new ArrayList<>();
     private final LinkedList<Runnable> deferred = new LinkedList<>();
     private Loader.Future<?> deferral = null;
@@ -627,6 +627,19 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	}
     }
 
+    public static int olidcmp(int a, int b) {
+	/* This assumes that overlay IDs are 31 bits. This is indeed
+	 * the case, but should arguably be considered more like a
+	 * protocol detail. */
+	int delta = (a << 1) - (b << 1);
+	if(delta > 0)
+	    return(1);
+	else if(delta < 0)
+	    return(-1);
+	else
+	    return(0);
+    }
+
     public void addol(Overlay ol, boolean async) {
 	if (getres() != null) {
 		if(OptWnd.disableIndustrialSmokeCheckBox.a && !getres().name.equals("gfx/terobjs/clue")) {
@@ -837,7 +850,10 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
     }
 
     public void delattr(Class<? extends GAttrib> c) {
-	setattr(attrclass(c), null);
+	Class<? extends GAttrib> ac = attrclass(c);
+	GAttrib attr = this.attr.get(ac);
+	if(c.isInstance(attr))
+	    setattr(attrclass(c), null);
     }
 
     public Supplier<? extends Pipe.Op> eqpoint(String nm, Message dat) {

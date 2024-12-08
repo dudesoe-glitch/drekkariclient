@@ -929,6 +929,18 @@ public class Resource implements Serializable {
 	return(new Coord(buf.int16(), buf.int16()));
     }
 	
+    public static class PoolMapper implements Function<Object, Object> {
+	public final Pool pool;
+
+	public PoolMapper(Pool pool) {this.pool = pool;}
+
+	public Object apply(Object obj) {
+	    if(obj instanceof Spec)
+		return(new Spec(pool, ((Spec)obj).name, ((Spec)obj).ver));
+	    return(obj);
+	}
+    }
+
     public abstract class Layer implements Serializable {
 	public abstract void init();
 	
@@ -941,6 +953,10 @@ public class Resource implements Serializable {
 		return(String.format("#<%s (%s) in %s>", getClass().getSimpleName(), ((IDLayer)this).layerid(), Resource.this.name));
 	    else
 		return(String.format("#<%s in %s>", getClass().getSimpleName(), Resource.this.name));
+	}
+
+	protected Function<Object, Object> resmapper() {
+	    return(new PoolMapper(Resource.this.pool));
 	}
     }
 

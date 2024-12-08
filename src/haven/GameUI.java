@@ -1993,10 +1993,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 	public ChatUI.Channel.Message logmessage();
     }
 
-    public boolean msg(UI.NoticeEvent ev) {
-	if(ev.propagate(this))
-		return(true);
-	UI.Notice msg = ev.msg;
+    public boolean msg(UI.Notice msg) {
 	Color color = msg.color();
 	if (msg.message().contains("There are no claims under siege"))
 		color = Color.green;
