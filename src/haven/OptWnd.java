@@ -2468,7 +2468,7 @@ public class OptWnd extends Window {
 				}
 			}, prev.pos("bl").adds(0, 12));
 			autoPeaceAnimalsWhenCombatStartsCheckBox.tooltip = autoPeaceAnimalsWhenCombatStartsTooltip;
-			prev = add(autoDrinkingCheckBox = new CheckBox("Auto-Drink Water threshold:"){
+			prev = add(autoDrinkingCheckBox = new CheckBox("Auto-Drink Water below threshold:"){
 				{a = Utils.getprefb("autoDrinkTeaOrWater", false);}
 				public void set(boolean val) {
 					Utils.setprefb("autoDrinkTeaOrWater", val);
