@@ -2052,11 +2052,11 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
     }
 
 	public void msg(String msg, Color color, Audio.Clip sfx){
-		msg(new UI.NoticeEvent(new UI.SimpleMessage(msg, color, sfx)));
+		msg(new UI.SimpleMessage(msg, color, sfx));
 	}
 
 	public void msg(String msg, Color color){
-		msg(new UI.NoticeEvent(new UI.SimpleMessage(msg, color, null)));
+		msg(new UI.SimpleMessage(msg, color, null));
 	}
 
 	public void optionInfoMsg(String msg, Color color, Audio.Clip sfx) {
