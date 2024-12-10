@@ -1333,7 +1333,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 		int cur_limit = 0;
 		while(iter.hasNext()) {
 			SysTimedMessage msg = iter.next();
-			if((Utils.rtime() - msg.time) > 5.0 || ++cur_limit > 5){
+			if((Utils.rtime() - msg.time) > (double) OptWnd.systemMessagesDurationSlider.val || ++cur_limit > OptWnd.systemMessagesListSizeSlider.val){
 				iter.remove();
 			}else{
 				g.chcolor(0, 0, 0, 192);

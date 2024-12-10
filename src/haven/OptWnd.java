@@ -1177,49 +1177,54 @@ public class OptWnd extends Window {
 	public static CheckBox autoSelectNewChatCheckBox;
 	public static CheckBox showKinStatusChangeMessages;
 
+	public static HSlider systemMessagesListSizeSlider;
+	public static HSlider systemMessagesDurationSlider;
+
 	public class ChatSettingsPanel extends Panel {
 		public ChatSettingsPanel(Panel back) {
 			Widget prev;
 
-			prev = add(chatAlertSoundsCheckBox = new CheckBox("Enable chat alert sounds"){
+			prev = add(chatAlertSoundsCheckBox = new CheckBox("Enable chat message notification sounds"){
 				{a = (Utils.getprefb("chatAlertSounds", true));}
 				public void changed(boolean val) {
 					Utils.setprefb("chatAlertSounds", val);
 				}
 			}, 0, 0);
 
-			prev = add(areaChatAlertSoundsCheckBox = new CheckBox("Enable area chat alert sounds"){
+			prev = add(areaChatAlertSoundsCheckBox = new CheckBox("Area Chat Sound"){
 				{a = (Utils.getprefb("areaChatAlertSounds", true));}
 				public void changed(boolean val) {
 					Utils.setprefb("areaChatAlertSounds", val);
 				}
 			}, prev.pos("bl").adds(20, 4));
 
-			prev = add(privateChatAlertSoundsCheckBox = new CheckBox("Enable private chat alert sounds"){
+			prev = add(privateChatAlertSoundsCheckBox = new CheckBox("Private Messages Sound"){
 				{a = (Utils.getprefb("privateChatAlertSounds", true));}
 				public void changed(boolean val) {
 					Utils.setprefb("privateChatAlertSounds", val);
 				}
 			}, prev.pos("bl").adds(0, 4));
 
-			prev = add(partyChatAlertSoundsCheckBox = new CheckBox("Enable party chat alert sounds"){
+			prev = add(partyChatAlertSoundsCheckBox = new CheckBox("Party Chat Sound"){
 				{a = (Utils.getprefb("partyChatAlertSounds", true));}
 				public void changed(boolean val) {
 					Utils.setprefb("partyChatAlertSounds", val);
 				}
 			}, prev.pos("bl").adds(0, 4));
 
-			prev = add(villageChatAlertSoundsCheckBox = new CheckBox("Enable village chat alert sounds"){
+			prev = add(villageChatAlertSoundsCheckBox = new CheckBox("Village Chat Sound"){
 				{
 					a = (Utils.getprefb("villageChatAlertSounds", true));
-					tooltip = RichText.render("You must set a village name below in order to configure the alerts properly.\n\nWithout setting a name, village alerts will default to the overall 'Enable chat alert sounds' setting.", UI.scale(300));
+					tooltip = RichText.render("You must set a Village Name below, for this setting to properly work." +
+							"\n" +
+							"\nIf you don't set a village name, the sound alert will always trigger if chat message notification sounds are enabled.", UI.scale(300));
 				}
 				public void changed(boolean val) {
 					Utils.setprefb("villageChatAlertSounds", val);
 				}
 			}, prev.pos("bl").adds(0, 4));
 
-			prev = add(new Label("Village name for alerts:"), prev.pos("bl").adds(20, 4));
+			prev = add(new Label("Village Name:"), prev.pos("bl").adds(20, 4));
 			add(villageNameTextEntry = new TextEntry(UI.scale(100), Utils.getpref("villageNameForChatAlerts", "")){
 				protected void changed() {
 					Utils.setpref("villageNameForChatAlerts", this.buf.line());
@@ -1233,12 +1238,30 @@ public class OptWnd extends Window {
 				}
 			}, prev.pos("bl").adds(0, 4).x(0));
 
-			prev = add(showKinStatusChangeMessages = new CheckBox("Show kin status change messages"){
+			prev = add(showKinStatusChangeMessages = new CheckBox("Show kin status system messages"){
 				{a = (Utils.getprefb("showKinStatusChangeMessages", true));}
 				public void changed(boolean val) {
 					Utils.setprefb("showKinStatusChangeMessages", val);
 				}
 			}, prev.pos("bl").adds(0, 4));
+			prev = add(new Label("System Messages List Size: "), prev.pos("bl").adds(0, 5));
+			Label systemMessagesListSizeLabel = new Label(Utils.getprefi("systemMessagesListSize", 5) + " rows");
+			add(systemMessagesListSizeLabel, prev.pos("ur").adds(0, 0));
+			prev = add(systemMessagesListSizeSlider = new HSlider(UI.scale(230), 1, 10, Utils.getprefi("systemMessagesListSize", 5)) {
+				public void changed() {
+					Utils.setprefi("systemMessagesListSize", val);
+					systemMessagesListSizeLabel.settext(val + " rows");
+				}
+			}, prev.pos("bl").adds(0, 2));
+			prev = add(new Label("System Messages Duration: "), prev.pos("bl").adds(0, 5));
+			Label systemMessagesDurationLabel = new Label(Utils.getprefi("systemMessagesDuration", 4) + (Utils.getprefi("systemMessagesDuration", 5) > 1 ? " seconds" : " second"));
+			add(systemMessagesDurationLabel, prev.pos("ur").adds(0, 0));
+			prev = add(systemMessagesDurationSlider = new HSlider(UI.scale(230), 3, 10, Utils.getprefi("systemMessagesDuration", 4)) {
+				public void changed() {
+					Utils.setprefi("systemMessagesDuration", val);
+					systemMessagesDurationLabel.settext(val + (val > 1 ? " seconds" : " second"));
+				}
+			}, prev.pos("bl").adds(0, 2));
 
 			Widget backButton;
 			add(backButton = new PButton(UI.scale(200), "Back", 27, back, "Advanced Settings"), prev.pos("bl").adds(0, 18).x(0));
