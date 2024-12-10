@@ -420,8 +420,10 @@ public class LoginScreen extends Widget {
 			}
 		} else if(stat.status == "down") {
 		    FastText.aprintfstroked(g, new Coord(x, FastText.h * 0), ax, 0, "Server status: Offline");
-		} else if(stat.status == "shutdown") {
-		    FastText.aprintfstroked(g, new Coord(x, FastText.h * 0), ax, 0, "Server status: Shutting down");
+        } else if(stat.status == "terminating") {
+            FastText.aprintfstroked(g, new Coord(x, FastText.h * 0), ax, 0, "Server status: Shutting down");
+        } else if(stat.status == "shutdown") {
+		    FastText.aprintfstroked(g, new Coord(x, FastText.h * 0), ax, 0, "Server status: Down");
 		} else if(stat.status == "crashed") {
 		    FastText.aprintfstroked(g, new Coord(x, FastText.h * 0), ax, 0, "Server status: Crashed");
 		}
