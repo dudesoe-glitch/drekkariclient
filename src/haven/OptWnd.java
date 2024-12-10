@@ -3170,6 +3170,7 @@ public class OptWnd extends Window {
 	public static CheckBox hideWallsCheckbox;
 	public static CheckBox hideHousesCheckbox;
 	public static CheckBox hideCropsCheckbox;
+	public static CheckBox hideTrellisCheckbox;
 	public static CheckBox hideStockpilesCheckbox;
 	public static ColorOptionWidget hiddenObjectsColorOptionWidget;
 	public static String[] hiddenObjectsColorSetting = Utils.getprefsa("hidingBox" + "_colorSetting", new String[]{"0", "225", "255", "170"});
@@ -3334,6 +3335,18 @@ public class OptWnd extends Window {
 				}
 			}, prev.pos("bl").adds(0, 2));
 			prev.tooltip = RichText.render("These won't show a hiding box, cause there's no collision.", UI.scale(300));
+
+			prev = add(hideTrellisCheckbox = new CheckBox("Trellises"){
+				{a = Utils.getprefb("hideTrellis", false);}
+				public void changed(boolean val) {
+					Utils.setprefb("hideTrellis", val);
+					if (ui != null && ui.gui != null) {
+						ui.sess.glob.oc.gobAction(Gob::updateHidingBoxes);
+						ui.gui.map.updatePlobHidingBox();
+					}
+				}
+			}, prev.pos("bl").adds(0, 2));
+			prev.tooltip = RichText.render("This only hides the trellises, and not the crops growing on them.", UI.scale(300));
 
 			Widget backButton;
 			add(backButton = new PButton(UI.scale(200), "Back", 27, back, "Advanced Settings"), prev.pos("bl").adds(0, 18).x(0));
