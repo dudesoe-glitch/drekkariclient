@@ -76,13 +76,21 @@ public class GobGrowthInfo extends GobInfo {
 	    if(data != null) {
 		int stage = data.uint8();
 		if(stage > maxStage) {stage = maxStage;}
-		if(res != null && (res.name.contains("turnip") || res.name.contains("carrot") || res.name.contains("leek"))){
-			 if (stage == maxStage - 2){
+		if(res != null && (res.name.contains("turnip") || res.name.contains("carrot"))) {
+			if (stage == maxStage - 1) {
 				return SEEDS_STAGE_DOT;
-			} else if (stage == maxStage){
+			} else if (stage == maxStage) {
 				return FINAL_STAGE_DOT;
 			} else {
-				 return getStageImage(stage, maxStage);
+				return getStageImage(stage, maxStage);
+			}
+		} else if (res != null && res.name.contains("leek")){
+			if (stage == maxStage - 2) {
+				return SEEDS_STAGE_DOT;
+			} else if (stage == maxStage) {
+				return FINAL_STAGE_DOT;
+			} else {
+				return getStageImage(stage, maxStage);
 			}
 		} else {
 			if (stage == maxStage){
