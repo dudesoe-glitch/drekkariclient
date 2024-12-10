@@ -314,4 +314,11 @@ public class Session implements Resource.Resolver {
 		}
 		return -1;
 	}
+
+	public Indir<Resource> getres2(int id) {
+		synchronized (rescache) {
+			CachedRes ret = rescache.get(id);
+			return ret != null ? (ret.get()) : null;
+		}
+	}
 }

@@ -1269,6 +1269,7 @@ public class OptWnd extends Window {
 	public static CheckBox showBeeSkepsRadiiCheckBox;
 	public static CheckBox showFoodTroughsRadiiCheckBox;
 	public static CheckBox showBarrelContentsTextCheckBox;
+	public static CheckBox showIconSignTextCheckBox;
 	public static CheckBox drawChaseVectorsCheckBox;
 	public static CheckBox drawYourCurrentPathCheckBox;
 	public static CheckBox highlightCliffsCheckBox;
@@ -1831,18 +1832,28 @@ public class OptWnd extends Window {
 					Utils.setprefb("showBarrelContentsText", val);
 					a = val;
 					if (ui != null && ui.gui != null){
-						ui.sess.glob.oc.gobAction(Gob::updateTroughsRadius);
 						ui.gui.optionInfoMsg("Barrel Contents Text is now " + (val ? "SHOWN" : "HIDDEN") + "!", (val ? msgGreen : msgGray), Audio.resclip(val ? Toggle.sfxon : Toggle.sfxoff));
 					}
 				}
-			}, middleColumn.pos("bl").adds(0, 12));
+			}, middleColumn.pos("bl").adds(0, 13));
+
+			middleColumn = add(showIconSignTextCheckBox = new CheckBox("Show Icon Sign Text"){
+				{a = (Utils.getprefb("showIconSignText", true));}
+				public void set(boolean val) {
+					Utils.setprefb("showIconSignText", val);
+					a = val;
+					if (ui != null && ui.gui != null){
+						ui.gui.optionInfoMsg("Icon Sign Text is now " + (val ? "SHOWN" : "HIDDEN") + "!", (val ? msgGreen : msgGray), Audio.resclip(val ? Toggle.sfxon : Toggle.sfxoff));
+					}
+				}
+			}, middleColumn.pos("bl").adds(0, 2));
 
 			middleColumn = add(displayGrowthInfoCheckBox = new CheckBox("Display Growth Info on Plants and Trees"){
 				{a = (Utils.getprefb("displayGrowthInfo", false));}
 				public void changed(boolean val) {
 					Utils.setprefb("displayGrowthInfo", val);
 				}
-			}, middleColumn.pos("bl").adds(0, 2));
+			}, middleColumn.pos("bl").adds(0, 12));
 			displayGrowthInfoCheckBox.tooltip = displayGrowthInfoTooltip;
 			middleColumn = add(alsoShowOversizedTreesAbovePercentageCheckBox = new CheckBox("Also Show Trees Above %:"){
 				{a = (Utils.getprefb("alsoShowOversizedTreesAbovePercentage", true));}

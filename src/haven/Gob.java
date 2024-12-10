@@ -110,6 +110,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	private Overlay archeryVector;
 	private Overlay archeryRadius;
 	BarrelContentsGobInfo barrelContentsGobInfo;
+	IconSignGobInfo iconSignGobInfo;
 	public boolean combatFoeHighlighted = false;
 
     public static class Overlay implements RenderTree.Node {
@@ -522,7 +523,9 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	growthInfo = new GobGrowthInfo(this);
 	setattr(GobGrowthInfo.class, growthInfo);
 	barrelContentsGobInfo = new BarrelContentsGobInfo(this);
+	iconSignGobInfo = new IconSignGobInfo(this);
 	setattr(BarrelContentsGobInfo.class, barrelContentsGobInfo);
+	setattr(IconSignGobInfo.class, iconSignGobInfo);
 	updwait(this::updateDrawableStuff, waiting -> {});
     }
 
@@ -2448,11 +2451,22 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 		checkIfObjectJustDied();
 		growthInfo.clear();
 		barrelContentsGobInfo.clear();
+		iconSignGobInfo.signInfoTex = null;
+		iconSignGobInfo.clear();
 		setGobSearchOverlay();
 	}
 
 	public void refreshGrowthInfo(){
 		growthInfo.clear();
+	}
+
+	public Message sdtm() {
+		Drawable d = getattr(Drawable.class);
+		if(d instanceof ResDrawable) {
+			ResDrawable dw = (ResDrawable) d;
+			return dw.sdt.clone();
+		}
+		return null;
 	}
 
 }
