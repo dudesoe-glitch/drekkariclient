@@ -2163,9 +2163,9 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
 		Long gobid = new Long((Integer) inf.clickargs()[1]);
 		Gob gob = glob.oc.getgob(gobid);
 			if(gob != null) {
-				if (OptWnd.clickThroughCupboardDecalCheckBox.a && !ui.modctrl) {
+				if (OptWnd.clickThroughContainerDecalCheckBox.a && !ui.modctrl) {
 					try {
-						if (gob.getres().name.contains("cupboard") && (int)args[2] == 3) {
+						if ((gob.getres().name.contains("cupboard") || gob.getres().name.contains("chest")) && (int)args[2] == 3) {
 							args[4] = 0;
 							args[7] = 0;
 						}

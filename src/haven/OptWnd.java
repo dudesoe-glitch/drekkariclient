@@ -2599,7 +2599,7 @@ public class OptWnd extends Window {
 	public static CheckBox useOGControlsForBuildingAndPlacingCheckBox;
 	public static CheckBox useImprovedInventoryTransferControlsCheckBox;
 	public static CheckBox tileCenteringCheckBox;
-	public static CheckBox clickThroughCupboardDecalCheckBox;
+	public static CheckBox clickThroughContainerDecalCheckBox;
 
 	public class AlteredGameplaySettingsPanel extends Panel {
 
@@ -2690,10 +2690,10 @@ public class OptWnd extends Window {
 			}, prev.pos("bl").adds(0, 12));
 			tileCenteringCheckBox.tooltip = tileCenteringTooltip;
 
-			prev = add(clickThroughCupboardDecalCheckBox = new CheckBox("Click through Cupboard Decal (Hold Ctrl to pick)"){
-				{a = Utils.getprefb("clickThroughCupboardDecal", true);}
+			prev = add(clickThroughContainerDecalCheckBox = new CheckBox("Click through Container Decal (Hold Ctrl to pick)"){
+				{a = Utils.getprefb("clickThroughContainerDecal", true);}
 				public void changed(boolean val) {
-					Utils.setprefb("clickThroughCupboardDecal", val);
+					Utils.setprefb("clickThroughContainerDecal", val);
 				}
 			}, prev.pos("bl").adds(0, 12));
 
