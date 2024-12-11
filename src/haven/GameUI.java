@@ -1301,7 +1301,8 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 	}
 
 	public void draw(GOut g) {
-	    g.image(curi, Coord.z);
+		if (showUI)
+	    	g.image(curi, Coord.z);
 	}
 
 	public boolean checkhit(Coord c) {
