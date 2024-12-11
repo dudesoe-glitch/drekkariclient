@@ -29,8 +29,6 @@ public class Cavein extends Sprite implements Sprite.CDel, PView.Render2D {
     Coord3f sz;
 
 	final Tex numberTex;
-	final Gob ownerGob;
-	final MapView mapView;
 	Integer number;
 	Map colorMap = new LinkedHashMap<Integer, Color>(){{
 		put(1, new Color(0, 102, 255));
@@ -56,13 +54,6 @@ public class Cavein extends Sprite implements Sprite.CDel, PView.Render2D {
 			numberTex = new TexI(Utils.outline2(Text.num20boldFnd.renderstroked(String.valueOf(number), numberColor, Color.BLACK).img, Color.BLACK, true));
 		else
 			numberTex = new TexI(Utils.outline2(Text.num20boldFnd.renderstroked(String.valueOf(number), numberColor, Color.WHITE).img, Color.BLACK, true));
-		if (owner instanceof Gob) {
-			ownerGob = (Gob) owner;
-			mapView = ownerGob.glob.sess.ui.gui.map;
-		} else {
-			ownerGob = null;
-			mapView = null;
-		}
 	}
 
     class Boll {
@@ -148,12 +139,12 @@ public class Cavein extends Sprite implements Sprite.CDel, PView.Render2D {
 	@Override
 	public void draw(GOut g, Pipe state) {
 		if (OptWnd.flatWorldCheckBox.a) { // TODO: ND: Need to figure out a way to make flatworld not needed for this. Something to do with the Z coordinate of the virtual gob probably.
-			if (OptWnd.enableMineSweeperCheckBox.a && ownerGob != null && mapView != null){
+			if (OptWnd.enableMineSweeperCheckBox.a){
 				try {
-					Coord3f sc3f = ownerGob.getc();
-					Coord sc = mapView.screenxf(sc3f).round2();
+					Coord2d sc3f = ((Gob)owner).rc;
+					Coord sc = ((Gob)owner).glob.sess.ui.gui.map.screenxf(sc3f).round2();
 					g.aimage(numberTex, sc, 0.5, 0.5);
-				} catch (Loading ignored) {
+				} catch (Exception ignored) {
 				}
 			}
 		}
