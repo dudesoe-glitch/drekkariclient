@@ -651,9 +651,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 			}
 		}
 		if(OptWnd.disableScentSmokeCheckBox.a && getres().name.equals("gfx/terobjs/clue")) {
-			if (ol.spr != null && ol.spr.res != null && ol.spr.res.name.contains("ismoke")) {
-				return;
-			}
+			return;
 		}
 	}
 	if(async) {
