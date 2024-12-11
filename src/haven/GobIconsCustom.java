@@ -49,6 +49,7 @@ public class GobIconsCustom {
 		put("gfx/terobjs/road/milestone-stone-e", "customclient/mapicons/milestone");
 
 		put("gfx/terobjs/map/starshard", "customclient/mapicons/starshard");
+		put("gfx/terobjs/map/gemstone", "customclient/mapicons/gemboulder");
     }};
 
 
