@@ -455,6 +455,8 @@ public class Glob {
 		rservertime = phaseOfMoon;
 		if (secintoday >= dewyladysmantletimemin && secintoday <= dewyladysmantletimemax)
 			bservertime = "(Dewy Lady's Mantle)";
+		else
+			bservertime = "";
 		infoUpdate(mservertimetex, mservertime);
 		infoUpdate(lservertimetex, lservertime);
 		infoUpdate(rservertimetex, rservertime);
