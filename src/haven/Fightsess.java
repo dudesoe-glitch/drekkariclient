@@ -1038,7 +1038,7 @@ public class Fightsess extends Widget {
 	}
 
 	private void drawSelfCombatOpenings(GOut g) {
-		Coord3f rawc = ui.gui.map.player().getc();
+		Coord3f rawc = ui.gui.map.player().placed.getc();
 		rawc.z += 15;
 		Coord sc = getparent(GameUI.class).map.screenxf(rawc).round2();
 		int scaledY = sc.y - UI.scale(86);
