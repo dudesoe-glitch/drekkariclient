@@ -54,7 +54,9 @@ public class IconSignGobInfo extends GobInfo {
 			Session session = gob.context(Session.class);
 			Indir<Resource> cres = session.getres2(resid);
 			if(cres != null) {
-				contents = Optional.of(cres.get().basename());
+				try {
+					contents = Optional.of(cres.get().basename());
+				} catch (Exception ignored){}
 			}
 		}
 	}
