@@ -89,7 +89,7 @@ public class DowseFx extends Sprite {
     }
 
     public void added(RenderTree.Slot slot) {
-	slot.ostate(Pipe.Op.compose(VertexColor.instance, States.maskdepth, Location.goback("gobx"), Clickable.notClickable,
+	slot.ostate(Pipe.Op.compose(VertexColor.instance, States.maskdepth, Location.goback("gobx"),
 				    /* Rendered.eyesort XXXRENDER */ Rendered.postpfx));
 //	slot.add(d1);
 	slot.add(d2);
