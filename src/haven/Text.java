@@ -56,7 +56,16 @@ public class Text implements Disposable {
 	num20boldFnd = new Text.Foundry(latin.deriveFont(Font.BOLD), 20).aa(true);
     }
 	
-    public static class Line extends Text {
+    public static abstract class Slug extends Text {
+	public Slug(String text, BufferedImage img) {
+	    super(text, img);
+	}
+
+	public abstract int advance(int pos);
+	public abstract int charat(int x);
+    }
+
+    public static class Line extends Slug {
 	private final FontMetrics m;
 	
 	private Line(String text, BufferedImage img, FontMetrics m) {
@@ -109,7 +118,13 @@ public class Text implements Disposable {
 	}
     }
 
-    public static class Foundry extends Furnace {
+    public static abstract class Forge extends Furnace {
+	public abstract Slug render(String text);
+	public abstract int height();
+	public abstract Coord strsize(String text);
+    }
+
+    public static class Foundry extends Forge {
 	private FontMetrics m;
 	public final Font font;
 	public final Color defcol;

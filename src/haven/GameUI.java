@@ -2011,6 +2011,8 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
     }
 
     public boolean msg(UI.Notice msg) {
+	if(msg.handler(this))
+	    return(true);
 	Color color = msg.color();
 	if (msg.message().contains("There are no claims under siege"))
 		color = Color.green;

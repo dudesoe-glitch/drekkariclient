@@ -37,16 +37,17 @@ import static haven.CharWnd.iconfilter;
 import static haven.PUtils.convolve;
 
 public class FoodInfo extends ItemInfo.Tip {
-    public final double end, glut, cons;
+    public final double end, glut, sev, cons;
     public final Event[] evs;
     public final Effect[] efs;
     public final int[] types;
 	private UI ui = null;
 
-    public FoodInfo(Owner owner, double end, double glut, double cons, Event[] evs, Effect[] efs, int[] types) {
+    public FoodInfo(Owner owner, double end, double glut, double cons, double sev, Event[] evs, Effect[] efs, int[] types) {
 	super(owner);
 	this.end = end;
 	this.glut = glut;
+	this.sev = sev;
 	this.cons = cons;
 	this.evs = evs;
 	this.efs = efs;
@@ -56,8 +57,8 @@ public class FoodInfo extends ItemInfo.Tip {
 	}
     }
 
-    public FoodInfo(Owner owner, double end, double glut, Event[] evs, Effect[] efs, int[] types) {
-	this(owner, end, glut, 0, evs, efs, types);
+    public FoodInfo(Owner owner, double end, double glut, double cons, Event[] evs, Effect[] efs, int[] types) {
+	this(owner, end, glut, cons, 0, evs, efs, types);
     }
 
     public static class Event {
@@ -135,9 +136,8 @@ public class FoodInfo extends ItemInfo.Tip {
 			head = "";
 		head += String.format("\nEnergy: $col[128,128,255]{%s%%}  |  Hunger: $col[255,192,128]{%s\u2030}", Utils.odformat2(end * 100, 2), Utils.odformat2(calculateEfficiency ? (glut * 1000 * (hungerEfficiency/100)) : (glut * 1000), 2));
 		double totalFeps = 0;
-		for (int i = 0; i < evs.length; i++) {
-			totalFeps += evs[i].a;
-		}
+        if(sev > 0)
+            totalFeps = sev;
 		if (evs.length > 0) {
 			head += "\n\nFood Event Points:";
 		}

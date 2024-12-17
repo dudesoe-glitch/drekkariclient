@@ -68,10 +68,10 @@ public abstract class SListWidget<I, W extends Widget> extends Widget {
 
 	protected abstract String text();
 	protected int margin() {return(-1);}
-	protected Text.Foundry foundry() {return(CharWnd.attrf);}
+	protected Text.Forge foundry() {return(CharWnd.attrf);}
 	protected boolean valid(String text) {return(true);}
 
-	private Text.Line text = null;
+	private Text.Slug text = null;
 	protected void drawtext(GOut g) {
 	    try {
 		if((this.text == null) || !valid(text.text)) {
@@ -108,10 +108,10 @@ public abstract class SListWidget<I, W extends Widget> extends Widget {
 	    }
 	}
 
-	public static TextItem of(Coord sz, Text.Foundry fnd, Supplier<String> text) {
+	public static TextItem of(Coord sz, Text.Forge fnd, Supplier<String> text) {
 	    return(new TextItem(sz) {
 		    public String text() {return(text.get());}
-		    public Text.Foundry foundry() {return(fnd);}
+		    public Text.Forge foundry() {return(fnd);}
 		});
 	}
 
@@ -128,7 +128,7 @@ public abstract class SListWidget<I, W extends Widget> extends Widget {
 	protected abstract BufferedImage img();
 	protected abstract String text();
 	protected int margin() {return(0);}
-	protected Text.Foundry foundry() {return(CharWnd.attrf);}
+	protected Text.Forge foundry() {return(CharWnd.attrf);}
 	protected boolean valid(String text) {return(true);}
 	protected PUtils.Convolution filter() {return(GobIcon.filter);}
 
@@ -157,8 +157,8 @@ public abstract class SListWidget<I, W extends Widget> extends Widget {
 	    }
 	}
 
-	private Text.Line text = null;
-	private Tex textTex = null;
+	private Text.Slug text = null;
+    private Tex textTex = null;
 	protected void drawtext(GOut g) {
 	    int tx = sz.y + UI.scale(5);
 	    try {
