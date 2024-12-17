@@ -73,7 +73,7 @@ public class AudioSprite {
 			stream = new Audio.VolAdjust(stream, OptWnd.clapSoundVolumeSlider.val/100d);
 		else if (res.name.equals("sfx/terobjs/quern"))
 			stream = new Audio.VolAdjust(stream, OptWnd.quernSoundVolumeSlider.val/100d);
-		else if (res.name.equals("sfx/squeak"))
+		else if (res.name.equals("sfx/squeak") || res.name.equals("sfx/terobjs/grinder"))
 			stream = new Audio.VolAdjust(stream, OptWnd.squeakSoundVolumeSlider.val/100d);
 		else if (res.name.equals("sfx/borka/butcher"))
 			stream = new Audio.VolAdjust(stream, OptWnd.butcherSoundVolumeSlider.val/100d);
