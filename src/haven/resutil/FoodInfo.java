@@ -136,8 +136,9 @@ public class FoodInfo extends ItemInfo.Tip {
 			head = "";
 		head += String.format("\nEnergy: $col[128,128,255]{%s%%}  |  Hunger: $col[255,192,128]{%s\u2030}", Utils.odformat2(end * 100, 2), Utils.odformat2(calculateEfficiency ? (glut * 1000 * (hungerEfficiency/100)) : (glut * 1000), 2));
 		double totalFeps = 0;
-        if(sev > 0)
-            totalFeps = sev;
+		for (int i = 0; i < evs.length; i++) {
+			totalFeps += evs[i].a;
+		}
 		if (evs.length > 0) {
 			head += "\n\nFood Event Points:";
 		}
@@ -154,9 +155,14 @@ public class FoodInfo extends ItemInfo.Tip {
 		efi = catimgsh(5, efi, RichText.render(String.format("$i{($col[192,192,255]{%d%%} chance)}", (int)Math.round(efs[i].p * 100)), 0).img);
 	    imgs.add(efi);
 	}
-		imgs.add(RichText.render(String.format("\nTotal FEPs: $col[0,180,0]{%s}", Utils.odformat2(calculateEfficiency ? (totalFeps * (fepEfficiency/100)) : totalFeps, 2)), 0).img);
-		if (glut > 0)
-			imgs.add(RichText.render(String.format("FEPs/Hunger: $col[0,180,0]{%s}", Utils.odformat2(calculateEfficiency ? totalFeps * (fepEfficiency/100) / (glut * 1000 * (hungerEfficiency/100)) : totalFeps / (glut * 1000), 2)), 0).img);
+		imgs.add(RichText.render(String.format("\n(+2 Weighted) Total FEPs: $col[0,180,0]{%s}", Utils.odformat2(calculateEfficiency ? (sev * (fepEfficiency/100)) : sev, 2)), 0).img);
+		if (glut > 0) {
+			imgs.add(RichText.render(String.format("(+2 Weighted) FEPs/Hunger: $col[0,180,0]{%s}", Utils.odformat2(calculateEfficiency ? sev * (fepEfficiency / 100) / (glut * 1000 * (hungerEfficiency / 100)) : sev / (glut * 1000), 2)), 0).img);
+		}
+		imgs.add(RichText.render(String.format("\n(Actual) Total FEPs: $col[0,180,0]{%s}", Utils.odformat2(calculateEfficiency ? (totalFeps * (fepEfficiency/100)) : totalFeps, 2)), 0).img);
+		if (glut > 0) {
+			imgs.add(RichText.render(String.format("(Actual) FEPs/Hunger: $col[0,180,0]{%s}", Utils.odformat2(calculateEfficiency ? totalFeps * (fepEfficiency / 100) / (glut * 1000 * (hungerEfficiency / 100)) : totalFeps / (glut * 1000), 2)), 0).img);
+		}
 		if (calculateEfficiency){
 			List<BAttrWnd.FoodMeter.El> els = ui.gui.chrwdg.battr.feps.els;
 			BufferedImage cur = null;
