@@ -1246,7 +1246,16 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 
 	public void updPose(HashSet<String> poses) {
 		isComposite = true;
-		knocked = (poses.contains("knock") || poses.contains("dead") || poses.contains("waterdead") || poses.contains("chicken-knock"));
+		Iterator<String> iter = poses.iterator();
+		while (iter.hasNext()) { // ND: Some animals have stupid names for the knock or dead pose, like "chicken-knock". Doing it this way is easier than manually adding every single one.
+			String s = iter.next();
+			if (s.contains("knock") || s.contains("dead") || s.contains("waterdead") || s.contains("banzai")) {
+				knocked = true;
+				break;
+			} else {
+				knocked = false;
+			}
+		}
 		if (this.getres().name.equals("gfx/borka/body")) {
 			isMannequin = (poses.contains("mannequinlift"));
 			isSkeleton = (poses.contains("deadskeletonpose"));
