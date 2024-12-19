@@ -534,7 +534,6 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
     }
 
     public void ctick(double dt) {
-	Map<Class<? extends GAttrib>, GAttrib> attr = cloneattrs();
 	for(GAttrib a : attr.values()){
 		if(a instanceof ResDrawable){
 			if(!(OptWnd.disableObjectAnimationsCheckBox.a && thisGobAnimationsCanBeDisabled)){
@@ -709,7 +708,6 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
     }
 
     public void dispose() {
-	Map<Class<? extends GAttrib>, GAttrib> attr = cloneattrs();
 	for(GAttrib a : attr.values())
 	    a.dispose();
     }
@@ -959,7 +957,6 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	    if(ol.slots != null)
 		slot.add(ol);
 	}
-	Map<Class<? extends GAttrib>, GAttrib> attr = cloneattrs();
 	for(GAttrib a : attr.values()) {
 	    if(a instanceof RenderTree.Node && !a.skipRender)
 			try {
@@ -1420,12 +1417,6 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 
 				}
 			}
-		}
-	}
-
-	private Map<Class<? extends GAttrib>, GAttrib> cloneattrs() { // ND: To prevent concurrent modification exceptions
-		synchronized (this.attr) {
-			return new HashMap<>(this.attr);
 		}
 	}
 
