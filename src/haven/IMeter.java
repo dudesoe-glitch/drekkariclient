@@ -47,6 +47,7 @@ public class IMeter extends LayerMeter {
 	private boolean ponyAlarmPlayed = false;
 	private boolean energyAlarmTriggered = false;
 	private boolean dangerEnergyAlarmTriggered = false;
+	public static boolean sparring = false;
 
     @RName("im")
     public static class $_ implements Factory {
@@ -173,15 +174,29 @@ public class IMeter extends LayerMeter {
 			String value = ((String)args[0]).split(":")[1].replaceAll("(\\(.+\\))", "");
 			if (value.contains("/")) { // ND: this part removes the HHP, so I only show the SHP and MHP
 				String[] hps = value.split("/");
-				String SHP = hps[0].trim();
-				if (Double.parseDouble(SHP) > 0){
-					String MHP = hps[2].trim();
-					characterSoftHealthPercent = (Double.parseDouble(SHP)/((Double.parseDouble(MHP)/100)));
+				if (hps.length == 4) { // ND: Sparring adds a 4th value
+					sparring = true;
+					String SHP = hps[0].trim();
+					if (Double.parseDouble(SHP) > 0) {
+						String MHP = hps[3].trim();
+						characterSoftHealthPercent = (Double.parseDouble(SHP) / ((Double.parseDouble(MHP) / 100)));
+					} else {
+						characterSoftHealthPercent = 0;
+					}
+					value = hps[0] + " / " + hps[hps.length - 1]; // ND: hps[0] is SHP, hps[1] is HHP, hps[2] (or hps[hps.length - 1]) is MHP
+					characterCurrentHealth = value;
 				} else {
-					characterSoftHealthPercent = 0;
+					sparring = false;
+					String SHP = hps[0].trim();
+					if (Double.parseDouble(SHP) > 0) {
+						String MHP = hps[2].trim();
+						characterSoftHealthPercent = (Double.parseDouble(SHP) / ((Double.parseDouble(MHP) / 100)));
+					} else {
+						characterSoftHealthPercent = 0;
+					}
+					value = hps[0] + " / " + hps[hps.length - 1]; // ND: hps[0] is SHP, hps[1] is HHP, hps[2] (or hps[hps.length - 1]) is MHP
+					characterCurrentHealth = value;
 				}
-				value = hps[0] + " / " + hps[hps.length - 1]; // ND: hps[0] is SHP, hps[1] is HHP, hps[2] (or hps[hps.length - 1]) is MHP
-				characterCurrentHealth = value;
 			}
 			tipTex = PUtils.strokeTex(tipF.render(value.trim()));
 		}

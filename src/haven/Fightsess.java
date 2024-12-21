@@ -76,6 +76,8 @@ public class Fightsess extends Widget {
 		public Integer value() {return(fv.current.oip);}
 	};
 	public static final Color stamBarBlue = new Color(47, 58, 207, 200);
+	public static final Color hpBarGreen = new Color(0, 166, 10, 255);
+	public static final Color hpBarGray = new Color(113, 113, 113, 255);
 	public static final Color hpBarRed = new Color(168, 0, 0, 255);
 	public static final Color hpBarYellow = new Color(182, 165, 0, 255);
 	private static final Color barFrame = new Color(255, 255, 255, 111);
@@ -1130,17 +1132,30 @@ public class Fightsess extends Widget {
 		int w = msz.x;
 		int w1 = (int) Math.ceil(w * m.a);
 		int w2 = (int) Math.ceil(w * (IMeter.characterSoftHealthPercent/100));
-		g.chcolor(hpBarYellow);
-		g.frect(sc, new Coord(w1, msz.y));
-		g.chcolor(hpBarRed);
-		g.frect(sc, new Coord(w2, msz.y));
-		g.chcolor(Color.BLACK);
-		g.line(new Coord(sc.x+w1, sc.y), new Coord(sc.x+w1, sc.y+msz.y), 2);
-		g.rect(sc, new Coord(msz.x, msz.y));
+		if (IMeter.sparring) {
+			g.chcolor(Fightsess.hpBarGray);
+			g.frect(sc, new Coord(w, msz.y));
+			g.chcolor(Fightsess.hpBarGreen);
+			g.frect(sc, new Coord(w2, msz.y));
+			g.chcolor(Color.BLACK);
+			g.line(new Coord(sc.x+w, sc.y), new Coord(sc.x+w, sc.y+msz.y), 2);
+			g.rect(sc, new Coord(msz.x, msz.y));
 
-		g.chcolor(Color.WHITE);
-		String HHPpercentage = OptWnd.includeHHPTextHealthBarCheckBox.a ? " ("+(fmt1DecPlace((int)(m.a*100))) + "% HHP)" : "";
-		g.aimage(Text.renderstroked((IMeter.characterCurrentHealth + HHPpercentage), Text.num12boldFnd).tex(), new Coord(sc.x+msz.x/2, sc.y+msz.y/2), 0.5, 0.5);
+			g.chcolor(Color.WHITE);
+			g.aimage(Text.renderstroked((IMeter.characterCurrentHealth), Text.num12boldFnd).tex(), new Coord(sc.x+msz.x/2, sc.y+msz.y/2), 0.5, 0.5);
+		} else {
+			g.chcolor(Fightsess.hpBarYellow);
+			g.frect(sc, new Coord(w1, msz.y));
+			g.chcolor(Fightsess.hpBarRed);
+			g.frect(sc, new Coord(w2, msz.y));
+			g.chcolor(Color.BLACK);
+			g.line(new Coord(sc.x+w1, sc.y), new Coord(sc.x+w1, sc.y+msz.y), 2);
+			g.rect(sc, new Coord(msz.x, msz.y));
+
+			g.chcolor(Color.WHITE);
+			String HHPpercentage = OptWnd.includeHHPTextHealthBarCheckBox.a ? " ("+(Fightsess.fmt1DecPlace((int)(m.a*100))) + "% HHP)" : "";
+			g.aimage(Text.renderstroked((IMeter.characterCurrentHealth + HHPpercentage), Text.num12boldFnd).tex(), new Coord(sc.x+msz.x/2, sc.y+msz.y/2), 0.5, 0.5);
+		}
 	}
 
 	private void drawStamMeterBar(GOut g, IMeter.Meter m, Coord sc, Coord msz) {
