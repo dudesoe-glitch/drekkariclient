@@ -420,7 +420,10 @@ public class WItem extends Widget implements DTarget {
 
 			if(cachedStudyTex == null) {
 				cachedStudyValue = value;
-				cachedStudyTex = PUtils.strokeTex(Text.renderstroked(value, Color.WHITE, Color.BLACK, studyFnd));
+				if (!value.contains("h")) // ND: When the curio has less than 1 hour left to study (it only shows the minutes)
+					cachedStudyTex = PUtils.strokeTex(Text.renderstroked(value, Color.GREEN, Color.BLACK, studyFnd));
+				else
+					cachedStudyTex = PUtils.strokeTex(Text.renderstroked(value, Color.WHITE, Color.BLACK, studyFnd));
 			}
 			return cachedStudyTex;
 		}
