@@ -913,7 +913,6 @@ public class Config {
 		cures.put("paginae/wound/blackeye", new String[]{
 				"gfx/invobjs/hartshornsalve",
 				"gfx/invobjs/honeybroadaid",
-				"gfx/invobjs/rootfill",
 				"gfx/invobjs/toadbutter"
 		});
 		cures.put("paginae/wound/bladekiss", new String[]{
