@@ -337,6 +337,11 @@ public class Glob {
 	synchronized(this) {
 	    ArrayList<Weather> ret = new ArrayList<>(wmap.size());
 	    for(Map.Entry<Indir<Resource>, Object> cur : wmap.entrySet()) {
+		try {
+			if (OptWnd.disableSeasonalGroundColorsCheckBox.a && cur.getKey().get().name.equals("gfx/fx/seasonmap")) {
+				continue;
+			}
+		} catch (Loading ignored){}
 		Object val = cur.getValue();
 		if(val instanceof Weather) {
 		    ret.add((Weather)val);

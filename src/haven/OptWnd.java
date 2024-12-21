@@ -2998,6 +2998,7 @@ public class OptWnd extends Window {
 	public static CheckBox disableTileTransitionsCheckBox;
 	public static CheckBox flatCaveWallsCheckBox;
 	public static CheckBox straightCliffEdgesCheckBox;
+	public static CheckBox disableSeasonalGroundColorsCheckBox;
 	public static HSlider treeAndBushScaleSlider;
 	private Button treeAndBushScaleResetButton;
 	public static CheckBox disableTreeAndBushSwayingCheckBox;
@@ -3118,6 +3119,14 @@ public class OptWnd extends Window {
 						ui.gui.optionInfoMsg("Straight Cliff Edges are now " + (val ? "ENABLED" : "DISABLED") + "!", (val ? msgGreen : msgRed), Audio.resclip(val ? Toggle.sfxon : Toggle.sfxoff));
 				}
 			}, leftColumn.pos("bl").adds(0, 2));
+
+			leftColumn = add(new Label("World Effects:"), leftColumn.pos("bl").adds(0, 10).x(0));
+			leftColumn = add(disableSeasonalGroundColorsCheckBox = new CheckBox("Disable Seasonal Ground Colors"){
+				{a = (Utils.getprefb("disableSeasonalGroundColors", false));}
+				public void changed(boolean val) {
+					Utils.setprefb("disableSeasonalGroundColors", val);
+				}
+			}, leftColumn.pos("bl").adds(12, 8));
 
 
 			rightColumn = add(new Label("Trees & Bushes Scale:"), UI.scale(290, 0));
