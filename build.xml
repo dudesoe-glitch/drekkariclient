@@ -180,7 +180,6 @@
     </copy>
     <copy file="etc/ansgar-config.properties" tofile="bin/haven-config.properties" />
     <copy file="Play.bat" todir="bin"/>
-    <copy file="Play Java16+.bat" todir="bin"/>
     <chmod file="bin/hafen.jar" perm="a+x" />
     <copy todir="bin/MapIconsPresets" >
       <fileset dir="MapIconsPresets" includes="**"/>
