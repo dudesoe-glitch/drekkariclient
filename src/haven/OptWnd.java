@@ -1626,8 +1626,8 @@ public class OptWnd extends Window {
 				}
 			}){}, leftColumn.pos("ur").adds(0, -3).x(UI.scale(115)));
 			add(new Button(UI.scale(70), "Reset", false).action(() -> {
-				Utils.setprefsa("workstationProgressUnprepared" + "_colorSetting", new String[]{"0", "120", "0", "180"});
-				showWorkstationProgressUnpreparedColorOptionWidget.cb.colorChooser.setColor(showWorkstationProgressUnpreparedColorOptionWidget.currentColor = new Color(0, 120, 0, 180));
+				Utils.setprefsa("workstationProgressUnprepared" + "_colorSetting", new String[]{"20", "20", "20", "180"});
+				showWorkstationProgressUnpreparedColorOptionWidget.cb.colorChooser.setColor(showWorkstationProgressUnpreparedColorOptionWidget.currentColor = new Color(20, 20, 20, 180));
 				if (ui != null && ui.gui != null) {
 					ui.sess.glob.oc.gobAction(Gob::updateWorkstationProgressHighlight);
 					ui.gui.map.updatePlobWorkstationProgressHighlight();
