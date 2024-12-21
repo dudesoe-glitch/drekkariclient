@@ -2990,7 +2990,6 @@ public class OptWnd extends Window {
 	private Label nightVisionLabel;
 	public static HSlider nightVisionSlider;
 	private Button nightVisionResetButton;
-	public static CheckBox disableWeatherAndEffectsCheckBox;
 	public static CheckBox simplifiedCropsCheckBox;
 	public static CheckBox simplifiedForageablesCheckBox;
 	public static CheckBox hideFlavorObjectsCheckBox;
@@ -3002,7 +3001,6 @@ public class OptWnd extends Window {
 	public static HSlider treeAndBushScaleSlider;
 	private Button treeAndBushScaleResetButton;
 	public static CheckBox disableTreeAndBushSwayingCheckBox;
-	public static CheckBox disableObjectAnimationsCheckBox;
 	public static CheckBox disableIndustrialSmokeCheckBox;
 	public static CheckBox disableScentSmokeCheckBox;
 	public static CheckBox flatCupboardsCheckBox;
@@ -3010,13 +3008,14 @@ public class OptWnd extends Window {
 	public class WorldGraphicsSettingsPanel extends Panel {
 
 		public WorldGraphicsSettingsPanel(Panel back) {
-			Widget prev;
+			Widget leftColumn;
+			Widget rightColumn;
 			add(new Label(""), 278, 0); // To fix window width
 
-			prev = add(nightVisionLabel = new Label("Night Vision / Brighter World:"), 0, 0);
+			leftColumn = add(nightVisionLabel = new Label("Night Vision / Brighter World:"), 0, 0);
 			nightVisionLabel.tooltip = nightVisionTooltip;
 			Glob.nightVisionBrightness = Utils.getprefd("nightVisionSetting", 0.0);
-			prev = add(nightVisionSlider = new HSlider(UI.scale(200), 0, 650, (int)(Glob.nightVisionBrightness*1000)) {
+			leftColumn = add(nightVisionSlider = new HSlider(UI.scale(200), 0, 650, (int)(Glob.nightVisionBrightness*1000)) {
 				protected void attach(UI ui) {
 					super.attach(ui);
 					val = (int)(Glob.nightVisionBrightness*1000);
@@ -3028,7 +3027,7 @@ public class OptWnd extends Window {
 						ui.sess.glob.brighten();
 					}
 				}
-			}, prev.pos("bl").adds(0, 6));
+			}, leftColumn.pos("bl").adds(0, 6));
 			nightVisionSlider.tooltip = nightVisionTooltip;
 			add(nightVisionResetButton = new Button(UI.scale(70), "Reset", false).action(() -> {
 				Glob.nightVisionBrightness = 0.0;
@@ -3037,41 +3036,9 @@ public class OptWnd extends Window {
 				if(ui.sess != null && ui.sess.glob != null) {
 					ui.sess.glob.brighten();
 				}
-			}), prev.pos("bl").adds(210, -20));
+			}), leftColumn.pos("bl").adds(210, -20));
 			nightVisionResetButton.tooltip = resetButtonTooltip;
-			prev = add(new Label("World Visuals:"), prev.pos("bl").adds(0, 12));
-			prev = add(disableWeatherAndEffectsCheckBox = new CheckBox("Disable Weather And Effects (Requires Reload)"){
-				{a = Utils.getprefb("disableWeatherAndEffects", false);}
-				public void changed(boolean val) {
-					Utils.setprefb("disableWeatherAndEffects", val);
-				}
-			}, prev.pos("bl").adds(12, 8));
-			disableWeatherAndEffectsCheckBox.tooltip = disableWeatherAndEffectsTooltip;
-			prev = add(simplifiedCropsCheckBox = new CheckBox("Simplified Crops (Requires Reload)"){
-				{a = Utils.getprefb("simplifiedCrops", false);}
-				public void changed(boolean val) {
-					Utils.setprefb("simplifiedCrops", val);
-				}
-			}, prev.pos("bl").adds(0, 2));
-			prev = add(simplifiedForageablesCheckBox = new CheckBox("Simplified Forageables (Requires Reload)"){
-				{a = Utils.getprefb("simplifiedForageables", false);}
-				public void changed(boolean val) {
-					Utils.setprefb("simplifiedForageables", val);
-				}
-			}, prev.pos("bl").adds(0, 2));
-			prev = add(hideFlavorObjectsCheckBox = new CheckBox("Hide Flavor Objects"){
-				{a = Utils.getprefb("hideFlavorObjects", false);}
-				public void changed(boolean val) {
-					Utils.setprefb("hideFlavorObjects", val);
-					if (ui.sess != null)
-						ui.sess.glob.map.invalidateAll();
-					if (ui != null && ui.gui != null) {
-						ui.gui.optionInfoMsg("Flavor Objects are now " + (val ? "HIDDEN" : "SHOWN") + "!", (val ? msgGray : msgGreen), Audio.resclip(val ? Toggle.sfxoff : Toggle.sfxon));
-					}
-				}
-			}, prev.pos("bl").adds(0, 2));
-			hideFlavorObjectsCheckBox.tooltip = hideFlavorObjectsTooltip;
-			prev = add(flatWorldCheckBox = new CheckBox("Flat World"){
+			leftColumn = add(flatWorldCheckBox = new CheckBox("Flat World"){
 				{a = Utils.getprefb("flatWorld", false);}
 				public void changed(boolean val) {
 					Utils.setprefb("flatWorld", val);
@@ -3081,9 +3048,9 @@ public class OptWnd extends Window {
 						ui.gui.optionInfoMsg("Flat World is now " + (val ? "ENABLED" : "DISABLED") + "!", (val ? msgGreen : msgRed), Audio.resclip(val ? Toggle.sfxon : Toggle.sfxoff));
 					}
 				}
-			}, prev.pos("bl").adds(0, 12));
+			}, leftColumn.pos("bl").adds(12, 8));
 			flatWorldCheckBox.tooltip = flatWorldTooltip;
-			prev = add(disableTileSmoothingCheckBox = new CheckBox("Disable Tile Smoothing"){
+			leftColumn = add(disableTileSmoothingCheckBox = new CheckBox("Disable Tile Smoothing"){
 				{a = Utils.getprefb("disableTileSmoothing", false);}
 				public void changed(boolean val) {
 					Utils.setprefb("disableTileSmoothing", val);
@@ -3093,9 +3060,9 @@ public class OptWnd extends Window {
 						ui.gui.optionInfoMsg("Tile Smoothing is now " + (val ? "DISABLED" : "ENABLED") + "!", (val ? msgRed : msgGreen), Audio.resclip(val ? Toggle.sfxoff : Toggle.sfxon));
 					}
 				}
-			}, prev.pos("bl").adds(0, 2));
+			}, leftColumn.pos("bl").adds(0, 2));
 			disableTileSmoothingCheckBox.tooltip = disableTileSmoothingTooltip;
-			prev = add(disableTileTransitionsCheckBox = new CheckBox("Disable Tile Transitions"){
+			leftColumn = add(disableTileTransitionsCheckBox = new CheckBox("Disable Tile Transitions"){
 				{a = Utils.getprefb("disableTileTransitions", false);}
 				public void changed(boolean val) {
 					Utils.setprefb("disableTileTransitions", val);
@@ -3105,9 +3072,33 @@ public class OptWnd extends Window {
 						ui.gui.optionInfoMsg("Tile Transitions are now " + (val ? "DISABLED" : "ENABLED") + "!", (val ? msgRed : msgGreen), Audio.resclip(val ? Toggle.sfxoff : Toggle.sfxon));
 					}
 				}
-			}, prev.pos("bl").adds(0, 2));
+			}, leftColumn.pos("bl").adds(0, 2));
 			disableTileTransitionsCheckBox.tooltip = disableTileTransitionsTooltip;
-			prev = add(flatCaveWallsCheckBox = new CheckBox("Flat Cave Walls"){
+			leftColumn = add(hideFlavorObjectsCheckBox = new CheckBox("Hide Flavor Objects"){
+				{a = Utils.getprefb("hideFlavorObjects", false);}
+				public void changed(boolean val) {
+					Utils.setprefb("hideFlavorObjects", val);
+					if (ui.sess != null)
+						ui.sess.glob.map.invalidateAll();
+					if (ui != null && ui.gui != null) {
+						ui.gui.optionInfoMsg("Flavor Objects are now " + (val ? "HIDDEN" : "SHOWN") + "!", (val ? msgGray : msgGreen), Audio.resclip(val ? Toggle.sfxoff : Toggle.sfxon));
+					}
+				}
+			}, leftColumn.pos("bl").adds(0, 12));
+			leftColumn = add(simplifiedCropsCheckBox = new CheckBox("Simplified Crops (Requires Reload)"){
+				{a = Utils.getprefb("simplifiedCrops", false);}
+				public void changed(boolean val) {
+					Utils.setprefb("simplifiedCrops", val);
+				}
+			}, leftColumn.pos("bl").adds(0, 2));
+			leftColumn = add(simplifiedForageablesCheckBox = new CheckBox("Simplified Forageables (Requires Reload)"){
+				{a = Utils.getprefb("simplifiedForageables", false);}
+				public void changed(boolean val) {
+					Utils.setprefb("simplifiedForageables", val);
+				}
+			}, leftColumn.pos("bl").adds(0, 2));
+			hideFlavorObjectsCheckBox.tooltip = hideFlavorObjectsTooltip;
+			leftColumn = add(flatCaveWallsCheckBox = new CheckBox("Flat Cave Walls"){
 				{a = Utils.getprefb("flatCaveWalls", false);}
 				public void changed(boolean val) {
 					Utils.setprefb("flatCaveWalls", val);
@@ -3116,8 +3107,8 @@ public class OptWnd extends Window {
 					if (ui != null && ui.gui != null)
 						ui.gui.optionInfoMsg("Flat Cave Walls are now " + (val ? "ENABLED" : "DISABLED") + "!", (val ? msgGreen : msgRed), Audio.resclip(val ? Toggle.sfxon : Toggle.sfxoff));
 				}
-			}, prev.pos("bl").adds(0, 2));
-			prev = add(straightCliffEdgesCheckBox = new CheckBox("Straight Cliff Edges"){
+			}, leftColumn.pos("bl").adds(0, 12));
+			leftColumn = add(straightCliffEdgesCheckBox = new CheckBox("Straight Cliff Edges"){
 				{a = Utils.getprefb("straightCliffEdges", false);}
 				public void changed(boolean val) {
 					Utils.setprefb("straightCliffEdges", val);
@@ -3126,9 +3117,11 @@ public class OptWnd extends Window {
 					if (ui != null && ui.gui != null)
 						ui.gui.optionInfoMsg("Straight Cliff Edges are now " + (val ? "ENABLED" : "DISABLED") + "!", (val ? msgGreen : msgRed), Audio.resclip(val ? Toggle.sfxon : Toggle.sfxoff));
 				}
-			}, prev.pos("bl").adds(0, 2));
-			prev = add(new Label("Trees & Bushes Scale:"), prev.pos("bl").adds(0, 10).x(0));
-			prev = add(treeAndBushScaleSlider = new HSlider(UI.scale(200), 30, 100, Utils.getprefi("treeAndBushScale", 100)) {
+			}, leftColumn.pos("bl").adds(0, 2));
+
+
+			rightColumn = add(new Label("Trees & Bushes Scale:"), UI.scale(290, 0));
+			rightColumn = add(treeAndBushScaleSlider = new HSlider(UI.scale(200), 30, 100, Utils.getprefi("treeAndBushScale", 100)) {
 				protected void attach(UI ui) {
 					super.attach(ui);
 					val = Utils.getprefi("treeAndBushScale", 100);
@@ -3141,32 +3134,23 @@ public class OptWnd extends Window {
 						ui.sess.glob.oc.gobAction(Gob::updateCollisionBoxes);
 					}
 				}
-			}, prev.pos("bl").adds(0, 6));
+			}, rightColumn.pos("bl").adds(0, 6));
 			add(treeAndBushScaleResetButton = new Button(UI.scale(70), "Reset", false).action(() -> {
 				treeAndBushScaleSlider.val = 100;
 				if (ui != null && ui.gui != null)
 					ui.sess.glob.oc.gobAction(Gob::reloadTreeScale);
 				Utils.setprefi("treeAndBushScale", 100);
-			}), prev.pos("bl").adds(210, -20));
+			}), rightColumn.pos("bl").adds(210, -20));
 			treeAndBushScaleResetButton.tooltip = resetButtonTooltip;
-			prev = add(disableTreeAndBushSwayingCheckBox = new CheckBox("Disable Tree & Bush Swaying"){
+			rightColumn = add(disableTreeAndBushSwayingCheckBox = new CheckBox("Disable Tree & Bush Swaying"){
 				{a = Utils.getprefb("disableTreeAndBushSwaying", false);}
 				public void changed(boolean val) {
 					Utils.setprefb("disableTreeAndBushSwaying", val);
 					if (ui != null && ui.gui != null)
 						ui.sess.glob.oc.gobAction(Gob::reloadTreeSwaying);
 				}
-			}, prev.pos("bl").adds(12, 14));
-			// TODO: ND: This setting should allow players to select what they want to disable, from a predefined list
-			//  Additionally, they should also be able disable some Overlay Animations (like the flags for visitor gates). I think I saw that somewhere in ardennes' or cediner's code...
-			prev = add(disableObjectAnimationsCheckBox = new CheckBox("Disable Some Object Animations"){
-				{a = (Utils.getprefb("disableObjectAnimations", false));}
-				public void changed(boolean val) {
-					Utils.setprefb("disableObjectAnimations", val);
-				}
-			}, prev.pos("bl").adds(0, 2));
-			disableObjectAnimationsCheckBox.tooltip = disableObjectAnimationsTooltip;
-			prev = add(disableIndustrialSmokeCheckBox = new CheckBox("Disable Industrial Smoke (Requires Reload)"){
+			}, rightColumn.pos("bl").adds(12, 14));
+			rightColumn = add(disableIndustrialSmokeCheckBox = new CheckBox("Disable Industrial Smoke (Requires Reload)"){
 				{a = (Utils.getprefb("disableIndustrialSmoke", false));}
 				public void changed(boolean val) {
 					Utils.setprefb("disableIndustrialSmoke", val);
@@ -3185,8 +3169,8 @@ public class OptWnd extends Window {
 						}
 					}
 				}
-			}, prev.pos("bl").adds(0, 2));
-			prev = add(disableScentSmokeCheckBox = new CheckBox("Disable Scent Smoke (Requires Reload)"){
+			}, rightColumn.pos("bl").adds(0, 2));
+			rightColumn = add(disableScentSmokeCheckBox = new CheckBox("Disable Scent Smoke (Requires Reload)"){
 				{a = (Utils.getprefb("disableScentSmoke", false));}
 				public void changed(boolean val) {
 					Utils.setprefb("disableScentSmoke", val);
@@ -3205,9 +3189,9 @@ public class OptWnd extends Window {
 						}
 					}
 				}
-			}, prev.pos("bl").adds(0, 2));
-			prev = add(new Label("Other Altered Objects:"), prev.pos("bl").adds(0, 10).x(0));
-			prev = add(flatCupboardsCheckBox = new CheckBox("Flat Cupboards"){
+			}, rightColumn.pos("bl").adds(0, 2));
+			rightColumn = add(new Label("Other Altered Objects:"), rightColumn.pos("bl").adds(0, 10).x(UI.scale(290)));
+			rightColumn = add(flatCupboardsCheckBox = new CheckBox("Flat Cupboards"){
 				{a = (Utils.getprefb("flatCupboards", true));}
 				public void set(boolean val) {
 					Utils.setprefb("flatCupboards", val);
@@ -3219,10 +3203,10 @@ public class OptWnd extends Window {
 						ui.gui.map.updatePlobCollisionBox();
 					}
 				}
-			}, prev.pos("bl").adds(12, 8));
+			}, rightColumn.pos("bl").adds(12, 8));
 
 			Widget backButton;
-			add(backButton = new PButton(UI.scale(200), "Back", 27, back, "Advanced Settings"), prev.pos("bl").adds(0, 18));
+			add(backButton = new PButton(UI.scale(200), "Back", 27, back, "Advanced Settings"), leftColumn.pos("bl").adds(0, 18));
 			pack();
 			centerBackButton(backButton, this);
 		}
@@ -4671,7 +4655,6 @@ public class OptWnd extends Window {
 			"\n$col[185,185,185]{It can slightly affect the light levels during the day too, but it is barely noticeable.}" +
 			"\n" +
 			"\n$col[218,163,0]{Keybind:} $col[185,185,185]{This slider can also be switched between minimum and maximum by using the 'Night Vision' keybind.}", UI.scale(300));
-	private final Object disableWeatherAndEffectsTooltip = RichText.render("This disables *ALL* weather and camera effects, including rain, drunkenness distortion, drug high, valhalla gray overlay, camera shake, and any other similar effects.", UI.scale(300));
 	private final Object hideFlavorObjectsTooltip = RichText.render("This hides the random objects that appear in the world, which you cannot interact with." +
 			"\n$col[185,185,185]{Players usually disable flavor objects to improve visibility, especially in combat.}" +
 			"\n" +
@@ -4681,9 +4664,6 @@ public class OptWnd extends Window {
 			"\n$col[218,163,0]{Action Button:} $col[185,185,185]{This setting can also be turned on/off using an action button from the menu grid (Custom Client Extras → Toggles).}", UI.scale(320));
 	private final Object disableTileSmoothingTooltip = RichText.render("$col[218,163,0]{Action Button:} $col[185,185,185]{This setting can also be turned on/off using an action button from the menu grid (Custom Client Extras → Toggles).}", UI.scale(320));
 	private final Object disableTileTransitionsTooltip = RichText.render("$col[218,163,0]{Action Button:} $col[185,185,185]{This setting can also be turned on/off using an action button from the menu grid (Custom Client Extras → Toggles).}", UI.scale(320));
-	private final Object disableObjectAnimationsTooltip = RichText.render("This stops animations for the following: fires, trash stockpiles, beehives, dreamcatchers, kilns, cauldrons." +
-			"\n" +
-			"\n$col[185,185,185]{Ideally, in the future, I'll change this to allow you to pick exactly what you want to disable, from a list.}", UI.scale(300));
 
 	// Server Integration Settings Tooltips
 	private final Object uploadMapTilesTooltip = RichText.render("Enable this to upload your map tiles to your web map server.", UI.scale(300));

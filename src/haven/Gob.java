@@ -66,8 +66,6 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
     private final LinkedList<Runnable> deferred = new LinkedList<>();
     private Loader.Future<?> deferral = null;
 	public Boolean isComposite = false;
-	private final Set<String> animatedGobsToDisable = new HashSet<>(Arrays.asList("dreca", "pow", "kiln", "cauldron", "beehive", "stockpile-trash"));
-	private boolean thisGobAnimationsCanBeDisabled = false;
 	public Boolean isMe = null;
 	public Boolean isMannequin = null;
 	public Boolean isSkeleton = null;
@@ -534,14 +532,8 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 
     public void ctick(double dt) {
 	for(GAttrib a : attr.values()){
-		if(a instanceof ResDrawable){
-			if(!(OptWnd.disableObjectAnimationsCheckBox.a && thisGobAnimationsCanBeDisabled)){
-				a.ctick(dt);
-			}
-		}
-		else
 	    a.ctick(dt);
-		}
+	}
 	for(Iterator<Overlay> i = ols.iterator(); i.hasNext();) {
 	    Overlay ol = i.next();
 	    if(ol.slots == null) {
@@ -1198,13 +1190,6 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	public void init(boolean throwLoading) {
 		Resource res = getres();
 		if (res != null) {
-			String resBaseName = res.basename();
-			for (String substring : animatedGobsToDisable) {
-				if (resBaseName.contains(substring)) {
-					thisGobAnimationsCanBeDisabled = true;
-					break;
-				}
-			}
 			if (getattr(Drawable.class) instanceof Composite) {
 				try {
 					initComp((Composite)getattr(Drawable.class));
