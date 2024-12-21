@@ -751,6 +751,7 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 		makeLocal("customclient/menugrid/Toggles/HighlightCliffs");
 		makeLocal("customclient/menugrid/Toggles/BeeSkepsRadii");
 		makeLocal("customclient/menugrid/Toggles/TroughsRadii");
+		makeLocal("customclient/menugrid/Toggles/MoundBedsRadii");
 		makeLocal("customclient/menugrid/Toggles/MineSupportRadii");
 		makeLocal("customclient/menugrid/Toggles/MineSupportSafeTiles");
 		makeLocal("customclient/menugrid/Toggles/MineSweeper");
@@ -839,6 +840,8 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 				OptWnd.showBeeSkepsRadiiCheckBox.set(!OptWnd.showBeeSkepsRadiiCheckBox.a);
 			} else if (ad[2].equals("TroughsRadii")) {
 				OptWnd.showFoodTroughsRadiiCheckBox.set(!OptWnd.showFoodTroughsRadiiCheckBox.a);
+			} else if (ad[2].equals("MoundBedsRadii")) {
+				OptWnd.showMoundBedsRadiiCheckBox.set(!OptWnd.showMoundBedsRadiiCheckBox.a);
 			} else if (ad[2].equals("MineSupportRadii")) {
 				OptWnd.showMineSupportRadiiCheckBox.set(!OptWnd.showMineSupportRadiiCheckBox.a);
 			} else if (ad[2].equals("MineSupportSafeTiles")) {

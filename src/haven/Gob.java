@@ -36,7 +36,6 @@ import java.util.concurrent.Future;
 import java.util.function.*;
 import java.util.stream.Collectors;
 
-import haven.Fuzzy;
 import haven.automated.mapper.MappingClient;
 import haven.render.*;
 import haven.render.gl.GLObject;
@@ -1236,6 +1235,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 		updateBeastDangerRadii();
 		updateTroughsRadius();
 		updateBeeSkepRadius();
+		updateMoundBedsRadius();
 		updateMineLadderRadius();
 		updateSupportOverlays();
 		initPermanentHighlightOverlay();
@@ -2015,6 +2015,14 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 		}
 	}
 
+	public void updateMoundBedsRadius() {
+		if (getres() != null) {
+			String resourceName = getres().name;
+			if (resourceName.equals("gfx/terobjs/moundbed")){
+				setRadiusOverlay(OptWnd.showMoundBedsRadiiCheckBox.a, new Color(158, 0, 207, 128), 225f);
+			}
+		}
+	}
 
 	private void setPlayerGender(){
 		try {
