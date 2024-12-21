@@ -1026,6 +1026,12 @@ public class Config {
 		cures.put("paginae/wound/wretchedgore", new String[]{
 				"gfx/invobjs/stitchpatch"
 		});
+		cures.put("paginae/wound/soresnout", new String[]{
+				"gfx/invobjs/antpaste",
+				"gfx/invobjs/mudointment",
+				"gfx/invobjs/toadbutter",
+				"gfx/invobjs/graygrease"
+		});
 	}
 
 	private static String playername;
