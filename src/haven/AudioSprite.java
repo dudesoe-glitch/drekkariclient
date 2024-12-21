@@ -77,6 +77,8 @@ public class AudioSprite {
 			stream = new Audio.VolAdjust(stream, OptWnd.squeakSoundVolumeSlider.val/100d);
 		else if (res.name.equals("sfx/borka/butcher"))
 			stream = new Audio.VolAdjust(stream, OptWnd.butcherSoundVolumeSlider.val/100d);
+		else if (res.name.equals("sfx/items/hats/quack"))
+			stream = new Audio.VolAdjust(stream, OptWnd.whiteDuckCapSoundVolumeSlider.val/100d);
 	    this.clip = new ActAudio.PosClip(new Audio.Monitor(stream) {
 		    protected void eof() {
 			super.eof();
