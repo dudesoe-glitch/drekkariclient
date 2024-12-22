@@ -1032,6 +1032,9 @@ public class Config {
 				"gfx/invobjs/toadbutter",
 				"gfx/invobjs/graygrease"
 		});
+		cures.put("paginae/wound/deepworm", new String[]{
+				"gfx/invobjs/jar-tansyextract"
+		});
 	}
 
 	private static String playername;
