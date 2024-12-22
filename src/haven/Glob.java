@@ -348,7 +348,8 @@ public class Glob {
 			|| (OptWnd.disableScreenShakingCheckBox.a && resName.equals("gfx/fx/quake"))
 			|| (OptWnd.disableHempHighCheckBox.a && resName.equals("gfx/fx/lucy"))
 			|| (OptWnd.disableOpiumHighCheckBox.a && resName.equals("gfx/fx/dragon"))
-			|| (OptWnd.disableLibertyCapsHighCheckBox.a && resName.equals("gfx/fx/shroomed"))) {
+			|| (OptWnd.disableLibertyCapsHighCheckBox.a && resName.equals("gfx/fx/shroomed"))
+			|| (OptWnd.disableDrunkennessDistortionCheckBox.a && resName.equals("gfx/fx/bottle"))) {
 				continue;
 			}
 		} catch (Loading ignored){}
