@@ -343,6 +343,7 @@ public class Glob {
 			|| (OptWnd.disableRainCheckBox.a && resName.equals("gfx/fx/rain"))
 			|| (OptWnd.disableCloudShadowsCheckBox.a && resName.equals("gfx/fx/clouds"))
 			|| (OptWnd.disableWetGroundOverlayCheckBox.a && resName.equals("gfx/fx/wet"))
+			|| (OptWnd.disableSnowingCheckBox.a && resName.equals("gfx/fx/snow"))
 			|| (OptWnd.disableValhallaFilterCheckBox.a && resName.equals("gfx/fx/desat"))) {
 				continue;
 			}

@@ -3002,6 +3002,7 @@ public class OptWnd extends Window {
 	public static CheckBox disableCloudShadowsCheckBox;
 	public static CheckBox disableRainCheckBox;
 	public static CheckBox disableWetGroundOverlayCheckBox;
+	public static CheckBox disableSnowingCheckBox;
 	public static HSlider treeAndBushScaleSlider;
 	private Button treeAndBushScaleResetButton;
 	public static CheckBox disableTreeAndBushSwayingCheckBox;
@@ -3149,6 +3150,13 @@ public class OptWnd extends Window {
 				{a = (Utils.getprefb("disableWetGroundOverlay", false));}
 				public void changed(boolean val) {
 					Utils.setprefb("disableWetGroundOverlay", val);
+				}
+			}, leftColumn.pos("bl").adds(0, 2));
+
+			leftColumn = add(disableSnowingCheckBox = new CheckBox("Disable Snowing"){
+				{a = (Utils.getprefb("disableSnowing", false));}
+				public void changed(boolean val) {
+					Utils.setprefb("disableSnowing", val);
 				}
 			}, leftColumn.pos("bl").adds(0, 2));
 
