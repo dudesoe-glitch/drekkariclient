@@ -3010,6 +3010,7 @@ public class OptWnd extends Window {
 	public static CheckBox disableScentSmokeCheckBox;
 	public static CheckBox flatCupboardsCheckBox;
 	public static CheckBox disableValhallaFilterCheckBox;
+	public static CheckBox disableScreenShakingCheckBox;
 
 	public class WorldGraphicsSettingsPanel extends Panel {
 
@@ -3252,6 +3253,13 @@ public class OptWnd extends Window {
 					Utils.setprefb("disableValhallaFilter", val);
 				}
 			}, rightColumn.pos("bl").adds(12, 8));
+
+			rightColumn = add(disableScreenShakingCheckBox = new CheckBox("Disable Screen Shaking"){
+				{a = (Utils.getprefb("disableScreenShaking", true));}
+				public void changed(boolean val) {
+					Utils.setprefb("disableScreenShaking", val);
+				}
+			}, rightColumn.pos("bl").adds(0, 2));
 
 			Widget backButton;
 			add(backButton = new PButton(UI.scale(200), "Back", 27, back, "Advanced Settings"), leftColumn.pos("bl").adds(0, 18));
