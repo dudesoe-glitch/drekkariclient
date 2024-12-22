@@ -3011,6 +3011,7 @@ public class OptWnd extends Window {
 	public static CheckBox flatCupboardsCheckBox;
 	public static CheckBox disableValhallaFilterCheckBox;
 	public static CheckBox disableScreenShakingCheckBox;
+	public static CheckBox disableHempHighCheckBox;
 
 	public class WorldGraphicsSettingsPanel extends Panel {
 
@@ -3258,6 +3259,13 @@ public class OptWnd extends Window {
 				{a = (Utils.getprefb("disableScreenShaking", true));}
 				public void changed(boolean val) {
 					Utils.setprefb("disableScreenShaking", val);
+				}
+			}, rightColumn.pos("bl").adds(0, 2));
+
+			rightColumn = add(disableHempHighCheckBox = new CheckBox("Disable Hemp High"){
+				{a = (Utils.getprefb("disableHempHigh", true));}
+				public void changed(boolean val) {
+					Utils.setprefb("disableHempHigh", val);
 				}
 			}, rightColumn.pos("bl").adds(0, 2));
 

@@ -345,7 +345,8 @@ public class Glob {
 			|| (OptWnd.disableWetGroundOverlayCheckBox.a && resName.equals("gfx/fx/wet"))
 			|| (OptWnd.disableSnowingCheckBox.a && resName.equals("gfx/fx/snow"))
 			|| (OptWnd.disableValhallaFilterCheckBox.a && resName.equals("gfx/fx/desat"))
-			|| (OptWnd.disableScreenShakingCheckBox.a && resName.equals("gfx/fx/quake"))) {
+			|| (OptWnd.disableScreenShakingCheckBox.a && resName.equals("gfx/fx/quake"))
+			|| (OptWnd.disableHempHighCheckBox.a && resName.equals("gfx/fx/lucy"))) {
 				continue;
 			}
 		} catch (Loading ignored){}
