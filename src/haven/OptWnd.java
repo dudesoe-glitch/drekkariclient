@@ -3129,41 +3129,20 @@ public class OptWnd extends Window {
 						ui.gui.optionInfoMsg("Straight Cliff Edges are now " + (val ? "ENABLED" : "DISABLED") + "!", (val ? msgGreen : msgRed), Audio.resclip(val ? Toggle.sfxon : Toggle.sfxoff));
 				}
 			}, leftColumn.pos("bl").adds(0, 2));
-			leftColumn = add(new Label("World Effects:"), leftColumn.pos("bl").adds(0, 10).x(0));
-			leftColumn = add(disableSeasonalGroundColorsCheckBox = new CheckBox("Disable Seasonal Ground Colors"){
-				{a = (Utils.getprefb("disableSeasonalGroundColors", false));}
-				public void changed(boolean val) {
-					Utils.setprefb("disableSeasonalGroundColors", val);
+			leftColumn = add(new Label("Other Altered Objects:"), leftColumn.pos("bl").adds(0, 10).x(UI.scale(0)));
+			leftColumn = add(flatCupboardsCheckBox = new CheckBox("Flat Cupboards"){
+				{a = (Utils.getprefb("flatCupboards", true));}
+				public void set(boolean val) {
+					Utils.setprefb("flatCupboards", val);
+					a = val;
+					if (ui != null && ui.gui != null) {
+						ui.sess.glob.oc.gobAction(Gob::updateCustomSizeAndRotation);
+						ui.sess.glob.oc.gobAction(Gob::updateCollisionBoxes);
+						ui.gui.map.updatePlobCustomSizeAndRotation();
+						ui.gui.map.updatePlobCollisionBox();
+					}
 				}
 			}, leftColumn.pos("bl").adds(12, 8));
-
-			leftColumn = add(disableCloudShadowsCheckBox = new CheckBox("Disable Cloud Shadows"){
-				{a = (Utils.getprefb("disableCloudShadows", false));}
-				public void changed(boolean val) {
-					Utils.setprefb("disableCloudShadows", val);
-				}
-			}, leftColumn.pos("bl").adds(0, 2));
-
-			leftColumn = add(disableRainCheckBox = new CheckBox("Disable Rain"){
-				{a = (Utils.getprefb("disableRain", false));}
-				public void changed(boolean val) {
-					Utils.setprefb("disableRain", val);
-				}
-			}, leftColumn.pos("bl").adds(0, 2));
-
-			leftColumn = add(disableWetGroundOverlayCheckBox = new CheckBox("Disable Wet Ground Overlay"){
-				{a = (Utils.getprefb("disableWetGroundOverlay", false));}
-				public void changed(boolean val) {
-					Utils.setprefb("disableWetGroundOverlay", val);
-				}
-			}, leftColumn.pos("bl").adds(0, 2));
-
-			leftColumn = add(disableSnowingCheckBox = new CheckBox("Disable Snowing"){
-				{a = (Utils.getprefb("disableSnowing", false));}
-				public void changed(boolean val) {
-					Utils.setprefb("disableSnowing", val);
-				}
-			}, leftColumn.pos("bl").adds(0, 2));
 
 			rightColumn = add(new Label("Trees & Bushes Scale:"), UI.scale(290, 0));
 			rightColumn = add(treeAndBushScaleSlider = new HSlider(UI.scale(200), 30, 100, Utils.getprefi("treeAndBushScale", 100)) {
@@ -3235,22 +3214,44 @@ public class OptWnd extends Window {
 					}
 				}
 			}, rightColumn.pos("bl").adds(0, 2));
-			rightColumn = add(new Label("Other Altered Objects:"), rightColumn.pos("bl").adds(0, 10).x(UI.scale(290)));
-			rightColumn = add(flatCupboardsCheckBox = new CheckBox("Flat Cupboards"){
-				{a = (Utils.getprefb("flatCupboards", true));}
-				public void set(boolean val) {
-					Utils.setprefb("flatCupboards", val);
-					a = val;
-					if (ui != null && ui.gui != null) {
-						ui.sess.glob.oc.gobAction(Gob::updateCustomSizeAndRotation);
-						ui.sess.glob.oc.gobAction(Gob::updateCollisionBoxes);
-						ui.gui.map.updatePlobCustomSizeAndRotation();
-						ui.gui.map.updatePlobCollisionBox();
-					}
+
+			rightColumn = add(new Label("World Effects:"), rightColumn.pos("bl").adds(0, 10).x(290));
+			rightColumn = add(disableSeasonalGroundColorsCheckBox = new CheckBox("Disable Seasonal Ground Colors"){
+				{a = (Utils.getprefb("disableSeasonalGroundColors", false));}
+				public void changed(boolean val) {
+					Utils.setprefb("disableSeasonalGroundColors", val);
 				}
 			}, rightColumn.pos("bl").adds(12, 8));
 
-			rightColumn = add(new Label("Screen Effects:"), rightColumn.pos("bl").adds(0, 70).x(UI.scale(290)));
+			rightColumn = add(disableCloudShadowsCheckBox = new CheckBox("Disable Cloud Shadows"){
+				{a = (Utils.getprefb("disableCloudShadows", false));}
+				public void changed(boolean val) {
+					Utils.setprefb("disableCloudShadows", val);
+				}
+			}, rightColumn.pos("bl").adds(0, 2));
+
+			rightColumn = add(disableRainCheckBox = new CheckBox("Disable Rain"){
+				{a = (Utils.getprefb("disableRain", false));}
+				public void changed(boolean val) {
+					Utils.setprefb("disableRain", val);
+				}
+			}, rightColumn.pos("bl").adds(0, 2));
+
+			rightColumn = add(disableWetGroundOverlayCheckBox = new CheckBox("Disable Wet Ground Overlay"){
+				{a = (Utils.getprefb("disableWetGroundOverlay", false));}
+				public void changed(boolean val) {
+					Utils.setprefb("disableWetGroundOverlay", val);
+				}
+			}, rightColumn.pos("bl").adds(0, 2));
+
+			rightColumn = add(disableSnowingCheckBox = new CheckBox("Disable Snowing"){
+				{a = (Utils.getprefb("disableSnowing", false));}
+				public void changed(boolean val) {
+					Utils.setprefb("disableSnowing", val);
+				}
+			}, rightColumn.pos("bl").adds(0, 2));
+
+			rightColumn = add(new Label("Screen Effects:"), rightColumn.pos("bl").adds(0, 10).x(UI.scale(290)));
 			rightColumn = add(disableValhallaFilterCheckBox = new CheckBox("Disable Valhalla Filter"){
 				{a = (Utils.getprefb("disableValhallaFilter", true));}
 				public void changed(boolean val) {
@@ -3291,7 +3292,7 @@ public class OptWnd extends Window {
 			}, rightColumn.pos("bl").adds(0, 2));
 
 			Widget backButton;
-			add(backButton = new PButton(UI.scale(200), "Back", 27, back, "Advanced Settings"), leftColumn.pos("bl").adds(0, 38));
+			add(backButton = new PButton(UI.scale(200), "Back", 27, back, "Advanced Settings"), rightColumn.pos("bl").adds(0, 38));
 			pack();
 			centerBackButton(backButton, this);
 		}
