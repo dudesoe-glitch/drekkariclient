@@ -341,6 +341,9 @@ public class Glob {
 			if (OptWnd.disableSeasonalGroundColorsCheckBox.a && cur.getKey().get().name.equals("gfx/fx/seasonmap")) {
 				continue;
 			}
+			if (OptWnd.disableValhallaFilterCheckBox.a && cur.getKey().get().name.equals("gfx/fx/desat")) {
+				continue;
+			}
 		} catch (Loading ignored){}
 		Object val = cur.getValue();
 		if(val instanceof Weather) {

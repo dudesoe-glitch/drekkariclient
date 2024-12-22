@@ -3005,6 +3005,7 @@ public class OptWnd extends Window {
 	public static CheckBox disableIndustrialSmokeCheckBox;
 	public static CheckBox disableScentSmokeCheckBox;
 	public static CheckBox flatCupboardsCheckBox;
+	public static CheckBox disableValhallaFilterCheckBox;
 
 	public class WorldGraphicsSettingsPanel extends Panel {
 
@@ -3119,7 +3120,6 @@ public class OptWnd extends Window {
 						ui.gui.optionInfoMsg("Straight Cliff Edges are now " + (val ? "ENABLED" : "DISABLED") + "!", (val ? msgGreen : msgRed), Audio.resclip(val ? Toggle.sfxon : Toggle.sfxoff));
 				}
 			}, leftColumn.pos("bl").adds(0, 2));
-
 			leftColumn = add(new Label("World Effects:"), leftColumn.pos("bl").adds(0, 10).x(0));
 			leftColumn = add(disableSeasonalGroundColorsCheckBox = new CheckBox("Disable Seasonal Ground Colors"){
 				{a = (Utils.getprefb("disableSeasonalGroundColors", false));}
@@ -3127,7 +3127,6 @@ public class OptWnd extends Window {
 					Utils.setprefb("disableSeasonalGroundColors", val);
 				}
 			}, leftColumn.pos("bl").adds(12, 8));
-
 
 			rightColumn = add(new Label("Trees & Bushes Scale:"), UI.scale(290, 0));
 			rightColumn = add(treeAndBushScaleSlider = new HSlider(UI.scale(200), 30, 100, Utils.getprefi("treeAndBushScale", 100)) {
@@ -3211,6 +3210,14 @@ public class OptWnd extends Window {
 						ui.gui.map.updatePlobCustomSizeAndRotation();
 						ui.gui.map.updatePlobCollisionBox();
 					}
+				}
+			}, rightColumn.pos("bl").adds(12, 8));
+
+			rightColumn = add(new Label("Screen Effects:"), rightColumn.pos("bl").adds(0, 70).x(UI.scale(290)));
+			rightColumn = add(disableValhallaFilterCheckBox = new CheckBox("Disable Valhalla Filter"){
+				{a = (Utils.getprefb("disableValhallaFilter", true));}
+				public void changed(boolean val) {
+					Utils.setprefb("disableValhallaFilter", val);
 				}
 			}, rightColumn.pos("bl").adds(12, 8));
 
