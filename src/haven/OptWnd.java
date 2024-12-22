@@ -3013,6 +3013,7 @@ public class OptWnd extends Window {
 	public static CheckBox disableScreenShakingCheckBox;
 	public static CheckBox disableHempHighCheckBox;
 	public static CheckBox disableOpiumHighCheckBox;
+	public static CheckBox disableLibertyCapsHighCheckBox;
 
 	public class WorldGraphicsSettingsPanel extends Panel {
 
@@ -3273,6 +3274,12 @@ public class OptWnd extends Window {
 				{a = (Utils.getprefb("disableOpiumHigh", true));}
 				public void changed(boolean val) {
 					Utils.setprefb("disableOpiumHigh", val);
+				}
+			}, rightColumn.pos("bl").adds(0, 2));
+			rightColumn = add(disableLibertyCapsHighCheckBox = new CheckBox("Disable Liberty Caps High"){
+				{a = (Utils.getprefb("disableLibertyCapsHigh", true));}
+				public void changed(boolean val) {
+					Utils.setprefb("disableLibertyCapsHigh", val);
 				}
 			}, rightColumn.pos("bl").adds(0, 2));
 
