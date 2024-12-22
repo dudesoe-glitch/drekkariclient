@@ -43,6 +43,13 @@ public class VarSprite extends SkelSprite {
 
     public boolean tick(double dt) {
 	Mapping mats = mats(), pmats = this.cmats;
+	if ((OptWnd.disableHerbalistTablesVarMatsCheckBox.a && res.name.equals("gfx/terobjs/htable"))
+	|| (OptWnd.disableCupboardsVarMatsCheckBox.a && res.name.equals("gfx/terobjs/cupboard"))
+	|| (OptWnd.disableTrellisesVarMatsCheckBox.a && res.name.equals("gfx/terobjs/plants/trellis"))
+	|| (OptWnd.disableSmokeShedsVarMatsCheckBox.a && res.name.equals("gfx/terobjs/smokeshed"))
+	|| (OptWnd.disableAllObjectsVarMatsCheckBox.a)){
+		mats = null;
+	}
 	if(mats != pmats) {
 	    try {
 		this.cmats = mats;

@@ -3009,6 +3009,11 @@ public class OptWnd extends Window {
 	public static CheckBox disableIndustrialSmokeCheckBox;
 	public static CheckBox disableScentSmokeCheckBox;
 	public static CheckBox flatCupboardsCheckBox;
+	public static CheckBox disableHerbalistTablesVarMatsCheckBox;
+	public static CheckBox disableCupboardsVarMatsCheckBox;
+	public static CheckBox disableTrellisesVarMatsCheckBox;
+	public static CheckBox disableSmokeShedsVarMatsCheckBox;
+	public static CheckBox disableAllObjectsVarMatsCheckBox;
 	public static CheckBox disableValhallaFilterCheckBox;
 	public static CheckBox disableScreenShakingCheckBox;
 	public static CheckBox disableHempHighCheckBox;
@@ -3143,6 +3148,40 @@ public class OptWnd extends Window {
 					}
 				}
 			}, leftColumn.pos("bl").adds(12, 8));
+
+			// TODO: ND: Would be nice if this was a scrollable list with selectable items, rather than individual checkboxes
+			leftColumn = add(new Label("Disable Variable Materials for Objects:"), leftColumn.pos("bl").adds(0, 10).x(UI.scale(0)));
+			leftColumn = add(disableHerbalistTablesVarMatsCheckBox = new CheckBox("Herbalist Tables Variable Materials"){
+				{a = (Utils.getprefb("disableHerbalistTablesVarMats", false));}
+				public void changed(boolean val) {
+					Utils.setprefb("disableHerbalistTablesVarMats", val);
+				}
+			}, leftColumn.pos("bl").adds(12, 8));
+			leftColumn = add(disableCupboardsVarMatsCheckBox = new CheckBox("Cupboards Variable Materials"){
+				{a = (Utils.getprefb("disableCupboardsVarMats", false));}
+				public void changed(boolean val) {
+					Utils.setprefb("disableCupboardsVarMats", val);
+				}
+			}, leftColumn.pos("bl").adds(0, 2));
+			leftColumn = add(disableTrellisesVarMatsCheckBox = new CheckBox("Trellises Variable Materials"){
+				{a = (Utils.getprefb("disableTrellisesVarMats", false));}
+				public void changed(boolean val) {
+					Utils.setprefb("disableTrellisesVarMats", val);
+				}
+			}, leftColumn.pos("bl").adds(0, 2));
+			leftColumn = add(disableSmokeShedsVarMatsCheckBox = new CheckBox("Smoke Sheds Variable Materials"){
+				{a = (Utils.getprefb("disableSmokeShedsVarMats", false));}
+				public void changed(boolean val) {
+					Utils.setprefb("disableSmokeShedsVarMats", val);
+				}
+			}, leftColumn.pos("bl").adds(0, 2));
+
+			leftColumn = add(disableAllObjectsVarMatsCheckBox = new CheckBox("ALL OBJECTS Variable Materials (you weirdo)"){
+				{a = (Utils.getprefb("disableAllObjectsVarMats", false));}
+				public void changed(boolean val) {
+					Utils.setprefb("disableAllObjectsVarMats", val);
+				}
+			}, leftColumn.pos("bl").adds(0, 2));
 
 			rightColumn = add(new Label("Trees & Bushes Scale:"), UI.scale(290, 0));
 			rightColumn = add(treeAndBushScaleSlider = new HSlider(UI.scale(200), 30, 100, Utils.getprefi("treeAndBushScale", 100)) {
