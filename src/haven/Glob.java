@@ -338,10 +338,10 @@ public class Glob {
 	    ArrayList<Weather> ret = new ArrayList<>(wmap.size());
 	    for(Map.Entry<Indir<Resource>, Object> cur : wmap.entrySet()) {
 		try {
-			if (OptWnd.disableSeasonalGroundColorsCheckBox.a && cur.getKey().get().name.equals("gfx/fx/seasonmap")) {
-				continue;
-			}
-			if (OptWnd.disableValhallaFilterCheckBox.a && cur.getKey().get().name.equals("gfx/fx/desat")) {
+			String resName = cur.getKey().get().name;
+			if ((OptWnd.disableSeasonalGroundColorsCheckBox.a && resName.equals("gfx/fx/seasonmap"))
+			|| (OptWnd.disableWetGroundOverlayCheckBox.a && resName.equals("gfx/fx/wet"))
+			|| (OptWnd.disableValhallaFilterCheckBox.a && resName.equals("gfx/fx/desat"))) {
 				continue;
 			}
 		} catch (Loading ignored){}
