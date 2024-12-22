@@ -3291,7 +3291,7 @@ public class OptWnd extends Window {
 			}, rightColumn.pos("bl").adds(0, 2));
 
 			Widget backButton;
-			add(backButton = new PButton(UI.scale(200), "Back", 27, back, "Advanced Settings"), leftColumn.pos("bl").adds(0, 18));
+			add(backButton = new PButton(UI.scale(200), "Back", 27, back, "Advanced Settings"), leftColumn.pos("bl").adds(0, 38));
 			pack();
 			centerBackButton(backButton, this);
 		}
