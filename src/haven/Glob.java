@@ -341,6 +341,7 @@ public class Glob {
 			String resName = cur.getKey().get().name;
 			if ((OptWnd.disableSeasonalGroundColorsCheckBox.a && resName.equals("gfx/fx/seasonmap"))
 			|| (OptWnd.disableRainCheckBox.a && resName.equals("gfx/fx/rain"))
+			|| (OptWnd.disableCloudShadowsCheckBox.a && resName.equals("gfx/fx/clouds"))
 			|| (OptWnd.disableWetGroundOverlayCheckBox.a && resName.equals("gfx/fx/wet"))
 			|| (OptWnd.disableValhallaFilterCheckBox.a && resName.equals("gfx/fx/desat"))) {
 				continue;
