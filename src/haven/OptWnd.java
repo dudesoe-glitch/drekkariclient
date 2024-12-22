@@ -2999,6 +2999,7 @@ public class OptWnd extends Window {
 	public static CheckBox flatCaveWallsCheckBox;
 	public static CheckBox straightCliffEdgesCheckBox;
 	public static CheckBox disableSeasonalGroundColorsCheckBox;
+	public static CheckBox disableRainCheckBox;
 	public static CheckBox disableWetGroundOverlayCheckBox;
 	public static HSlider treeAndBushScaleSlider;
 	private Button treeAndBushScaleResetButton;
@@ -3128,6 +3129,13 @@ public class OptWnd extends Window {
 					Utils.setprefb("disableSeasonalGroundColors", val);
 				}
 			}, leftColumn.pos("bl").adds(12, 8));
+
+			leftColumn = add(disableRainCheckBox = new CheckBox("Disable Rain"){
+				{a = (Utils.getprefb("disableRain", false));}
+				public void changed(boolean val) {
+					Utils.setprefb("disableRain", val);
+				}
+			}, leftColumn.pos("bl").adds(0, 2));
 
 			leftColumn = add(disableWetGroundOverlayCheckBox = new CheckBox("Disable Wet Ground Overlay"){
 				{a = (Utils.getprefb("disableWetGroundOverlay", false));}
