@@ -60,7 +60,11 @@ public class BarrelContentsGobInfo extends GobInfo {
 		}
 		text = addSpaceAndCapitalize(text);
 
-        return PUtils.strokeImg(text(text, BARREL_COL).img);
+		try {
+        	return PUtils.strokeImg(text(text, BARREL_COL).img);
+		} catch (NullPointerException ignored) {
+			return null;
+		}
 	}
 	return null;
     }
