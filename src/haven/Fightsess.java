@@ -49,7 +49,8 @@ public class Fightsess extends Widget {
     public static final Coord indbframeo = (indframe.sz().sub(off)).div(2);
     public static final Tex useframe = Resource.loadtex("gfx/hud/combat/lastframe");
     public static final Coord useframeo = (useframe.sz().sub(off)).div(2);
-    public static final int actpitch = UI.scale(50);
+    public static final int actpitch = UI.scale(45);
+	public static final int actpitch2 = UI.scale(62);
     public final Action[] actions;
     public int use = -1, useb = -1;
     public Coord pcc;
@@ -99,7 +100,7 @@ public class Fightsess extends Widget {
 
 	private static Coord actc(int i) {
 		int rl = OptWnd.singleRowCombatMovesCheckBox.a ? 10 : 5;
-		return(new Coord((actpitch * (i % rl)) - (((rl - 1) * actpitch) / 2), UI.scale(125) + ((i / rl) * actpitch)));
+		return(new Coord((actpitch * (i % rl)) - (((rl - 1) * actpitch) / 2), UI.scale(125) + ((i / rl) * actpitch2)));
 	}
 
     public static class Action {
