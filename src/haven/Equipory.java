@@ -100,7 +100,6 @@ public class Equipory extends Widget implements DTarget {
 	public static CheckBox autoEquipBunnySlippersPlateBootsCheckBox;
 	boolean checkForLeeches = false;
 	boolean checkForTicks = false;
-	GItem lweap,rweap;
 
     @RName("epry")
     public static class $_ implements Factory {
@@ -199,19 +198,6 @@ public class Equipory extends Widget implements DTarget {
 	    ArrayList<WItem> v = new ArrayList<>();
 	    for(int i = 0; i < args.length; i++) {
 		int ep = Utils.iv(args[i]);
-		switch(ep)
-		{
-			case 6:
-
-			lweap = g;
-
-			break;
-			case 7:
-
-			rweap = g;
-			
-			break;
-		}
 		if(ep < ecoords.length)
 			 v.add(slots[ep] = add(new WItem(g), ecoords[ep].add(1, 1)));
 	    }
@@ -228,6 +214,7 @@ public class Equipory extends Widget implements DTarget {
 				ui.sess.glob.oc.gobAction(Gob::updateBeastDangerRadii);
 			}
 		} catch (Exception ignored){}
+		Fightsess.loadoutChecked = false;
 	} else {
 	    super.addchild(child, args);
 	}
@@ -256,6 +243,7 @@ public class Equipory extends Widget implements DTarget {
 			}
 		} catch (Exception ignored){}
 	}
+	Fightsess.loadoutChecked = false;
     }
 
     public void uimsg(String msg, Object... args) {
@@ -419,7 +407,10 @@ public class Equipory extends Widget implements DTarget {
 		
 	}
 	public GItem getWeapon() {
-
+		GItem lweap = null;
+		GItem rweap = null;
+		if (slots[6] != null) lweap = slots[6].item;
+		if (slots[7] != null) rweap = slots[7].item;
         if (lweap != null && ItemInfo.hasInfo(lweap.info,"Damage")) {
             return lweap;
         } else if (rweap != null && ItemInfo.hasInfo(rweap.info,"Damage")) {

@@ -82,11 +82,12 @@ public class Fightsess extends Widget {
 	public static final Color hpBarYellow = new Color(182, 165, 0, 255);
 	private static final Color barFrame = new Color(255, 255, 255, 111);
 
+	public static boolean loadoutChecked = false;
 	private static int[] openingArr = new int[] {0,0,0,0};
-	private static int wepdmg = 1;
+	private static int wepdmg = 0;
 	private static double ql = 1;
-	private static int basedmg = 1;
-	private static double str = 1;
+	private static int basedmg = 0;
+	public static double myStrength = 1;
 
 	Map<String, Color> openingsColorMap = new HashMap<>() {{
 		put("paginae/atk/offbalance", new Color(0, 128, 3));
@@ -113,23 +114,7 @@ public class Fightsess extends Widget {
     @RName("fsess")
     public static class $_ implements Factory {
 	public Widget create(UI ui, Object[] args) {
-
-		str = ui.sess.glob.getcattr("str").comp;
-		GItem wep = ui.gui.getequipory().getWeapon();
-		if(wep!=null) {	//This null-check fixed the soft crash when you login already in combat, another way of handling this is doing this in a second or two, maybe with a new Thread()
-			setupWepDmg(ui.gui);
-		}
-		else {
-			new Thread(() -> {	//I did the thing, i hope this doesnt break anything. Thanks chatgpt
-				try {
-					Thread.sleep(10000); //idk maybe the player has a potato pc? its not like seeing what dmg you will do is a high-prio anyways
-					setupWepDmg(ui.gui);
-				} catch (InterruptedException e) {
-					Thread.currentThread().interrupt();
-				}
-			}).start();
-		}
-		
+		loadoutChecked = false;
 	    int nact = Utils.iv(args[0]);
 		if(OptWnd.combatStartSoundEnabledCheckbox.a) {
 			try {
@@ -219,6 +204,19 @@ public class Fightsess extends Widget {
     }
 
     public void tick(double dt) {
+	if (!loadoutChecked) {
+		try {
+			myStrength = ui.sess.glob.getcattr("str").comp;
+			wepdmg = basedmg = 0;
+			Equipory equipory = ui.gui.getequipory();
+			GItem wep = equipory.getWeapon();
+			if (wep != null) {
+				setupWepDmg(ui.gui);
+				loadoutChecked = true;
+			}
+		} catch (Exception ignored) {
+		}
+	}
 	for(Iterator<Effect> i = curfx.iterator(); i.hasNext();) {
 	    Effect fx = i.next();
 	    if(!fx.used) {
@@ -656,7 +654,7 @@ public class Fightsess extends Widget {
 
 					if(attack.isMC()) {
 						double weaponDamageCalc;
-						weaponDamageCalc = basedmg * Math.sqrt( Math.sqrt(ql*str) / 10);
+						weaponDamageCalc = basedmg * Math.sqrt( Math.sqrt(ql* myStrength) / 10);
 						name = Integer.toString((int)Math.ceil( //I need to cast this into Integer so it doesnt print "0.0", printing "0" is prettier.
 						weaponDamageCalc //Full damage
 						*attack.getDmgMul()
@@ -665,7 +663,7 @@ public class Fightsess extends Widget {
 					}
 					else {
 						name = Integer.toString((int)Math.ceil( //I need to cast this into Integer so it doesnt print "0.0", printing "0" is prettier.
-							attack.getDmg()*Math.sqrt(str/10) //Full damage
+							attack.getDmg()*Math.sqrt(myStrength/10) //Full damage
 							*openingMul
 						));
 
@@ -674,7 +672,7 @@ public class Fightsess extends Widget {
 				else{
 					name = "";
 				}
-				if(name!="") {
+				if(!name.isEmpty()) {
 					infoY += 12;
 					g.aimage(new TexI(Utils.outline2(damageFoundry.render(name,Color.RED).img, Color.BLACK, true)), ca.add((int)(img.sz().x/2), img.sz().y + UI.scale(infoY)), 0.5, 0.5);
 				}
@@ -1302,7 +1300,7 @@ public class Fightsess extends Widget {
 		GItem wep = gui.getequipory().getWeapon();
 		wepdmg = ItemInfo.getDamage(wep.info);
 		//ui.gui.msg("wepdmg: "+wepdmg,Color.white);
-		ql = gui.getequipory().getWeapon().getQBuff().q;
+		ql = wep.getQBuff().q;
 		//ui.gui.msg("ql: "+ql,Color.white);
 		basedmg = (int)(Math.ceil(wepdmg/Math.sqrt(ql/10)));
 		//ui.gui.msg("basedmg: "+basedmg,Color.white);

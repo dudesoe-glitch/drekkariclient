@@ -952,12 +952,6 @@ public class OptWnd extends Window {
 					Utils.setprefb("showCombatHotkeysUI", val);
 				}
 			}, prev.pos("bl").adds(0, 10));
-			prev = add(showDamagePredictUICheckBox = new CheckBox("Show Attack's Damage Prediction (Bottom Panel)"){
-				{a = Utils.getprefb("showDamagePredictUI", false);}
-				public void changed(boolean val) {
-					Utils.setprefb("showDamagePredictUI", val);
-				}
-			}, prev.pos("bl").adds(0, 10));
 			prev = add(singleRowCombatMovesCheckBox = new CheckBox("Single row for Combat Moves (Bottom Panel)"){
 				{a = Utils.getprefb("singleRowCombatMoves", false);}
 				public void set(boolean val) {
@@ -965,6 +959,12 @@ public class OptWnd extends Window {
 					a = val;
 				}
 			}, prev.pos("bl").adds(0, 2));
+			prev = add(showDamagePredictUICheckBox = new CheckBox("Show Combat Move Damage Prediction (Bottom Panel)"){
+				{a = Utils.getprefb("showDamagePredictUI", true);}
+				public void changed(boolean val) {
+					Utils.setprefb("showDamagePredictUI", val);
+				}
+			}, prev.pos("bl").adds(0, 10));
 
 			prev = add(includeHHPTextHealthBarCheckBox = new CheckBox("Include HHP% text in Health Bar"){
 				{a = Utils.getprefb("includeHHPTextHealthBar", false);}
