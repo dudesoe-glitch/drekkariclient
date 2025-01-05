@@ -128,6 +128,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 	public Thread combatDistanceToolThread;
 	public Thread harvestNearestDreamcatcherThread;
 	public Thread destroyNearestTrellisPlantScriptThread;
+	public Thread lootNearestKnockedPlayerThread;
 
 	// Tool Threads
 	public MiningSafetyAssistant miningSafetyAssistantWindow;
@@ -1784,6 +1785,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 	public static KeyBinding kb_toggleCollisionBoxes  = KeyBinding.get("toggleCollisionBoxesKB",  KeyMatch.forchar('B', KeyMatch.S));
 	public static KeyBinding kb_toggleGrowthInfo  = KeyBinding.get("toggleGrowthInfoKB",  KeyMatch.forchar('I',  KeyMatch.C | KeyMatch.S));
 	public static KeyBinding kb_toggleCursorItem = KeyBinding.get("toggleCursorItemKB",  KeyMatch.nil);
+	public static KeyBinding kb_lootNearestKnockedPlayer = KeyBinding.get("lootNearestKnockedPlayerKB",  KeyMatch.forchar('D', KeyMatch.S));
 	public static KeyBinding kb_instantLogout = KeyBinding.get("instantLogoutKB",  KeyMatch.nil);
 	public static KeyBinding kb_aggroNearestTargetButton = KeyBinding.get("AggroNearestTargetButtonKB",  KeyMatch.forcode(KeyEvent.VK_SPACE, KeyMatch.S));
 	public static KeyBinding kb_aggroOrTargetNearestCursor = KeyBinding.get("AggroOrTargetNearestCursorButtonKB",  KeyMatch.nil);
@@ -1923,6 +1925,16 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 		return(true);
 	} else if (kb_instantLogout.key().match(ev)) {
 		ui.sess.close();
+	} else if (kb_lootNearestKnockedPlayer.key().match(ev)) {
+		if (lootNearestKnockedPlayerThread == null) {
+			lootNearestKnockedPlayerThread = new Thread(new LootNearestKnockedPlayer(this), "LootNearestKnockedPlayer");
+			lootNearestKnockedPlayerThread.start();
+		} else {
+			lootNearestKnockedPlayerThread.interrupt();
+			lootNearestKnockedPlayerThread = null;
+			lootNearestKnockedPlayerThread = new Thread(new LootNearestKnockedPlayer(this), "LootNearestKnockedPlayer");
+			lootNearestKnockedPlayerThread.start();
+		}
 	} else if(kb_aggroNearestTargetButton.key().match(ev)) {
 		this.runActionThread(new Thread(new AggroNearestTarget(this), "AggroNearestTarget"));
 		return(true);

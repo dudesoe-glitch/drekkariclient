@@ -2379,6 +2379,8 @@ public class OptWnd extends Window {
 		y = addbtn(cont, "Display Growth Info on Plants", GameUI.kb_toggleGrowthInfo, y);
 		y = addbtn(cont, "Hide/Show Cursor Item", GameUI.kb_toggleCursorItem, y);
 		y+=UI.scale(20);
+		y = addbtn(cont, "Loot Nearest Knocked Player", GameUI.kb_lootNearestKnockedPlayer, y);
+		y+=UI.scale(20);
 		y = addbtn(cont, "Instant Log Out", GameUI.kb_instantLogout, y);
 
 		prev = adda(new PointBind(UI.scale(200)), scroll.pos("bl").adds(0, 10).x(scroll.sz.x / 2), 0.5, 0.0);
