@@ -1277,25 +1277,25 @@ public class Fightsess extends Widget {
 			fv.wdgmsg("bump", (int) closestRel.gobid);
 		}
 	}
-	private void setupOpeningArr(ArrayList<Buff> buffs)
-	{
-		for(Buff buff : buffs)
-		{
-			switch(buff.res.get().name)	{
-				case "paginae/atk/offbalance":
-					openingArr[0] = getOpeningValue(buff);
-					break;
-				case "paginae/atk/reeling":
-					openingArr[1] = getOpeningValue(buff);
-					break;
-				case "paginae/atk/cornered":
-					openingArr[2] = getOpeningValue(buff);
-					break;
-				case "paginae/atk/dizzy":
-					openingArr[3] = getOpeningValue(buff);
-					break;
+	private void setupOpeningArr(ArrayList<Buff> buffs){
+		try {
+			for(Buff buff : buffs) {
+				switch(buff.res.get().name)	{
+					case "paginae/atk/offbalance":
+						openingArr[0] = getOpeningValue(buff);
+						break;
+					case "paginae/atk/reeling":
+						openingArr[1] = getOpeningValue(buff);
+						break;
+					case "paginae/atk/cornered":
+						openingArr[2] = getOpeningValue(buff);
+						break;
+					case "paginae/atk/dizzy":
+						openingArr[3] = getOpeningValue(buff);
+						break;
+				}
 			}
-		}
+		} catch (Exception ignored){} // ND: Maybe it should be Loading rather than Exception, idk, idc.
 	}
 	private static void setupWepDmg(GameUI gui) {
 		GItem wep = gui.getequipory().getWeapon();
