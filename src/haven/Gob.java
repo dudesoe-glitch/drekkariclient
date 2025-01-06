@@ -70,7 +70,6 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	public Boolean isMannequin = null;
 	public Boolean isSkeleton = null;
 	private boolean isLoftar = false;
-	public boolean playerNameChecked = false;
 	public final ArrayList<Gob> occupants = new ArrayList<Gob>(); // ND: The "passengers" of this gob
 	public Long occupiedGobID = null; // ND: The id of the "vehicle" this gob is currently in
 	private HitBoxGobSprite<HidingBox> hidingBoxHollow = null;
@@ -1347,24 +1346,21 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	}
 
 	public void setCustomPlayerName() {
-		if (!playerNameChecked) {
-			if (getattr(Buddy.class) == null && getattr(haven.res.ui.obj.buddy_n.Named.class) == null && isMannequin != null && !isMannequin && isSkeleton != null && !isSkeleton && glob.sess.ui.gui != null && glob.sess.ui.gui.map != null) {
-				if (getres() != null) {
-					if (getres().name.equals("gfx/borka/body")) {
-						long plgobid = glob.sess.ui.gui.map.plgob;
-						if (plgobid != -1 && plgobid != id) {
-							if (isLoftar)
-								setattr(new Buddy(this, -1, "Loftar", Color.WHITE));
-							else if ((getattr(Vilmate.class) != null))
-								setattr(new Buddy(this, -1, "Village/Realm Member", Color.WHITE));
-							else {
-								setattr(new Buddy(this, -1, "Unknown", Color.GRAY));
-							}
+		if (getattr(Buddy.class) == null && getattr(haven.res.ui.obj.buddy_n.Named.class) == null && isMannequin != null && !isMannequin && isSkeleton != null && !isSkeleton && glob.sess.ui.gui != null && glob.sess.ui.gui.map != null) {
+			if (getres() != null) {
+				if (getres().name.equals("gfx/borka/body")) {
+					long plgobid = glob.sess.ui.gui.map.plgob;
+					if (plgobid != -1 && plgobid != id) {
+						if (isLoftar)
+							setattr(new Buddy(this, -1, "Loftar", Color.WHITE));
+						else if ((getattr(Vilmate.class) != null))
+							setattr(new Buddy(this, -1, "Village/Realm Member", Color.WHITE));
+						else {
+							setattr(new Buddy(this, -1, "Unknown", Color.GRAY));
 						}
 					}
 				}
 			}
-			playerNameChecked = true;
 		}
 	}
 
@@ -1393,7 +1389,6 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 									if (getattr(Buddy.class) != null)
 										delattr(Buddy.class);
 									isLoftar = true;
-									playerNameChecked = false;
 									break;
 								}
 							}

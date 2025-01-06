@@ -42,7 +42,6 @@ public class Buddy extends GAttrib implements InfoPart {
 	    gob.setattr(new Buddy(gob, dat.int32()));
 	else {
 		gob.delattr(Buddy.class);
-		gob.playerNameChecked = false;
 	}
     }
 
