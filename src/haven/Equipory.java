@@ -95,6 +95,7 @@ public class Equipory extends Widget implements DTarget {
 	private boolean showEquipmentBonuses = Utils.getprefb("showEquipmentBonuses", false);
 	private Button expandButton = null;
 	public boolean myOwnEquipory = false;
+	public boolean isWardrobe = false;
 	public static CheckBox autoDropLeechesCheckBox;
 	public static CheckBox autoDropTicksCheckBox;
 	public static CheckBox autoEquipBunnySlippersPlateBootsCheckBox;
@@ -118,6 +119,11 @@ public class Equipory extends Widget implements DTarget {
     protected void added() {
 	if(ava.avagob == -2)
 	    ava.avagob = getparent(GameUI.class).plid;
+	if (parent != null && parent instanceof Window) {
+		if (((Window) parent).cap != null && ((Window) parent).cap.equals("Wardrobe")) {
+			isWardrobe = true;
+		}
+	}
 	super.added();
     }
 
