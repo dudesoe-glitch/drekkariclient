@@ -4370,6 +4370,132 @@ public class OptWnd extends Window {
 
 	}
 
+	public static CheckBox autoLootRingsCheckBox;
+	public static CheckBox autoLootNecklaceCheckBox;
+	public static CheckBox autoLootWeaponCheckBox;
+	public static CheckBox autoLootHelmetCheckBox;
+	public static CheckBox autoLootChestArmorCheckBox;
+	public static CheckBox autoLootLegArmorCheckBox;
+	public static CheckBox autoLootCloakRobeCheckBox;
+	public static CheckBox autoLootShirtCheckBox;
+	public static CheckBox autoLootPantsCheckBox;
+	public static CheckBox autoLootGlovesCheckBox;
+	public static CheckBox autoLootBootsCheckBox;
+	public static CheckBox autoLootEyewearCheckBox;
+	public static CheckBox autoLootMouthCheckBox;
+	public static CheckBox autoLootCapeCheckBox;
+
+	public class AutoLootSettingsPanel extends Panel {
+
+		private int addbtn(Widget cont, String nm, KeyBinding cmd, int y) {
+			return (cont.addhl(new Coord(0, y), cont.sz.x,
+					new Label(nm), new SetButton(UI.scale(140), cmd))
+					+ UI.scale(2));
+		}
+
+		public AutoLootSettingsPanel(Panel back) {
+			Widget prev;
+
+			Scrollport scroll = add(new Scrollport(UI.scale(new Coord(350, 40))), 0, 0);
+			prev = scroll.cont;
+			addbtn(prev, "Loot Nearest Knocked Player hotkey:", GameUI.kb_lootNearestKnockedPlayer, 0);
+
+			prev = add(new Label("Auto-Loot the following gear from enemies (when stealing):"), prev.pos("bl").adds(0, 6));
+			prev = add(autoLootRingsCheckBox = new CheckBox("Rings"){
+				{a = Utils.getprefb("autoLootRings", false);}
+				public void changed(boolean val) {
+					Utils.setprefb("autoLootRings", val);
+				}
+			}, prev.pos("bl").adds(0, 4).x(12));
+			prev = add(autoLootNecklaceCheckBox = new CheckBox("Necklace"){
+				{a = Utils.getprefb("autoLootNecklace", false);}
+				public void changed(boolean val) {
+					Utils.setprefb("autoLootNecklace", val);
+				}
+			}, prev.pos("bl").adds(0, 2));
+			prev = add(autoLootWeaponCheckBox = new CheckBox("Weapon (Try to put in Belt first, then Inventory)"){
+				{a = Utils.getprefb("autoLootWeapon", false);}
+				public void changed(boolean val) {
+					Utils.setprefb("autoLootWeapon", val);
+				}
+			}, prev.pos("bl").adds(0, 2));
+			prev = add(autoLootHelmetCheckBox = new CheckBox("Helmet"){
+				{a = Utils.getprefb("autoLootHelmet", false);}
+				public void changed(boolean val) {
+					Utils.setprefb("autoLootHelmet", val);
+				}
+			}, prev.pos("bl").adds(0, 2));
+			prev = add(autoLootChestArmorCheckBox = new CheckBox("Chest Armor"){
+				{a = Utils.getprefb("autoLootChestArmor", false);}
+				public void changed(boolean val) {
+					Utils.setprefb("autoLootChestArmor", val);
+				}
+			}, prev.pos("bl").adds(0, 2));
+			prev = add(autoLootLegArmorCheckBox = new CheckBox("Leg Armor"){
+				{a = Utils.getprefb("autoLootLegArmor", false);}
+				public void changed(boolean val) {
+					Utils.setprefb("autoLootLegArmor", val);
+				}
+			}, prev.pos("bl").adds(0, 2));
+			prev = add(autoLootCloakRobeCheckBox = new CheckBox("Cloak/Robe"){
+				{a = Utils.getprefb("autoLootCloakRobe", false);}
+				public void changed(boolean val) {
+					Utils.setprefb("autoLootCloakRobe", val);
+				}
+			}, prev.pos("bl").adds(0, 2));
+			prev = add(autoLootShirtCheckBox = new CheckBox("Shirt"){
+				{a = Utils.getprefb("autoLootShirt", false);}
+				public void changed(boolean val) {
+					Utils.setprefb("autoLootShirt", val);
+				}
+			}, prev.pos("bl").adds(0, 2));
+			prev = add(autoLootPantsCheckBox = new CheckBox("Pants"){
+				{a = Utils.getprefb("autoLootPants", false);}
+				public void changed(boolean val) {
+					Utils.setprefb("autoLootPants", val);
+				}
+			}, prev.pos("bl").adds(0, 2));
+			prev = add(autoLootGlovesCheckBox = new CheckBox("Gloves"){
+				{a = Utils.getprefb("autoLootGloves", false);}
+				public void changed(boolean val) {
+					Utils.setprefb("autoLootGloves", val);
+				}
+			}, prev.pos("bl").adds(0, 2));
+			prev = add(autoLootBootsCheckBox = new CheckBox("Boots"){
+				{a = Utils.getprefb("autoLootBoots", false);}
+				public void changed(boolean val) {
+					Utils.setprefb("autoLootBoots", val);
+				}
+			}, prev.pos("bl").adds(0, 2));
+			prev = add(autoLootEyewearCheckBox = new CheckBox("Eyewear"){
+				{a = Utils.getprefb("autoLootEyewear", false);}
+				public void changed(boolean val) {
+					Utils.setprefb("autoLootEyewear", val);
+				}
+			}, prev.pos("bl").adds(0, 2));
+			prev = add(autoLootMouthCheckBox = new CheckBox("Mouth"){
+				{a = Utils.getprefb("autoLootMouth", false);}
+				public void changed(boolean val) {
+					Utils.setprefb("autoLootMouth", val);
+				}
+			}, prev.pos("bl").adds(0, 2));
+			prev = add(autoLootCapeCheckBox = new CheckBox("Cape"){
+				{a = Utils.getprefb("autoLootCape", false);}
+				public void changed(boolean val) {
+					Utils.setprefb("autoLootCape", val);
+				}
+			}, prev.pos("bl").adds(0, 2));
+
+
+
+			Widget backButton;
+			add(backButton = new PButton(UI.scale(200), "Back", 27, back, "Advanced Settings"), prev.pos("bl").adds(0, 18).x(0));
+			pack();
+			centerBackButton(backButton, this);
+		}
+
+	}
+
 
     public static class PointBind extends Button implements CursorQuery.Handler {
 	public static final String msg = "Bind other elements...";
@@ -4509,6 +4635,7 @@ public class OptWnd extends Window {
 		Panel combatuipanel = add(new CombatUIPanel(advancedSettings));
 		Panel combataggrosettings = add(new AggroExclusionSettingsPanel(advancedSettings));
 		Panel serverintegrationsettings = add(new ServerIntegrationSettingsPanel(advancedSettings));
+		Panel autolootsettings = add(new AutoLootSettingsPanel(advancedSettings));
 
 		int leftY = UI.scale(6);
 		leftY = advancedSettings.add(new PButton(UI.scale(200), "Interface Settings", -1, interfacesettings, "Interface Settings"), 0, leftY).pos("bl").adds(0, 5).y;
@@ -4531,6 +4658,7 @@ public class OptWnd extends Window {
 
 		rightY += UI.scale(20);
 		rightY = advancedSettings.add(new PButton(UI.scale(200), "Gameplay Automation Settings", -1, gameplayautomationsettings, "Gameplay Automation Settings"), rightX, rightY).pos("bl").adds(0, 5).y;
+		rightY = advancedSettings.add(new PButton(UI.scale(200), "Auto-Loot Settings", -1, autolootsettings, "Auto-Loot Settings"), rightX, rightY).pos("bl").adds(0, 5).y;
 
 
 		int middleX = UI.scale(110);

@@ -102,7 +102,7 @@ public class Equipory extends Widget implements DTarget {
 	boolean checkForLeeches = false;
 	boolean checkForTicks = false;
 
-    @RName("epry")
+	@RName("epry")
     public static class $_ implements Factory {
 	public Widget create(UI ui, Object[] args) {
 	    long gobid;
@@ -202,10 +202,13 @@ public class Equipory extends Widget implements DTarget {
 	    add(child);
 	    GItem g = (GItem)child;
 	    ArrayList<WItem> v = new ArrayList<>();
+		int slot = 69; // ND: Doesn't really need to be initialised I guess, but just to be safe
 	    for(int i = 0; i < args.length; i++) {
 		int ep = Utils.iv(args[i]);
-		if(ep < ecoords.length)
-			 v.add(slots[ep] = add(new WItem(g), ecoords[ep].add(1, 1)));
+		if(ep < ecoords.length) {
+			v.add(slots[ep] = add(new WItem(g), ecoords[ep].add(1, 1)));
+			slot = ep;
+		}
 	    }
 		g.sendttupdate = true;
 	    v.trimToSize();
@@ -222,6 +225,36 @@ public class Equipory extends Widget implements DTarget {
 		} catch (Exception ignored){}
 		if (myOwnEquipory) {
 			Fightsess.loadoutChecked = false;
+		} else {
+			if (!isWardrobe){
+				if ((OptWnd.autoLootRingsCheckBox.a && (slot == 8 || slot == 9))
+				|| (OptWnd.autoLootNecklaceCheckBox.a && slot == 1)
+				|| (OptWnd.autoLootHelmetCheckBox.a && slot == 0)
+				|| (OptWnd.autoLootChestArmorCheckBox.a && slot == 3)
+				|| (OptWnd.autoLootLegArmorCheckBox.a && slot == 13)
+				|| (OptWnd.autoLootCloakRobeCheckBox.a && slot == 10)
+				|| (OptWnd.autoLootShirtCheckBox.a && slot == 2)
+				|| (OptWnd.autoLootPantsCheckBox.a && slot == 12)
+				|| (OptWnd.autoLootGlovesCheckBox.a && slot == 4)
+				|| (OptWnd.autoLootBootsCheckBox.a && slot == 15)
+				|| (OptWnd.autoLootEyewearCheckBox.a && slot == 17)
+				|| (OptWnd.autoLootMouthCheckBox.a && slot == 18)
+				|| (OptWnd.autoLootCapeCheckBox.a && slot == 14)){
+					child.wdgmsg("transfer", Coord.z);
+				} else if (OptWnd.autoLootWeaponCheckBox.a && (slot == 6 || slot == 7)) { // ND: Weapon special case
+					if (!((GItem) child).getres().name.equals("gfx/invobjs/small/roundshield")) { // ND: Don't need shields, waste of inventory/belt space
+						Inventory belt = returnBelt();
+						if (belt != null) {
+							if (belt.getFreeSpace() > 0) {
+								child.wdgmsg("take", Coord.z);
+								belt.wdgmsg("drop", belt.isRoom(1, 1));
+							}
+						}
+						// ND: If failed, try to transfer to inventory
+						child.wdgmsg("transfer", Coord.z);
+					}
+				}
+			}
 		}
 	} else {
 	    super.addchild(child, args);
@@ -428,5 +461,18 @@ public class Equipory extends Widget implements DTarget {
             return null;
         }
     }
+
+	public Inventory returnBelt() {
+		Inventory belt = null;
+		for (Widget w = ui.gui.lchild; w != null; w = w.prev) {
+			if (!(w instanceof GItem.ContentsWindow) || !((GItem.ContentsWindow) w).myOwnEquipory) continue;
+			if (!((GItem.ContentsWindow) w).cap.contains("Belt")) continue;
+			for (Widget ww : w.children()) {
+				if (!(ww instanceof Inventory)) continue;
+				belt = (Inventory) ww;
+			}
+		}
+		return belt;
+	}
 
 }
