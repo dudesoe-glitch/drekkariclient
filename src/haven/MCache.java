@@ -370,7 +370,7 @@ public class MCache implements MapSource {
 			    super.update(mesh);
 				try {
 					if (sess.ui != null && mesh != null) {
-						checkTiles(mesh, sess.ui);
+//						checkTiles(mesh, sess.ui);
 					}
 				} catch (Exception ignored) {}
 			    olseq = -1;
@@ -546,7 +546,6 @@ public class MCache implements MapSource {
 					Coord c = origin.div(MCache.tilesz).round().add(i, j);
 					int t = ret.map.gettile(c);
 					Resource res = ret.map.tilesetr(t);
-
 					if (res.name.startsWith("gfx/tiles/field") || res.name.startsWith("gfx/tiles/dirt")) { // Trollex: we break it here due to plowing specifically, it was just laggy as fuck because of the tile changes
 						// ND: I can't be arsed to test it, Trollex's MCache is outdated, but I DO EXPECT the same issue to happen with mine, so just break it, why not
 						break outerLoop;
