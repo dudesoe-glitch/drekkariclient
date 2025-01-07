@@ -118,16 +118,21 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 	public static String backgroundSong = "";
 	public static long delayedMusicStopTime;
 	static public final Resource caveTheme = Resource.local().loadwait("customclient/sfx/cavetheme");
+	static public final Resource caveThemeLegacy = Resource.local().loadwait("customclient/sfx/cavetheme_legacy");
 	static public Audio.CS caveThemeClip = null;
 	static public final Resource cabinTheme = Resource.local().loadwait("customclient/sfx/cabintheme");
+	static public final Resource cabinThemeLegacy = Resource.local().loadwait("customclient/sfx/cabintheme_Legacy");
 	static public Audio.CS cabinThemeClip = null;
 	public static boolean playingPoseSong = false;
 	public static String backgroundPoseSong = "";
 	static public final Resource fishingTheme = Resource.local().loadwait("customclient/sfx/fishingtheme");
+	static public final Resource fishingThemeLegacy = Resource.local().loadwait("customclient/sfx/fishingtheme_legacy");
 	static public Audio.CS fishingThemeClip = null;
 	static public final Resource hookahTheme = Resource.local().loadwait("customclient/sfx/hookahtheme");
+	static public final Resource hookahThemeLegacy = Resource.local().loadwait("customclient/sfx/hookahtheme_legacy");
 	static public Audio.CS hookahThemeClip = null;
 	static public final Resource feastingTheme = Resource.local().loadwait("customclient/sfx/feastingtheme");
+	static public final Resource feastingThemeLegacy = Resource.local().loadwait("customclient/sfx/feastingtheme_legacy");
 	static public Audio.CS feastingThemeClip = null;
 
 	// Script Threads
@@ -2989,6 +2994,8 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 	public static void playCaveTheme() {
 		if ((caveThemeClip == null || !((Audio.Mixer) Audio.player.stream).playing(caveThemeClip)) && backgroundSong.equals("cave")) {
 			Audio.CS klippi = fromres(caveTheme);
+			if (Utils.getprefi("backgroundMusicTheme", 0) == 0) klippi = fromres(caveTheme);
+			else if (Utils.getprefi("backgroundMusicTheme", 0) == 1) klippi = fromres(caveThemeLegacy);
 			caveThemeClip = new Audio.VolAdjust(klippi, Utils.getprefi("themeSongVolume", 40)/100d);
 			Audio.play(caveThemeClip);
 		}
@@ -3002,6 +3009,8 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 	public static void playCabinTheme() {
 		if ((cabinThemeClip == null || !((Audio.Mixer) Audio.player.stream).playing(cabinThemeClip)) && backgroundSong.equals("cabin")) {
 			Audio.CS klippi = fromres(cabinTheme);
+			if (Utils.getprefi("backgroundMusicTheme", 0) == 0) klippi = fromres(cabinTheme);
+			else if (Utils.getprefi("backgroundMusicTheme", 0) == 1) klippi = fromres(cabinThemeLegacy);
 			cabinThemeClip = new Audio.VolAdjust(klippi, Utils.getprefi("themeSongVolume", 40)/100d);
 			Audio.play(cabinThemeClip);
 		}
@@ -3015,6 +3024,8 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 	public static void playFishingTheme() {
 		if (fishingThemeClip == null || !((Audio.Mixer) Audio.player.stream).playing(fishingThemeClip)) {
 			Audio.CS klippi = fromres(fishingTheme);
+			if (Utils.getprefi("backgroundMusicTheme", 0) == 0) klippi = fromres(fishingTheme);
+			else if (Utils.getprefi("backgroundMusicTheme", 0) == 1) klippi = fromres(fishingThemeLegacy);
 			fishingThemeClip = new Audio.VolAdjust(klippi, Utils.getprefi("themeSongVolume", 40)/100d);
 			Audio.play(fishingThemeClip);
 		}
@@ -3028,6 +3039,8 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 	public static void playHookahTheme() {
 		if (hookahThemeClip == null || !((Audio.Mixer) Audio.player.stream).playing(hookahThemeClip)) {
 			Audio.CS klippi = fromres(hookahTheme);
+			if (Utils.getprefi("backgroundMusicTheme", 0) == 0) klippi = fromres(hookahTheme);
+			else if (Utils.getprefi("backgroundMusicTheme", 0) == 1) klippi = fromres(hookahThemeLegacy);
 			hookahThemeClip = new Audio.VolAdjust(klippi, Utils.getprefi("themeSongVolume", 40)/100d);
 			Audio.play(hookahThemeClip);
 		}
@@ -3041,6 +3054,8 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 	public static void playFeastingTheme() {
 		if (feastingThemeClip == null || !((Audio.Mixer) Audio.player.stream).playing(feastingThemeClip)) {
 			Audio.CS klippi = fromres(feastingTheme);
+			if (Utils.getprefi("backgroundMusicTheme", 0) == 0) klippi = fromres(feastingTheme);
+			else if (Utils.getprefi("backgroundMusicTheme", 0) == 1) klippi = fromres(feastingThemeLegacy);
 			feastingThemeClip = new Audio.VolAdjust(klippi, Utils.getprefi("themeSongVolume", 40)/100d);
 			Audio.play(feastingThemeClip);
 		}
@@ -3054,6 +3069,14 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 	public static void stopAllThemes(){
 		backgroundSong = "";
 		backgroundPoseSong = "";
+		stopCabinTheme();
+		stopCaveTheme();
+		stopFishingTheme();
+		stopHookahTheme();
+		stopFeastingTheme();
+	}
+
+	public static void settingStopAllThemes(){
 		stopCabinTheme();
 		stopCaveTheme();
 		stopFishingTheme();

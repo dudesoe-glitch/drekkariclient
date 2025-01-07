@@ -456,6 +456,40 @@ public class OptWnd extends Window {
 				Utils.setprefi("themeSongVolume", val);
 			}
 		}, prev.pos("bl").adds(0, 2));
+
+
+		prev = add(new Label("Background Music Theme:"), prev.pos("bl").adds(0, 6).x(0));
+		List<String> musicThemes = Arrays.asList("Hurricane  ", "Legacy");
+		add(new OldDropBox<String>(musicThemes.size(), musicThemes) {
+			{
+				super.change(musicThemes.get(Utils.getprefi("backgroundMusicTheme", 0)));
+			}
+			@Override
+			protected String listitem(int i) {
+				return musicThemes.get(i);
+			}
+			@Override
+			protected int listitems() {
+				return musicThemes.size();
+			}
+			@Override
+			protected void drawitem(GOut g, String item, int i) {
+				g.aimage(Text.renderstroked(item).tex(), Coord.of(UI.scale(3), g.sz().y / 2), 0.0, 0.5);
+			}
+			@Override
+			public void change(String item) {
+				super.change(item);
+				for (int i = 0; i < musicThemes.size(); i++){
+					if (item.equals(musicThemes.get(i))){
+						Utils.setprefi("backgroundMusicTheme", i);
+					}
+				}
+				GameUI.settingStopAllThemes();
+			}
+		}, prev.pos("ur").adds(0, 1));
+
+
+
 	    prev = add(new Label("Interface sound volume"), prev.pos("bl").adds(0, 15));
 	    prev = add(new HSlider(UI.scale(audioSliderWidth), 0, 1000, 0) {
 		    protected void attach(UI ui) {

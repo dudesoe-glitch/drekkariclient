@@ -26,18 +26,11 @@
 
 package haven;
 
-import javax.sound.sampled.AudioFormat;
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.UnsupportedAudioFileException;
 import java.awt.Color;
-import java.io.IOException;
 import java.util.*;
 
 import static haven.Audio.fromres;
-import static haven.LoginScreen.charSelectThemeClip;
-import static haven.LoginScreen.charSelectThemeStopped;
-import static haven.LoginScreen.charSelectTheme;
+import static haven.LoginScreen.*;
 
 public class Charlist extends Widget {
     public static final Coord bsz = UI.scale(289, 96);
@@ -308,6 +301,8 @@ public class Charlist extends Widget {
 	public static void playCharSelectTheme() {
 		if (!charSelectThemeStopped &&(charSelectThemeClip == null || !((Audio.Mixer) Audio.player.stream).playing(charSelectThemeClip))) {
 			Audio.CS klippi = fromres(charSelectTheme);
+			if (Utils.getprefi("backgroundMusicTheme", 0) == 0) klippi = fromres(charSelectTheme);
+			else if (Utils.getprefi("backgroundMusicTheme", 0) == 1) klippi = fromres(charSelectThemeLegacy);
 			charSelectThemeClip = new Audio.VolAdjust(klippi, Utils.getprefi("themeSongVolume", 40)/100d);
 			Audio.play(charSelectThemeClip);
 		}
@@ -319,4 +314,5 @@ public class Charlist extends Widget {
 			charSelectThemeStopped = true;
 		}
 	}
+
 }

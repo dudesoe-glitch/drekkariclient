@@ -58,6 +58,7 @@ public class LoginScreen extends Widget {
 	static public Audio.CS mainThemeClip = null;
 	static public boolean mainThemeStopped = false;
 	static public final Resource charSelectTheme = Resource.local().loadwait("customclient/sfx/charselecttheme");
+	static public final Resource charSelectThemeLegacy = Resource.local().loadwait("customclient/sfx/charselecttheme_legacy");
 	static public Audio.CS charSelectThemeClip = null;
 	static public boolean charSelectThemeStopped = false;
 	private Window firstTimeUseWindow = null;
