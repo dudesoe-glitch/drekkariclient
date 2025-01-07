@@ -39,7 +39,7 @@ public abstract class OldDropBox<T> extends OldListWidget<T> {
     public OldDropBox(int w, int listh, int itemh) {
 	super(new Coord(w, itemh), itemh);
 	this.listh = listh;
-	dropc = new Coord(sz.x - drop.sz().x, 0);
+	dropc = new Coord(sz.x - drop.sz().x, -2);
     }
 	public OldDropBox(int listh, List<String> values) {
 		this(calcWidth(values) + drop.sz().x + 2, listh, calcHeight(values));
@@ -99,7 +99,7 @@ public abstract class OldDropBox<T> extends OldListWidget<T> {
     }
 
     public void draw(GOut g) {
-	g.chcolor(new Color(20, 20, 20, 255));
+	g.chcolor(new Color(8, 8, 8, 255));
 	g.frect(Coord.z, sz);
 	g.chcolor();
 	if(sel != null)
