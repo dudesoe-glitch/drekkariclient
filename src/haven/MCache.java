@@ -31,6 +31,8 @@ import java.util.function.*;
 import java.lang.ref.*;
 import haven.render.*;
 
+import static haven.Audio.fromres;
+
 /* XXX: This whole file is a bit of a mess and could use a bit of a
  * rewrite some rainy day. Synchronization especially is quite hairy. */
 public class MCache implements MapSource {
@@ -366,6 +368,11 @@ public class MCache implements MapSource {
 			}
 			public void update(MapMesh mesh) {
 			    super.update(mesh);
+				try {
+					if (sess.ui != null && mesh != null) {
+						checkTiles(mesh, sess.ui);
+					}
+				} catch (Exception ignored) {}
 			    olseq = -1;
 			}
 			public String message() {
@@ -529,6 +536,33 @@ public class MCache implements MapSource {
 	public MapMesh getcut(Coord cc) {
 	    return(geticut(cc).mesh.get());
 	}
+
+		public void checkTiles(MapMesh ret, UI ui) { // ND: Taken from Trollex
+			Coord2d origin = ui.gui.map.player().rc.floor().div(100).mul(new Coord2d(100.0D, 100.0D)).add(45.0D, 45.0D).floor(MCache.tilesz).mul(MCache.tilesz);
+
+			outerLoop:
+			for(int i = -45; i <= 45; ++i) {
+				for(int j = -45; j <= 45; ++j) {
+					Coord c = origin.div(MCache.tilesz).round().add(i, j);
+					int t = ret.map.gettile(c);
+					Resource res = ret.map.tilesetr(t);
+
+					if (res.name.startsWith("gfx/tiles/field") || res.name.startsWith("gfx/tiles/dirt")) { // Trollex: we break it here due to plowing specifically, it was just laggy as fuck because of the tile changes
+						// ND: I can't be arsed to test it, Trollex's MCache is outdated, but I DO EXPECT the same issue to happen with mine, so just break it, why not
+						break outerLoop;
+					}
+					if (res.name.startsWith("gfx/tiles/nil")) {
+						GameUI.backgroundSong = "cabin";
+						return;
+					}
+					if (res.name.startsWith("gfx/tiles/cave") || res.name.startsWith("gfx/tiles/mine")) {
+						GameUI.backgroundSong = "cave";
+						return;
+					}
+				}
+			}
+			GameUI.backgroundSong = "";
+		}
 	
 	public RenderTree.Node getolcut(OverlayInfo id, Coord cc) {
 	    int nseq = MCache.this.olseq;

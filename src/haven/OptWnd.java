@@ -427,6 +427,7 @@ public class OptWnd extends Window {
 	public static HSlider butcherSoundVolumeSlider;
 	public static HSlider whiteDuckCapSoundVolumeSlider;
 	private final int audioSliderWidth = 220;
+	public static HSlider themeSongVolumeSlider;
 
     public class AudioPanel extends Panel {
 	public AudioPanel(Panel back) {
@@ -435,6 +436,25 @@ public class OptWnd extends Window {
 		    public void changed() {
 			Audio.setvolume(val / 1000.0);
 		    }
+		}, prev.pos("bl").adds(0, 2));
+		prev = add(new Label("Background Music Volume"), prev.pos("bl").adds(0, 15));
+		prev = add(themeSongVolumeSlider = new HSlider(UI.scale(220), 0, 100, Utils.getprefi("themeSongVolume", 40)) {
+			protected void attach(UI ui) {
+				super.attach(ui);
+			}
+			public void changed() { // ND: I hate hardcoding stuff but OH WELL
+				if (LoginScreen.mainThemeClip != null) ((Audio.VolAdjust) LoginScreen.mainThemeClip).vol = val/100d;
+				if (LoginScreen.charSelectThemeClip != null) ((Audio.VolAdjust) LoginScreen.charSelectThemeClip).vol = val/100d;
+				if (GameUI.cabinThemeClip != null) ((Audio.VolAdjust) GameUI.cabinThemeClip).vol = val/100d;
+				if (GameUI.caveThemeClip != null) ((Audio.VolAdjust) GameUI.caveThemeClip).vol = val/100d;
+				if (GameUI.fishingThemeClip != null) ((Audio.VolAdjust) GameUI.fishingThemeClip).vol = val/100d;
+				if (GameUI.hookahThemeClip != null) ((Audio.VolAdjust) GameUI.hookahThemeClip).vol = val/100d;
+				if (GameUI.feastingThemeClip != null) ((Audio.VolAdjust) GameUI.feastingThemeClip).vol = val/100d;
+
+				if (LoginScreen.themeSongVolumeSlider != null) LoginScreen.themeSongVolumeSlider.val = val;
+				if (Charlist.themeSongVolumeSlider != null) Charlist.themeSongVolumeSlider.val = val;
+				Utils.setprefi("themeSongVolume", val);
+			}
 		}, prev.pos("bl").adds(0, 2));
 	    prev = add(new Label("Interface sound volume"), prev.pos("bl").adds(0, 15));
 	    prev = add(new HSlider(UI.scale(audioSliderWidth), 0, 1000, 0) {

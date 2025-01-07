@@ -45,6 +45,7 @@ import haven.automated.mapper.MappingClient;
 import haven.render.Location;
 import haven.res.ui.stackinv.ItemStack;
 
+import static haven.Audio.fromres;
 import static haven.Inventory.invsq;
 
 public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.Handler {
@@ -114,6 +115,20 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 	public static Map<Long,String> gobIdToKinName = new ConcurrentHashMap<>();
 	public static boolean showUI = true;
 	public MiniStudy miniStudy;
+	public static String backgroundSong = "";
+	public static long delayedMusicStopTime;
+	static public final Resource caveTheme = Resource.local().loadwait("customclient/sfx/cavetheme");
+	static public Audio.CS caveThemeClip = null;
+	static public final Resource cabinTheme = Resource.local().loadwait("customclient/sfx/cabintheme");
+	static public Audio.CS cabinThemeClip = null;
+	public static boolean playingPoseSong = false;
+	public static String backgroundPoseSong = "";
+	static public final Resource fishingTheme = Resource.local().loadwait("customclient/sfx/fishingtheme");
+	static public Audio.CS fishingThemeClip = null;
+	static public final Resource hookahTheme = Resource.local().loadwait("customclient/sfx/hookahtheme");
+	static public Audio.CS hookahThemeClip = null;
+	static public final Resource feastingTheme = Resource.local().loadwait("customclient/sfx/feastingtheme");
+	static public Audio.CS feastingThemeClip = null;
 
 	// Script Threads
 	public Thread autoRepeatFlowerMenuScriptThread;
@@ -1512,6 +1527,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 			}
 		}
 	}
+	handleBackgroundMusic();
     }
     
     public void uimsg(String msg, Object... args) {
@@ -2967,6 +2983,140 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 			handSave.addAll(hand);
 			hand.clear();
 			updhand();
+		}
+	}
+
+	public static void playCaveTheme() {
+		if ((caveThemeClip == null || !((Audio.Mixer) Audio.player.stream).playing(caveThemeClip)) && backgroundSong.equals("cave")) {
+			Audio.CS klippi = fromres(caveTheme);
+			caveThemeClip = new Audio.VolAdjust(klippi, Utils.getprefi("themeSongVolume", 40)/100d);
+			Audio.play(caveThemeClip);
+		}
+	}
+	public static void stopCaveTheme() {
+		if(caveThemeClip != null){
+			Audio.stop(caveThemeClip);
+		}
+	}
+
+	public static void playCabinTheme() {
+		if ((cabinThemeClip == null || !((Audio.Mixer) Audio.player.stream).playing(cabinThemeClip)) && backgroundSong.equals("cabin")) {
+			Audio.CS klippi = fromres(cabinTheme);
+			cabinThemeClip = new Audio.VolAdjust(klippi, Utils.getprefi("themeSongVolume", 40)/100d);
+			Audio.play(cabinThemeClip);
+		}
+	}
+	public static void stopCabinTheme() {
+		if(cabinThemeClip != null){
+			Audio.stop(cabinThemeClip);
+		}
+	}
+
+	public static void playFishingTheme() {
+		if (fishingThemeClip == null || !((Audio.Mixer) Audio.player.stream).playing(fishingThemeClip)) {
+			Audio.CS klippi = fromres(fishingTheme);
+			fishingThemeClip = new Audio.VolAdjust(klippi, Utils.getprefi("themeSongVolume", 40)/100d);
+			Audio.play(fishingThemeClip);
+		}
+	}
+	public static void stopFishingTheme() {
+		if(fishingThemeClip != null){
+			Audio.stop(fishingThemeClip);
+		}
+	}
+
+	public static void playHookahTheme() {
+		if (hookahThemeClip == null || !((Audio.Mixer) Audio.player.stream).playing(hookahThemeClip)) {
+			Audio.CS klippi = fromres(hookahTheme);
+			hookahThemeClip = new Audio.VolAdjust(klippi, Utils.getprefi("themeSongVolume", 40)/100d);
+			Audio.play(hookahThemeClip);
+		}
+	}
+	public static void stopHookahTheme() {
+		if(hookahThemeClip != null){
+			Audio.stop(hookahThemeClip);
+		}
+	}
+
+	public static void playFeastingTheme() {
+		if (feastingThemeClip == null || !((Audio.Mixer) Audio.player.stream).playing(feastingThemeClip)) {
+			Audio.CS klippi = fromres(feastingTheme);
+			feastingThemeClip = new Audio.VolAdjust(klippi, Utils.getprefi("themeSongVolume", 40)/100d);
+			Audio.play(feastingThemeClip);
+		}
+	}
+	public static void stopFeastingTheme() {
+		if(feastingThemeClip != null){
+			Audio.stop(feastingThemeClip);
+		}
+	}
+
+	public static void stopAllThemes(){
+		backgroundSong = "";
+		backgroundPoseSong = "";
+		stopCabinTheme();
+		stopCaveTheme();
+		stopFishingTheme();
+		stopHookahTheme();
+		stopFeastingTheme();
+	}
+
+	private void handleBackgroundMusic(){ // ND: Calling this spaghetti code would be an understatement
+		boolean feasting = false;
+		outerLoop:
+		for (Window wnd : getAllWindows()) {
+			if (wnd.cap.equals("Table")) {
+				for (Widget wdg : wnd.children()) {
+					if (wdg instanceof Button) {
+						feasting = true;
+						break outerLoop; // Break out of both loops
+					}
+				}
+			}
+		}
+		if (feasting) {
+			playingPoseSong = true;
+		}
+		if (!playingPoseSong) {
+			stopFishingTheme();
+			stopHookahTheme();
+			stopFeastingTheme();
+			if (backgroundSong.equals("cabin")) {
+				playCabinTheme();
+				stopCaveTheme();
+			} else if (backgroundSong.equals("cave")) {
+				playCaveTheme();
+				stopCabinTheme();
+			} else {
+				stopCaveTheme();
+				stopCabinTheme();
+			}
+		} else {
+			stopCaveTheme();
+			stopCabinTheme();
+			if (backgroundPoseSong.equals("fishing")){
+				playFishingTheme();
+				stopHookahTheme();
+				stopFeastingTheme();
+				long rightnow = System.currentTimeMillis();
+				if ((rightnow - GameUI.delayedMusicStopTime) > 15000){ // ND: 20 seconds ought to be enough?
+					GameUI.playingPoseSong = false;
+					backgroundPoseSong = "";
+				}
+			} else if (backgroundPoseSong.equals("hookah")){
+				playHookahTheme();
+				stopFishingTheme();
+				stopFeastingTheme();
+			} else if (feasting) {
+				playFeastingTheme();
+				stopFishingTheme();
+				stopHookahTheme();
+			} else {
+				GameUI.playingPoseSong = false;
+				stopFishingTheme();
+				stopHookahTheme();
+				stopFeastingTheme();
+			}
 		}
 	}
 

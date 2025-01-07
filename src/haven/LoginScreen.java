@@ -55,8 +55,8 @@ public class LoginScreen extends Widget {
 	private String lastPass = "";
 	public static HSlider themeSongVolumeSlider;
 	static public final Resource mainTheme = Resource.local().loadwait("customclient/sfx/maintheme");
-	static private Audio.CS mainThemeClip = null;
-	static private boolean mainThemeStopped = false;
+	static public Audio.CS mainThemeClip = null;
+	static public boolean mainThemeStopped = false;
 	static public final Resource charSelectTheme = Resource.local().loadwait("customclient/sfx/charselecttheme");
 	static public Audio.CS charSelectThemeClip = null;
 	static public boolean charSelectThemeStopped = false;
@@ -106,9 +106,8 @@ public class LoginScreen extends Widget {
 			super.attach(ui);
 		}
 		public void changed() {
-			if (mainThemeClip != null)
-				((Audio.VolAdjust) mainThemeClip).vol = val/100d;
-			Utils.setprefi("themeSongVolume", val);
+			OptWnd.themeSongVolumeSlider.val = val;
+			OptWnd.themeSongVolumeSlider.changed();
 		}
 	}, bg.sz().x - UI.scale(230) , bg.sz().y - UI.scale(20));
 	add(new Label("Background Music Volume"), bg.sz().x - UI.scale(184) , bg.sz().y - UI.scale(36));
@@ -156,6 +155,7 @@ public class LoginScreen extends Widget {
 	});
 	GameUI.verifiedAccount = false;
 	GameUI.subscribedAccount = false;
+	GameUI.stopAllThemes();
     }
 
 //    public static final KeyBinding kb_savtoken = KeyBinding.get("login/savtoken", KeyMatch.forchar('R', KeyMatch.M)); // ND: Why the fuck are there keybinds for these? Someone might press one of those by mistake

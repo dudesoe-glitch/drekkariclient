@@ -72,6 +72,7 @@ public class Charlist extends Widget {
 	Gob.batWingCapeEquipped = false;
 	Gob.nightQueenDefeated = false;
 	Gob.alarmPlayed.clear();
+	GameUI.stopAllThemes();
     }
 
     public static class Char {
@@ -173,9 +174,8 @@ public class Charlist extends Widget {
 			super.attach(ui);
 		}
 		public void changed() {
-			if (charSelectThemeClip != null)
-				((Audio.VolAdjust) charSelectThemeClip).vol = val/100d;
-			Utils.setprefi("themeSongVolume", val);
+			OptWnd.themeSongVolumeSlider.val = val;
+			OptWnd.themeSongVolumeSlider.changed();
 		}
 	}, parent.sz.x - UI.scale(230) , parent.sz.y - UI.scale(20));
 	parent.add(new Label("Background Music Volume"), parent.sz.x - UI.scale(184) , parent.sz.y - UI.scale(36));
