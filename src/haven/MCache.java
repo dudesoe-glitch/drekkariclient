@@ -368,9 +368,6 @@ public class MCache implements MapSource {
 			}
 			public void update(MapMesh mesh) {
 			    super.update(mesh);
-				try {
-					checkTiles();
-				} catch (Exception ignored) {}
 			    olseq = -1;
 			}
 			public String message() {
@@ -390,6 +387,9 @@ public class MCache implements MapSource {
 	    public void invalidate() {
 		mesh.rebuild();
 		fo.rebuild();
+		try {
+			checkTiles();
+		} catch (Exception ignored) {}
 	    }
 
 	    public void dispose() {
@@ -537,7 +537,7 @@ public class MCache implements MapSource {
 
 		public void checkTiles() { // ND: Taken from Trollex
 			Coord2d origin = sess.ui.gui.map.player().rc;
-			MCache mcache = sess.glob.map;
+			MCache mcache = MCache.this;
 
 			outerLoop:
 			for(int i = -45; i <= 45; ++i) {
