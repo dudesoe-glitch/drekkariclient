@@ -51,6 +51,17 @@ public class GobIconsCustom {
 
 		put("gfx/terobjs/map/starshard", "customclient/mapicons/starshard");
 		put("gfx/terobjs/map/gemstone", "customclient/mapicons/gemboulder");
+
+		put("gfx/terobjs/items/truffle-black0", "customclient/mapicons/blacktruffle");
+		put("gfx/terobjs/items/truffle-black1", "customclient/mapicons/blacktruffle");
+		put("gfx/terobjs/items/truffle-black2", "customclient/mapicons/blacktruffle");
+		put("gfx/terobjs/items/truffle-black3", "customclient/mapicons/blacktruffle");
+
+		put("gfx/terobjs/items/truffle-white0", "customclient/mapicons/whitetruffle");
+		put("gfx/terobjs/items/truffle-white1", "customclient/mapicons/whitetruffle");
+		put("gfx/terobjs/items/truffle-white2", "customclient/mapicons/whitetruffle");
+		put("gfx/terobjs/items/truffle-white3", "customclient/mapicons/whitetruffle");
+
     }};
 
 

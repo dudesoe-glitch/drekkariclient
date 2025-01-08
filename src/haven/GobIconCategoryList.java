@@ -141,6 +141,8 @@ public class GobIconCategoryList extends OldListBox<GobIconCategoryList.GobCateg
                 "/invobjs/whirlingsnowflake",
                 "/invobjs/small/yulestar",
                 "/invobjs/small/yulelights",
+                "customclient/mapicons/blacktruffle",
+                "customclient/mapicons/whitetruffle",
         };
 
         private static final String[] ORE_PATHS = {
