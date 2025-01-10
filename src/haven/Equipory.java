@@ -88,6 +88,7 @@ public class Equipory extends Widget implements DTarget {
 	private static final Text.Foundry acf = new Text.Foundry(Text.sans, 12);
 	public boolean updateBottomText = false;
 	long delayedUpdateTime;
+	long autoLootDelayTime;
 	private Tex Detection = null;
 	private Tex Subtlety = null;
 	private Tex ArmorClass = null;
@@ -202,19 +203,17 @@ public class Equipory extends Widget implements DTarget {
 	    add(child);
 	    GItem g = (GItem)child;
 	    ArrayList<WItem> v = new ArrayList<>();
-		int slot = 69; // ND: Doesn't really need to be initialised I guess, but just to be safe
 	    for(int i = 0; i < args.length; i++) {
 		int ep = Utils.iv(args[i]);
 		if(ep < ecoords.length) {
 			v.add(slots[ep] = add(new WItem(g), ecoords[ep].add(1, 1)));
-			slot = ep;
 		}
 	    }
 		g.sendttupdate = true;
 	    v.trimToSize();
 	    wmap.put(g, v);
 		updateBottomText = true;
-		delayedUpdateTime = System.currentTimeMillis();
+		autoLootDelayTime = delayedUpdateTime = System.currentTimeMillis();
 		checkForLeeches = true;
 		checkForTicks = true;
 		try {
@@ -225,36 +224,6 @@ public class Equipory extends Widget implements DTarget {
 		} catch (Exception ignored){}
 		if (myOwnEquipory) {
 			Fightsess.loadoutChecked = false;
-		} else {
-			if (!isWardrobe){
-				if ((OptWnd.autoLootRingsCheckBox.a && (slot == 8 || slot == 9))
-				|| (OptWnd.autoLootNecklaceCheckBox.a && slot == 1)
-				|| (OptWnd.autoLootHelmetCheckBox.a && slot == 0)
-				|| (OptWnd.autoLootChestArmorCheckBox.a && slot == 3)
-				|| (OptWnd.autoLootLegArmorCheckBox.a && slot == 13)
-				|| (OptWnd.autoLootCloakRobeCheckBox.a && slot == 10)
-				|| (OptWnd.autoLootShirtCheckBox.a && slot == 2)
-				|| (OptWnd.autoLootPantsCheckBox.a && slot == 12)
-				|| (OptWnd.autoLootGlovesCheckBox.a && slot == 4)
-				|| (OptWnd.autoLootBootsCheckBox.a && slot == 15)
-				|| (OptWnd.autoLootEyewearCheckBox.a && slot == 17)
-				|| (OptWnd.autoLootMouthCheckBox.a && slot == 18)
-				|| (OptWnd.autoLootCapeCheckBox.a && slot == 14)){
-					child.wdgmsg("transfer", Coord.z);
-				} else if (OptWnd.autoLootWeaponCheckBox.a && (slot == 6 || slot == 7)) { // ND: Weapon special case
-					if (!((GItem) child).getres().name.equals("gfx/invobjs/small/roundshield")) { // ND: Don't need shields, waste of inventory/belt space
-						Inventory belt = returnBelt();
-						if (belt != null) {
-							if (belt.getFreeSpace() > 0) {
-								child.wdgmsg("take", Coord.z);
-								belt.wdgmsg("drop", belt.isRoom(1, 1));
-							}
-						}
-						// ND: If failed, try to transfer to inventory
-						child.wdgmsg("transfer", Coord.z);
-					}
-				}
-			}
 		}
 	} else {
 	    super.addchild(child, args);
@@ -424,8 +393,8 @@ public class Equipory extends Widget implements DTarget {
 
 	public void tick(double dt) {
 		super.tick(dt);
+		long now = System.currentTimeMillis();
 		if (OptWnd.autoDropLeechesCheckBox.a && myOwnEquipory && checkForLeeches) {
-			long now = System.currentTimeMillis();
 			if ((now - delayedUpdateTime) > 300){
 				for (WItem equippedItem : slots) {
 					if (equippedItem != null && equippedItem.item != null && equippedItem.item.getname() != null && equippedItem.item.getname().contains("Leech")){
@@ -436,7 +405,6 @@ public class Equipory extends Widget implements DTarget {
 			}
 		}
 		if (OptWnd.autoDropTicksCheckBox.a && myOwnEquipory && checkForTicks) {
-			long now = System.currentTimeMillis();
 			if ((now - delayedUpdateTime) > 300){
 				for (WItem equippedItem : slots) {
 					if (equippedItem != null && equippedItem.item != null && equippedItem.item.getname() != null && equippedItem.item.getname().contains("Tick")){
@@ -444,6 +412,44 @@ public class Equipory extends Widget implements DTarget {
 					}
 				}
 				checkForTicks = false;
+			}
+		}
+		if (!myOwnEquipory && !isWardrobe){
+			if ((now - autoLootDelayTime) > 300){
+				for (int slot = 0; slot < slots.length; slot++) {
+					if (slots[slot] != null) {
+						GItem child = slots[slot].item;
+						if (child != null) {
+							if ((OptWnd.autoLootRingsCheckBox.a && (slot == 8 || slot == 9))
+									|| (OptWnd.autoLootNecklaceCheckBox.a && slot == 1)
+									|| (OptWnd.autoLootHelmetCheckBox.a && slot == 0)
+									|| (OptWnd.autoLootChestArmorCheckBox.a && slot == 3)
+									|| (OptWnd.autoLootLegArmorCheckBox.a && slot == 13)
+									|| (OptWnd.autoLootCloakRobeCheckBox.a && slot == 10)
+									|| (OptWnd.autoLootShirtCheckBox.a && slot == 2)
+									|| (OptWnd.autoLootPantsCheckBox.a && slot == 12)
+									|| (OptWnd.autoLootGlovesCheckBox.a && slot == 4)
+									|| (OptWnd.autoLootBootsCheckBox.a && slot == 15)
+									|| (OptWnd.autoLootEyewearCheckBox.a && slot == 17)
+									|| (OptWnd.autoLootMouthCheckBox.a && slot == 18)
+									|| (OptWnd.autoLootCapeCheckBox.a && slot == 14)){
+								child.wdgmsg("transfer", Coord.z);
+							} else if (OptWnd.autoLootWeaponCheckBox.a && (slot == 6 || slot == 7)) { // ND: Weapon special case
+								if (!child.getres().name.equals("gfx/invobjs/small/roundshield")) { // ND: Don't need shields, waste of inventory/belt space
+									Inventory belt = returnBelt();
+									if (belt != null) {
+										if (belt.getFreeSpace() > 0) {
+											child.wdgmsg("take", Coord.z);
+											belt.wdgmsg("drop", belt.isRoom(1, 1));
+										}
+									}
+									// ND: If failed, try to transfer to inventory
+									child.wdgmsg("transfer", Coord.z);
+								}
+							}
+						}
+					}
+				}
 			}
 		}
 		
