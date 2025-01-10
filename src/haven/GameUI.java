@@ -121,7 +121,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 	static public final Resource caveThemeLegacy = Resource.local().loadwait("customclient/sfx/cavetheme_legacy");
 	static public Audio.CS caveThemeClip = null;
 	static public final Resource cabinTheme = Resource.local().loadwait("customclient/sfx/cabintheme");
-	static public final Resource cabinThemeLegacy = Resource.local().loadwait("customclient/sfx/cabintheme_Legacy");
+	static public final Resource cabinThemeLegacy = Resource.local().loadwait("customclient/sfx/cabintheme_legacy");
 	static public Audio.CS cabinThemeClip = null;
 	public static boolean playingPoseSong = false;
 	public static String backgroundPoseSong = "";
