@@ -70,6 +70,8 @@ public class UI {
 	public GameUI gui = null;
 	private final Object guiLock = new Object();
 	public int lastWidgetID = 0;
+	public static Tex province = null;
+	public static Tex realm = null;
 
     {
 	lastevent = lasttick = Utils.rtime();
@@ -512,6 +514,16 @@ public class UI {
 	newwidget(id, type, cargs);
 	if(parent != -1)
 	    addwidget(id, parent, pargs);
+	if (type.startsWith("ui/province")){
+		System.out.println(Arrays.toString(cargs));
+		if (cargs.length == 4) {
+			province = Text.renderstroked(String.format("Province: %s", cargs[0])).tex();
+			realm = Text.renderstroked(String.format("Realm: %s", cargs[3])).tex();
+		} else if (cargs.length == 3) {
+			province = Text.renderstroked(String.format("Province: %s", cargs[0])).tex();
+			realm = Text.renderstroked(String.format("Realm: %s", "-")).tex();
+		}
+	}
     }
 
     public class Grab<E extends Event> {

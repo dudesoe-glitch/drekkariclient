@@ -19,6 +19,8 @@ public class StatusWdg extends Widget {
     public static final boolean iswindows = System.getProperty("os.name").startsWith("Windows");
     private static final Tex hearthlingsplayingdef = Text.renderstroked(String.format("Players Online: %s", "Loading...")).tex();
     private static final Tex pingtimedef = Text.renderstroked(String.format("Ping: %s ms", "?")).tex();
+    public static final Tex provincedef = Text.renderstroked(String.format("Province: %s", "?")).tex();
+    public static final Tex realmdef = Text.renderstroked(String.format("Realm: %s", "?")).tex();
     public Tex players = hearthlingsplayingdef;
     public Tex pingtime = pingtimedef;
     private long lastPingUpdate = System.currentTimeMillis();
@@ -93,13 +95,7 @@ public class StatusWdg extends Widget {
 
     @Override
     public void draw(GOut g) {
-        g.image(players, Coord.z);
-        g.image(pingtime, new Coord(0, players.sz().y));
-
-        int w = players.sz().x;
-        if (pingtime.sz().x > w)
-            w = pingtime.sz().x;
-        this.sz = new Coord(w, players.sz().y + pingtime.sz().y);
+        // ND: This is actually done in GameUI
     }
 
     @Override
