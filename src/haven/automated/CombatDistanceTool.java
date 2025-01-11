@@ -20,7 +20,7 @@ public class CombatDistanceTool extends Window implements Runnable {
     static {
         animalDistances.put("gfx/kritter/adder/adder", 17.1);
         animalDistances.put("gfx/kritter/ant/ant", 15.2);
-        animalDistances.put("gfx/kritter/aurochs/aurochs", 27.0);
+        animalDistances.put("gfx/kritter/cattle/cattle", 27.0);
         animalDistances.put("gfx/kritter/badger/badger", 19.9);
         animalDistances.put("gfx/kritter/bear/bear", 24.7);
         animalDistances.put("gfx/kritter/boar/boar", 25.1);
