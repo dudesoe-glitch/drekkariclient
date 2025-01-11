@@ -89,7 +89,7 @@ public class FoodInfo extends ItemInfo.Tip {
 		boolean calculateEfficiency = ui != null && !ui.modshift;
 		double tableFoodEventBonus = 1.0;
 		Window feastingWindow = null;
-		if (ui != null) {
+		if (ui != null && ui.gui != null && ui.gui.chrwdg != null && ui.gui.chrwdg.battr != null && ui.gui.chrwdg.battr.cons != null && ui.gui.chrwdg.battr.glut != null) {
 			for(int i = 0; i < ui.gui.chrwdg.battr.cons.els.size(); i++) {
 				BAttrWnd.Constipations.El el = ui.gui.chrwdg.battr.cons.els.get(i);
 				for (int type : types) {
