@@ -97,6 +97,7 @@ public class Equipory extends Widget implements DTarget {
 	private Button expandButton = null;
 	public boolean myOwnEquipory = false;
 	public boolean isWardrobe = false;
+	public boolean isMannequin = false;
 	public static CheckBox autoDropLeechesCheckBox;
 	public static CheckBox autoDropTicksCheckBox;
 	public static CheckBox autoEquipBunnySlippersPlateBootsCheckBox;
@@ -121,8 +122,11 @@ public class Equipory extends Widget implements DTarget {
 	if(ava.avagob == -2)
 	    ava.avagob = getparent(GameUI.class).plid;
 	if (parent != null && parent instanceof Window) {
-		if (((Window) parent).cap != null && ((Window) parent).cap.equals("Wardrobe")) {
-			isWardrobe = true;
+		if (((Window) parent).cap != null) {
+			if (((Window) parent).cap.equals("Wardrobe"))
+				isWardrobe = true;
+			if (((Window) parent).cap.equals("Mannequin"))
+				isMannequin = true;
 		}
 	}
 	super.added();
@@ -418,7 +422,7 @@ public class Equipory extends Widget implements DTarget {
 				checkForTicks = false;
 			}
 		}
-		if (!myOwnEquipory && !isWardrobe){
+		if (!myOwnEquipory && !isWardrobe && !isMannequin){
 			if ((now - autoLootDelayTime) > 300){
 				for (int slot = 0; slot < slots.length; slot++) {
 					if (slots[slot] != null) {
