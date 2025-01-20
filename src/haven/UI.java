@@ -515,7 +515,7 @@ public class UI {
 	if(parent != -1)
 	    addwidget(id, parent, pargs);
 	if (type.startsWith("ui/province")){
-		System.out.println(Arrays.toString(cargs));
+//		System.out.println(Arrays.toString(cargs));
 		if (cargs.length == 4) {
 			province = Text.renderstroked(String.format("Province: %s", cargs[0])).tex();
 			realm = Text.renderstroked(String.format("Realm: %s", cargs[3])).tex();
