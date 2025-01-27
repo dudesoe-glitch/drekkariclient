@@ -2709,7 +2709,7 @@ public class OptWnd extends Window {
 					a = val;
 					if (ui != null && ui.gui != null) {
 						ui.gui.optionInfoMsg("Queued Movement - Checkpoint Route Window is now " + (val ? "ENABLED" : "DISABLED") + ".", (val ? msgGreen : msgRed), Audio.resclip(val ? Toggle.sfxon : Toggle.sfxoff));
-						if (!val)
+						if (!val && ui.gui.map.checkpointManager != null)
 							ui.gui.map.checkpointManager.wdgmsg("close");
 					}
 				}
