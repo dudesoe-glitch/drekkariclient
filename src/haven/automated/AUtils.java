@@ -78,7 +78,9 @@ public class AUtils {
         add("gfx/kritter/bat/denmother");
         add("gfx/kritter/bat/fatbat");
 
-
+        add("gfx/kritter/rat/ratking");
+        add("gfx/kritter/rat/fatrat");
+        add("gfx/kritter/rat/blackrat");
 
     }
     };
