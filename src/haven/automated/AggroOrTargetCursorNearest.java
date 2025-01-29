@@ -36,8 +36,8 @@ public class AggroOrTargetCursorNearest implements Runnable {
                         if (isPlayer(clickedGob)) {
                             if (!clickedGob.isFriend()) {
                                 AUtils.attackGob(gui, clickedGob);
-                                return;
                             }
+                            return;
                         }
                         if (potentialAggroTargets.contains(clickedGob.getres().name)) {
                             AUtils.attackGob(gui, clickedGob);
