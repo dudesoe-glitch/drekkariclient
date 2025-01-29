@@ -182,7 +182,7 @@ public class FoodInfo extends ItemInfo.Tip {
 		}
 
 		imgs.add(RichText.render(calculateEfficiency ? "\n$col[185,185,185]{<Hold Shift to Hide Modifiers>}" : "\n$col[218,163,0]{<Showing Unmodified Values>}", 300).img);
-		if (calculateEfficiency) {
+		if (calculateEfficiency && ui != null && ui.gui != null && ui.gui.chrwdg != null && ui.gui.chrwdg.battr != null && ui.gui.chrwdg.battr.glut != null) {
 			if (GameUI.subscribedAccount && GameUI.verifiedAccount) imgs.add(RichText.render("x 1.5 - $col[185,185,185]{Verified} and $col[185,185,185]{Subscribed}", 300).img);
 			else if (GameUI.subscribedAccount) imgs.add(RichText.render("x 1.3 - $col[185,185,185]{Subscribed}", 300).img);
 			else if (GameUI.verifiedAccount) imgs.add(RichText.render("x 1.2 - $col[185,185,185]{Verified}", 300).img);
