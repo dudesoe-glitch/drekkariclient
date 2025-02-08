@@ -41,7 +41,7 @@ public class AlarmManager {
 	// Load settings from file or use defaults if file does not exist
 	public static void load() {
 		alarms.clear();
-		File config = new File("AlarmSounds/settings/yourSavedConfig");
+		File config = new File(haven.MainFrame.gameDir + "AlarmSounds/settings/yourSavedConfig");
 		if(!config.exists()) {
 			defaultSettings();
 		} else {
@@ -73,7 +73,7 @@ public class AlarmManager {
 	// Save current settings to file
 	public static void save() {
 		try {
-			BufferedWriter bw = Files.newBufferedWriter(Paths.get(new File("AlarmSounds/settings/yourSavedConfig").toURI()), StandardCharsets.UTF_8);
+			BufferedWriter bw = Files.newBufferedWriter(Paths.get(new File(haven.MainFrame.gameDir + "AlarmSounds/settings/yourSavedConfig").toURI()), StandardCharsets.UTF_8);
 			for(Map.Entry<String, Alarm> e : alarms.entrySet()) {
 				bw.write(e.getKey() + ";" + e.getValue().enabled + ";" + e.getValue().alarmName + ";" + e.getValue().filePath.replace(".wav", "") + ";" + e.getValue().volume + ";" + e.getValue().knocked+"\n");
 			}
@@ -97,7 +97,7 @@ public class AlarmManager {
 	// Loads the default settings
 	public static void defaultSettings() {
 		alarms.clear();
-		loadFromFile(new File("AlarmSounds/settings/defaultAlarms"));
+		loadFromFile(new File(haven.MainFrame.gameDir + "AlarmSounds/settings/defaultAlarms"));
 	}
 
 	public static class Alarm {
@@ -116,7 +116,7 @@ public class AlarmManager {
 
 		public void play() {
 			String filePath2 = filePath.endsWith(".wav") ? filePath : filePath + ".wav";
-			File file = new File("AlarmSounds/" + filePath2);
+			File file = new File(haven.MainFrame.gameDir + "AlarmSounds/" + filePath2);
 			if(!file.exists()) {
 				System.out.println("Error while playing an alarm, file " + file.getAbsolutePath() + " does not exist!");
 				return;

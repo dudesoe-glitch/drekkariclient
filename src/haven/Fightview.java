@@ -452,7 +452,7 @@ public class Fightview extends Widget {
 
 				if(OptWnd.cleaveSoundEnabledCheckbox.a && res.basename().endsWith("cleave")) {
 					try {
-						File file = new File("AlarmSounds/" + OptWnd.cleaveSoundFilename.buf.line() + ".wav");
+						File file = new File(haven.MainFrame.gameDir + "AlarmSounds/" + OptWnd.cleaveSoundFilename.buf.line() + ".wav");
 						if(!file.exists()) {
 							return;
 						}
@@ -466,7 +466,7 @@ public class Fightview extends Widget {
 					}
 				} else if (OptWnd.opkSoundEnabledCheckbox.a &&res.basename().endsWith("oppknock")) {
 					try {
-						File file = new File("AlarmSounds/" + OptWnd.opkSoundFilename.buf.line() + ".wav");
+						File file = new File(haven.MainFrame.gameDir + "AlarmSounds/" + OptWnd.opkSoundFilename.buf.line() + ".wav");
 						if(!file.exists()) {
 							return;
 						}

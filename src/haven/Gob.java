@@ -2248,7 +2248,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	private void playPlayerColorAlarm(Boolean enabled, String line, int val) {
 		if (enabled) {
 			try {
-				File file = new File("AlarmSounds/" + line + ".wav");
+				File file = new File(haven.MainFrame.gameDir + "AlarmSounds/" + line + ".wav");
 				if (file.exists()) {
 					AudioInputStream in = AudioSystem.getAudioInputStream(file);
 					AudioFormat tgtFormat = new AudioFormat(AudioFormat.Encoding.PCM_SIGNED, 44100, 16, 2, 4, 44100, false);

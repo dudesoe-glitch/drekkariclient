@@ -362,7 +362,7 @@ public class AlarmWindow extends Window {
 				public boolean mousedown(MouseDownEvent ev) {
 					if(ev.b != 1)
 						return true;
-					File file = new File("AlarmSounds/" + getAlarmFilename());
+					File file = new File(haven.MainFrame.gameDir + "AlarmSounds/" + getAlarmFilename());
 					if(!file.exists() || file.isDirectory()) {
 						if (ui != null && ui.gui != null)
 							ui.gui.msg("Error while playing an alarm, file " + file.getAbsolutePath() + " does not exist!", Color.WHITE);

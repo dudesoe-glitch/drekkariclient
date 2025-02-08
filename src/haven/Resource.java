@@ -843,7 +843,7 @@ public class Resource implements Serializable {
 	    synchronized(Resource.class) {
 		if(_local == null) {
 //		    Pool local = new Pool(new JarSource("res"));
-			Pool local = new Pool(new FileSource(Utils.path("res"))); // ND: Load custom res files from the client folder
+			Pool local = new Pool(new FileSource(Utils.path(haven.MainFrame.gameDir + "res"))); // ND: Load custom res files from the client folder
 			local.add(new JarSource("res"));
 		    try {
 			if(resdir.get() != null)

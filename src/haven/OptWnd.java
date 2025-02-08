@@ -3675,7 +3675,7 @@ public class OptWnd extends Window {
 				public boolean mousedown(MouseDownEvent ev) {
 					if(ev.b != 1)
 						return true;
-					File file = new File("AlarmSounds/" + whitePlayerAlarmFilename.buf.line() + ".wav");
+					File file = new File(haven.MainFrame.gameDir + "AlarmSounds/" + whitePlayerAlarmFilename.buf.line() + ".wav");
 					if(!file.exists() || file.isDirectory()) {
 						if (ui != null && ui.gui != null)
 							ui.gui.msg("Error while playing an alarm, file " + file.getAbsolutePath() + " does not exist!", Color.WHITE);
@@ -3722,7 +3722,7 @@ public class OptWnd extends Window {
 				public boolean mousedown(MouseDownEvent ev) {
 					if(ev.b != 1)
 						return true;
-					File file = new File("AlarmSounds/" + whiteVillageOrRealmPlayerAlarmFilename.buf.line() + ".wav");
+					File file = new File(haven.MainFrame.gameDir + "AlarmSounds/" + whiteVillageOrRealmPlayerAlarmFilename.buf.line() + ".wav");
 					if(!file.exists() || file.isDirectory()) {
 						if (ui != null && ui.gui != null)
 							ui.gui.msg("Error while playing an alarm, file " + file.getAbsolutePath() + " does not exist!", Color.WHITE);
@@ -3770,7 +3770,7 @@ public class OptWnd extends Window {
 				public boolean mousedown(MouseDownEvent ev) {
 					if(ev.b != 1)
 						return true;
-					File file = new File("AlarmSounds/" + greenPlayerAlarmFilename.buf.line() + ".wav");
+					File file = new File(haven.MainFrame.gameDir + "AlarmSounds/" + greenPlayerAlarmFilename.buf.line() + ".wav");
 					if(!file.exists() || file.isDirectory()) {
 						if (ui != null && ui.gui != null)
 							ui.gui.msg("Error while playing an alarm, file " + file.getAbsolutePath() + " does not exist!", Color.WHITE);
@@ -3818,7 +3818,7 @@ public class OptWnd extends Window {
 				public boolean mousedown(MouseDownEvent ev) {
 					if(ev.b != 1)
 						return true;
-					File file = new File("AlarmSounds/" + redPlayerAlarmFilename.buf.line() + ".wav");
+					File file = new File(haven.MainFrame.gameDir + "AlarmSounds/" + redPlayerAlarmFilename.buf.line() + ".wav");
 					if(!file.exists() || file.isDirectory()) {
 						if (ui != null && ui.gui != null)
 							ui.gui.msg("Error while playing an alarm, file " + file.getAbsolutePath() + " does not exist!", Color.WHITE);
@@ -3866,7 +3866,7 @@ public class OptWnd extends Window {
 				public boolean mousedown(MouseDownEvent ev) {
 					if(ev.b != 1)
 						return true;
-					File file = new File("AlarmSounds/" + bluePlayerAlarmFilename.buf.line() + ".wav");
+					File file = new File(haven.MainFrame.gameDir + "AlarmSounds/" + bluePlayerAlarmFilename.buf.line() + ".wav");
 					if(!file.exists() || file.isDirectory()) {
 						if (ui != null && ui.gui != null)
 							ui.gui.msg("Error while playing an alarm, file " + file.getAbsolutePath() + " does not exist!", Color.WHITE);
@@ -3914,7 +3914,7 @@ public class OptWnd extends Window {
 				public boolean mousedown(MouseDownEvent ev) {
 					if(ev.b != 1)
 						return true;
-					File file = new File("AlarmSounds/" + tealPlayerAlarmFilename.buf.line() + ".wav");
+					File file = new File(haven.MainFrame.gameDir + "AlarmSounds/" + tealPlayerAlarmFilename.buf.line() + ".wav");
 					if(!file.exists() || file.isDirectory()) {
 						if (ui != null && ui.gui != null)
 							ui.gui.msg("Error while playing an alarm, file " + file.getAbsolutePath() + " does not exist!", Color.WHITE);
@@ -3962,7 +3962,7 @@ public class OptWnd extends Window {
 				public boolean mousedown(MouseDownEvent ev) {
 					if(ev.b != 1)
 						return true;
-					File file = new File("AlarmSounds/" + yellowPlayerAlarmFilename.buf.line() + ".wav");
+					File file = new File(haven.MainFrame.gameDir + "AlarmSounds/" + yellowPlayerAlarmFilename.buf.line() + ".wav");
 					if(!file.exists() || file.isDirectory()) {
 						if (ui != null && ui.gui != null)
 							ui.gui.msg("Error while playing an alarm, file " + file.getAbsolutePath() + " does not exist!", Color.WHITE);
@@ -4010,7 +4010,7 @@ public class OptWnd extends Window {
 				public boolean mousedown(MouseDownEvent ev) {
 					if(ev.b != 1)
 						return true;
-					File file = new File("AlarmSounds/" + purplePlayerAlarmFilename.buf.line() + ".wav");
+					File file = new File(haven.MainFrame.gameDir + "AlarmSounds/" + purplePlayerAlarmFilename.buf.line() + ".wav");
 					if(!file.exists() || file.isDirectory()) {
 						if (ui != null && ui.gui != null)
 							ui.gui.msg("Error while playing an alarm, file " + file.getAbsolutePath() + " does not exist!", Color.WHITE);
@@ -4058,7 +4058,7 @@ public class OptWnd extends Window {
 				public boolean mousedown(MouseDownEvent ev) {
 					if(ev.b != 1)
 						return true;
-					File file = new File("AlarmSounds/" + orangePlayerAlarmFilename.buf.line() + ".wav");
+					File file = new File(haven.MainFrame.gameDir + "AlarmSounds/" + orangePlayerAlarmFilename.buf.line() + ".wav");
 					if(!file.exists() || file.isDirectory()) {
 						if (ui != null && ui.gui != null)
 							ui.gui.msg("Error while playing an alarm, file " + file.getAbsolutePath() + " does not exist!", Color.WHITE);
@@ -4109,7 +4109,7 @@ public class OptWnd extends Window {
 				public boolean mousedown(MouseDownEvent ev) {
 					if(ev.b != 1)
 						return true;
-					File file = new File("AlarmSounds/" + combatStartSoundFilename.buf.line() + ".wav");
+					File file = new File(haven.MainFrame.gameDir + "AlarmSounds/" + combatStartSoundFilename.buf.line() + ".wav");
 					if(!file.exists() || file.isDirectory()) {
 						if (ui != null && ui.gui != null)
 							ui.gui.msg("Error while playing an alarm, file " + file.getAbsolutePath() + " does not exist!", Color.WHITE);
@@ -4157,7 +4157,7 @@ public class OptWnd extends Window {
 				public boolean mousedown(MouseDownEvent ev) {
 					if(ev.b != 1)
 						return true;
-					File file = new File("AlarmSounds/" + cleaveSoundFilename.buf.line() + ".wav");
+					File file = new File(haven.MainFrame.gameDir + "AlarmSounds/" + cleaveSoundFilename.buf.line() + ".wav");
 					if(!file.exists() || file.isDirectory()) {
 						if (ui != null && ui.gui != null)
 							ui.gui.msg("Error while playing an alarm, file " + file.getAbsolutePath() + " does not exist!", Color.WHITE);
@@ -4205,7 +4205,7 @@ public class OptWnd extends Window {
 				public boolean mousedown(MouseDownEvent ev) {
 					if(ev.b != 1)
 						return true;
-					File file = new File("AlarmSounds/" + opkSoundFilename.buf.line() + ".wav");
+					File file = new File(haven.MainFrame.gameDir + "AlarmSounds/" + opkSoundFilename.buf.line() + ".wav");
 					if(!file.exists() || file.isDirectory()) {
 						if (ui != null && ui.gui != null)
 							ui.gui.msg("Error while playing an alarm, file " + file.getAbsolutePath() + " does not exist!", Color.WHITE);
@@ -4253,7 +4253,7 @@ public class OptWnd extends Window {
 				public boolean mousedown(MouseDownEvent ev) {
 					if(ev.b != 1)
 						return true;
-					File file = new File("AlarmSounds/" + ponyPowerSoundFilename.buf.line() + ".wav");
+					File file = new File(haven.MainFrame.gameDir + "AlarmSounds/" + ponyPowerSoundFilename.buf.line() + ".wav");
 					if(!file.exists() || file.isDirectory()) {
 						if (ui != null && ui.gui != null)
 							ui.gui.msg("Error while playing an alarm, file " + file.getAbsolutePath() + " does not exist!", Color.WHITE);
@@ -4300,7 +4300,7 @@ public class OptWnd extends Window {
 				public boolean mousedown(MouseDownEvent ev) {
 					if(ev.b != 1)
 						return true;
-					File file = new File("AlarmSounds/" + lowEnergySoundFilename.buf.line() + ".wav");
+					File file = new File(haven.MainFrame.gameDir + "AlarmSounds/" + lowEnergySoundFilename.buf.line() + ".wav");
 					if(!file.exists() || file.isDirectory()) {
 						if (ui != null && ui.gui != null)
 							ui.gui.msg("Error while playing an alarm, file " + file.getAbsolutePath() + " does not exist!", Color.WHITE);

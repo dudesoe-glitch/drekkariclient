@@ -43,6 +43,8 @@ public class MainFrame extends java.awt.Frame implements Console.Directory, AWTE
     boolean fullscreen;
     DisplayMode fsmode = null, prefs = null;
     Coord prefssz = null;
+	public static String gameDir = null;
+	public static boolean runningThroughSteam = true;
 	
     public static void initawt() {
 	try {
@@ -57,6 +59,14 @@ public class MainFrame extends java.awt.Frame implements Console.Directory, AWTE
 
 	static {
 		try {
+			if (gameDir == null) {
+				if((SteamStore.steamsvc.get() != null) && (Steam.get() != null)) {
+					gameDir = System.getProperty("user.dir") + File.separator + ".." + File.separator + ".." + File.separator + "workshop" + File.separator + "content" + File.separator + "3051280" + File.separator + "3423755273" + File.separator;
+				}
+				else {
+					gameDir = "";
+				}
+			}
 			FlowerMenu.createDatabaseIfNotExist();
 			FlowerMenu.fillAutoChooseMap();
 		} catch (SQLException e) {
@@ -497,6 +507,10 @@ public class MainFrame extends java.awt.Frame implements Console.Directory, AWTE
 	main.start();
 	GobIcon.initPresets();
 	AlarmManager.init();
+	String runningThroughSteamValue = System.getProperty("runningThroughSteam");
+	if (runningThroughSteamValue != null) {
+		runningThroughSteam = Boolean.parseBoolean(runningThroughSteamValue);
+	}
     }
 	
     private static void dumplist(Collection<Resource> list, Path fn) {

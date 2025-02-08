@@ -46,6 +46,7 @@ public class LoginScreen extends Widget {
     public static final Tex bg = Resource.loadtex("gfx/loginscr");
     public static final Position bgc = new Position(UI.scale(533, 250)); // ND: This affects only the login screen username/password location
     public final Widget login;
+	public Widget loginSteam = null;
     public final String hostname;
     private Text error, progress;
     private Button optbtn;
@@ -83,17 +84,20 @@ public class LoginScreen extends Widget {
 	optbtn.setgkey(GameUI.kb_opt);
 //	if(HttpStatus.mond.get() != null)
 //	    adda(new StatusLabel(HttpStatus.mond.get(), 1.0), sz.x - UI.scale(10), UI.scale(10), 1.0, 0.0);
-	switch(authmech.get()) {
-	case "native":
-	    login = new Credbox();
-	    break;
-	case "steam":
-	    login = new Steambox();
-	    break;
-	default:
-	    throw(new RuntimeException("Unknown authmech: " + authmech.get()));
-	}
+//	switch(authmech.get()) {
+//	case "native":
+//	    login = new Credbox();
+//	    break;
+//	case "steam":
+//	    login = new Steambox();
+//	    break;
+//	default:
+//	    throw(new RuntimeException("Unknown authmech: " + authmech.get()));
+//	}
+	login = new Credbox();
 	adda(login, bgc.adds(0, 10), 0.5, 0.0).hide();
+	loginSteam = new Steambox();
+	adda(loginSteam, bgc.adds(0, 10), -1.0, 0.0).hide();
 	accounts = add(new AccountList(16));
 	try {
 		adda(new StatusLabel(new URI("http", hostname, "/mt/srv-mon", null), 0.5), bgc.x, bg.sz().y, 0.5, 1.4); // ND: This adds the server status and player count
@@ -358,12 +362,12 @@ public class LoginScreen extends Widget {
 	}
     }
 
-    private static boolean steam_autologin = true;
+    private static boolean steam_autologin = false;
     public class Steambox extends Widget {
 
 	private Steambox() {
 	    super(UI.scale(200, 150));
-	    Widget prev = adda(new Label("Logging in with Steam", textf), sz.x / 2, 0, 0.5, 0);
+	    Widget prev = adda(new Label("Login through Steam", textf), sz.x / 2, 0, 0.5, 0);
 	    adda(new IButton("gfx/hud/buttons/login", "u", "d", "o") {
 		    protected void depress() {ui.sfx(Button.clbtdown.stream());}
 		    protected void unpress() {ui.sfx(Button.clbtup.stream());}
@@ -439,6 +443,10 @@ public class LoginScreen extends Widget {
 
     private void mklogin() {
 	login.show();
+	if (haven.MainFrame.runningThroughSteam) {
+		if (Steam.get() != null)
+			loginSteam.show();
+	}
 	progress(null);
     }
 
@@ -458,6 +466,10 @@ public class LoginScreen extends Widget {
 
     private void clear() {
 	login.hide();
+	if (haven.MainFrame.runningThroughSteam) {
+		if (Steam.get() != null)
+			loginSteam.hide();
+	}
 	progress(null);
     }
 

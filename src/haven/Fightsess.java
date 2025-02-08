@@ -119,7 +119,7 @@ public class Fightsess extends Widget {
 	    int nact = Utils.iv(args[0]);
 		if(OptWnd.combatStartSoundEnabledCheckbox.a) {
 			try {
-				File file = new File("AlarmSounds/" + OptWnd.combatStartSoundFilename.buf.line() + ".wav");
+				File file = new File(haven.MainFrame.gameDir + "AlarmSounds/" + OptWnd.combatStartSoundFilename.buf.line() + ".wav");
 				if(file.exists()) {
 					AudioInputStream in = AudioSystem.getAudioInputStream(file);
 					AudioFormat tgtFormat = new AudioFormat(AudioFormat.Encoding.PCM_SIGNED, 44100, 16, 2, 4, 44100, false);
