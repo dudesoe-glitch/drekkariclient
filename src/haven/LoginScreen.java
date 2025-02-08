@@ -443,10 +443,8 @@ public class LoginScreen extends Widget {
 
     private void mklogin() {
 	login.show();
-	if (haven.MainFrame.runningThroughSteam) {
-		if (Steam.get() != null)
-			loginSteam.show();
-	}
+	if (Steam.get() != null)
+		loginSteam.show();
 	progress(null);
     }
 
@@ -466,10 +464,8 @@ public class LoginScreen extends Widget {
 
     private void clear() {
 	login.hide();
-	if (haven.MainFrame.runningThroughSteam) {
-		if (Steam.get() != null)
-			loginSteam.hide();
-	}
+	if (Steam.get() != null)
+		loginSteam.hide();
 	progress(null);
     }
 

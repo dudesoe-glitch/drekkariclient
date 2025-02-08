@@ -142,14 +142,16 @@ public class Steam {
 
     private static Steam instance = null;
     public static synchronized Steam get() {
-	if(instance == null) {
-	    try {
-		if(!API.init())
-		    return(null);
-	    } catch(NoClassDefFoundError e) {
-		return(null);
-	    }
-	    instance = new Steam();
+	if (MainFrame.runningThroughSteam) {
+		if (instance == null) {
+			try {
+				if (!API.init())
+					return (null);
+			} catch (NoClassDefFoundError e) {
+				return (null);
+			}
+			instance = new Steam();
+		}
 	}
 	return(instance);
     }
