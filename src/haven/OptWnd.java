@@ -1977,6 +1977,9 @@ public class OptWnd extends Window {
 				{a = (Utils.getprefb("alsoShowOversizedTreesAbovePercentage", true));}
 				public void changed(boolean val) {
 					Utils.setprefb("alsoShowOversizedTreesAbovePercentage", val);
+					if (ui != null && ui.gui != null) {
+						ui.sess.glob.oc.gobAction(Gob::refreshGrowthInfo);
+					}
 				}
 			}, middleColumn.pos("bl").adds(12, 2));
 			add(oversizedTreesPercentageTextEntry = new TextEntry(UI.scale(36), Utils.getpref("oversizedTreesPercentage", "150")){
