@@ -2470,4 +2470,12 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 		return null;
 	}
 
+	public void reloadPalisadeScale(){
+		if (getres() != null) {
+			if ((getres().name.startsWith("gfx/terobjs/arch/palisade") || getres().name.startsWith("gfx/terobjs/arch/brickwall")) && !getres().name.contains("gate")) {
+				customSizeAndRotation.update(this);
+			}
+		}
+	}
+
 }

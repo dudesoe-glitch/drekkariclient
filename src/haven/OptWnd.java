@@ -3083,6 +3083,8 @@ public class OptWnd extends Window {
 	public static CheckBox disableOpiumHighCheckBox;
 	public static CheckBox disableLibertyCapsHighCheckBox;
 	public static CheckBox disableDrunkennessDistortionCheckBox;
+	public static HSlider palisadeAndWallScaleSlider;
+	private Button palisadeAndWallScaleResetButton;
 
 	public class WorldGraphicsSettingsPanel extends Panel {
 
@@ -3246,6 +3248,27 @@ public class OptWnd extends Window {
 				}
 			}, leftColumn.pos("bl").adds(0, 2));
 
+			leftColumn = add(new Label("Palisades & Walls Scale:"), leftColumn.pos("bl").adds(0, 10).x(0));
+			leftColumn = add(palisadeAndWallScaleSlider = new HSlider(UI.scale(200), 40, 100, Utils.getprefi("palisadeAndWallScale", 100)) {
+				protected void attach(UI ui) {
+					super.attach(ui);
+					val = Utils.getprefi("palisadeAndWallScale", 100);
+				}
+				public void changed() {
+					Utils.setprefi("palisadeAndWallScale", val);
+					if (ui != null && ui.gui != null) {
+						ui.sess.glob.oc.gobAction(Gob::reloadPalisadeScale);
+					}
+				}
+			}, leftColumn.pos("bl").adds(0, 6));
+			add(palisadeAndWallScaleResetButton = new Button(UI.scale(70), "Reset", false).action(() -> {
+				palisadeAndWallScaleSlider.val = 100;
+				if (ui != null && ui.gui != null)
+					ui.sess.glob.oc.gobAction(Gob::reloadPalisadeScale);
+				Utils.setprefi("palisadeAndWallScale", 100);
+			}), leftColumn.pos("bl").adds(210, -20));
+			palisadeAndWallScaleResetButton.tooltip = resetButtonTooltip;
+
 			rightColumn = add(new Label("Trees & Bushes Scale:"), UI.scale(290, 0));
 			rightColumn = add(treeAndBushScaleSlider = new HSlider(UI.scale(200), 30, 100, Utils.getprefi("treeAndBushScale", 100)) {
 				protected void attach(UI ui) {
@@ -3394,7 +3417,7 @@ public class OptWnd extends Window {
 			}, rightColumn.pos("bl").adds(0, 2));
 
 			Widget backButton;
-			add(backButton = new PButton(UI.scale(200), "Back", 27, back, "Advanced Settings"), rightColumn.pos("bl").adds(0, 38));
+			add(backButton = new PButton(UI.scale(200), "Back", 27, back, "Advanced Settings"), leftColumn.pos("bl").adds(0, 38));
 			pack();
 			centerBackButton(backButton, this);
 		}
