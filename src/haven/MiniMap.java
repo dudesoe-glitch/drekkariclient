@@ -27,6 +27,8 @@
 package haven;
 
 import haven.render.*;
+
+import java.awt.image.BufferedImage;
 import java.util.*;
 import java.util.function.*;
 import java.awt.Color;
@@ -46,7 +48,19 @@ import static haven.OCache.posres;
 public class MiniMap extends Widget {
     public static final Tex bg = Resource.loadtex("gfx/hud/mmap/ptex");
     public static final Tex nomap = Resource.loadtex("gfx/hud/mmap/nomap");
-    public static final Tex plp = ((TexI)Resource.loadtex("gfx/hud/mmap/plp")).filter(Texture.Filter.LINEAR);
+    public static Tex plp;
+	public static final Resource.Image plpImg = Resource.local().loadwait("gfx/hud/mmap/plp").layer(Resource.imgc);
+	static {
+		BufferedImage buf = MiniMap.plpImg.img;
+		buf = PUtils.rasterimg(PUtils.blurmask2(buf.getRaster(), 1, 1, Color.BLACK));
+		Coord tsz;
+		if(buf.getWidth() > buf.getHeight())
+			tsz = new Coord(GobIcon.size, (GobIcon.size * buf.getHeight()) / buf.getWidth());
+		else
+			tsz = new Coord((GobIcon.size * buf.getWidth()) / buf.getHeight(), GobIcon.size);
+		buf = PUtils.convolve(buf, tsz, GobIcon.filter);
+		plp = new TexI(buf);
+	}
     public final MapFile file;
     public Location curloc;
     public Location sessloc;

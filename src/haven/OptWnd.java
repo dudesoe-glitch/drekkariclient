@@ -38,6 +38,7 @@ import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
@@ -633,6 +634,7 @@ public class OptWnd extends Window {
 	public static CheckBox alwaysShowCombatUIHealthBarCheckBox;
 	public static HSlider mapZoomSpeedSlider;
 	public static CheckBox alwaysOpenMiniStudyOnLoginCheckBox;
+	public static HSlider mapIconsSizeSlider;
 
     public class InterfaceSettingsPanel extends Panel {
 	public InterfaceSettingsPanel(Panel back) {
@@ -841,6 +843,43 @@ public class OptWnd extends Window {
 		add(new Button(UI.scale(60), "Reset", false).action(() -> {
 			mapZoomSpeedSlider.val = 15;
 			Utils.setprefi("mapZoomSpeed", 15);
+		}), rightColumn.pos("ur").adds(6, -4));
+
+		rightColumn = add(new Label("Map Icons Size:"), rightColumn.pos("bl").adds(0, 10).x(UI.scale(230)));
+		rightColumn = add(mapIconsSizeSlider = new HSlider(UI.scale(110), 16, 40, Utils.getprefi("mapIconsSize", 20)) {
+			public void changed() {
+				Utils.setprefi("mapIconsSize", val);
+				GobIcon.size = UI.scale(val);
+				synchronized(GobIcon.Image.cache) {
+					GobIcon.Image.cache.clear();
+				}
+				BufferedImage buf = MiniMap.plpImg.img;
+				buf = PUtils.rasterimg(PUtils.blurmask2(buf.getRaster(), 1, 1, Color.BLACK));
+				Coord tsz;
+				if(buf.getWidth() > buf.getHeight())
+					tsz = new Coord(GobIcon.size, (GobIcon.size * buf.getHeight()) / buf.getWidth());
+				else
+					tsz = new Coord((GobIcon.size * buf.getWidth()) / buf.getHeight(), GobIcon.size);
+				buf = PUtils.convolve(buf, tsz, GobIcon.filter);
+				MiniMap.plp = new TexI(buf);
+			}
+		}, rightColumn.pos("bl").adds(0, 4));
+		add(new Button(UI.scale(60), "Reset", false).action(() -> {
+			mapIconsSizeSlider.val = 20;
+			GobIcon.size = UI.scale(20);
+			synchronized(GobIcon.Image.cache) {
+				GobIcon.Image.cache.clear();
+			}
+			Utils.setprefi("mapIconsSize", 20);
+			BufferedImage buf = MiniMap.plpImg.img;
+			buf = PUtils.rasterimg(PUtils.blurmask2(buf.getRaster(), 1, 1, Color.BLACK));
+			Coord tsz;
+			if(buf.getWidth() > buf.getHeight())
+				tsz = new Coord(GobIcon.size, (GobIcon.size * buf.getHeight()) / buf.getWidth());
+			else
+				tsz = new Coord((GobIcon.size * buf.getWidth()) / buf.getHeight(), GobIcon.size);
+			buf = PUtils.convolve(buf, tsz, GobIcon.filter);
+			MiniMap.plp = new TexI(buf);
 		}), rightColumn.pos("ur").adds(6, -4));
 
 		Widget backButton;

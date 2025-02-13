@@ -15,6 +15,7 @@ public class Player extends GobIcon.Icon {
     public static final Resource.Image img = Resource.local().loadwait("customclient/mapicons/playerIcon").layer(Resource.imgc);
     public final Gob gob = owner.fcontext(Gob.class, false);
     public final int group;
+	public final Tex tex;
 
     public Player(OwnerContext owner, Resource res, int group) {
 	super(owner, res);
@@ -24,6 +25,17 @@ public class Player extends GobIcon.Icon {
 	    if((buddy != null) && (buddy.buddy() == null) && (buddy.customName == null))
 		throw(new Loading("Waiting for group-info..."));
 	}
+	// ND: Do this following stuff for the map icon scale setting
+	BufferedImage buf = img.img;
+	buf = PUtils.rasterimg(PUtils.blurmask2(buf.getRaster(), 1, 1, Color.BLACK));
+	Coord tsz;
+	if(buf.getWidth() > buf.getHeight())
+		tsz = new Coord(GobIcon.size, (GobIcon.size * buf.getHeight()) / buf.getWidth());
+	else
+		tsz = new Coord((GobIcon.size * buf.getWidth()) / buf.getHeight(), GobIcon.size);
+	buf = PUtils.convolve(buf, tsz, GobIcon.filter);
+	this.tex = new TexI(buf);
+
     }
 
     public Player(OwnerContext owner, Resource res) {
@@ -66,12 +78,12 @@ public class Player extends GobIcon.Icon {
     public void draw(GOut g, Coord cc) {
 	Color col = Utils.colmul(g.getcolor(), color());
 	g.chcolor(col);
-	g.rotimage(img.tex(), cc, img.ssz.div(2), -gob.a - (Math.PI * 0.5));
+	g.rotimage(tex, cc, tex.sz().div(2), -gob.a - (Math.PI * 0.5));
 	g.chcolor();
     }
 
     public boolean checkhit(Coord c) {
-	return(c.isect(img.ssz.div(2).inv(), img.ssz));
+	return(c.isect(tex.sz().div(2).inv(), tex.sz()));
     }
 
     public int z() {return(img.z);}
