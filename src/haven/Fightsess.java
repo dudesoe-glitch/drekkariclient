@@ -27,7 +27,7 @@
 package haven;
 
 import haven.render.*;
-import haven.sprites.CurrentTargetSprite;
+import haven.sprites.CurrentAggroSprite;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
@@ -928,7 +928,7 @@ public class Fightsess extends Widget {
 		}
 		if((cur == null) || (cur.slot == null)) {
 			try {
-				cur = new Effect(new CurrentTargetSprite(null));
+				cur = new Effect(new CurrentAggroSprite(null));
 				cur.slot = map.basic.add(cur.spr, place);
 			} catch(Loading l) {
 				return(null);

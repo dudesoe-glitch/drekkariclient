@@ -624,4 +624,8 @@ public abstract class Message {
 		}
 		return false;
 	}
+
+	public Coord2d coordf16() {
+		return new Coord2d((double)this.float16(), (double)this.float16());
+	}
 }
