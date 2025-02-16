@@ -1819,6 +1819,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 	public static KeyBinding kb_toggleHidingBoxes  = KeyBinding.get("toggleHidingBoxesKB",  KeyMatch.forchar('H', KeyMatch.C));
 	public static KeyBinding kb_toggleCollisionBoxes  = KeyBinding.get("toggleCollisionBoxesKB",  KeyMatch.forchar('B', KeyMatch.S));
 	public static KeyBinding kb_toggleGrowthInfo  = KeyBinding.get("toggleGrowthInfoKB",  KeyMatch.forchar('I',  KeyMatch.C | KeyMatch.S));
+	public static KeyBinding kb_toggleSpeedInfo  = KeyBinding.get("toggleSpeedInfoKB",  KeyMatch.forchar('S',  KeyMatch.C | KeyMatch.S));
 	public static KeyBinding kb_toggleCursorItem = KeyBinding.get("toggleCursorItemKB",  KeyMatch.nil);
 	public static KeyBinding kb_lootNearestKnockedPlayer = KeyBinding.get("lootNearestKnockedPlayerKB",  KeyMatch.forchar('D', KeyMatch.S));
 	public static KeyBinding kb_instantLogout = KeyBinding.get("instantLogoutKB",  KeyMatch.nil);
@@ -1954,6 +1955,9 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 		return(true);
 	} else if(kb_toggleGrowthInfo.key().match(ev)) {
 		OptWnd.displayGrowthInfoCheckBox.set(!OptWnd.displayGrowthInfoCheckBox.a);
+		return(true);
+	} else if(kb_toggleSpeedInfo.key().match(ev)) {
+		OptWnd.showObjectsSpeedCheckBox.set(!OptWnd.showObjectsSpeedCheckBox.a);
 		return(true);
 	} else if(kb_toggleCursorItem.key().match(ev)) {
 		toggleCursorItem();

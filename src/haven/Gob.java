@@ -108,6 +108,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	BarrelContentsGobInfo barrelContentsGobInfo;
 	IconSignGobInfo iconSignGobInfo;
 	public boolean combatFoeHighlighted = false;
+	private GobSpeedInfo gobSpeedInfo;
 
     public static class Overlay implements RenderTree.Node {
 	public final int id;
@@ -812,6 +813,10 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 		if (gobChaseVector != null) {
 			gobChaseVector.remove();
 			gobChaseVector = null;
+		}
+		if (gobSpeedInfo == null) {
+			gobSpeedInfo = new GobSpeedInfo(this);
+			setattr(GobSpeedInfo.class, gobSpeedInfo);
 		}
 	}
 	if (a instanceof Homing) {

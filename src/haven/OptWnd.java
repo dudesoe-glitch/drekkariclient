@@ -1461,11 +1461,11 @@ public class OptWnd extends Window {
 	public static CheckBox showCirclesUnderCombatFoesCheckBox;
 	public static ColorOptionWidget combatFoeColorOptionWidget;
 	public static String[] combatFoeColorSetting = Utils.getprefsa("combatFoe" + "_colorSetting", new String[]{"160", "0", "0", "164"});
-
 	public static ColorOptionWidget areaChatPingColorOptionWidget;
 	public static String[] areaChatPingColorSetting = Utils.getprefsa("areaChatPing" + "_colorSetting", new String[]{"255", "183", "0", "255"});
 	public static ColorOptionWidget partyChatPingColorOptionWidget;
 	public static String[] partyChatPingColorSetting = Utils.getprefsa("partyChatPing" + "_colorSetting", new String[]{"243", "0", "0", "255"});
+	public static CheckBox showObjectsSpeedCheckBox;
 
 	public static CheckBox objectPermanentHighlightingCheckBox;
 
@@ -2141,6 +2141,17 @@ public class OptWnd extends Window {
 				Utils.setprefsa("partyChatPing" + "_colorSetting", new String[]{"243", "0", "0", "255"});
 				partyChatPingColorOptionWidget.cb.colorChooser.setColor(partyChatPingColorOptionWidget.currentColor = new Color(243, 0, 0, 255));
 			}), partyChatPingColorOptionWidget.pos("ur").adds(10, 0));
+			rightColumn = add(showObjectsSpeedCheckBox = new CheckBox("Show Objects Speed"){
+				{a = Utils.getprefb("showObjectsSpeed", false);}
+				public void set(boolean val) {
+					Utils.setprefb("showObjectsSpeed", val);
+					a = val;
+					if (ui != null && ui.gui != null) {
+						ui.gui.optionInfoMsg("Objects Speed is now " + (val ? "SHOWN" : "HIDDEN") + "!", (val ? msgGreen : msgGray), Audio.resclip(val ? Toggle.sfxon : Toggle.sfxoff));
+					}
+				}
+			}, rightColumn.pos("bl").adds(0, 12));
+			showObjectsSpeedCheckBox.tooltip = showObjectsSpeedTooltip;
 
 			Widget backButton;
 			add(backButton = new PButton(UI.scale(200), "Back", 27, back, "Advanced Settings"), leftColumn.pos("bl").adds(0, 18).x(0));
@@ -2473,6 +2484,7 @@ public class OptWnd extends Window {
 		y = addbtn(cont, "Toggle Collision Boxes", GameUI.kb_toggleCollisionBoxes, y);
 		y = addbtn(cont, "Toggle Object Hiding", GameUI.kb_toggleHidingBoxes, y);
 		y = addbtn(cont, "Display Growth Info on Plants", GameUI.kb_toggleGrowthInfo, y);
+		y = addbtn(cont, "Show Objects Speed", GameUI.kb_toggleSpeedInfo, y);
 		y = addbtn(cont, "Hide/Show Cursor Item", GameUI.kb_toggleCursorItem, y);
 		y+=UI.scale(20);
 		y = addbtn(cont, "Loot Nearest Knocked Player", GameUI.kb_lootNearestKnockedPlayer, y);
@@ -4939,6 +4951,9 @@ public class OptWnd extends Window {
 	private final Object showCirclesUnderPartyMembersTooltip = RichText.render("Enabling this will put a colored circle under all party members." +
 			"\n" +
 			"\n$col[185,185,185]{If you are the party leader, your circle's color will always be the $col[255,255,255]{Leader's Color}.}", UI.scale(300));
+	private final Object showObjectsSpeedTooltip = RichText.render("Enabling this will show the speed of moving objects (Players, Mobs, Vehicles, etc.) below them." +
+			"\n" +
+			"\n$col[218,163,0]{Keybind:} $col[185,185,185]{This can also be toggled using a keybind.}", UI.scale(300));
 
 	// Quality Display Settings Tooltips
 	private final Object customQualityColorsTooltip = RichText.render("These numbers and colors are completely arbitrary, and you can change them to whatever you like." +
