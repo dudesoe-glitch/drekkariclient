@@ -3394,7 +3394,7 @@ public class OptWnd extends Window {
 				}
 			}, rightColumn.pos("bl").adds(0, 2));
 
-			rightColumn = add(new Label("World Effects:"), rightColumn.pos("bl").adds(0, 10).x(290));
+			rightColumn = add(new Label("World Effects:"), rightColumn.pos("bl").adds(0, 10).x(UI.scale(290)));
 			rightColumn = add(disableSeasonalGroundColorsCheckBox = new CheckBox("Disable Seasonal Ground Colors"){
 				{a = (Utils.getprefb("disableSeasonalGroundColors", false));}
 				public void changed(boolean val) {
