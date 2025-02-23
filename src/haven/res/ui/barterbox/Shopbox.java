@@ -79,7 +79,7 @@ public class Shopbox extends Widget implements ItemInfo.SpriteOwner, GSprite.Own
 	protected Tex find(List<ItemInfo> info) {
 	    GItem.NumberInfo ninf = ItemInfo.find(GItem.NumberInfo.class, info);
 	    if(ninf == null) return(null);
-	    return(new TexI(Utils.outline2(Text.render(Integer.toString(ninf.itemnum()), Color.WHITE).img, Utils.contrast(Color.WHITE))));
+	    return(PUtils.strokeTex(WItem.quantityFoundry.renderstroked2(Integer.toString(ninf.itemnum()), Color.WHITE, Color.BLACK)));
 	}
     };
 
@@ -101,7 +101,7 @@ public class Shopbox extends Widget implements ItemInfo.SpriteOwner, GSprite.Own
 		}
 		spr.draw(sg);
 		if(itemnum.get() != null)
-		    sg.aimage(itemnum.get(), sqsz, 1, 1);
+		    sg.aimage(itemnum.get(), sqsz, 0.9, 0.8);
 		if(num != null)
 		    g.aimage(PUtils.strokeTex(num), itemc.add(invsq.sz()).add(UI.scale(5, 0)), 0.0, 1.0);
 		if (quality != null) {
