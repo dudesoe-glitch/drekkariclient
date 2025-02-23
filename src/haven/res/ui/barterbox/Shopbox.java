@@ -2,6 +2,8 @@
 package haven.res.ui.barterbox;
 
 import haven.*;
+import haven.res.ui.tt.q.qbuff.QBuff;
+
 import static haven.Inventory.invsq;
 import static haven.Inventory.sqsz;
 import java.awt.image.BufferedImage;
@@ -31,6 +33,7 @@ public class Shopbox extends Widget implements ItemInfo.SpriteOwner, GSprite.Own
     private Button spipe, bpipe, bbtn, cbtn;
     private TextEntry pnume, pqe;
     public final boolean admin;
+	private Text quality;
 
     public static Widget mkwidget(UI ui, Object... args) {
 	boolean adm = (Integer)args[0] != 0;
@@ -54,7 +57,7 @@ public class Shopbox extends Widget implements ItemInfo.SpriteOwner, GSprite.Own
     public abstract class AttrCache<T> {
 	private List<ItemInfo> forinfo = null;
 	private T save = null;
-	
+
 	public T get() {
 	    try {
 		List<ItemInfo> info = info();
@@ -67,7 +70,7 @@ public class Shopbox extends Widget implements ItemInfo.SpriteOwner, GSprite.Own
 	    }
 	    return(save);
 	}
-	
+
 	protected abstract T find(List<ItemInfo> info);
     }
 
@@ -100,6 +103,10 @@ public class Shopbox extends Widget implements ItemInfo.SpriteOwner, GSprite.Own
 		    sg.aimage(itemnum.get(), sqsz, 1, 1);
 		if(num != null)
 		    g.aimage(num.tex(), itemc.add(invsq.sz()).add(UI.scale(5, 0)), 0.0, 1.0);
+		if (quality != null) {
+//			g.aimage(qlbl.tex(), itemc.add(Inventory.invsq.sz()).add(5, 0), 0.0D, 1.0D);
+			g.aimage(quality.tex(), itemc.add(invsq.sz()).add(UI.scale(5, -20)), 0.0, 1.0);
+		}
 	    }
 	}
 
@@ -126,8 +133,12 @@ public class Shopbox extends Widget implements ItemInfo.SpriteOwner, GSprite.Own
 
     private List<ItemInfo> cinfo;
     public List<ItemInfo> info() {
-	if(cinfo == null)
-	    cinfo = ItemInfo.buildinfo(this, info);
+	if(cinfo == null) {
+		cinfo = ItemInfo.buildinfo(this, info);
+		QBuff qb = quality();
+		if (qb != null)
+			quality = Text.render("Quality: " + (int) qb.q);
+	}
 	return(cinfo);
     }
 
@@ -297,4 +308,24 @@ public class Shopbox extends Widget implements ItemInfo.SpriteOwner, GSprite.Own
 	    super.uimsg(name, args);
 	}
     }
+
+	private QBuff quality() {
+		try {
+			for (ItemInfo info : info()) {
+				if (info instanceof ItemInfo.Contents)
+					return getQBuff(((ItemInfo.Contents) info).sub);
+			}
+			return getQBuff(info());
+		} catch (Loading l) {
+		}
+		return null;
+	}
+
+	private QBuff getQBuff(List<ItemInfo> infolist) {
+		for (ItemInfo info : infolist) {
+			if (info instanceof QBuff)
+				return (QBuff) info;
+		}
+		return null;
+	}
 }
