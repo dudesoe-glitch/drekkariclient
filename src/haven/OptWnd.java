@@ -3129,6 +3129,7 @@ public class OptWnd extends Window {
 	public static CheckBox disableHerbalistTablesVarMatsCheckBox;
 	public static CheckBox disableCupboardsVarMatsCheckBox;
 	public static CheckBox disableChestsVarMatsCheckBox;
+	public static CheckBox disableMetalCabinetsVarMatsCheckBox;
 	public static CheckBox disableTrellisesVarMatsCheckBox;
 	public static CheckBox disableSmokeShedsVarMatsCheckBox;
 	public static CheckBox disableAllObjectsVarMatsCheckBox;
@@ -3287,6 +3288,12 @@ public class OptWnd extends Window {
 				{a = (Utils.getprefb("disableChestsVarMats", false));}
 				public void changed(boolean val) {
 					Utils.setprefb("disableChestsVarMats", val);
+				}
+			}, leftColumn.pos("bl").adds(0, 2));
+			leftColumn = add(disableMetalCabinetsVarMatsCheckBox = new CheckBox("Metal Cabinets Variable Materials"){
+				{a = (Utils.getprefb("disableMetalCabinetsVarMats", false));}
+				public void changed(boolean val) {
+					Utils.setprefb("disableMetalCabinetsVarMats", val);
 				}
 			}, leftColumn.pos("bl").adds(0, 2));
 			leftColumn = add(disableTrellisesVarMatsCheckBox = new CheckBox("Trellises Variable Materials"){
