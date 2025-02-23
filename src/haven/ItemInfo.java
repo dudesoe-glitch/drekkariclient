@@ -680,7 +680,7 @@ public abstract class ItemInfo {
 				}
 			} else if(info instanceof Name) {
 				Name name = (Name) info;
-				if (!name.str.text.contains("seed")){ // ND: Seeds already show the quantity
+				if (!name.str.text.contains("seed") && !name.str.text.contains("coin")){ // ND: Seeds and coins already show the quantity
 					try {
 						Matcher m = count_pattern.matcher(name.original);
 						if(m.find()) {
