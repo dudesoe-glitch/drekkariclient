@@ -87,9 +87,11 @@ public class ActAudio extends State {
 	    synchronized(this) {
 		Collection<CS> clips = this.clips;
 		this.clips = null;
-		for(Iterator<CS> i = clips.iterator(); i.hasNext();) {
-		    parent.remove(i.next());
-		    i.remove();
+		if (clips != null) {
+			for (Iterator<CS> i = clips.iterator(); i.hasNext(); ) {
+				parent.remove(i.next());
+				i.remove();
+			}
 		}
 	    }
 	}
