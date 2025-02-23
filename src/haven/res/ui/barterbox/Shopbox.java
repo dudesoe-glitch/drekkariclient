@@ -21,7 +21,8 @@ public class Shopbox extends Widget implements ItemInfo.SpriteOwner, GSprite.Own
 	pricec = UI.scale(200, 5),
 	qualc = UI.scale(220 + 40, 5).add(invsq.sz()),
 	cbtnc = UI.scale(220, 66),
-	spipec = UI.scale(85, 66),
+	spipec = UI.scale(85, 40),
+	bulkTextEntryc = UI.scale(87, 68),
 	bpipec = UI.scale(300, 66);
     public ResData res;
     public ItemSpec price;
@@ -31,7 +32,7 @@ public class Shopbox extends Widget implements ItemInfo.SpriteOwner, GSprite.Own
     private GSprite spr;
     private Object[] info = {};
     private Button spipe, bpipe, bbtn, cbtn;
-    private TextEntry pnume, pqe;
+    private TextEntry pnume, pqe, bulkTextEntry;
     public final boolean admin;
 	private Text quality;
 
@@ -227,7 +228,14 @@ public class Shopbox extends Widget implements ItemInfo.SpriteOwner, GSprite.Own
     public void wdgmsg(Widget sender, String msg, Object... args) {
 	Integer n;
 	if(sender == bbtn) {
-	    wdgmsg("buy");
+		if (!bulkTextEntry.text().isEmpty()) {
+			int count = Integer.parseInt(bulkTextEntry.text());
+			for (int i = 0; i < count; ++i) {
+				this.wdgmsg("buy");
+			}
+		} else {
+			this.wdgmsg("buy");
+		}
 	} else if(sender == spipe) {
 	    wdgmsg("spipe");
 	} else if(sender == bpipe) {
@@ -244,7 +252,14 @@ public class Shopbox extends Widget implements ItemInfo.SpriteOwner, GSprite.Own
     private void updbtn() {
 	boolean canbuy = (res != null) && (price != null) && (pnum > 0);
 	if(canbuy && (bbtn == null)) {
-	    bbtn = add(new Button(UI.scale(75), "Buy"), buyc);
+	    bbtn = add(new Button(UI.scale(75), "Buy:"), buyc);
+		bulkTextEntry = add(new TextEntry(UI.scale(71), ""){
+			protected void changed() {
+				this.settext(this.text().replaceAll("[^\\d]", "")); // Only numbers
+				this.settext(this.text().replaceAll("(?<=^.{2}).*", "")); // No more than 2 digits
+				super.changed();
+			}
+		}, bulkTextEntryc);
 	} else if(!canbuy && (bbtn != null)) {
 	    bbtn.reqdestroy();
 	    bbtn = null;
