@@ -103,10 +103,9 @@ public class Shopbox extends Widget implements ItemInfo.SpriteOwner, GSprite.Own
 		if(itemnum.get() != null)
 		    sg.aimage(itemnum.get(), sqsz, 1, 1);
 		if(num != null)
-		    g.aimage(num.tex(), itemc.add(invsq.sz()).add(UI.scale(5, 0)), 0.0, 1.0);
+		    g.aimage(PUtils.strokeTex(num), itemc.add(invsq.sz()).add(UI.scale(5, 0)), 0.0, 1.0);
 		if (quality != null) {
-//			g.aimage(qlbl.tex(), itemc.add(Inventory.invsq.sz()).add(5, 0), 0.0D, 1.0D);
-			g.aimage(quality.tex(), itemc.add(invsq.sz()).add(UI.scale(5, -20)), 0.0, 1.0);
+			g.aimage(PUtils.strokeTex(quality), itemc.add(invsq.sz()).add(UI.scale(4, -18)), 0.0, 1.0);
 		}
 	    }
 	}
@@ -121,11 +120,11 @@ public class Shopbox extends Widget implements ItemInfo.SpriteOwner, GSprite.Own
 		sg.image(WItem.missing.layer(Resource.imgc).tex(), Coord.z, sqsz);
 	    }
 	    if(!admin && (pnumt != null))
-		g.aimage(pnumt.tex(), pricec.add(invsq.sz()), 0.0, 1.0);
+		g.aimage(PUtils.strokeTex(pnumt), pricec.add(invsq.sz()), 0.0, 1.0);
 	    if(!admin) {
 		if(pqt != null) {
-		    g.aimage(qlbl.tex(), qualc, 0, 1);
-		    g.aimage(pqt.tex(), qualc.add(UI.scale(40, 0)), 0, 1);
+		    g.aimage(PUtils.strokeTex(qlbl), qualc, 0, 1);
+		    g.aimage(PUtils.strokeTex(pqt), qualc.add(UI.scale(40, 0)), 0, 1);
 		}
 	    }
 	}
