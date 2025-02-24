@@ -2814,21 +2814,36 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 		List<String> command = List.of("ping", pingCommand, "1", gameServer);
 
 		String output;
+		Process process = null;
 		try {
-			Process process = new ProcessBuilder(command).start();
+			process = new ProcessBuilder(command).start();
+
+			// Set a timeout of 500 milliseconds for the process
+			if (!process.waitFor(500, java.util.concurrent.TimeUnit.MILLISECONDS)) {
+				// If the process did not complete within 500ms, destroy it and return null
+				process.destroy();
+				System.err.println("Ping command timed out. You're failing to ping game.havenandhearth.com due to some DNS issue. You need to manually edit your Hosts file.");
+				return null;
+			}
+
 			try (BufferedReader standardOutput = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
 				output = standardOutput.lines().collect(Collectors.joining());
 			}
-		} catch (IOException e) {
+
+		} catch (IOException | InterruptedException e) {
 			System.err.println("Failed to execute ping command: " + e.getMessage());
 			return null;
+		} finally {
+			if (process != null && process.isAlive()) {
+				process.destroy();
+			}
 		}
 
 		Matcher matcher = pattern.matcher(output);
 		if (matcher.find()) {
 			String matchedPing = matcher.group(1);
 			try {
-				return (int)Double.parseDouble(matchedPing);
+				return (int) Double.parseDouble(matchedPing);
 			} catch (NumberFormatException e) {
 				System.err.println("Failed to parse ping value: " + matchedPing);
 			}
