@@ -11,7 +11,6 @@ public class EnterNearestVehicle implements Runnable {
 
     public EnterNearestVehicle(GameUI gui) {
         this.gui = gui;
-        Integer ping = GameUI.getPingValue();
     }
 
     @Override
