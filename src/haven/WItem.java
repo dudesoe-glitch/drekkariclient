@@ -323,17 +323,20 @@ public class WItem extends Widget implements DTarget {
 			ui.rcvr.rcvmsg(ui.lastWidgetID + 1, "cl", option, 0);
 		}
 		if(ui.modctrl && ui.modshift && OptWnd.autoRepeatFlowerMenuCheckBox.a){
-			try {
-				if (ui.gui.autoRepeatFlowerMenuScriptThread == null) {
-					ui.gui.autoRepeatFlowerMenuScriptThread = new Thread(new AutoRepeatFlowerMenuScript(ui.gui, this.item.getres().name), "autoRepeatFlowerMenu");
-					ui.gui.autoRepeatFlowerMenuScriptThread.start();
-				} else {
-					ui.gui.autoRepeatFlowerMenuScriptThread.interrupt();
-					ui.gui.autoRepeatFlowerMenuScriptThread = null;
-					ui.gui.autoRepeatFlowerMenuScriptThread = new Thread(new AutoRepeatFlowerMenuScript(ui.gui, this.item.getres().name), "autoRepeatFlowerMenu");
-					ui.gui.autoRepeatFlowerMenuScriptThread.start();
+			if (!(item != null && item.contents != null)) { // ND: Ctrl+Shift on stack items splits them, so ignore them.
+				try {
+					if (ui.gui.autoRepeatFlowerMenuScriptThread == null) {
+						ui.gui.autoRepeatFlowerMenuScriptThread = new Thread(new AutoRepeatFlowerMenuScript(ui.gui, this.item.getres().name), "autoRepeatFlowerMenu");
+						ui.gui.autoRepeatFlowerMenuScriptThread.start();
+					} else {
+						ui.gui.autoRepeatFlowerMenuScriptThread.interrupt();
+						ui.gui.autoRepeatFlowerMenuScriptThread = null;
+						ui.gui.autoRepeatFlowerMenuScriptThread = new Thread(new AutoRepeatFlowerMenuScript(ui.gui, this.item.getres().name), "autoRepeatFlowerMenu");
+						ui.gui.autoRepeatFlowerMenuScriptThread.start();
+					}
+				} catch (Loading ignored) {
 				}
-			} catch (Loading ignored){}
+			}
 		}
 	    item.wdgmsg("iact", ev.c, ui.modflags());
 	    return(true);
