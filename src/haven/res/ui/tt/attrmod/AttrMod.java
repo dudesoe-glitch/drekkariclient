@@ -6,6 +6,7 @@ import static haven.PUtils.*;
 import java.util.*;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
+import java.util.stream.Collectors;
 
 @Resource.PublishedCode(name = "attrmod")
 @haven.FromResource(name = "ui/tt/attrmod", version = 11)
@@ -14,7 +15,7 @@ public class AttrMod extends ItemInfo.Tip {
 
     public AttrMod(Owner owner, Collection<Entry> tab) {
 	super(owner);
-	this.tab = tab;
+	this.tab = tab.stream().sorted(this::BY_PRIORITY).collect(Collectors.toList());
     }
 
     public static class Fac implements InfoFactory {
@@ -68,4 +69,10 @@ public class AttrMod extends ItemInfo.Tip {
 	    tablayout(l, tab);
 	}
     }
+
+	private int BY_PRIORITY(Entry o1, Entry o2) {
+		String a1 = o1.attr.name();
+		String a2 = o2.attr.name();
+		return Integer.compare(Config.statsAndAttributesOrder.indexOf(a2), Config.statsAndAttributesOrder.indexOf(a1));
+	}
 }

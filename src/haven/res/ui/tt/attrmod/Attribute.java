@@ -10,8 +10,8 @@ import java.awt.image.BufferedImage;
 @Resource.PublishedCode(name = "attrmod")
 @haven.FromResource(name = "ui/tt/attrmod", version = 11)
 public interface Attribute {
-    public static final Color buff = new Color(128, 255, 128);
-    public static final Color debuff = new Color(255, 128, 128);
+    public static final Color buff = new Color(96,235,96);
+    public static final Color debuff = new Color(235,96,96);
 
     public String name();
     public BufferedImage icon();
