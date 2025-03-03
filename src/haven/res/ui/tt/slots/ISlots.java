@@ -25,6 +25,7 @@ public class ISlots extends ItemInfo.Tip implements GItem.NumberInfo {
     public final Resource[] attrs;
     public final boolean ignol;
 	private UI ui = null;
+	Pattern pattern = Pattern.compile("\\{([+-]?\\d+)\\}");
 
     public ISlots(Owner owner, int left, double pmin, double pmax, Resource[] attrs) {
 	super(owner);
@@ -61,7 +62,6 @@ public class ISlots extends ItemInfo.Tip implements GItem.NumberInfo {
 	for(SItem si : s) {
 		if (extendedView)
 			si.layout(l);
-		Pattern pattern = Pattern.compile("\\{([+-]?\\d+)\\}");
 		for (ItemInfo ii : si.info) {
 			if (ii instanceof AttrMod) {
 				AttrMod attrMod = (AttrMod) ii;
@@ -190,7 +190,7 @@ public class ISlots extends ItemInfo.Tip implements GItem.NumberInfo {
 
 	private int BY_PRIORITY(Map.Entry<Entry, String> o1, Map.Entry<Entry, String> o2) {
 		String a1 =  o1.getKey().attr.name();
-		String a2 =  o1.getKey().attr.name();
+		String a2 =  o2.getKey().attr.name();
 		return Integer.compare(Config.statsAndAttributesOrder.indexOf(a2), Config.statsAndAttributesOrder.indexOf(a1));
 	}
 }
