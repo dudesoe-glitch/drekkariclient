@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class AttrBonusesWdg extends Widget implements ItemInfo.Owner {
-    private static final Coord bonusc = new Coord(UI.scale(6), UI.scale(32));
+    private static final Coord bonusc = new Coord(UI.scale(0), UI.scale(26));
     private static final ClassResolver<AttrBonusesWdg> ctxr = new ClassResolver<AttrBonusesWdg>()
             .add(Glob.class, wdg -> wdg.ui.sess.glob)
             .add(Session.class, wdg -> wdg.ui.sess);
@@ -28,7 +28,7 @@ public class AttrBonusesWdg extends Widget implements ItemInfo.Owner {
     private CharWnd charWnd = null;
 
     public AttrBonusesWdg(int y) {
-        super(new Coord(UI.scale(146), y - UI.scale(38)));
+        super(new Coord(UI.scale(160), y - UI.scale(38)));
         add(new Label("Equipment bonuses:"), UI.scale(26), UI.scale(5));
         bar = adda(new Scrollbar(y - bonusc.y - UI.scale(38), 0, 0), sz.x, bonusc.y , 1, 0);
     }
@@ -69,7 +69,7 @@ public class AttrBonusesWdg extends Widget implements ItemInfo.Owner {
             }
 
             if (tip != null)
-                bar.move(Coord.of(tip.sz().x + bar.sz.x + UI.scale(5), bar.c.y));
+                bar.move(Coord.of(tip.sz().x + bar.sz.x, bar.c.y));
             int delta = tip != null ? tip.sz().y : 0;
             bar.visible = delta > bar.sz.y;
             bar.max = delta - bar.sz.y;

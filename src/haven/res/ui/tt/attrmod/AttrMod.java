@@ -28,7 +28,7 @@ public class AttrMod extends ItemInfo.Tip {
 	}
     }
 
-    public static void tablayout(Layout l, Collection<Entry> tabc) {
+    public static void tablayout(Layout l, Collection<Entry> tabc, boolean itemSpec) {
 	Entry[] tab = tabc.toArray(new Entry[0]);
 	BufferedImage[] icons = new BufferedImage[tab.length];
 	BufferedImage[] names = new BufferedImage[tab.length];
@@ -44,12 +44,13 @@ public class AttrMod extends ItemInfo.Tip {
 	    w = Math.max(w, names[i].getWidth());
 	}
 	for(int i = 0; i < tab.length; i++) {
-	    int y = l.cmp.sz.y;
+	    int y = itemSpec ? l.cmp.sz.y + UI.scale(1) : ((i == 0) ? l.cmp.sz.y + UI.scale(5) : l.cmp.sz.y + UI.scale(1));
+		int x = itemSpec ? 0 : UI.scale(8);
 	    if(icons[i] != null)
-		l.cmp.add(icons[i], Coord.of(0, y));
+		l.cmp.add(icons[i], Coord.of(x, y));
 	    int nx = names[i].getHeight() + (int)UI.scale(0.75);
-	    l.cmp.add(names[i], Coord.of(nx, y));
-	    l.cmp.add(values[i], Coord.of(nx + w + UI.scale(5), y));
+	    l.cmp.add(names[i], Coord.of(x + nx, y));
+	    l.cmp.add(values[i], Coord.of(x + nx + w + UI.scale(5), y));
 	}
     }
 
@@ -66,7 +67,10 @@ public class AttrMod extends ItemInfo.Tip {
 	}
 
 	public void layout(Layout l) {
-	    tablayout(l, tab);
+		if (owner instanceof ItemSpec)
+	    	tablayout(l, tab, true);
+		else
+			tablayout(l, tab, false);
 	}
     }
 
