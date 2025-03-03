@@ -1,7 +1,6 @@
 package haven;
 
 
-import haven.res.ui.tt.attrmod.Attribute;
 import haven.res.ui.tt.attrmod.resattr;
 
 import java.util.*;
@@ -123,21 +122,32 @@ public class AttrBonusesWdg extends Widget implements ItemInfo.Owner {
         }
     }
 
-    static final Pattern pattern = Pattern.compile("\\{([+-]?\\d+)\\}");
+    static final Pattern integerStatPattern = Pattern.compile("\\{([+-]?\\d+)\\}");
+    static final Pattern percentageStatPattern = Pattern.compile("\\{([+-]?\\d*(\\.\\d+)?|\\d+)%\\}");
     private void build() {
         try {
             Map<haven.res.ui.tt.attrmod.Entry, String> totalAttr = new HashMap<>();
-            for (Map.Entry<haven.res.ui.tt.attrmod.Entry, String> entry : bonuses.entrySet()) {
-                haven.res.ui.tt.attrmod.Entry key = entry.getKey();
-                String value = entry.getValue();
+            for (Map.Entry<haven.res.ui.tt.attrmod.Entry, String> bonusesEntry : bonuses.entrySet()) {
+                haven.res.ui.tt.attrmod.Entry key = bonusesEntry.getKey();
+                String value = bonusesEntry.getValue();
                 boolean exist = false;
-                for (Map.Entry<haven.res.ui.tt.attrmod.Entry, String> entry2 : totalAttr.entrySet()) {
-                    if (entry2.getKey().attr.name().equals(key.attr.name())) {
-                        Matcher matcher = pattern.matcher(value);
-                        Matcher matcher2 = pattern.matcher(entry2.getValue());
-                        if (matcher.find() && matcher2.find()) {
-                            int sum = Integer.parseInt(matcher.group(1)) + Integer.parseInt(matcher2.group(1));
-                            entry2.setValue(String.format("$col[%s]{%s%d}", sum < 0 ? "235,96,96" : "96,235,96", sum < 0 ? "-" : "+", Math.abs(sum)));
+                for (Map.Entry<haven.res.ui.tt.attrmod.Entry, String> totalAttrEntry : totalAttr.entrySet()) {
+                    if (totalAttrEntry.getKey().attr.name().equals(key.attr.name())) {
+                        Matcher integerMatcher1 = integerStatPattern.matcher(value);
+                        Matcher integerMatcher2 = integerStatPattern.matcher(totalAttrEntry.getValue());
+                        Matcher percentageMatcher1 = percentageStatPattern.matcher(value);
+                        Matcher percentageMatcher2 = percentageStatPattern.matcher(totalAttrEntry.getValue());
+                        if (integerMatcher1.find() && integerMatcher2.find()) {
+                            int sum = Integer.parseInt(integerMatcher1.group(1)) + Integer.parseInt(integerMatcher2.group(1));
+                            totalAttrEntry.setValue(String.format("$col[%s]{%s%d}", sum < 0 ? "235,96,96" : "96,235,96", sum < 0 ? "-" : "+", Math.abs(sum)));
+                            exist = true;
+                            break;
+                        }
+                        if (percentageMatcher1.find() && percentageMatcher2.find()) {
+                            double sum = Double.parseDouble(percentageMatcher1.group(1)) + Double.parseDouble(percentageMatcher2.group(1));
+                            String formattedValue = String.format("%.1f", sum);
+                            String prefix = sum < 0 ? "" : "+";
+                            totalAttrEntry.setValue("$col[96,235,96]" + "{" + prefix + formattedValue + "%}");
                             exist = true;
                             break;
                         }
@@ -166,10 +176,16 @@ public class AttrBonusesWdg extends Widget implements ItemInfo.Owner {
         Object[] args = new Object[mods.size() * 2 + 1];
         int i = 1;
         for (Entry<haven.res.ui.tt.attrmod.Entry, String> entry : mods) {
-            Matcher matcher = pattern.matcher(entry.getValue());
-            if (entry.getKey().attr instanceof resattr && matcher.find() && ((resattr) entry.getKey().attr).res != null) {
+            Matcher integerMatcher = integerStatPattern.matcher(entry.getValue());
+            Matcher percentageMatcher = percentageStatPattern.matcher(entry.getValue());
+            if (entry.getKey().attr instanceof resattr && ((resattr) entry.getKey().attr).res != null) {
                 args[i] = ui.sess.getresid(((resattr) entry.getKey().attr).res);
-                args[i + 1] = Integer.parseInt(matcher.group(1));
+                if (integerMatcher.find()) {
+                    args[i + 1] = Integer.parseInt(integerMatcher.group(1));
+                }
+                else if (percentageMatcher.find()) {
+                    args[i + 1] = Double.parseDouble(percentageMatcher.group(1))*10;
+                }
                 i += 2;
             }
         }
