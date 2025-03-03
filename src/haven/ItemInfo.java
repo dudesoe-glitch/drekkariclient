@@ -597,27 +597,13 @@ public abstract class ItemInfo {
 		return bonuses;
 	}
 
-	static final Pattern pattern = Pattern.compile("\\{([+-]?\\d+)\\}");
 	@SuppressWarnings("unchecked")
 	public static void parseAttrMods(Map<Entry, String> bonuses, List infos) {
 		for (Object inf : infos) {
 			List<Entry> tab = (List<Entry>) Reflect.getFieldValue(inf, "tab");
 			if (tab != null) {
 				for (Entry attrmodEntry : tab) {
-					boolean exist = false;
-					for (Map.Entry<Entry, String> entry : bonuses.entrySet()) {
-						if (entry.getKey().attr.name().equals(attrmodEntry.attr.name())) {
-							Matcher matcher = pattern.matcher(attrmodEntry.fmtvalue());
-							Matcher matcher2 = pattern.matcher(entry.getValue());
-							if (matcher.find() && matcher2.find()) {
-								int sum = Integer.parseInt(matcher2.group(1)) + Integer.parseInt(matcher.group(1));
-								entry.setValue("$col[" + (sum < 0 ? "235,96,96" : "96,235,96") + "]{" + (sum < 0 ? "-" : "+") + Math.abs(sum) + "}");
-								exist = true;
-								break;
-							}
-						}
-					}
-					if (!exist) bonuses.put(attrmodEntry, attrmodEntry.fmtvalue());
+					bonuses.put(attrmodEntry, attrmodEntry.fmtvalue());
 				}
 			}
 		}
