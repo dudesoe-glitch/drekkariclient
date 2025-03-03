@@ -25,7 +25,8 @@ public class ISlots extends ItemInfo.Tip implements GItem.NumberInfo {
     public final Resource[] attrs;
     public final boolean ignol;
 	private UI ui = null;
-	Pattern pattern = Pattern.compile("\\{([+-]?\\d+)\\}");
+	static final Pattern integerStatPattern = Pattern.compile("\\{([+-]?\\d+)\\}");
+	static final Pattern percentageStatPattern = Pattern.compile("\\{([+-]?\\d*(\\.\\d+)?|\\d+)%\\}");
 
     public ISlots(Owner owner, int left, double pmin, double pmax, Resource[] attrs) {
 	super(owner);
@@ -69,11 +70,21 @@ public class ISlots extends ItemInfo.Tip implements GItem.NumberInfo {
 					boolean exist = false;
 					for (Map.Entry<Entry, String> entry : totalAttr.entrySet()) {
 						if (entry.getKey().attr.name().equals(attrmodEntry.attr.name())) {
-							Matcher matcher = pattern.matcher(attrmodEntry.fmtvalue());
-							Matcher matcher2 = pattern.matcher(entry.getValue());
-							if (matcher.find() && matcher2.find()) {
-								int sum = Integer.parseInt(matcher2.group(1)) + Integer.parseInt(matcher.group(1));
+							Matcher integerMatcher1 = integerStatPattern.matcher(attrmodEntry.fmtvalue());
+							Matcher integerMatcher2 = integerStatPattern.matcher(entry.getValue());
+							Matcher percentageMatcher1 = percentageStatPattern.matcher(attrmodEntry.fmtvalue());
+							Matcher percentageMatcher2 = percentageStatPattern.matcher(entry.getValue());
+							if (integerMatcher1.find() && integerMatcher2.find()) {
+								int sum = Integer.parseInt(integerMatcher2.group(1)) + Integer.parseInt(integerMatcher1.group(1));
 								entry.setValue("$col[" + (sum < 0 ? "235,96,96" : "96,235,96") + "]{" + (sum < 0 ? "-" : "+") + Math.abs(sum) + "}");
+								exist = true;
+								break;
+							}
+							if (percentageMatcher1.find() && percentageMatcher2.find()) {
+								double sum = Double.parseDouble(percentageMatcher1.group(1)) + Double.parseDouble(percentageMatcher2.group(1));
+								String formattedValue = String.format("%.1f", sum);
+								String prefix = sum < 0 ? "" : "+";
+								entry.setValue("$col[96,235,96]" + "{" + prefix + formattedValue + "%}");
 								exist = true;
 								break;
 							}
