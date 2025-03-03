@@ -42,7 +42,7 @@ public class ISlots extends ItemInfo.Tip implements GItem.NumberInfo {
 
     public static final String chc = "192,192,255";
     public void layout(Layout l) {
-	boolean extendedView = ui != null && ui.modshift;
+	boolean extendedView = ui == null || (ui != null && ui.modshift); // ND: There's a weird bug with barterstands. The UI from the Shopbox class doesn't detect ui.modshift or some crap.
 	l.cmp.add(ch.img, new Coord(UI.scale(2), l.cmp.sz.y + UI.scale(4)));
 	if(attrs.length > 0) {
 	    BufferedImage head = RichText.render(String.format("Chance: $col[%s]{%d%%} to $col[%s]{%d%%}", chc, Math.round(100 * pmin), chc, Math.round(100 * pmax)), 0).img;
