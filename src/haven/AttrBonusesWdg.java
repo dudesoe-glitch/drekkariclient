@@ -167,13 +167,17 @@ public class AttrBonusesWdg extends Widget implements ItemInfo.Owner {
         int i = 1;
         for (Entry<haven.res.ui.tt.attrmod.Entry, String> entry : mods) {
             Matcher matcher = pattern.matcher(entry.getValue());
-            if (entry.getKey().attr instanceof resattr && matcher.find()) {
+            if (entry.getKey().attr instanceof resattr && matcher.find() && ((resattr) entry.getKey().attr).res != null) {
                 args[i] = ui.sess.getresid(((resattr) entry.getKey().attr).res);
                 args[i + 1] = Integer.parseInt(matcher.group(1));
                 i += 2;
             }
         }
-        return f.build(this, new ItemInfo.Raw(args), args);
+        try {
+            return f.build(this, new ItemInfo.Raw(args), args);
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     private int BY_PRIORITY(Map.Entry<haven.res.ui.tt.attrmod.Entry, String> o1, Map.Entry<haven.res.ui.tt.attrmod.Entry, String> o2) {
