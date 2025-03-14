@@ -34,6 +34,7 @@ import java.io.*;
 import java.nio.file.*;
 import java.sql.SQLException;
 import java.util.*;
+import java.lang.reflect.*;
 
 public class MainFrame extends java.awt.Frame implements Console.Directory, AWTEventListener {
     public static final Config.Variable<Boolean> initfullscreen = Config.Variable.propb("haven.fullscreen", false);
@@ -47,15 +48,33 @@ public class MainFrame extends java.awt.Frame implements Console.Directory, AWTE
     Coord prefssz = null;
 	public static String gameDir = null;
 	public static boolean runningThroughSteam = true;
-	
+
+    public static void initlocale() {
+	try {
+	    /* XXX? Localization is nice and all, but the game as a
+	     * whole currently isn't internationalized, so using the
+	     * local settings for things like number formatting just
+	     * leads to inconsistency.
+	     *
+	     * The locale still seems to influence AWT default font
+	     * selection, though. This should be investigated. */
+	    Locale.setDefault(Locale.US);
+	} catch(Exception e) {
+	    new Warning(e, "locale initialization failed").issue();
+	}
+    }
+
     public static void initawt() {
 	try {
 	    System.setProperty("apple.awt.application.name", "Haven & Hearth");
 	    javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());
-	} catch(Exception e) {}
+	} catch(Exception e) {
+	    new Warning(e, "AWT initialization failed").issue();
+	}
     }
 
     static {
+	initlocale();
 	initawt();
     }
 
@@ -77,7 +96,7 @@ public class MainFrame extends java.awt.Frame implements Console.Directory, AWTE
 			throw new RuntimeException(e);
 		}
 	}
-	
+
     DisplayMode findmode(int w, int h) {
 	GraphicsDevice dev = getGraphicsConfiguration().getDevice();
 	if(!dev.isFullScreenSupported())
@@ -268,7 +287,7 @@ public class MainFrame extends java.awt.Frame implements Console.Directory, AWTE
 			}
 		}
 	}
-	
+
     private void savewndstate() {
 	if(!fullscreen) {
 	    if(getExtendedState() == NORMAL)

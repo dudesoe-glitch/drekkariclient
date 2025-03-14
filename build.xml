@@ -93,6 +93,7 @@
     <pathelement path="lib/sqlite-jdbc-3.42.0.0.jar" />
       </classpath>
       <compilerarg value="-Xlint:unchecked" />
+      <compilerarg value="-Xlint:deprecation" />
       <compilerarg value="-Xlint:-options" />
       <!-- <compilerarg value="-Xbarda" /> -->
     </javac>

@@ -29,7 +29,7 @@ package haven;
 import java.util.function.*;
 import haven.render.*;
 
-public class ResDrawable extends Drawable implements EquipTarget {
+public class ResDrawable extends Drawable implements Sprite.Owner, EquipTarget {
     public final Indir<Resource> res;
     public final Resource rres;
     public final Sprite spr;
@@ -40,7 +40,7 @@ public class ResDrawable extends Drawable implements EquipTarget {
 	this.res = res;
 	this.sdt = new MessageBuf(sdt);
 	this.rres = res.get();
-	spr = Sprite.create(gob, rres, this.sdt.clone());
+	spr = Sprite.create(this, rres, this.sdt.clone());
 	if(old || true)
 	    spr.age();
     }
@@ -71,6 +71,9 @@ public class ResDrawable extends Drawable implements EquipTarget {
 	    spr.dispose();
     }
 
+    /* This is only deprecated becuase Sprite.Owner.getres is. Its
+     * override from Drawable is not considered deprecated. */
+    @Deprecated
     public Resource getres() {
 	return(rres);
     }
@@ -83,6 +86,11 @@ public class ResDrawable extends Drawable implements EquipTarget {
 	}
 	return(super.placer());
     }
+
+    private static final ClassResolver<ResDrawable> ctxr = new ClassResolver<ResDrawable>()
+	.add(ResDrawable.class, d -> d);
+    public <T> T context(Class<T> cl) {return(OwnerContext.orparent(cl, ctxr.context(cl, this, false), gob));}
+    public Random mkrandoom() {return(gob.mkrandoom());}
 
     public Supplier<? extends Pipe.Op> eqpoint(String nm, Message dat) {
 	if(spr instanceof EquipTarget) {
