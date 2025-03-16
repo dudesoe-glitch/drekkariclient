@@ -26,6 +26,7 @@
 
 package haven;
 
+import java.util.*;
 import java.util.function.*;
 import haven.render.*;
 
