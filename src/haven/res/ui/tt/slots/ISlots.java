@@ -76,15 +76,15 @@ public class ISlots extends ItemInfo.Tip implements GItem.NumberInfo {
 							Matcher percentageMatcher2 = percentageStatPattern.matcher(entry.getValue());
 							if (integerMatcher1.find() && integerMatcher2.find()) {
 								int sum = Integer.parseInt(integerMatcher2.group(1)) + Integer.parseInt(integerMatcher1.group(1));
-								entry.setValue("$col[" + (sum < 0 ? "235,96,96" : "96,235,96") + "]{" + (sum < 0 ? "-" : "+") + Math.abs(sum) + "}");
+								entry.setValue(String.format("%s{%s%d}", RichText.Parser.col2a((sum < 0) ? haven.res.ui.tt.attrmod.Attribute.debuff : haven.res.ui.tt.attrmod.Attribute.buff), sum < 0 ? "-" : "+", Math.abs(sum)));
 								exist = true;
 								break;
 							}
 							if (percentageMatcher1.find() && percentageMatcher2.find()) {
 								double sum = Double.parseDouble(percentageMatcher1.group(1)) + Double.parseDouble(percentageMatcher2.group(1));
-								String formattedValue = String.format("%.1f", sum);
-								String prefix = sum < 0 ? "" : "+";
-								entry.setValue("$col[96,235,96]" + "{" + prefix + formattedValue + "%}");
+								entry.setValue(String.format("%s{%s%s%%}",
+										RichText.Parser.col2a((sum < 0) ? haven.res.ui.tt.attrmod.Attribute.debuff : haven.res.ui.tt.attrmod.Attribute.buff),
+										(sum < 0) ? "-" : "+", Utils.odformat2(sum, 1)));
 								exist = true;
 								break;
 							}
