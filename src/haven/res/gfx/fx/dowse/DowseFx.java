@@ -18,15 +18,20 @@ public class DowseFx extends Sprite {
     public final double a1, a2;
     private double a = 0;
     private final Model /*d1,*/ d2;
-	public Gob gobowner;
-	public Coord2d startCoord;
-	public float startZ;
+	public Gob gobowner = null;
+	public Coord2d startCoord = null;
+	public float startZ = 0;
 
     public DowseFx(Owner owner, Resource res, Message sdt) {
 	super(owner, res);
-	this.gobowner = (Gob) owner;
-	this.startCoord = gobowner.rc;
+	if (owner instanceof Gob)
+		this.gobowner = (Gob) owner;
+	else if (owner instanceof Gob.Overlay)
+		this.gobowner = ((Gob.Overlay) owner).gob;
+	if (gobowner != null) {
+		this.startCoord = gobowner.rc;
 	this.startZ = gobowner.getc().z;
+	}
 	if(sdt.eom()) {
 	    a1 = -PI / 8;
 	    a2 = PI / 8;
@@ -39,12 +44,16 @@ public class DowseFx extends Sprite {
 	    this.a2 = a2;
 	}
 	try {
-		gobowner.glob.sess.ui.gui.mapfile.view.addSprite(new ClueSprite(gobowner.rc, a1, a2, 2, 500, 60));
+		if (gobowner != null)
+			gobowner.glob.sess.ui.gui.mapfile.view.addSprite(new ClueSprite(gobowner.rc, a1, a2, 2, 500, 60));
 	} catch (Exception e) {
 		System.out.println("failed to add clue sprite to map");
 	}
 //	d1 = new Model(Model.Mode.TRIANGLE_FAN, new VertexArray(fmt, new VertexArray.Buffer(v1(), DataBuffer.Usage.STREAM)), null);
-	d2 = new Model(Model.Mode.TRIANGLE_FAN, new VertexArray(fmt, new VertexArray.Buffer(v2(), DataBuffer.Usage.STREAM)), null);
+	if (gobowner != null)
+		d2 = new Model(Model.Mode.TRIANGLE_FAN, new VertexArray(fmt, new VertexArray.Buffer(v2modified(), DataBuffer.Usage.STREAM)), null);
+	else
+		d2 = new Model(Model.Mode.TRIANGLE_FAN, new VertexArray(fmt, new VertexArray.Buffer(v2(), DataBuffer.Usage.STREAM)), null);
     }
 
     private ByteBuffer v1() {
@@ -63,30 +72,52 @@ public class DowseFx extends Sprite {
 	return(buf);
     }
 
-    private ByteBuffer v2() {
-	float locoffsetX = (float) (startCoord.x - gobowner.rc.x);
-	float locoffsetY = (float) -(startCoord.y - gobowner.rc.y);
-	float locoffsetZ = 0;
-	try {
-		locoffsetZ = startZ-gobowner.getc().z;
-	} catch (Loading ignored) {};
-	ByteBuffer buf = ByteBuffer.allocate(128);
-	buf.order(ByteOrder.nativeOrder());
-	byte alpha;
-	alpha = Utils.f2u8(0.4f * (1 - (float)Utils.clip((a - 0.75) / 0.25, 0, 1)));
-	buf.putFloat(locoffsetX).putFloat(locoffsetY).putFloat(locoffsetZ);
-	buf.put((byte)255).put((byte)0).put((byte)0).put(alpha);
-	for(double ca = a1; ca < a2; ca += PI * 0x0.04p0) {
-	    buf = Utils.growbuf(buf, 16);
-	    buf.putFloat((float)(Math.cos(a1) * 300.0)+locoffsetX).putFloat((float)(Math.sin(a1) * 300.0)+locoffsetY).putFloat(15.0f+locoffsetZ);
-	    buf.put((byte)255).put((byte)0).put((byte)0).put(alpha);
+	private ByteBuffer v2() {
+		ByteBuffer buf = ByteBuffer.allocate(128);
+		buf.order(ByteOrder.nativeOrder());
+		byte alpha;
+		if(a > 0.25)
+			alpha = Utils.f2u8(0.3f * (1 - (float)Utils.clip((a - 0.75) / 0.25, 0, 1)));
+		else
+			alpha = 0;
+		buf.putFloat(0).putFloat(0).putFloat(0);
+		buf.put((byte)255).put((byte)0).put((byte)0).put(alpha);
+		for(double ca = a1; ca < a2; ca += PI * 0x0.04p0) {
+			buf = Utils.growbuf(buf, 16);
+			buf.putFloat((float)(cos(ca) * r)).putFloat((float)(sin(ca) * r)).putFloat(15);
+			buf.put((byte)255).put((byte)0).put((byte)0).put(alpha);
+		}
+		buf = Utils.growbuf(buf, 16);
+		buf.putFloat((float)(cos(a2) * r)).putFloat((float)(sin(a2) * r)).putFloat(15);
+		buf.put((byte)255).put((byte)0).put((byte)0).put(alpha);
+		buf.flip();
+		return(buf);
 	}
-	buf = Utils.growbuf(buf, 16);
-	buf.putFloat((float)(Math.cos(this.a2) * 300.0)+locoffsetX).putFloat((float)(Math.sin(this.a2) * 300.0)+locoffsetY).putFloat(15.0f+locoffsetZ);
-	buf.put((byte)255).put((byte)0).put((byte)0).put(alpha);
-	buf.flip();
-	return(buf);
-    }
+
+	private ByteBuffer v2modified() {
+		float locoffsetX = (float) (startCoord.x - gobowner.rc.x);
+		float locoffsetY = (float) -(startCoord.y - gobowner.rc.y);
+		float locoffsetZ = 0;
+		try {
+			locoffsetZ = startZ-gobowner.getc().z;
+		} catch (Loading ignored) {};
+		ByteBuffer buf = ByteBuffer.allocate(128);
+		buf.order(ByteOrder.nativeOrder());
+		byte alpha;
+		alpha = Utils.f2u8(0.4f * (1 - (float)Utils.clip((a - 0.75) / 0.25, 0, 1)));
+		buf.putFloat(locoffsetX).putFloat(locoffsetY).putFloat(locoffsetZ);
+		buf.put((byte)255).put((byte)0).put((byte)0).put(alpha);
+		for(double ca = a1; ca < a2; ca += PI * 0x0.04p0) {
+			buf = Utils.growbuf(buf, 16);
+			buf.putFloat((float)(Math.cos(a1) * 300.0)+locoffsetX).putFloat((float)(Math.sin(a1) * 300.0)+locoffsetY).putFloat(15.0f+locoffsetZ);
+			buf.put((byte)255).put((byte)0).put((byte)0).put(alpha);
+		}
+		buf = Utils.growbuf(buf, 16);
+		buf.putFloat((float)(Math.cos(this.a2) * 300.0)+locoffsetX).putFloat((float)(Math.sin(this.a2) * 300.0)+locoffsetY).putFloat(15.0f+locoffsetZ);
+		buf.put((byte)255).put((byte)0).put((byte)0).put(alpha);
+		buf.flip();
+		return(buf);
+	}
 
     public void added(RenderTree.Slot slot) {
 	slot.ostate(Pipe.Op.compose(VertexColor.instance, States.maskdepth, Location.goback("gobx"),
