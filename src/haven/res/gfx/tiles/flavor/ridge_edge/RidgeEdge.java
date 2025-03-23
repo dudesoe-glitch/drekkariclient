@@ -12,7 +12,7 @@ import haven.resutil.Ridges.*;
 @haven.FromResource(name = "gfx/tiles/flavor/ridge-edge", version = 1)
 public class RidgeEdge implements Tileset.Flavor {
     public NodeWrap mat;
-    public float r = 2f, zoff = -0.5f, xoff = -0.5f;
+    public float r = 1.25f, zoff = -0.12f, xoff = -0.12f;
 
     public RidgeEdge(Resource sres, Object[][] argsv) {
 	for(Object[] args : argsv) {
