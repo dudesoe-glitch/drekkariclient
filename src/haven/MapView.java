@@ -2360,7 +2360,11 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
 											if (c.comp.cmod.size() > 0) {
 												sb.append("$col[255,200,0]{Composite Modifiers:} \n");
 												for (Composited.MD item : c.comp.cmod) {
-													sb.append("   "+item.mod.get().name+" \n");
+													StringBuilder result = new StringBuilder();
+													for (ResData resdata : item.tex) {
+														result.append(resdata.res.get().name).append("; ");
+													}
+													sb.append("   ").append(item.mod.get().name).append(" ( ").append(item.tex.size()).append( item.tex.size() > 1 ? " textures: " : " texture: ").append(result).append(")").append(" \n");
 												}
 											}
 											equip = sb.toString();
