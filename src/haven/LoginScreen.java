@@ -27,6 +27,7 @@
 package haven;
 
 import javax.imageio.ImageIO;
+import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -69,7 +70,6 @@ public class LoginScreen extends Widget {
 	private final Window updateWindow;
 	private boolean githubVersionChecked = false;
 
-
     private String getpref(String name, String def) {
 	return(Utils.getpref(name + "@" + hostname, def));
     }
@@ -80,6 +80,7 @@ public class LoginScreen extends Widget {
 	Tex bg = bg();
 	setfocustab(true);
 	add(new Img(bg), Coord.z);
+	add(new CircleFadein(0.5));
 	optbtn = adda(new Button(UI.scale(100), "Options"), pos("cbl").add(10, -10), 0, 1);
 	optbtn.setgkey(GameUI.kb_opt);
 //	if(HttpStatus.mond.get() != null)
