@@ -889,6 +889,8 @@ public class OptWnd extends Window {
 	}
     }
 
+	public static CheckBox holdCTRLtoRemoveActionButtonsCheckBox;
+
 	public class ActionBarsSettingsPanel extends Panel {
 		private int addbtn(Widget cont, String nm, KeyBinding cmd, int y) {
 			return (cont.addhl(new Coord(0, y), cont.sz.x,
@@ -941,7 +943,14 @@ public class OptWnd extends Window {
 			}, prev.pos("bl").adds(0, 2));
 			addOrientationRadio(prev, "actionBar4Horizontal", 4);
 
-			Scrollport scroll = add(new Scrollport(UI.scale(new Coord(280, 380))), prev.pos("bl").adds(0,10).x(0));
+			prev = add(holdCTRLtoRemoveActionButtonsCheckBox = new CheckBox("Hold CTRL when right-clicking to remove action buttons"){
+				{a = (Utils.getprefb("holdCTRLtoRemoveActionButtons", false));}
+				public void changed(boolean val) {
+					Utils.setprefb("holdCTRLtoRemoveActionButtons", val);
+				}
+			}, prev.pos("bl").adds(0, 12).x(0));
+
+			Scrollport scroll = add(new Scrollport(UI.scale(new Coord(290, 380))), prev.pos("bl").adds(0,10).x(0));
 			Widget cont = scroll.cont;
 			int y = 0;
 			y = cont.adda(new Label("Action Bar 1 Keybinds"), cont.sz.x / 2, y, 0.5, 0.0).pos("bl").adds(0, 5).y;

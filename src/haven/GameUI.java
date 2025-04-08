@@ -2566,6 +2566,8 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 				if (ev.b == 1) {
 					use(slot);
 				} else if (ev.b == 3) {
+					if (OptWnd.holdCTRLtoRemoveActionButtonsCheckBox.a && !ui.modctrl)
+						return (true);
 					GameUI.this.wdgmsg("setbelt", slot, null);
 					belt[slot] = null;
 					saveLocally();
