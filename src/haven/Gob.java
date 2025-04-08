@@ -956,7 +956,8 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 
     public void added(RenderTree.Slot slot) {
 	slot.ostate(curstate());
-	for(Overlay ol : ols) {
+	List<Overlay> olsSnapshot = new ArrayList<>(ols);
+	for (Overlay ol : olsSnapshot) {
 	    if(ol.slots != null)
 		slot.add(ol);
 	}
@@ -1722,16 +1723,15 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 			if (collisionBox != null) {
 				collisionBox.fx.updateState();
 			}
-			synchronized (ols) {
-				for (Overlay ol : ols) {
-					if (ol.spr != null && ol.spr.res != null && ol.spr.res.name.equals("gfx/terobjs/items/parchment-decal") && ol.slots != null) {
-						synchronized (ol.slots) {
-							for (RenderTree.Slot slot : ol.slots) {
-								if (OptWnd.flatCupboardsCheckBox.a) {
-									slot.cstate(Pipe.Op.compose(Location.scale(1, 1, 1.6f), Location.xlate(new Coord3f(0, 0, -5.4f))));
-								} else {
-									slot.cstate(Pipe.Op.compose(Location.scale(1, 1, 1), Location.xlate(new Coord3f(0, 0, 0))));
-								}
+			List<Overlay> olsSnapshot = new ArrayList<>(ols);
+			for (Overlay ol : olsSnapshot) {
+				if (ol.spr != null && ol.spr.res != null && ol.spr.res.name.equals("gfx/terobjs/items/parchment-decal") && ol.slots != null) {
+					synchronized (ol.slots) {
+						for (RenderTree.Slot slot : ol.slots) {
+							if (OptWnd.flatCupboardsCheckBox.a) {
+								slot.cstate(Pipe.Op.compose(Location.scale(1, 1, 1.6f), Location.xlate(new Coord3f(0, 0, -5.4f))));
+							} else {
+								slot.cstate(Pipe.Op.compose(Location.scale(1, 1, 1), Location.xlate(new Coord3f(0, 0, 0))));
 							}
 						}
 					}
@@ -1770,7 +1770,8 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 			if (resName.equals("gfx/terobjs/dframe")) {
 				boolean done = true;
 				boolean empty = true;
-				for (Overlay ol : ols) {
+				List<Overlay> olsSnapshot = new ArrayList<>(ols);
+				for (Overlay ol : olsSnapshot) {
 					try {
 						Resource olres = ol.spr.res;
 						if (olres != null) {
@@ -2300,7 +2301,8 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 
 	public void setMiningSafeTilesOverlay(boolean enabled, float angle, int size) {
 		if (enabled) {
-			for (Overlay ol : ols) {
+			List<Overlay> olsSnapshot = new ArrayList<>(ols);
+			for (Overlay ol : olsSnapshot) {
 				if (ol.spr instanceof MiningSafeTilesSprite) {
 					return;
 				}
