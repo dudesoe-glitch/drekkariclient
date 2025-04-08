@@ -83,6 +83,8 @@ public class AnimSprite extends Sprite {
 				Location.scale(1.2f, 1.1f, 1.1f), Location.xlate(new Coord3f(0, 0, -0.1f))));
 	} else if (this.res.name.equals("gfx/terobjs/items/hats/giftwrapcap")) {
 		slot.cstate(Pipe.Op.compose(Location.rot(new Coord3f(0, 0, 1), 3.15f)));
+	} else if (this.res.name.equals("gfx/terobjs/items/hats/goblincap")) {
+		slot.cstate(Pipe.Op.compose(Location.rot(new Coord3f(0, 0, 1), 3.15f), Location.rot(new Coord3f(0, 1, 0), -0.2f)));
 	}
 	for(RenderTree.Node p : parts)
 	    slot.add(p);
