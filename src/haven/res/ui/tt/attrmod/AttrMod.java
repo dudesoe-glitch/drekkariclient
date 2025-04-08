@@ -9,7 +9,7 @@ import java.awt.image.BufferedImage;
 import java.util.stream.Collectors;
 
 @Resource.PublishedCode(name = "attrmod")
-@haven.FromResource(name = "ui/tt/attrmod", version = 11)
+@haven.FromResource(name = "ui/tt/attrmod", version = 12)
 public class AttrMod extends ItemInfo.Tip {
     public final Collection<Entry> tab;
 
@@ -28,7 +28,7 @@ public class AttrMod extends ItemInfo.Tip {
 	}
     }
 
-    public static void tablayout(Layout l, Collection<Entry> tabc, boolean itemSpec) {
+    public static void tablayout(Layout l, Collection<Entry> tabc) {
 	Entry[] tab = tabc.toArray(new Entry[0]);
 	BufferedImage[] icons = new BufferedImage[tab.length];
 	BufferedImage[] names = new BufferedImage[tab.length];
@@ -44,15 +44,40 @@ public class AttrMod extends ItemInfo.Tip {
 	    w = Math.max(w, names[i].getWidth());
 	}
 	for(int i = 0; i < tab.length; i++) {
-	    int y = itemSpec ? l.cmp.sz.y + UI.scale(1) : ((i == 0) ? l.cmp.sz.y + UI.scale(5) : l.cmp.sz.y + UI.scale(1));
-		int x = itemSpec ? 0 : UI.scale(8);
+	    int y = l.cmp.sz.y;
 	    if(icons[i] != null)
-		l.cmp.add(icons[i], Coord.of(x, y));
+		l.cmp.add(icons[i], Coord.of(0, y));
 	    int nx = names[i].getHeight() + (int)UI.scale(0.75);
-	    l.cmp.add(names[i], Coord.of(x + nx, y));
-	    l.cmp.add(values[i], Coord.of(x + nx + w + UI.scale(5), y));
+	    l.cmp.add(names[i], Coord.of(nx, y));
+	    l.cmp.add(values[i], Coord.of(nx + w + UI.scale(5), y));
 	}
     }
+
+	public static void tablayout(Layout l, Collection<Entry> tabc, boolean itemSpec) {
+		Entry[] tab = tabc.toArray(new Entry[0]);
+		BufferedImage[] icons = new BufferedImage[tab.length];
+		BufferedImage[] names = new BufferedImage[tab.length];
+		BufferedImage[] values = new BufferedImage[tab.length];
+		int w = 0;
+		for(int i = 0; i < tab.length; i++) {
+			Entry row = tab[i];
+			names[i] = Text.render(row.attr.name()).img;
+			icons[i] = row.attr.icon();
+			if(icons[i] != null)
+				icons[i] = convolvedown(icons[i], Coord.of(names[i].getHeight()), CharWnd.iconfilter);
+			values[i] = RichText.render(row.fmtvalue(), 0).img;
+			w = Math.max(w, names[i].getWidth());
+		}
+		for(int i = 0; i < tab.length; i++) {
+			int y = itemSpec ? l.cmp.sz.y + UI.scale(1) : ((i == 0) ? l.cmp.sz.y + UI.scale(5) : l.cmp.sz.y + UI.scale(1));
+			int x = itemSpec ? 0 : UI.scale(8);
+			if(icons[i] != null)
+				l.cmp.add(icons[i], Coord.of(x, y));
+			int nx = names[i].getHeight() + (int)UI.scale(0.75);
+			l.cmp.add(names[i], Coord.of(x + nx, y));
+			l.cmp.add(values[i], Coord.of(x + nx + w + UI.scale(5), y));
+		}
+	}
 
     public void prepare(Layout l) {
 	l.intern(Collected.id).tab.addAll(tab);
@@ -68,9 +93,9 @@ public class AttrMod extends ItemInfo.Tip {
 
 	public void layout(Layout l) {
 		if (owner instanceof ItemSpec)
-	    	tablayout(l, tab, true);
+			tablayout(l, tab, true);
 		else
-			tablayout(l, tab, false);
+			tablayout(l, tab);
 	}
     }
 
