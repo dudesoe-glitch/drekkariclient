@@ -1778,16 +1778,12 @@ public class OptWnd extends Window {
 				}
 			}, leftColumn.pos("bl").adds(0, 2));
 			showMineSupportSafeTilesCheckBox.tooltip = showMineSupportSafeTilesTooltip;
-			leftColumn = add(enableMineSweeperCheckBox = new CheckBox("Enable Mine Sweeper (Req. Flat World)"){
+			leftColumn = add(enableMineSweeperCheckBox = new CheckBox("Enable Mine Sweeper"){
 				{a = (Utils.getprefb("enableMineSweeper", true));}
 				public void set(boolean val) {
 					Utils.setprefb("enableMineSweeper", val);
 					if (ui != null && ui.gui != null) {
-						if (flatWorldCheckBox.a) {
-							ui.gui.optionInfoMsg("Mine Sweeper numbers are now " + (val ? "ENABLED" : "DISABLED") + "!", (val ? msgGreen : msgRed), Audio.resclip(val ? Toggle.sfxon : Toggle.sfxoff));
-						} else {
-							ui.gui.optionInfoMsg("Mine Sweeper numbers are now " + (val ? "ENABLED" : "DISABLED") + "!" + (!val ? "" : " (HEY!!!: Flat World is DISABLED! You need to enable Flat World in order to see the mine sweeper numbers!)"), (val ? msgYellow : msgRed), Audio.resclip(val ? Toggle.sfxon : Toggle.sfxoff));
-						}
+						ui.gui.optionInfoMsg("Mine Sweeper numbers are now " + (val ? "ENABLED" : "DISABLED") + "!", (val ? msgGreen : msgRed), Audio.resclip(val ? Toggle.sfxon : Toggle.sfxoff));
 						if (ui != null && ui.gui != null && ui.gui.miningSafetyAssistantWindow != null)
 							ui.gui.miningSafetyAssistantWindow.enableMineSweeperCheckBox.a = val;
 					}
@@ -4960,9 +4956,7 @@ public class OptWnd extends Window {
 			"\n$col[218,163,0]{Disclaimer:} $col[185,185,185]{Chase vectors sometimes don't show when chasing a critter that is standing still. The client treats this as something else for some reason and I can't fix it.}", UI.scale(430));
 	private final Object showMineSupportRadiiTooltip = RichText.render("$col[218,163,0]{Action Button:} $col[185,185,185]{This setting can also be turned on/off using an action button from the menu grid (Custom Client Extras → Toggles).}", UI.scale(320));
 	private final Object showMineSupportSafeTilesTooltip = RichText.render("$col[218,163,0]{Action Button:} $col[185,185,185]{This setting can also be turned on/off using an action button from the menu grid (Custom Client Extras → Toggles).}", UI.scale(320));
-	private final Object enableMineSweeperTooltip = RichText.render("$col[200,0,0]{NOTE:} TO PREVENT LAG, THE NUMBERS ONLY WORK IF YOU ENABLE FLAT WORLD!" +
-			"\n" +
-			"\nEnabling this will cause cave dust tiles to show the number of potential cave-ins surrounding them, just like in Minesweeper." +
+	private final Object enableMineSweeperTooltip = RichText.render("Enabling this will cause cave dust tiles to show the number of potential cave-ins surrounding them, just like in Minesweeper." +
 			"\n$col[218,163,0]{Note:} $col[185,185,185]{If a cave-in has been mined out, the tiles surrounding it will still drop cave dust, and they will still show a number on the ground. The cave dust tiles are pre-generated with the world. That's just how Loftar coded it.}" +
 			"\n$col[218,163,0]{Note:} $col[185,185,185]{You can still pick up the cave dust item off the ground. The numbers are affected only by the duration of the falling dust particles effect (aka dust rain), which can be set below}" +
 			"\n" +
