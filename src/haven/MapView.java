@@ -623,7 +623,10 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
     }
 
     public void dispose() {
+	try {
 	gobs.slot.remove();
+	} catch (NullPointerException ignored) { // ND: Someone crashed to gobs.slot being null. I will never understand render code.
+	}
 	clmaplist.dispose();
 	clobjlist.dispose();
 	super.dispose();
