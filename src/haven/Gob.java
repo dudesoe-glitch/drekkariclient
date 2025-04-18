@@ -1503,7 +1503,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 					try {
 						glob.loader.defer(() -> {
 							synchronized(Gob.this) {
-								RUtils.multiadd(tmpSlots, d);
+								RUtils.multiaddSafe(tmpSlots, d);
 							}
 						}, null);
 					} catch (Exception ignored) {
