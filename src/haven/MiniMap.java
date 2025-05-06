@@ -26,6 +26,7 @@
 
 package haven;
 
+import haven.automated.helpers.TileStatic;
 import haven.render.*;
 
 import java.awt.image.BufferedImage;
@@ -1111,7 +1112,14 @@ public class MiniMap extends Widget {
 			}
 			if(newbiome != null && !newbiome.equals(biome)) {
 				biome = newbiome;
-				biometex = Text.renderstroked(prettybiome(biome)).tex();
+				String key = prettybiome(biome).toLowerCase();
+				String biomeText;
+				if (TileStatic.ORE_NAMES.containsKey(key)) {
+					biomeText = TileStatic.ORE_NAMES.get(key);
+				} else {
+					biomeText = prettybiome(biome);
+				}
+				biometex = Text.renderstroked(biomeText).tex();
 			}
 		} catch (Loading ignored) {
 		}
