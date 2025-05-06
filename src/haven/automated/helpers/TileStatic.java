@@ -8,7 +8,7 @@ public class TileStatic {
 
     static {
         ORE_NAMES.put("argentite", "Silvershine (Argentite)");
-        ORE_NAMES.put("blackcoal", "Coal");
+        ORE_NAMES.put("blackcoal", "Coal (Black Coal)");
         ORE_NAMES.put("cuprite", "Wine Glance (Cuprite)");
         ORE_NAMES.put("cassiterite", "Cassiterite");
         ORE_NAMES.put("chalcopyrite", "Chalcopyrite");
