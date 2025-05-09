@@ -81,7 +81,8 @@ public class AutoRepeatFlowerMenuScript implements Runnable{
                             }
                         }
                         items = iterateThroughItems(name);
-                        ping = GameUI.getPingValue() != null ? GameUI.getPingValue() + 10 : 200;
+                        Integer pingValue = GameUI.getPingValue();
+                        ping = pingValue != null ? pingValue + 10 : 200;
                     }
                     stop = true;
                 }
