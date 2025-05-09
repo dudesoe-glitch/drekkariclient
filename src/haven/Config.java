@@ -439,6 +439,7 @@ public class Config {
 			"gfx/kritter/stagbeetle/stagbeetle",
 			"gfx/kritter/stalagoomba/stalagoomba",
 			"gfx/kritter/tick/tick",
+			"gfx/kritter/tick/tick-bloated",
 			"gfx/kritter/toad/toad",
 			"gfx/kritter/waterstrider/waterstrider",
 			"gfx/kritter/woodgrouse/woodgrouse-f", // ND: Only female can be chased, males will fight you
