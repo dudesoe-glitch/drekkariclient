@@ -2,18 +2,18 @@ package haven;
 
 public class TableInfo extends Widget {
 
-    public static CheckBox preventCutleryFromBreakingCheckBox = new CheckBox("Prevent Cutlery from Breaking"){
-        {a = Utils.getprefb("antiCutleryBreakage", true);}
+    public static CheckBox preventTablewareFromBreakingCheckBox = new CheckBox("Prevent Tableware from Breaking"){
+        {a = Utils.getprefb("preventTablewareFromBreaking", true);}
         public void set(boolean val) {
-            OptWnd.preventCutleryFromBreakingCheckBox.set(val);
+            OptWnd.preventTablewareFromBreakingCheckBox.set(val);
             a = val;
         }
     };
 
     public TableInfo(int x, int y) {
         this.sz = new Coord(x, y);
-        add(preventCutleryFromBreakingCheckBox, 10, 0);
-        preventCutleryFromBreakingCheckBox.tooltip = OptWnd.preventCutleryFromBreakingCheckBox.tooltip;
+        add(preventTablewareFromBreakingCheckBox, 10, 0);
+        preventTablewareFromBreakingCheckBox.tooltip = OptWnd.preventTablewareFromBreakingCheckBox.tooltip;
     }
 
 }

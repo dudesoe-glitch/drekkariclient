@@ -2549,7 +2549,7 @@ public class OptWnd extends Window {
 	public static CheckBox alsoUseContainersWithRepeaterCheckBox;
 	public static CheckBox autoRepeatFlowerMenuCheckBox;
 	public static CheckBox autoReloadCuriositiesFromInventoryCheckBox;
-	public static CheckBox preventCutleryFromBreakingCheckBox = null;
+	public static CheckBox preventTablewareFromBreakingCheckBox = null;
 	public static CheckBox autoDropLeechesCheckBox;
 	public static CheckBox autoEquipBunnySlippersPlateBootsCheckBox;
 	public static CheckBox autoDropTicksCheckBox;
@@ -2672,15 +2672,15 @@ public class OptWnd extends Window {
 				}
 			}, prev.pos("bl").adds(0, 12).x(0));
 			autoReloadCuriositiesFromInventoryCheckBox.tooltip = autoReloadCuriositiesFromInventoryTooltip;
-			prev = add(preventCutleryFromBreakingCheckBox = new CheckBox("Prevent Cutlery from Breaking"){
-				{a = Utils.getprefb("preventCutleryFromBreaking", true);}
+			prev = add(preventTablewareFromBreakingCheckBox = new CheckBox("Prevent Tableware from Breaking"){
+				{a = Utils.getprefb("preventTablewareFromBreaking", true);}
 				public void set(boolean val) {
-					Utils.setprefb("preventCutleryFromBreaking", val);
+					Utils.setprefb("preventTablewareFromBreaking", val);
 					a = val;
-					TableInfo.preventCutleryFromBreakingCheckBox.a = val;
+					TableInfo.preventTablewareFromBreakingCheckBox.a = val;
 				}
 			}, prev.pos("bl").adds(0, 2));
-			preventCutleryFromBreakingCheckBox.tooltip = preventCutleryFromBreakingTooltip;
+			preventTablewareFromBreakingCheckBox.tooltip = preventTablewareFromBreakingTooltip;
 			prev = add(autoDropLeechesCheckBox = new CheckBox("Auto-Drop Leeches"){
 				{a = Utils.getprefb("autoDropLeeches", true);}
 				public void set(boolean val) {
@@ -4988,9 +4988,9 @@ public class OptWnd extends Window {
 			"\nThis picks items only from your Inventory and currently open Cupboards. No other containers." +
 			"\n" +
 			"\n$col[185,185,185]{It only reloads curiosities that are currently being studied. It can't add new curiosities.}", UI.scale(300));
-	private final Object preventCutleryFromBreakingTooltip = RichText.render("Saves cutlery by moving it to your inventory the moment it reaches 1 durability left." +
+	private final Object preventTablewareFromBreakingTooltip = RichText.render("Prevents eating when the table contains Tableware with only 1 durability left." +
 			"\n" +
-			"\n$col[185,185,185]{A system warning message will be shown, to let you know that the item has been saved.}", UI.scale(300));
+			"\n$col[185,185,185]{A system warning message will be shown, to let you know which Tableware is at 1 durability.}", UI.scale(300));
     private final Object autoSelect1stFlowerMenuTooltip = RichText.render("Holding Ctrl before right clicking an item or object will auto-select the first available option from the flower menu." +
 			"\n" +
 			"\n$col[185,185,185]{Except for the Head of Lettuce. It will select the 2nd option there, so you split it rather than eat it.}", UI.scale(300));

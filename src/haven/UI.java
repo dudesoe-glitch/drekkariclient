@@ -1058,7 +1058,6 @@ public class UI {
 		}
 	}
 
-	private static HashMap<String, Long> recentlyTakenCutlery = new HashMap<>();
 	private void processWindowContent(Window pwdg, Widget wdg) {
 		String cap = pwdg.cap;
 		if (wdg instanceof Inventory && cap.equals("Study Desk")) {
@@ -1067,27 +1066,6 @@ public class UI {
 		if (wdg instanceof Inventory && cap.equals("Table")) {
 			if (!((Inventory)wdg).isz.equals(3, 3) && !((Inventory)wdg).isz.equals(1, 2))
 				initTableUi(pwdg, (Inventory) wdg);
-			if (((Inventory)wdg).isz.equals(3, 3) || ((Inventory)wdg).isz.equals(1, 2) ) {
-				wdg.add(new WidgetChildActor<Inventory>((Inventory)wdg) {
-					@Override
-					public void act(Inventory parent) {
-						try {
-							for (WItem item : parent.wmap.values()) {
-								for (ItemInfo ii : item.item.info()) {
-									if (ii instanceof Wear) {
-										Wear wear = (Wear) ii;
-										if (OptWnd.preventCutleryFromBreakingCheckBox.a && wear.d == wear.m - 1&& item.item.getres() != null && (!recentlyTakenCutlery.containsKey(item.item.getres().name) || System.currentTimeMillis() - recentlyTakenCutlery.get(item.item.getres().name) > 500 )) { // About to break
-											ui.gui.error("The " + item.item.getname() + " is almost broken! Moving it to your inventory. Polish it or replace it.");
-											item.item.wdgmsg("transfer", Coord.z);
-											recentlyTakenCutlery.put(item.item.getres().name, System.currentTimeMillis());
-										}
-									}
-								}
-							}
-						} catch (Exception ignored){};
-					}
-				});
-			}
 		}
 	}
 

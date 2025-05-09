@@ -30,6 +30,7 @@ import java.util.*;
 import haven.render.*;
 import haven.res.ui.tt.q.qbuff.QBuff;
 import haven.res.ui.tt.q.quality.Quality;
+import haven.res.ui.tt.wear.Wear;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
@@ -691,5 +692,45 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 		} catch (Exception ignored) {
 		}
 		return null;
+	}
+
+	@Override
+	public void wdgmsg(String msg, Object... args) {
+		if (msg.equals("take")) {
+			if (OptWnd.preventTablewareFromBreakingCheckBox.a && ui.checkCursorImage("gfx/hud/curs/eat")) { // ND: Only when using the table's Feast button
+				Window feastingWindow = null;
+				outerLoop:
+				for (Window wnd : ui.gui.getAllWindows()) {
+					if (wnd.cap.equals("Table")) {
+						for (Widget wdg : wnd.children()) {
+							if (wdg instanceof Button) {
+								feastingWindow = wnd;
+								break outerLoop; // Break out of both loops
+							}
+						}
+					}
+				}
+				if (feastingWindow != null) {
+					for(Widget wdg : feastingWindow.children()) {
+						if (wdg instanceof Inventory) {
+							if (((Inventory)wdg).isz.equals(3, 3) || ((Inventory)wdg).isz.equals(1, 2)) {
+								for (WItem item : ((Inventory)wdg).wmap.values()) {
+									for (ItemInfo ii : item.item.info()) {
+										if (ii instanceof Wear) {
+											Wear wear = (Wear) ii;
+											if ((wear.m - wear.d == 1) && item.item.getres() != null) {
+												ui.gui.error("Preventing Cutlery from Breaking! The " + item.item.getname() + " is almost broken. Polish it or replace it.");
+												return;
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		super.wdgmsg(msg, args);
 	}
 }
