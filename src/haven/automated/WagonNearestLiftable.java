@@ -114,7 +114,8 @@ public class WagonNearestLiftable implements Runnable {
         Coord2d exitCoords = player.rc.add(Math.cos(angle) * distFromPlayer, Math.sin(angle) * distFromPlayer);
         gui.map.wdgmsg ( "click", Coord.z, exitCoords.floor ( posres ), 1, UI.MOD_CTRL, 0);
 
-        return waitPose(player, startPose, false, 25, Math.max(150, GameUI.getPingValue()+10));
+        Integer ping = GameUI.getPingValue();
+        return waitPose(player, startPose, false, 25, Math.max(150, ping != null ? GameUI.getPingValue()+10 : 100));
     }
 
     private enum VehicleType {
