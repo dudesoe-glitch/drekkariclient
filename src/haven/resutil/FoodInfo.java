@@ -129,8 +129,23 @@ public class FoodInfo extends ItemInfo.Tip {
 					}
 				}
 			}
-
-			head = String.format("\nFood Efficiency: $col[49,255,39]{%s%%}", Utils.odformat2(calculateEfficiency ? fepEfficiency : 100, 2));
+			boolean deepWorm = false;
+			if (ui != null && ui.gui != null && ui.gui.chrwdg != null && ui.gui.chrwdg.wound != null && ui.gui.chrwdg.wound.wounds != null && ui.gui.chrwdg.wound.wounds.wounds != null) {
+				for (WoundWnd.Wound wound : ui.gui.chrwdg.wound.wounds.wounds) {
+					if (wound != null && wound.res != null && wound.res.get() != null && wound.res.get().name != null && wound.res.get().name.equals("paginae/wound/deepworm")) {
+						deepWorm = true;
+						break;
+					}
+				}
+			}
+			if (deepWorm) {
+				head = "\n$col[255,25,25]{HEY! You have a Deep Worm Wound!" +
+						"\nYour food efficiency will be reduced!" +
+						"\nThe following values are inaccurate!}" +
+						"\n";
+				head += String.format("\nFood Efficiency: $col[49,255,39]{%s%%}", Utils.odformat2(calculateEfficiency ? fepEfficiency : 100, 2));
+			} else
+				head = String.format("\nFood Efficiency: $col[49,255,39]{%s%%}", Utils.odformat2(calculateEfficiency ? fepEfficiency : 100, 2));
 		}
 		else
 			head = "";
