@@ -56,7 +56,19 @@ public class LoginScreen extends Widget {
 	private String lastUser = "";
 	private String lastPass = "";
 	public static HSlider themeSongVolumeSlider;
-	static public final Resource mainTheme = Resource.local().loadwait("customclient/sfx/maintheme");
+	static public final List<Resource> themes = new ArrayList<>() {{
+		add(Resource.local().loadwait("customclient/sfx/rogueTheme"));
+		add(Resource.local().loadwait("customclient/sfx/knightTheme"));
+		add(Resource.local().loadwait("customclient/sfx/vikingTheme"));
+	}};
+	private static List<String> backgrounds = new ArrayList<>() {{
+		add("res/customclient/rogueScreen.png");
+		add("res/customclient/knightScreen.png");
+		add("res/customclient/vikingScreen.png");
+	}};
+	private OldDropBox backgroundDropBox;
+	static public int bgIndex = 1;
+	public Img backgroundImg;
 	static public Audio.CS mainThemeClip = null;
 	static public boolean mainThemeStopped = false;
 	static public final Resource charSelectTheme = Resource.local().loadwait("customclient/sfx/charselecttheme");
@@ -66,7 +78,6 @@ public class LoginScreen extends Widget {
 	private Window firstTimeUseWindow = null;
 	private Window firstTimeUseExtraBackgroundWindow = null; // ND: Do an extra window to have a solid background, no transparency.
 	private boolean firstTimeWindowCreated = false;
-	private static String backgroundPath = "res/customclient/loginScreen.png";
 	private final Window updateWindow;
 	private boolean githubVersionChecked = false;
 
@@ -75,11 +86,54 @@ public class LoginScreen extends Widget {
     }
 
     public LoginScreen(String hostname) {
-	super(bg().sz());
+	super(bg("res/customclient/bgsizer.png").sz());
+	if (Utils.getprefi("loginBgIndex", 0) == 0) {
+		Random rand = new Random();
+		bgIndex = rand.nextInt(3) + 1; // Generates 0–2, then add 1
+	} else {
+		bgIndex = Utils.getprefi("loginBgIndex", 0);
+	}
 	this.hostname = hostname;
-	Tex bg = bg();
+	Tex bg = bg(backgrounds.get(bgIndex-1));
 	setfocustab(true);
-	add(new Img(bg), Coord.z);
+	add(backgroundImg = new Img(bg), Coord.z);
+	backgroundDropBox = new OldDropBox<String>(UI.scale(66), 4, UI.scale(17)) {
+		final List<String> keys = new ArrayList<>(){{
+			add("Random!");
+			add("Rogue");
+			add("Knight");
+			add("Viking");
+		}};
+		{
+			super.change(bgIndex);
+		}
+		@Override
+		protected String listitem(int i) {
+			if (!keys.isEmpty())
+				return keys.get(i);
+			else return "???";
+		}
+		@Override
+		protected int listitems() {
+			return keys.size();
+		}
+		@Override
+		protected void drawitem(GOut g, String item, int i) {
+			g.aimage(Text.renderstroked(item).tex(), Coord.of(UI.scale(3), g.sz().y / 2), 0.0, 0.5);
+		}
+		@Override
+		public void change(String item) {
+			super.change(item);
+			Utils.setprefi("loginBgIndex", selindex);
+			if (selindex == 0) {
+				Random rand = new Random();
+				bgIndex = rand.nextInt(3) + 1; // Generates 0–2, then add 1
+			} else {
+				bgIndex = selindex;
+			}
+			changeLoginScreen(themes.get(bgIndex-1), backgrounds.get(bgIndex-1));
+		}
+	};
 	add(new CircleFadein(0.5));
 	optbtn = adda(new Button(UI.scale(100), "Options"), pos("cbl").add(10, -10), 0, 1);
 	optbtn.setgkey(GameUI.kb_opt);
@@ -106,7 +160,7 @@ public class LoginScreen extends Widget {
 		throw(new RuntimeException(e));
 	}
 	mainThemeStopped = false;
-	playMainTheme();
+	playMainTheme(themes.get(bgIndex-1));
 	add(themeSongVolumeSlider = new HSlider(UI.scale(220), 0, 100, Utils.getprefi("themeSongVolume", 40)) {
 		protected void attach(UI ui) {
 			super.attach(ui);
@@ -116,7 +170,9 @@ public class LoginScreen extends Widget {
 			OptWnd.themeSongVolumeSlider.changed();
 		}
 	}, bg.sz().x - UI.scale(230) , bg.sz().y - UI.scale(20));
-	add(new Label("Background Music Volume"), bg.sz().x - UI.scale(184) , bg.sz().y - UI.scale(36));
+	add(new Label("Background Music Volume"), bg.sz().x - UI.scale(180) , bg.sz().y - UI.scale(36));
+	add(new Label("Login Screen Style:"), bg.sz().x - UI.scale(200) , bg.sz().y - UI.scale(52));
+	add(backgroundDropBox, bg.sz().x - UI.scale(100) , bg.sz().y - UI.scale(52));
 	GameUI.swimmingToggled = false;
 	GameUI.trackingToggled = false;
 	GameUI.crimesToggled = false;
@@ -494,7 +550,7 @@ public class LoginScreen extends Widget {
     }
 
 	public void tick(double dt) {
-		playMainTheme();
+		playMainTheme(themes.get(bgIndex-1));
 		if (!firstTimeWindowCreated && Utils.getprefb("firstTimeOpeningClient", true)){
 			createFirstTimeUseWindow();
 		}
@@ -558,9 +614,9 @@ public class LoginScreen extends Widget {
 		g.aimage(PUtils.strokeTex(progress), bgc.adds(0, 50), 0.5, 0.0);
     }
 
-	private void playMainTheme() {
+	private void playMainTheme(Resource theme) {
 		if (!mainThemeStopped &&(mainThemeClip == null || !((Audio.Mixer) Audio.player.stream).playing(mainThemeClip))) {
-				Audio.CS klippi = fromres(mainTheme);
+				Audio.CS klippi = fromres(theme);
 				mainThemeClip = new Audio.VolAdjust(klippi, Utils.getprefi("themeSongVolume", 40)/100d);
 				Audio.play(mainThemeClip);
 		}
@@ -571,6 +627,13 @@ public class LoginScreen extends Widget {
 			Audio.stop(mainThemeClip);
 			mainThemeStopped = true;
 		}
+	}
+
+	private void changeLoginScreen(Resource theme, String imgPath){
+		stopMainTheme();
+		mainThemeStopped = false;
+		backgroundImg.setimg(bg(imgPath));
+		add(new CircleFadein(0.5));
 	}
 
 	private void createFirstTimeUseWindow(){
@@ -614,9 +677,9 @@ public class LoginScreen extends Widget {
 		firstTimeWindowCreated = true;
 	}
 
-	static Tex bg(){
+	static Tex bg(String imgPath){
 		try {
-			BufferedImage originalImage = ImageIO.read(new File(backgroundPath));
+			BufferedImage originalImage = ImageIO.read(new File(imgPath));
 			// Create a new buffered image with the desired size
 			BufferedImage resizedImage = new BufferedImage(bg.sz().x, bg.sz().y, originalImage.getType());
 			// Create a Graphics2D object to perform the drawing
