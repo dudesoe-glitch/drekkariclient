@@ -1369,7 +1369,7 @@ public class OptWnd extends Window {
 				}
 			}, prev.pos("bl").adds(0, 4).x(0));
 
-			prev = add(removeRealmChatCheckBox = new CheckBox("Remove realm chat (requires restart)"){
+			prev = add(removeRealmChatCheckBox = new CheckBox("Remove public realm chat (requires relog)"){
 				{a = (Utils.getprefb("removeRealmChat", false));}
 				public void changed(boolean val) {
 					Utils.setprefb("removeRealmChat", val);
