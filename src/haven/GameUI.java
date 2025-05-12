@@ -2407,7 +2407,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 		private final String horizontalSettingName;
 
 		public ActionBar(KeyBinding[] keybindings, int beltNumber, String horizontalSettingName) {
-			super(UI.scale(Utils.getprefb(horizontalSettingName, true) ? new Coord(388, 37) : new Coord(37, 388)));
+			super(UI.scale(Utils.getprefb(horizontalSettingName, true) ? new Coord(358, 37) : new Coord(37, 358)));
 			isHorizontal = Utils.getprefb(horizontalSettingName, true);
 			this.horizontalSettingName = horizontalSettingName;
 			beltkeys = keybindings;
@@ -2459,9 +2459,9 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 
 		private Coord beltc(int i) {
 			if (isHorizontal)
-				return(pagoff.add(UI.scale(39 * i), 0));
+				return(pagoff.add(UI.scale(36 * i), 0));
 			else
-				return(pagoff.add(0, UI.scale(39 * i)));
+				return(pagoff.add(0, UI.scale(36 * i)));
 		}
 
 		public int beltslot(Coord c) {
@@ -2631,7 +2631,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 		}
 
 		public void setActionBarHorizontal(boolean horizontal){
-			this.sz = UI.scale(horizontal ? new Coord(388, 37) : new Coord(37, 388));
+			this.sz = UI.scale(horizontal ? new Coord(358, 37) : new Coord(37, 358));
 			isHorizontal = horizontal;
 			Utils.setprefb(horizontalSettingName, horizontal);
 			checkIfOutsideOfUI();
