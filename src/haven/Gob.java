@@ -1489,25 +1489,11 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 				if (doHide) {
 					if (d.slots != null) {
 						ArrayList<RenderTree.Slot> tmpSlots = new ArrayList<>(d.slots);
-						try {
-							glob.loader.defer(() -> {
-								synchronized(Gob.this) {
-									RUtils.multiremSafe(tmpSlots);
-								}
-							}, null);
-						} catch (Exception ignored) {
-						}
+						glob.loader.defer(() -> RUtils.multiremSafe(tmpSlots), null);
 					}
 				} else {
 					ArrayList<RenderTree.Slot> tmpSlots = new ArrayList<>(slots);
-					try {
-						glob.loader.defer(() -> {
-							synchronized(Gob.this) {
-								RUtils.multiaddSafe(tmpSlots, d);
-							}
-						}, null);
-					} catch (Exception ignored) {
-					}
+					glob.loader.defer(() -> RUtils.multiaddSafe(tmpSlots, d), null);
 				}
 			}
 			if ((OptWnd.toggleGobHidingCheckBox.a && doShowHidingBox)) {

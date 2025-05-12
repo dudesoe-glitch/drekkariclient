@@ -300,8 +300,8 @@ public class RUtils {
 		} catch(RuntimeException e) {
 			for(Slot slot : added)
 				slot.remove();
-		}
-		catch (Exception ignored){}
+			throw(e);
+		} catch (Exception ignored){}
 		return(added);
 	}
 
