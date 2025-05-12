@@ -199,14 +199,6 @@
   <target name="deftgt" depends="jars, bin" />
 
   <target name="run" depends="bin">
-    <exec dir="bin/" executable="cmd">
-      <arg value="/c"/>
-      <arg value = "start"/>
-      <arg value="Play.bat"/>
-    </exec>
-  </target>
-
-    <target name="run2" depends="bin">
         <condition property="jogl-exports">
             <javaversion atleast="16" />
         </condition>
@@ -224,6 +216,13 @@
         </java>
     </target>
 
+  <target name="run > Play (Bat File)" depends="bin">
+    <exec dir="bin/" executable="cmd">
+      <arg value="/c"/>
+      <arg value = "start"/>
+      <arg value="Play.bat"/>
+    </exec>
+  </target>
 
     <target name="clean">
     <delete dir="build" />
