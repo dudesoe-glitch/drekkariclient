@@ -34,6 +34,7 @@ import java.util.Set;
 
 public class ISBox extends Widget implements DTarget {
     public static final Color bgcol = new Color(43, 51, 44, 127);
+    public static final Color bgcolinvisible = new Color(0, 0, 0, 0);
     public static final IBox box = new IBox("gfx/hud/bosq", "tl", "tr", "bl", "br", "el", "er", "et", "eb") {
 	    public void draw(GOut g, Coord tl, Coord sz) {
 		super.draw(g, tl, sz);
@@ -42,6 +43,15 @@ public class ISBox extends Widget implements DTarget {
 		g.chcolor();
 	    }
 	};
+    public static final IBox boxinvisible = new IBox("gfx/hud/bosq", "tl", "tr", "bl", "br", "el", "er", "et", "eb") {
+        public void draw(GOut g, Coord tl, Coord sz) {
+            g.chcolor(bgcolinvisible);
+            super.draw(g, tl, sz);
+            g.chcolor(bgcolinvisible);
+//            g.frect(tl.add(ctloff()), sz.sub(cisz()));
+//            g.chcolor();
+        }
+    };
     public static final Coord defsz = UI.scale(145, 42);
     public static final Text.Foundry lf = new Text.Foundry(Text.fraktur, 22, Color.WHITE).aa(true);
     private final Indir<Resource> res;

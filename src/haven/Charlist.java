@@ -33,9 +33,9 @@ import static haven.Audio.fromres;
 import static haven.LoginScreen.*;
 
 public class Charlist extends Widget {
-    public static final Coord bsz = UI.scale(289, 96);
+    public static final Coord bsz = UI.scale(364, 96);
     public static final Text.Furnace tf = new PUtils.BlurFurn(new PUtils.TexFurn(new Text.Foundry(Text.fraktur, 20).aa(true), Window.ctex), UI.scale(2), UI.scale(2), Color.BLACK);
-    public static final int margin = UI.scale(6);
+    public static final int margin = UI.scale(0);
     public static final int btnw = UI.scale(100);
     public final int height;
     public final IButton sau, sad;
@@ -55,10 +55,10 @@ public class Charlist extends Widget {
 	super(Coord.z);
 	this.height = height + 1;
 	setcanfocus(true);
-	sau = adda(new IButton("gfx/hud/buttons/csau", "u", "d", "o"), bsz.x / 2, 0, 0.5, 0)
+	sau = adda(new IButton("gfx/hud/buttons/csau", "u", "d", "o"), bsz.x / 3, 0, 0.5, 0)
 	    .action(() -> scroll(-1));
 	list = add(new Boxlist(height + 1), 0, sau.c.y + sau.sz.y + margin);
-	sad = adda(new IButton("gfx/hud/buttons/csad", "u", "d", "o"), bsz.x / 2, list.c.y + list.sz.y + margin, 0.5, 0)
+	sad = adda(new IButton("gfx/hud/buttons/csad", "u", "d", "o"), bsz.x / 3, list.c.y + list.sz.y + margin, 0.5, 0)
 	    .action(() -> scroll(1));
 	sau.hide(); sad.hide();
 	resize(new Coord(bsz.x, sad.c.y + sad.sz.y));
@@ -93,8 +93,8 @@ public class Charlist extends Widget {
 	    super(bsz);
 	    this.chr = chr;
 	    Widget avaf = adda(Frame.with(this.ava = new Avaview(Avaview.dasz, -1, "avacam"), false), Coord.of(sz.y / 2), 0.5, 0.5);
-	    add(new Img(tf.render(chr.name).tex()), avaf.pos("ur").adds(5, 0));
-	    adda(new Button(UI.scale(100), "Play"), pos("cbr").subs(10, 2), 1.0, 1.0).action(() -> {
+	    add(new Img(tf.render(chr.name).tex()), avaf.pos("ur").adds(10, 0));
+	    add(new Button(UI.scale(60), "Play"), pos("cbl").adds(100, -46)).action(() -> {
 			Charlist.this.wdgmsg("play", chr.name);
 			Config.setPlayerName(chr.name);
 			Config.initAutomapper(ui);
@@ -108,10 +108,10 @@ public class Charlist extends Widget {
 	}
 
 	public void draw(GOut g) {
-	    if(list.sel == chr)
-		g.chcolor(255, 195, 0, 255); // ND: Character selection overlay
-	    ISBox.box.draw(g, Coord.z, sz);
-	    g.chcolor();
+//	    if(list.sel == chr)
+//		g.chcolor(255, 195, 0, 255); // ND: Character selection overlay
+	    ISBox.boxinvisible.draw(g, Coord.z, sz); // ND: The avaviews bug out if the box is not drawn. God knows why. So I'm drawing an invisible one
+//	    g.chcolor();
 	    super.draw(g);
 	}
 
