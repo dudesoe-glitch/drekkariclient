@@ -105,7 +105,7 @@ public class LoginScreen extends Widget {
 			add("Viking");
 		}};
 		{
-			super.change(bgIndex);
+			super.change(Utils.getprefi("loginBgIndex", 0));
 		}
 		@Override
 		protected String listitem(int i) {
