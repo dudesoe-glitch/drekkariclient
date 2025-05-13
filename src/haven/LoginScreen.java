@@ -32,6 +32,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.util.*;
 import java.util.List;
@@ -218,6 +219,22 @@ public class LoginScreen extends Widget {
 	GameUI.verifiedAccount = false;
 	GameUI.subscribedAccount = false;
 	GameUI.stopAllThemes();
+	add(new IButton("customclient/discord", "", "-d", "-h") {
+		{settip("Hurricane Client Discord");}
+		public void click() {
+			URI uri = null;
+			try {
+				uri = new URI("https://discord.gg/WnEYkeAzja");
+			} catch (URISyntaxException e) {
+				return;
+			}
+			try {
+				WebBrowser.sshow(uri.toURL());
+			} catch (MalformedURLException | WebBrowser.BrowserException ignored) {
+			}
+
+        }
+	}, new Coord(this.sz.x + UI.scale(-60), 0));
     }
 
 //    public static final KeyBinding kb_savtoken = KeyBinding.get("login/savtoken", KeyMatch.forchar('R', KeyMatch.M)); // ND: Why the fuck are there keybinds for these? Someone might press one of those by mistake
