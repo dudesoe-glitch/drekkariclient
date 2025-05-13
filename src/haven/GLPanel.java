@@ -200,10 +200,10 @@ public interface GLPanel extends UIPanel, UI.Context {
 		if(pos.y < 0)
 		    pos.y = 0;
 		Coord br = pos.add(sz);
-		Coord m = UI.scale(2, 2);
-		g.chcolor(255, 195, 0, 215); // ND: This is the tooltip border color
-		g.rect2(pos.sub(m).sub(1, 1), br.add(m).add(1, 1));
-		g.chcolor(35, 35, 35, 192);
+		Coord m = UI.scale(3, 3);
+		g.chcolor(255, 195, 0, 210); // ND: This is the tooltip border color
+		g.rect2(pos.sub(m).sub(1, 1), br.add(m));
+		g.chcolor(5, 5, 5, 230);
 		g.frect2(pos.sub(m), br.add(m));
 		g.chcolor();
 		g.image(tex, pos);
