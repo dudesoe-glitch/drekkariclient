@@ -77,6 +77,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	public HitBoxGobSprite<CollisionBox> collisionBox = null;
 	private final GobQualityInfo qualityInfo;
 	GobGrowthInfo growthInfo;
+	GobReadyForHarvestInfo readyForHarvestInfo;
 	public boolean isHidden;
 	private final GobCustomSizeAndRotation customSizeAndRotation = new GobCustomSizeAndRotation();
 	public double gobSpeed = 0;
@@ -526,6 +527,8 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	setattr(GobQualityInfo.class, qualityInfo);
 	growthInfo = new GobGrowthInfo(this);
 	setattr(GobGrowthInfo.class, growthInfo);
+	readyForHarvestInfo = new GobReadyForHarvestInfo(this);
+	setattr(GobReadyForHarvestInfo.class, readyForHarvestInfo);
 	barrelContentsGobInfo = new BarrelContentsGobInfo(this);
 	iconSignGobInfo = new IconSignGobInfo(this);
 	setattr(BarrelContentsGobInfo.class, barrelContentsGobInfo);
@@ -2452,6 +2455,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 		updateWorkstationProgressHighlight();
 		checkIfObjectJustDied();
 		growthInfo.clear();
+		readyForHarvestInfo.clear();
 		barrelContentsGobInfo.clear();
 		iconSignGobInfo.signInfoTex = null;
 		iconSignGobInfo.clear();
@@ -2460,6 +2464,16 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 
 	public void refreshGrowthInfo(){
 		growthInfo.clear();
+	}
+
+	//Useful for getting stage information or model type
+	public int sdt() {
+		Drawable d = getattr(Drawable.class);
+		if(d instanceof ResDrawable) {
+			ResDrawable dw = (ResDrawable) d;
+			return dw.sdtnum();
+		}
+		return 0;
 	}
 
 	public Message sdtm() {

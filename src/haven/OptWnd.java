@@ -1483,6 +1483,7 @@ public class OptWnd extends Window {
 	public static ColorOptionWidget partyChatPingColorOptionWidget;
 	public static String[] partyChatPingColorSetting = Utils.getprefsa("partyChatPing" + "_colorSetting", new String[]{"243", "0", "0", "255"});
 	public static CheckBox showObjectsSpeedCheckBox;
+	public static CheckBox showTreesBushesHarvestIconsCheckBox;
 
 	public static CheckBox objectPermanentHighlightingCheckBox;
 
@@ -2165,6 +2166,14 @@ public class OptWnd extends Window {
 				}
 			}, rightColumn.pos("bl").adds(0, 12));
 			showObjectsSpeedCheckBox.tooltip = showObjectsSpeedTooltip;
+			rightColumn = add(showTreesBushesHarvestIconsCheckBox = new CheckBox("Show Trees & Bushes Harvest Icons"){
+				{a = Utils.getprefb("showTreesBushesHarvestIcons", false);}
+				public void set(boolean val) {
+					Utils.setprefb("showTreesBushesHarvestIcons", val);
+					a = val;
+				}
+			}, rightColumn.pos("bl").adds(0, 12));
+			showTreesBushesHarvestIconsCheckBox.tooltip = showTreesBushesHarvestIconsTooltip;
 
 			Widget backButton;
 			add(backButton = new PButton(UI.scale(200), "Back", 27, back, "Advanced Settings"), leftColumn.pos("bl").adds(0, 18).x(0));
@@ -4979,6 +4988,9 @@ public class OptWnd extends Window {
 	private final Object showObjectsSpeedTooltip = RichText.render("Enabling this will show the speed of moving objects (Players, Mobs, Vehicles, etc.) below them." +
 			"\n" +
 			"\n$col[218,163,0]{Keybind:} $col[185,185,185]{This can also be toggled using a keybind.}", UI.scale(300));
+	private final Object showTreesBushesHarvestIconsTooltip = RichText.render("Enabling this will show the icons of seeds and leaves that can be collected on fully grown trees and bushes." +
+			"\n" +
+			"\n$col[185,185,185]{It won't show the icons on trees/bushes that are not 100% grown, even if they can already be harvested.}", UI.scale(300));
 
 	// Quality Display Settings Tooltips
 	private final Object customQualityColorsTooltip = RichText.render("These numbers and colors are completely arbitrary, and you can change them to whatever you like." +

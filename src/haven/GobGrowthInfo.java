@@ -8,10 +8,10 @@ import java.util.List;
 import java.util.Map;
 
 public class GobGrowthInfo extends GobInfo {
-    private static final int TREE_START = 10;
-    private static final int BUSH_START = 30;
-    private static final double TREE_MULT = 100.0 / (100.0 - TREE_START);
-    private static final double BUSH_MULT = 100.0 / (100.0 - BUSH_START);
+    public static final int TREE_START = 10;
+	public static final int BUSH_START = 30;
+	public static final double TREE_MULT = 100.0 / (100.0 - TREE_START);
+	public static final double BUSH_MULT = 100.0 / (100.0 - BUSH_START);
     private static final Color BG = new Color(0, 0, 0, 0);
 	private static final Map<String, BufferedImage> stageTextCache = new HashMap<>();
 

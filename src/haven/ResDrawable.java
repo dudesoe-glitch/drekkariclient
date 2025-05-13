@@ -30,6 +30,8 @@ import java.util.*;
 import java.util.function.*;
 import haven.render.*;
 
+import static haven.Sprite.decnum;
+
 public class ResDrawable extends Drawable implements Sprite.Owner, EquipTarget {
     public final Indir<Resource> res;
     public final Resource rres;
@@ -126,4 +128,12 @@ public class ResDrawable extends Drawable implements Sprite.Owner, EquipTarget {
 		g.updateDrawableStuff();
 	}
     }
+
+	public int sdtnum() {
+		if (sdt != null) {
+			Message msg = sdt.clone();
+			return msg.eom() ? 0xffff000 : decnum(msg);
+		}
+		return 0;
+	}
 }
