@@ -2019,34 +2019,6 @@ public class OptWnd extends Window {
 				}
 			}, middleColumn.pos("bl").adds(0, 2));
 
-			middleColumn = add(displayGrowthInfoCheckBox = new CheckBox("Display Growth Info on Plants and Trees"){
-				{a = (Utils.getprefb("displayGrowthInfo", false));}
-				public void changed(boolean val) {
-					Utils.setprefb("displayGrowthInfo", val);
-				}
-			}, middleColumn.pos("bl").adds(0, 12));
-			displayGrowthInfoCheckBox.tooltip = displayGrowthInfoTooltip;
-			middleColumn = add(alsoShowOversizedTreesAbovePercentageCheckBox = new CheckBox("Also Show Trees Above %:"){
-				{a = (Utils.getprefb("alsoShowOversizedTreesAbovePercentage", true));}
-				public void changed(boolean val) {
-					Utils.setprefb("alsoShowOversizedTreesAbovePercentage", val);
-					if (ui != null && ui.gui != null) {
-						ui.sess.glob.oc.gobAction(Gob::refreshGrowthInfo);
-					}
-				}
-			}, middleColumn.pos("bl").adds(12, 2));
-			add(oversizedTreesPercentageTextEntry = new TextEntry(UI.scale(36), Utils.getpref("oversizedTreesPercentage", "150")){
-				protected void changed() {
-					this.settext(this.text().replaceAll("[^\\d]", "")); // Only numbers
-					this.settext(this.text().replaceAll("(?<=^.{3}).*", "")); // No more than 3 digits
-					Utils.setpref("oversizedTreesPercentage", this.buf.line());
-					if (ui != null && ui.gui != null) {
-						ui.sess.glob.oc.gobAction(Gob::refreshGrowthInfo);
-					}
-					super.changed();
-				}
-			}, alsoShowOversizedTreesAbovePercentageCheckBox.pos("ur").adds(4, 0));
-
 			rightColumn = add(drawChaseVectorsCheckBox = new CheckBox("Draw Chase Vectors"){
 				{a = Utils.getprefb("drawChaseVectors", true);}
 				public void changed(boolean val) {
@@ -2164,15 +2136,42 @@ public class OptWnd extends Window {
 						ui.gui.optionInfoMsg("Objects Speed is now " + (val ? "SHOWN" : "HIDDEN") + "!", (val ? msgGreen : msgGray), Audio.resclip(val ? Toggle.sfxon : Toggle.sfxoff));
 					}
 				}
-			}, rightColumn.pos("bl").adds(0, 12));
+			}, rightColumn.pos("bl").adds(0, 12).x(UI.scale(480)));
 			showObjectsSpeedCheckBox.tooltip = showObjectsSpeedTooltip;
+			rightColumn = add(displayGrowthInfoCheckBox = new CheckBox("Display Growth Info on Plants and Trees"){
+				{a = (Utils.getprefb("displayGrowthInfo", false));}
+				public void changed(boolean val) {
+					Utils.setprefb("displayGrowthInfo", val);
+				}
+			}, rightColumn.pos("bl").adds(0, 17));
+			displayGrowthInfoCheckBox.tooltip = displayGrowthInfoTooltip;
+			rightColumn = add(alsoShowOversizedTreesAbovePercentageCheckBox = new CheckBox("Also Show Trees Above %:"){
+				{a = (Utils.getprefb("alsoShowOversizedTreesAbovePercentage", true));}
+				public void changed(boolean val) {
+					Utils.setprefb("alsoShowOversizedTreesAbovePercentage", val);
+					if (ui != null && ui.gui != null) {
+						ui.sess.glob.oc.gobAction(Gob::refreshGrowthInfo);
+					}
+				}
+			}, rightColumn.pos("bl").adds(12, 2));
+			add(oversizedTreesPercentageTextEntry = new TextEntry(UI.scale(36), Utils.getpref("oversizedTreesPercentage", "150")){
+				protected void changed() {
+					this.settext(this.text().replaceAll("[^\\d]", "")); // Only numbers
+					this.settext(this.text().replaceAll("(?<=^.{3}).*", "")); // No more than 3 digits
+					Utils.setpref("oversizedTreesPercentage", this.buf.line());
+					if (ui != null && ui.gui != null) {
+						ui.sess.glob.oc.gobAction(Gob::refreshGrowthInfo);
+					}
+					super.changed();
+				}
+			}, alsoShowOversizedTreesAbovePercentageCheckBox.pos("ur").adds(4, 0));
 			rightColumn = add(showTreesBushesHarvestIconsCheckBox = new CheckBox("Show Trees & Bushes Harvest Icons"){
 				{a = Utils.getprefb("showTreesBushesHarvestIcons", false);}
 				public void set(boolean val) {
 					Utils.setprefb("showTreesBushesHarvestIcons", val);
 					a = val;
 				}
-			}, rightColumn.pos("bl").adds(0, 12));
+			}, rightColumn.pos("bl").adds(0, 12).x(UI.scale(480)));
 			showTreesBushesHarvestIconsCheckBox.tooltip = showTreesBushesHarvestIconsTooltip;
 
 			Widget backButton;
