@@ -432,14 +432,28 @@ public class OptWnd extends Window {
 
     public class AudioPanel extends Panel {
 	public AudioPanel(Panel back) {
-	    prev = add(new Label("Master audio volume"), 0, 0);
-	    prev = add(new HSlider(UI.scale(audioSliderWidth), 0, 1000, (int)(Audio.volume * 1000)) {
+		Widget leftColumn, rightColumn;
+		leftColumn = add(new Label("Master audio volume"), 179, 0);
+		leftColumn = add(new HSlider(UI.scale(460), 0, 1000, (int)(Audio.volume * 1000)) {
 		    public void changed() {
 			Audio.setvolume(val / 1000.0);
 		    }
-		}, prev.pos("bl").adds(0, 2));
-		prev = add(new Label("Background Music Volume"), prev.pos("bl").adds(0, 15));
-		prev = add(themeSongVolumeSlider = new HSlider(UI.scale(220), 0, 100, Utils.getprefi("themeSongVolume", 40)) {
+		}, leftColumn.pos("bl").adds(0, 2).x(0));
+
+		leftColumn = add(new Label("In-game event volume (Sound FX)"), leftColumn.pos("bl").adds(0, 15));
+		leftColumn = add(new HSlider(UI.scale(audioSliderWidth), 0, 1000, 0) {
+			protected void attach(UI ui) {
+				super.attach(ui);
+				val = (int)(ui.audio.pos.volume * 1000);
+			}
+			public void changed() {
+				ui.audio.pos.setvolume(val / 1000.0);
+			}
+		}, leftColumn.pos("bl").adds(0, 2));
+
+
+		leftColumn = add(new Label("Background Music Volume (Custom Client)"), leftColumn.pos("bl").adds(0, 5));
+		leftColumn = add(themeSongVolumeSlider = new HSlider(UI.scale(220), 0, 100, Utils.getprefi("themeSongVolume", 40)) {
 			protected void attach(UI ui) {
 				super.attach(ui);
 			}
@@ -456,10 +470,8 @@ public class OptWnd extends Window {
 				if (Charlist.themeSongVolumeSlider != null) Charlist.themeSongVolumeSlider.val = val;
 				Utils.setprefi("themeSongVolume", val);
 			}
-		}, prev.pos("bl").adds(0, 2));
-
-
-		prev = add(new Label("Background Music Theme:"), prev.pos("bl").adds(0, 6).x(0));
+		}, leftColumn.pos("bl").adds(0, 2));
+		leftColumn = add(new Label("Background Music Theme:"), leftColumn.pos("bl").adds(0, 6).x(0));
 		List<String> musicThemes = Arrays.asList("Hurricane  ", "Legacy");
 		add(new OldDropBox<String>(musicThemes.size(), musicThemes) {
 			{
@@ -487,130 +499,124 @@ public class OptWnd extends Window {
 				}
 				GameUI.settingStopAllThemes();
 			}
-		}, prev.pos("ur").adds(0, 1));
+		}, leftColumn.pos("ur").adds(0, 1));
+
+		rightColumn = add(new Label("Ambient volume"), UI.scale(240, 51));
+		rightColumn = add(new HSlider(UI.scale(audioSliderWidth), 0, 1000, 0) {
+			protected void attach(UI ui) {
+				super.attach(ui);
+				val = (int)(ui.audio.amb.volume * 1000);
+			}
+			public void changed() {
+				ui.audio.amb.setvolume(val / 1000.0);
+			}
+		}, rightColumn.pos("bl").adds(0, 2));
 
 
+		rightColumn = add(new Label("Interface sound volume"), rightColumn.pos("bl").adds(0, 5));
+		rightColumn = add(new HSlider(UI.scale(audioSliderWidth), 0, 1000, 0) {
+			protected void attach(UI ui) {
+				super.attach(ui);
+				val = (int)(ui.audio.aui.volume * 1000);
+			}
+			public void changed() {
+				ui.audio.aui.setvolume(val / 1000.0);
+			}
+		}, rightColumn.pos("bl").adds(0, 2));
 
-	    prev = add(new Label("Interface sound volume"), prev.pos("bl").adds(0, 15));
-	    prev = add(new HSlider(UI.scale(audioSliderWidth), 0, 1000, 0) {
-		    protected void attach(UI ui) {
-			super.attach(ui);
-			val = (int)(ui.audio.aui.volume * 1000);
-		    }
-		    public void changed() {
-			ui.audio.aui.setvolume(val / 1000.0);
-		    }
-		}, prev.pos("bl").adds(0, 2));
-	    prev = add(new Label("In-game event volume"), prev.pos("bl").adds(0, 5));
-	    prev = add(new HSlider(UI.scale(audioSliderWidth), 0, 1000, 0) {
-		    protected void attach(UI ui) {
-			super.attach(ui);
-			val = (int)(ui.audio.pos.volume * 1000);
-		    }
-		    public void changed() {
-			ui.audio.pos.setvolume(val / 1000.0);
-		    }
-		}, prev.pos("bl").adds(0, 2));
-	    prev = add(new Label("Ambient volume"), prev.pos("bl").adds(0, 5));
-	    prev = add(new HSlider(UI.scale(audioSliderWidth), 0, 1000, 0) {
-		    protected void attach(UI ui) {
-			super.attach(ui);
-			val = (int)(ui.audio.amb.volume * 1000);
-		    }
-		    public void changed() {
-			ui.audio.amb.setvolume(val / 1000.0);
-		    }
-		}, prev.pos("bl").adds(0, 2));
-	    prev = add(new Label("Audio latency"), prev.pos("bl").adds(0, 15));
-		prev.tooltip = audioLatencyTooltip;
+	    leftColumn = add(new Label("Audio latency"), leftColumn.pos("bl").adds(195, 15));
+		leftColumn.tooltip = audioLatencyTooltip;
 	    {
 		Label dpy = new Label("");
-		addhlp(prev.pos("bl").adds(0, 2), UI.scale(5),
-		       prev = new HSlider(UI.scale(audioSliderWidth-40), Math.round(Audio.fmt.getSampleRate() * 0.05f), Math.round(Audio.fmt.getSampleRate() / 4), Audio.bufsize()) {
-			       protected void added() {
-				   dpy();
-			       }
-			       void dpy() {
-				   dpy.settext(Math.round((this.val * 1000) / Audio.fmt.getSampleRate()) + " ms");
-			       }
-			       public void changed() {
-				   Audio.bufsize(val, true);
-				   dpy();
-			       }
-			   }, dpy);
-		prev.tooltip = audioLatencyTooltip;
+		addhlp(leftColumn.pos("bl").adds(0, 2).x(0), UI.scale(5),
+			leftColumn = new HSlider(UI.scale(460-40), Math.round(Audio.fmt.getSampleRate() * 0.05f), Math.round(Audio.fmt.getSampleRate() / 4), Audio.bufsize()) {
+			   protected void added() {
+			   dpy();
+			   }
+			   void dpy() {
+			   dpy.settext(Math.round((this.val * 1000) / Audio.fmt.getSampleRate()) + " ms");
+			   }
+			   public void changed() {
+			   Audio.bufsize(val, true);
+			   dpy();
+			   }
+		   	}, dpy);
+			leftColumn.tooltip = audioLatencyTooltip;
 	    }
 
-		prev = add(new Label("Other Sound Settings"), prev.pos("bl").adds(52, 20));
-		prev = add(new Label("Music Instruments Volume"), prev.pos("bl").adds(0, 5).x(0));
-		prev = add(instrumentsSoundVolumeSlider = new HSlider(UI.scale(audioSliderWidth), 0, 100, Utils.getprefi("instrumentsSoundVolume", 70)) {
-			protected void attach(UI ui) {
-				super.attach(ui);
-			}
-			public void changed() {
-				Utils.setprefi("instrumentsSoundVolume", val);
-			}
-		}, prev.pos("bl").adds(0, 2));
-		prev = add(new Label("Clap Sound Effect Volume"), prev.pos("bl").adds(0, 5).x(0));
-		prev = add(clapSoundVolumeSlider = new HSlider(UI.scale(audioSliderWidth), 0, 100, Utils.getprefi("clapSoundVolume", 10)) {
-			protected void attach(UI ui) {
-				super.attach(ui);
-			}
-			public void changed() {
-				Utils.setprefi("clapSoundVolume", val);
-			}
-		}, prev.pos("bl").adds(0, 2));
+		leftColumn = add(new Label("Other Sound Settings"), leftColumn.pos("bl").adds(177, 20));
 
-		prev = add(new Label("Quern Sound Effect Volume"), prev.pos("bl").adds(0, 5).x(0));
-		prev = add(quernSoundVolumeSlider = new HSlider(UI.scale(audioSliderWidth), 0, 100, Utils.getprefi("quernSoundVolume", 10)) {
-			protected void attach(UI ui) {
-				super.attach(ui);
-			}
-			public void changed() {
-				Utils.setprefi("quernSoundVolume", val);
-			}
-		}, prev.pos("bl").adds(0, 2));
-
-		prev = add(new Label("Boiling Cauldron Volume (Requires Reload)"), prev.pos("bl").adds(0, 5).x(0));
-		prev = add(cauldronSoundVolumeSlider = new HSlider(UI.scale(audioSliderWidth), 0, 100, Utils.getprefi("cauldronSoundVolume", 25)) {
+		leftColumn = add(new Label("Boiling Cauldron Volume (Requires Reload)"), leftColumn.pos("bl").adds(0, 5).x(0));
+		leftColumn = add(cauldronSoundVolumeSlider = new HSlider(UI.scale(audioSliderWidth), 0, 100, Utils.getprefi("cauldronSoundVolume", 25)) {
 			protected void attach(UI ui) {
 				super.attach(ui);
 			}
 			public void changed() {
 				Utils.setprefi("cauldronSoundVolume", val);
 			}
-		}, prev.pos("bl").adds(0, 2));
+		}, leftColumn.pos("bl").adds(0, 2));
 
-		prev = add(new Label("Squeak Sound Volume (Roasting Spit, etc.)"), prev.pos("bl").adds(0, 5).x(0));
-		prev = add(squeakSoundVolumeSlider = new HSlider(UI.scale(audioSliderWidth), 0, 100, Utils.getprefi("squeakSoundVolume", 25)) {
+		leftColumn = add(new Label("Squeak Sound Volume (Roasting Spit, etc.)"), leftColumn.pos("bl").adds(0, 5).x(0));
+		leftColumn = add(squeakSoundVolumeSlider = new HSlider(UI.scale(audioSliderWidth), 0, 100, Utils.getprefi("squeakSoundVolume", 25)) {
 			protected void attach(UI ui) {
 				super.attach(ui);
 			}
 			public void changed() {
 				Utils.setprefi("squeakSoundVolume", val);
 			}
-		}, prev.pos("bl").adds(0, 2));
+		}, leftColumn.pos("bl").adds(0, 2));
 
-		prev = add(new Label("Butcher Sound Volume"), prev.pos("bl").adds(0, 5).x(0));
-		prev = add(butcherSoundVolumeSlider = new HSlider(UI.scale(audioSliderWidth), 0, 100, Utils.getprefi("butcherSoundVolume", 75)) {
+		leftColumn = add(new Label("Butchering Sound Volume"), leftColumn.pos("bl").adds(0, 5).x(0));
+		leftColumn = add(butcherSoundVolumeSlider = new HSlider(UI.scale(audioSliderWidth), 0, 100, Utils.getprefi("butcherSoundVolume", 75)) {
 			protected void attach(UI ui) {
 				super.attach(ui);
 			}
 			public void changed() {
 				Utils.setprefi("butcherSoundVolume", val);
 			}
-		}, prev.pos("bl").adds(0, 2));
-		prev = add(new Label("White Duck Cap Sound Volume"), prev.pos("bl").adds(0, 5).x(0));
-		prev = add(whiteDuckCapSoundVolumeSlider = new HSlider(UI.scale(audioSliderWidth), 0, 100, Utils.getprefi("whiteDuckCapSoundVolume", 75)) {
+		}, leftColumn.pos("bl").adds(0, 2));
+
+		leftColumn = add(new Label("Quern Sound Effect Volume"), leftColumn.pos("bl").adds(0, 5).x(0));
+		leftColumn = add(quernSoundVolumeSlider = new HSlider(UI.scale(audioSliderWidth), 0, 100, Utils.getprefi("quernSoundVolume", 10)) {
+			protected void attach(UI ui) {
+				super.attach(ui);
+			}
+			public void changed() {
+				Utils.setprefi("quernSoundVolume", val);
+			}
+		}, leftColumn.pos("bl").adds(0, 2));
+
+		rightColumn = add(new Label("Music Instruments Volume"), rightColumn.pos("bl").adds(0, 119));
+		rightColumn = add(instrumentsSoundVolumeSlider = new HSlider(UI.scale(audioSliderWidth), 0, 100, Utils.getprefi("instrumentsSoundVolume", 70)) {
+			protected void attach(UI ui) {
+				super.attach(ui);
+			}
+			public void changed() {
+				Utils.setprefi("instrumentsSoundVolume", val);
+			}
+		}, rightColumn.pos("bl").adds(0, 2));
+
+		rightColumn = add(new Label("Clap Sound Effect Volume"), rightColumn.pos("bl").adds(0, 5));
+		rightColumn = add(clapSoundVolumeSlider = new HSlider(UI.scale(audioSliderWidth), 0, 100, Utils.getprefi("clapSoundVolume", 10)) {
+			protected void attach(UI ui) {
+				super.attach(ui);
+			}
+			public void changed() {
+				Utils.setprefi("clapSoundVolume", val);
+			}
+		}, rightColumn.pos("bl").adds(0, 2));
+
+		rightColumn = add(new Label("White Duck Cap Sound Volume"), rightColumn.pos("bl").adds(0, 5));
+		rightColumn = add(whiteDuckCapSoundVolumeSlider = new HSlider(UI.scale(audioSliderWidth), 0, 100, Utils.getprefi("whiteDuckCapSoundVolume", 75)) {
 			protected void attach(UI ui) {
 				super.attach(ui);
 			}
 			public void changed() {
 				Utils.setprefi("whiteDuckCapSoundVolume", val);
 			}
-		}, prev.pos("bl").adds(0, 2));
+		}, rightColumn.pos("bl").adds(0, 2));
 
-	    add(new PButton(UI.scale(200), "Back", 27, back, "Options            "), prev.pos("bl").adds(0, 30));
+	    add(new PButton(UI.scale(200), "Back", 27, back, "Options            "), leftColumn.pos("bl").adds(0, 30));
 	    pack();
 	}
     }
