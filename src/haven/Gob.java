@@ -75,7 +75,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	private HitBoxGobSprite<HidingBox> hidingBoxHollow = null;
 	private HitBoxGobSprite<HidingBox> hidingBoxFilled = null;
 	public HitBoxGobSprite<CollisionBox> collisionBox = null;
-	private final GobQualityInfo qualityInfo;
+	private GobQualityInfo qualityInfo;
 	GobGrowthInfo growthInfo;
 	GobReadyForHarvestInfo readyForHarvestInfo;
 	public boolean isHidden;
@@ -523,16 +523,6 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 		addDmg();
 	}
 	setupmods.add(customSizeAndRotation);
-	qualityInfo = new GobQualityInfo(this);
-	setattr(GobQualityInfo.class, qualityInfo);
-	growthInfo = new GobGrowthInfo(this);
-	setattr(GobGrowthInfo.class, growthInfo);
-	readyForHarvestInfo = new GobReadyForHarvestInfo(this);
-	setattr(GobReadyForHarvestInfo.class, readyForHarvestInfo);
-	barrelContentsGobInfo = new BarrelContentsGobInfo(this);
-	iconSignGobInfo = new IconSignGobInfo(this);
-	setattr(BarrelContentsGobInfo.class, barrelContentsGobInfo);
-	setattr(IconSignGobInfo.class, iconSignGobInfo);
 	updwait(this::updateDrawableStuff, waiting -> {});
     }
 
@@ -1228,6 +1218,25 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 						alarmPlayed.add(id);
 				}
 			}
+			if (res.name.startsWith("gfx/terobjs/barrel") && barrelContentsGobInfo == null) {
+				barrelContentsGobInfo = new BarrelContentsGobInfo(this);
+				setattr(BarrelContentsGobInfo.class, barrelContentsGobInfo);
+			}
+			if (res.name.startsWith("gfx/terobjs/iconsign") && iconSignGobInfo == null) {
+				iconSignGobInfo = new IconSignGobInfo(this);
+				setattr(IconSignGobInfo.class, iconSignGobInfo);
+			}
+			if(((res.name.contains("gfx/terobjs/trees") && !res.name.endsWith("log") && !res.name.endsWith("oldtrunk"))
+			|| (res.name.contains("gfx/terobjs/bushes"))
+			|| (res.name.contains("gfx/terobjs/plants") && !res.name.endsWith("trellis"))) && growthInfo == null){
+				growthInfo = new GobGrowthInfo(this);
+				setattr(GobGrowthInfo.class, growthInfo);
+			}
+			if(((res.name.contains("gfx/terobjs/trees") && !res.name.endsWith("log") && !res.name.endsWith("oldtrunk"))
+			|| (res.name.contains("gfx/terobjs/bushes"))) && readyForHarvestInfo == null){
+				readyForHarvestInfo = new GobReadyForHarvestInfo(this);
+				setattr(GobReadyForHarvestInfo.class, readyForHarvestInfo);
+			}
 		}
 		updateCustomIcons();
 		updateCritterAuras();
@@ -1564,8 +1573,15 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	}
 
 	public void setQualityInfo(int quality){
-		qualityInfo.clear();
-		qualityInfo.setQ(quality);
+		if (qualityInfo == null) {
+			qualityInfo = new GobQualityInfo(this);
+			setattr(GobQualityInfo.class, qualityInfo);
+			qualityInfo.clear();
+			qualityInfo.setQ(quality);
+		} else {
+			qualityInfo.clear();
+			qualityInfo.setQ(quality);
+		}
 	}
 
 
@@ -2454,16 +2470,18 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 		updateCustomSizeAndRotation();
 		updateWorkstationProgressHighlight();
 		checkIfObjectJustDied();
-		growthInfo.clear();
-		readyForHarvestInfo.clear();
-		barrelContentsGobInfo.clear();
-		iconSignGobInfo.signInfoTex = null;
-		iconSignGobInfo.clear();
+		if (growthInfo != null) growthInfo.clear();
+		if (readyForHarvestInfo != null) readyForHarvestInfo.clear();
+		if (barrelContentsGobInfo != null) barrelContentsGobInfo.clear();
+		if (iconSignGobInfo != null) {
+			iconSignGobInfo.signInfoTex = null;
+			iconSignGobInfo.clear();
+		}
 		setGobSearchOverlay();
 	}
 
 	public void refreshGrowthInfo(){
-		growthInfo.clear();
+		if (growthInfo != null) growthInfo.clear();
 	}
 
 	//Useful for getting stage information or model type
