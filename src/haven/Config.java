@@ -33,7 +33,6 @@ import java.util.function.*;
 import java.io.*;
 import java.nio.file.*;
 import java.net.URI;
-import java.net.URLConnection;
 import java.io.PrintStream;
 
 public class Config {
@@ -1127,6 +1126,27 @@ public class Config {
 		MappingClient automapper = MappingClient.getInstance();
 		if (automapper != null)
 			automapper.SetPlayerName(OptWnd.liveLocationNameTextEntry.buf.line() + " (" + playername + ")");
+	}
+
+	public static final Map<String, String> ORE_FULL_NAMES = new HashMap<>();
+	static {
+		ORE_FULL_NAMES.put("argentite", "Silvershine (Argentite)");
+		ORE_FULL_NAMES.put("blackcoal", "Coal (Black Coal)");
+		ORE_FULL_NAMES.put("cuprite", "Wine Glance (Cuprite)");
+		ORE_FULL_NAMES.put("cassiterite", "Cassiterite");
+		ORE_FULL_NAMES.put("chalcopyrite", "Chalcopyrite");
+		ORE_FULL_NAMES.put("hematite", "Bloodstone (Hematite)");
+		ORE_FULL_NAMES.put("hornsilver", "Horn Silver");
+		ORE_FULL_NAMES.put("ilmenite", "Heavy Earth (Ilmenite)");
+		ORE_FULL_NAMES.put("leadglance", "Lead Glance");
+		ORE_FULL_NAMES.put("limonite", "Iron Ochre (Limonite)");
+		ORE_FULL_NAMES.put("malachite", "Malachite");
+		ORE_FULL_NAMES.put("magnetite", "Black Ore (Magnetite)");
+		ORE_FULL_NAMES.put("nagyagite", "Leaf Ore (Nagyagite)");
+		ORE_FULL_NAMES.put("peacockore", "Peacockore");
+		ORE_FULL_NAMES.put("petzite", "Direvein (Petzite)");
+		ORE_FULL_NAMES.put("sylvanite", "Schrifterz (Sylvanite)");
+		ORE_FULL_NAMES.put("galena", "Galena");
 	}
 
 }

@@ -26,7 +26,6 @@
 
 package haven;
 
-import haven.automated.helpers.TileStatic;
 import haven.render.*;
 
 import java.awt.image.BufferedImage;
@@ -1114,8 +1113,8 @@ public class MiniMap extends Widget {
 				biome = newbiome;
 				String key = prettybiome(biome).toLowerCase();
 				String biomeText;
-				if (TileStatic.ORE_NAMES.containsKey(key)) {
-					biomeText = TileStatic.ORE_NAMES.get(key);
+				if (Config.ORE_FULL_NAMES.containsKey(key)) {
+					biomeText = Config.ORE_FULL_NAMES.get(key);
 				} else {
 					biomeText = prettybiome(biome);
 				}

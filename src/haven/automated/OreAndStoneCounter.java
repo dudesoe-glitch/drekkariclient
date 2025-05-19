@@ -4,7 +4,6 @@ import haven.Label;
 import haven.Scrollbar;
 import haven.Window;
 import haven.*;
-import haven.automated.helpers.TileStatic;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -42,8 +41,8 @@ public class OreAndStoneCounter extends Window implements Runnable {
                         Resource res =  gui.ui.sess.glob.map.tilesetr(t);
                         if(res.name.contains("gfx/tiles/rocks/")){
                             String name = res.basename();
-                            if(TileStatic.ORE_NAMES.get(name) != null){
-                                name = TileStatic.ORE_NAMES.get(name);
+                            if(Config.ORE_FULL_NAMES.get(name) != null){
+                                name = Config.ORE_FULL_NAMES.get(name);
                                 ores.put(name, ores.getOrDefault(name, 1) + 1);
                             } else {
                                 rocks.put(name, rocks.getOrDefault(name, 1) + 1);

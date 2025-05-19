@@ -1,7 +1,5 @@
 package haven;
 
-import haven.automated.helpers.TileStatic;
-
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
@@ -258,8 +256,8 @@ public class TileHighlight {
 	private TileItem(String res) {
 	    this.res = res;
 		String key = Utils.prettyResName(res).toLowerCase();
-		if (TileStatic.ORE_NAMES.containsKey(key)) {
-			this.name = TileStatic.ORE_NAMES.get(key);
+		if (Config.ORE_FULL_NAMES.containsKey(key)) {
+			this.name = Config.ORE_FULL_NAMES.get(key);
 		} else {
 			this.name = Utils.prettyResName(res);
 		}
