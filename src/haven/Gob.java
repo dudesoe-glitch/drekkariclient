@@ -78,6 +78,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	private GobQualityInfo qualityInfo;
 	GobGrowthInfo growthInfo;
 	GobReadyForHarvestInfo readyForHarvestInfo;
+	GobFoodWaterInfo foodWaterInfo;
 	public boolean isHidden;
 	private final GobCustomSizeAndRotation customSizeAndRotation = new GobCustomSizeAndRotation();
 	public double gobSpeed = 0;
@@ -1236,6 +1237,10 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 			|| (res.name.contains("gfx/terobjs/bushes"))) && readyForHarvestInfo == null){
 				readyForHarvestInfo = new GobReadyForHarvestInfo(this);
 				setattr(GobReadyForHarvestInfo.class, readyForHarvestInfo);
+			}
+			if ((res.name.equals("gfx/terobjs/chickencoop") || res.name.equals("gfx/terobjs/rabbithutch")) && foodWaterInfo == null) {
+				foodWaterInfo = new GobFoodWaterInfo(this);
+				setattr(GobFoodWaterInfo.class, foodWaterInfo);
 			}
 		}
 		updateCustomIcons();
@@ -2472,6 +2477,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 		checkIfObjectJustDied();
 		if (growthInfo != null) growthInfo.clear();
 		if (readyForHarvestInfo != null) readyForHarvestInfo.clear();
+		if (foodWaterInfo != null) foodWaterInfo.clear();
 		if (barrelContentsGobInfo != null) barrelContentsGobInfo.clear();
 		if (iconSignGobInfo != null) {
 			iconSignGobInfo.signInfoTex = null;

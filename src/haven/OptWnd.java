@@ -1490,6 +1490,7 @@ public class OptWnd extends Window {
 	public static String[] partyChatPingColorSetting = Utils.getprefsa("partyChatPing" + "_colorSetting", new String[]{"243", "0", "0", "255"});
 	public static CheckBox showObjectsSpeedCheckBox;
 	public static CheckBox showTreesBushesHarvestIconsCheckBox;
+	public static CheckBox showLowFoodWaterIconsCheckBox;
 
 	public static CheckBox objectPermanentHighlightingCheckBox;
 
@@ -2180,6 +2181,15 @@ public class OptWnd extends Window {
 			}, rightColumn.pos("bl").adds(0, 12).x(UI.scale(480)));
 			showTreesBushesHarvestIconsCheckBox.tooltip = showTreesBushesHarvestIconsTooltip;
 
+			rightColumn = add(showLowFoodWaterIconsCheckBox = new CheckBox("Show Low Food & Water Icons"){
+				{a = Utils.getprefb("showLowFoodWaterIcons", false);}
+				public void set(boolean val) {
+					Utils.setprefb("showLowFoodWaterIcons", val);
+					a = val;
+				}
+			}, rightColumn.pos("bl").adds(0, 2).x(UI.scale(480)));
+			showLowFoodWaterIconsCheckBox.tooltip = showLowFoodWaterIconsTooltip;
+
 			Widget backButton;
 			add(backButton = new PButton(UI.scale(200), "Back", 27, back, "Advanced Settings"), leftColumn.pos("bl").adds(0, 18).x(0));
 			pack();
@@ -2512,6 +2522,7 @@ public class OptWnd extends Window {
 		y = addbtn(cont, "Toggle Object Hiding", GameUI.kb_toggleHidingBoxes, y);
 		y = addbtn(cont, "Display Growth Info on Plants", GameUI.kb_toggleGrowthInfo, y);
 		y = addbtn(cont, "Show Tree/Bush Harvest Icons", GameUI.kb_toggleHarvestIcons, y);
+		y = addbtn(cont, "Show Low Food/Water Icons", GameUI.kb_toggleLowFoodWaterIcons, y);
 		y = addbtn(cont, "Show Objects Speed", GameUI.kb_toggleSpeedInfo, y);
 		y = addbtn(cont, "Hide/Show Cursor Item", GameUI.kb_toggleCursorItem, y);
 		y+=UI.scale(20);
@@ -4420,6 +4431,13 @@ public class OptWnd extends Window {
 	private final Object showTreesBushesHarvestIconsTooltip = RichText.render("Enabling this will show the icons of seeds and leaves that can be collected on fully grown trees and bushes." +
 			"\n" +
 			"\n$col[185,185,185]{It won't show the icons on trees/bushes that are not 100% grown, even if they can already be harvested.}", UI.scale(300));
+	private final Object showLowFoodWaterIconsTooltip = RichText.render("Enabling this will show warning icons for low food and low water over Chicken Coops and Rabbit Hutches" +
+			"\n" +
+			"\n$col[185,185,185]{For Chicken Coops, the icons show up when they go below 50% Food/Water. " +
+			"\nFor Rabbit Hutches, the icons show up when they go below 33% for Food and below 50% for Water." +
+			"\nI can't change this because the game does not differentiate between any other values for them.}" +
+			"\n" +
+			"\n$col[218,163,0]{Keybind:} $col[185,185,185]{This can also be toggled using a keybind.}", UI.scale(300));
 
 	// Quality Display Settings Tooltips
 	private final Object customQualityColorsTooltip = RichText.render("These numbers and colors are completely arbitrary, and you can change them to whatever you like." +
