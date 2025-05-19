@@ -49,7 +49,7 @@ public class GobReadyForHarvestInfo extends GobInfo {
 	}};
 
 	public static final Map<String, String> LeavesMap = new HashMap<String, String>() {{
-		// ND: These have to be manually done, cause if the tree/bush doesn't actually produce seeds, the indicator for leaves is always true
+		// ND: These have to be manually done, cause if the tree/bush doesn't actually produce leaves, the indicator for leaves is always true
 		put("conkertree", "gfx/invobjs/leaf-conkertree");
 		put("figtree", "gfx/invobjs/leaf-fig");
 		put("laurel", "gfx/invobjs/leaf-laurel");
