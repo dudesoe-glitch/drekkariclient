@@ -103,8 +103,8 @@ public class GobReadyForHarvestInfo extends GobInfo {
 					boolean seed = (sdt & 1) != 1;
 					boolean leaf = (sdt & 2) != 2; // ND: If the tree/bush doesn't actually produce seeds, this is always true (smh)
 					parts = new BufferedImage[]{
-							seed ? getIcon(resBaseName, "seed") : null,
 							leaf ? getIcon(resBaseName, "leaf") : null,
+							seed ? getIcon(resBaseName, "seed") : null,
 					};
 				}
 			}
