@@ -258,6 +258,8 @@ public class TileHighlight {
 		String key = Utils.prettyResName(res).toLowerCase();
 		if (Config.ORE_FULL_NAMES.containsKey(key)) {
 			this.name = Config.ORE_FULL_NAMES.get(key);
+		} else if (Config.STONE_FULL_NAMES.containsKey(key)) {
+			this.name = Config.STONE_FULL_NAMES.get(key);
 		} else {
 			this.name = Utils.prettyResName(res);
 		}

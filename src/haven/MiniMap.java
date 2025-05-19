@@ -1115,6 +1115,8 @@ public class MiniMap extends Widget {
 				String biomeText;
 				if (Config.ORE_FULL_NAMES.containsKey(key)) {
 					biomeText = Config.ORE_FULL_NAMES.get(key);
+				} else if (Config.STONE_FULL_NAMES.containsKey(key)) {
+					biomeText = Config.STONE_FULL_NAMES.get(key);
 				} else {
 					biomeText = prettybiome(biome);
 				}

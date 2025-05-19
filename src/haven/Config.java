@@ -1149,4 +1149,9 @@ public class Config {
 		ORE_FULL_NAMES.put("galena", "Galena");
 	}
 
+	public static final Map<String, String> STONE_FULL_NAMES = new HashMap<>();
+	static {
+		STONE_FULL_NAMES.put("corund", "Korund (Corund)");
+	}
+
 }

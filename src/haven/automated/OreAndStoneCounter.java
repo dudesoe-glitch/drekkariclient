@@ -41,9 +41,12 @@ public class OreAndStoneCounter extends Window implements Runnable {
                         Resource res =  gui.ui.sess.glob.map.tilesetr(t);
                         if(res.name.contains("gfx/tiles/rocks/")){
                             String name = res.basename();
-                            if(Config.ORE_FULL_NAMES.get(name) != null){
+                            if(Config.ORE_FULL_NAMES.get(name) != null) {
                                 name = Config.ORE_FULL_NAMES.get(name);
                                 ores.put(name, ores.getOrDefault(name, 1) + 1);
+                            } else if(Config.STONE_FULL_NAMES.get(name) != null){
+                                name = Config.STONE_FULL_NAMES.get(name);
+                                ores.put(name, rocks.getOrDefault(name, 1) + 1);
                             } else {
                                 rocks.put(name, rocks.getOrDefault(name, 1) + 1);
                             }
