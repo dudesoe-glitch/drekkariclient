@@ -13,16 +13,19 @@ public class GobReadyForHarvestInfo extends GobInfo {
 		// Pine trees are called "pine", and their seed is "seed-pine" (so this works by default)
 		// Quince trees are called "quincetree", and their seed is "quince"
 		// Mulberry trees are called "mulberry", and their seed is "mulberry"
+
+		// Trees:
 		put("almondtree", "gfx/invobjs/almond");
 		put("appletree", "gfx/invobjs/apple");
 		put("appletreegreen", "gfx/invobjs/applegreen");
 		put("birdcherrytree", "gfx/invobjs/birdcherry");
+		put("carobtree", "gfx/invobjs/carobfruit");
 		put("cherry", "gfx/invobjs/cherry");
 		put("chestnuttree", "gfx/invobjs/chestnut");
+		put("corkoak", "gfx/invobjs/cork");
 		put("figtree", "gfx/invobjs/fig");
 		put("hazel", "gfx/invobjs/hazelnut");
 		put("lemontree", "gfx/invobjs/lemon");
-		put("mastic", "gfx/invobjs/masticfruit");
 		put("medlartree", "gfx/invobjs/medlar");
 		put("mulberry", "gfx/invobjs/mulberry");
 		put("olivetree", "gfx/invobjs/olive");
@@ -30,14 +33,19 @@ public class GobReadyForHarvestInfo extends GobInfo {
 		put("peartree", "gfx/invobjs/pear");
 		put("persimmontree", "gfx/invobjs/persimmon");
 		put("plumtree", "gfx/invobjs/plum");
-		put("rowan", "gfx/invobjs/rowanberry");
-		put("corkoak", "gfx/invobjs/cork");
 		put("quincetree", "gfx/invobjs/quince");
+		put("rowan", "gfx/invobjs/rowanberry");
 		put("sorbtree", "gfx/invobjs/sorbapple");
 		put("stonepine", "gfx/invobjs/stonepinecone");
 		put("strawberrytree", "gfx/invobjs/woodstrawberry");
 		put("walnuttree", "gfx/invobjs/walnut");
 		put("whitebeam", "gfx/invobjs/whitebeamfruit");
+
+		// Bushes:
+		put("ghostpipe", "gfx/invobjs/ghostpipes");
+		put("mastic", "gfx/invobjs/masticfruit");
+		put("poppycaps", "gfx/invobjs/poppycapss"); // ND: Yes, "poppycapss" with 2 "s". This is not a typo.
+
 	}};
 
 	public static final Map<String, String> LeavesMap = new HashMap<String, String>() {{
