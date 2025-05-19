@@ -2006,9 +2006,8 @@ public class OptWnd extends Window {
 			showMoundBedsRadiiCheckBox.tooltip = showMoundBedsRadiiTooltip;
 			middleColumn = add(showBarrelContentsTextCheckBox = new CheckBox("Show Barrel Contents Text"){
 				{a = (Utils.getprefb("showBarrelContentsText", true));}
-				public void set(boolean val) {
+				public void changed(boolean val) {
 					Utils.setprefb("showBarrelContentsText", val);
-					a = val;
 					if (ui != null && ui.gui != null){
 						ui.gui.optionInfoMsg("Barrel Contents Text is now " + (val ? "SHOWN" : "HIDDEN") + "!", (val ? msgGreen : msgGray), Audio.resclip(val ? Toggle.sfxon : Toggle.sfxoff));
 					}
@@ -2017,9 +2016,8 @@ public class OptWnd extends Window {
 
 			middleColumn = add(showIconSignTextCheckBox = new CheckBox("Show Icon Sign Text"){
 				{a = (Utils.getprefb("showIconSignText", true));}
-				public void set(boolean val) {
+				public void changed(boolean val) {
 					Utils.setprefb("showIconSignText", val);
-					a = val;
 					if (ui != null && ui.gui != null){
 						ui.gui.optionInfoMsg("Icon Sign Text is now " + (val ? "SHOWN" : "HIDDEN") + "!", (val ? msgGreen : msgGray), Audio.resclip(val ? Toggle.sfxon : Toggle.sfxoff));
 					}
@@ -2136,9 +2134,8 @@ public class OptWnd extends Window {
 			}), partyChatPingColorOptionWidget.pos("ur").adds(10, 0));
 			rightColumn = add(showObjectsSpeedCheckBox = new CheckBox("Show Objects Speed"){
 				{a = Utils.getprefb("showObjectsSpeed", false);}
-				public void set(boolean val) {
+				public void changed(boolean val) {
 					Utils.setprefb("showObjectsSpeed", val);
-					a = val;
 					if (ui != null && ui.gui != null) {
 						ui.gui.optionInfoMsg("Objects Speed is now " + (val ? "SHOWN" : "HIDDEN") + "!", (val ? msgGreen : msgGray), Audio.resclip(val ? Toggle.sfxon : Toggle.sfxoff));
 					}
@@ -2149,6 +2146,9 @@ public class OptWnd extends Window {
 				{a = (Utils.getprefb("displayGrowthInfo", false));}
 				public void changed(boolean val) {
 					Utils.setprefb("displayGrowthInfo", val);
+					if (ui != null && ui.gui != null) {
+						ui.gui.optionInfoMsg("Growth Info on Plants and Trees is now " + (val ? "SHOWN" : "HIDDEN") + "!", (val ? msgGreen : msgGray), Audio.resclip(val ? Toggle.sfxon : Toggle.sfxoff));
+					}
 				}
 			}, rightColumn.pos("bl").adds(0, 17));
 			displayGrowthInfoCheckBox.tooltip = displayGrowthInfoTooltip;
@@ -2174,18 +2174,22 @@ public class OptWnd extends Window {
 			}, alsoShowOversizedTreesAbovePercentageCheckBox.pos("ur").adds(4, 0));
 			rightColumn = add(showTreesBushesHarvestIconsCheckBox = new CheckBox("Show Trees & Bushes Harvest Icons"){
 				{a = Utils.getprefb("showTreesBushesHarvestIcons", false);}
-				public void set(boolean val) {
+				public void changed(boolean val) {
 					Utils.setprefb("showTreesBushesHarvestIcons", val);
-					a = val;
+					if (ui != null && ui.gui != null) {
+						ui.gui.optionInfoMsg("Trees & Bushes Harvest Icons are now " + (val ? "SHOWN" : "HIDDEN") + "!", (val ? msgGreen : msgGray), Audio.resclip(val ? Toggle.sfxon : Toggle.sfxoff));
+					}
 				}
 			}, rightColumn.pos("bl").adds(0, 12).x(UI.scale(480)));
 			showTreesBushesHarvestIconsCheckBox.tooltip = showTreesBushesHarvestIconsTooltip;
 
 			rightColumn = add(showLowFoodWaterIconsCheckBox = new CheckBox("Show Low Food & Water Icons"){
 				{a = Utils.getprefb("showLowFoodWaterIcons", false);}
-				public void set(boolean val) {
+				public void changed(boolean val) {
 					Utils.setprefb("showLowFoodWaterIcons", val);
-					a = val;
+					if (ui != null && ui.gui != null) {
+						ui.gui.optionInfoMsg("Low Food & Water Icons are now " + (val ? "SHOWN" : "HIDDEN") + "!", (val ? msgGreen : msgGray), Audio.resclip(val ? Toggle.sfxon : Toggle.sfxoff));
+					}
 				}
 			}, rightColumn.pos("bl").adds(0, 2).x(UI.scale(480)));
 			showLowFoodWaterIconsCheckBox.tooltip = showLowFoodWaterIconsTooltip;
@@ -4430,7 +4434,9 @@ public class OptWnd extends Window {
 			"\n$col[218,163,0]{Keybind:} $col[185,185,185]{This can also be toggled using a keybind.}", UI.scale(300));
 	private final Object showTreesBushesHarvestIconsTooltip = RichText.render("Enabling this will show the icons of seeds and leaves that can be collected on fully grown trees and bushes." +
 			"\n" +
-			"\n$col[185,185,185]{It won't show the icons on trees/bushes that are not 100% grown, even if they can already be harvested.}", UI.scale(300));
+			"\n$col[185,185,185]{It won't show the icons on trees/bushes that are not 100% grown, even if they can already be harvested.}" +
+			"\n" +
+			"\n$col[218,163,0]{Keybind:} $col[185,185,185]{This can also be toggled using a keybind.}", UI.scale(300));
 	private final Object showLowFoodWaterIconsTooltip = RichText.render("Enabling this will show warning icons for low food and low water over Chicken Coops and Rabbit Hutches" +
 			"\n" +
 			"\n$col[185,185,185]{For Chicken Coops, the icons show up when they go below 50% Food/Water. " +
