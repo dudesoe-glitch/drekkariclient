@@ -79,6 +79,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	GobGrowthInfo growthInfo;
 	GobReadyForHarvestInfo readyForHarvestInfo;
 	GobFoodWaterInfo foodWaterInfo;
+	GobBeeskepHarvestInfo beeskepHarvestInfo;
 	public boolean isHidden;
 	private final GobCustomSizeAndRotation customSizeAndRotation = new GobCustomSizeAndRotation();
 	public double gobSpeed = 0;
@@ -1241,6 +1242,10 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 			if ((res.name.equals("gfx/terobjs/chickencoop") || res.name.equals("gfx/terobjs/rabbithutch")) && foodWaterInfo == null) {
 				foodWaterInfo = new GobFoodWaterInfo(this);
 				setattr(GobFoodWaterInfo.class, foodWaterInfo);
+			}
+			if (res.name.equals("gfx/terobjs/beehive") && beeskepHarvestInfo == null) {
+				beeskepHarvestInfo = new GobBeeskepHarvestInfo(this);
+				setattr(GobBeeskepHarvestInfo.class, beeskepHarvestInfo);
 			}
 		}
 		updateCustomIcons();
@@ -2478,6 +2483,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 		if (growthInfo != null) growthInfo.clear();
 		if (readyForHarvestInfo != null) readyForHarvestInfo.clear();
 		if (foodWaterInfo != null) foodWaterInfo.clear();
+		if (beeskepHarvestInfo != null) beeskepHarvestInfo.clear();
 		if (barrelContentsGobInfo != null) barrelContentsGobInfo.clear();
 		if (iconSignGobInfo != null) {
 			iconSignGobInfo.signInfoTex = null;

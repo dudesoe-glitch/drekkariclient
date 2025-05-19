@@ -1821,6 +1821,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 	public static KeyBinding kb_toggleGrowthInfo  = KeyBinding.get("toggleGrowthInfoKB",  KeyMatch.forchar('I',  KeyMatch.C | KeyMatch.S));
 	public static KeyBinding kb_toggleHarvestIcons  = KeyBinding.get("toggleHarvestIconsKB",  KeyMatch.forchar('P',  KeyMatch.C | KeyMatch.S));
 	public static KeyBinding kb_toggleLowFoodWaterIcons  = KeyBinding.get("toggleLowFoodWaterIconsKB",  KeyMatch.forchar('O',  KeyMatch.C | KeyMatch.S));
+	public static KeyBinding kb_toggleBeeSkepIcons  = KeyBinding.get("toggleBeeSkepIconsKB",  KeyMatch.forchar('L',  KeyMatch.C | KeyMatch.S));
 	public static KeyBinding kb_toggleSpeedInfo  = KeyBinding.get("toggleSpeedInfoKB",  KeyMatch.forchar('S',  KeyMatch.C | KeyMatch.S));
 	public static KeyBinding kb_toggleCursorItem = KeyBinding.get("toggleCursorItemKB",  KeyMatch.nil);
 	public static KeyBinding kb_lootNearestKnockedPlayer = KeyBinding.get("lootNearestKnockedPlayerKB",  KeyMatch.forchar('D', KeyMatch.S));
@@ -1963,6 +1964,9 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 		return(true);
 	} else if(kb_toggleLowFoodWaterIcons.key().match(ev)) {
 		OptWnd.showLowFoodWaterIconsCheckBox.set(!OptWnd.showLowFoodWaterIconsCheckBox.a);
+		return(true);
+	} else if(kb_toggleBeeSkepIcons.key().match(ev)) {
+		OptWnd.showBeeSkepsHarvestIconsCheckBox.set(!OptWnd.showBeeSkepsHarvestIconsCheckBox.a);
 		return(true);
 	} else if(kb_toggleSpeedInfo.key().match(ev)) {
 		OptWnd.showObjectsSpeedCheckBox.set(!OptWnd.showObjectsSpeedCheckBox.a);
