@@ -70,6 +70,7 @@ public class GobReadyForHarvestInfo extends GobInfo {
 
 	@Override
 	protected Tex render() {
+	up(6);
 	if(gob == null || gob.getres() == null) { return null;}
 		if (icons() != null)
 			return new TexI(icons());
