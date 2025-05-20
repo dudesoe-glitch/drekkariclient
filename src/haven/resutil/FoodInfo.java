@@ -81,6 +81,7 @@ public class FoodInfo extends ItemInfo.Tip {
 	public Effect(List<ItemInfo> info, double p) {this.info = info; this.p = p;}
     }
 
+	// TODO: ND: This method needs to be cleaned up
     public BufferedImage tipimg() {
 		String head = null;
 		double hungerEfficiency = 100;
