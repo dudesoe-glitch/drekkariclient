@@ -50,7 +50,10 @@ public class GobCheeseRackInfo extends GobInfo {
 			String name = spr.res.name;
 			String text = null;
 			if (name.startsWith("gfx/terobjs/items/cheesetray-")) {
-				text = "T" + name.substring(name.lastIndexOf("-") + 2);
+				if (name.endsWith("curd"))
+					text = "Curd";
+				else
+					text = "T" + name.substring(name.lastIndexOf("-") + 2);
 			}
 			if(text != null) {
 				spr.setTex2d(combine(PUtils.strokeImg(text(text, TEXT_COL).img)));
