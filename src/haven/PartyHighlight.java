@@ -47,7 +47,7 @@ public class PartyHighlight {
     }
 
     private void highlight(Gob gob, Color color) {
-        if (overlays.containsKey(gob) && overlays.get(gob).c == color)
+        if (overlays.containsKey(gob) && overlays.get(gob).color == color)
             return;
         GobPartyHighlight overlay = new GobPartyHighlight(gob, color);
         gob.setattr(overlay);

@@ -6,17 +6,19 @@ import haven.render.Pipe;
 import java.awt.*;
 
 public class GobPartyHighlight extends GAttrib implements Gob.SetupMod {
-    public final Color c;
+    public Color color;
+    public MixColor mixColor;
     
-    public GobPartyHighlight(Gob g, Color c) {
+    public GobPartyHighlight(Gob g, Color color) {
 	super(g);
-	this.c = c;
-    }
-    
-    public void start() {
+	this.color = color;
     }
     
     public Pipe.Op gobstate() {
-        return new MixColor(c.getRed(), c.getGreen(), c.getBlue(), c.getAlpha());
+        if (color != null) {
+            mixColor = new MixColor(color);
+            color = null;
+        }
+        return mixColor;
     }
 }

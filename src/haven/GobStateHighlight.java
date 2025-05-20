@@ -7,6 +7,7 @@ import java.awt.*;
 
 public class GobStateHighlight extends GAttrib implements Gob.SetupMod {
     public Color color;
+    public MixColor mixColor;
 
     public GobStateHighlight(Gob g, Color color) {
 	super(g);
@@ -14,6 +15,10 @@ public class GobStateHighlight extends GAttrib implements Gob.SetupMod {
     }
     
     public Pipe.Op gobstate() {
-        return new MixColor(color);
+        if (color != null) {
+            mixColor = new MixColor(color);
+            color = null;
+        }
+        return mixColor;
     }
 }

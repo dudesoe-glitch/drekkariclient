@@ -2112,7 +2112,7 @@ public class OptWnd extends Window {
 			}, rightColumn.pos("bl").adds(0, 2));
 
 			rightColumn = add(combatFoeColorOptionWidget = new ColorOptionWidget("Combat Foes:", "combatFoes", 115, Integer.parseInt(combatFoeColorSetting[0]), Integer.parseInt(combatFoeColorSetting[1]), Integer.parseInt(combatFoeColorSetting[2]), Integer.parseInt(combatFoeColorSetting[3]), (Color col) -> {
-				GobCombatHighlight.COMBAT_FOE_COLOR = col;
+				GobCombatHighlight.COMBAT_FOE_MIXCOLOR = new MixColor(col.getRed(), col.getGreen(), col.getBlue(), col.getAlpha());
 				AggroCircleSprite.COMBAT_FOE_COLOR = col;
 				if (ui != null && ui.gui != null) {
 					ui.sess.glob.oc.gobAction(Gob::removeCombatFoeCircleOverlay);
@@ -2122,7 +2122,7 @@ public class OptWnd extends Window {
 			add(new Button(UI.scale(70), "Reset", false).action(() -> {
 				Utils.setprefsa("combatFoes" + "_colorSetting", new String[]{"160", "0", "0", "164"});
 				combatFoeColorOptionWidget.cb.colorChooser.setColor(combatFoeColorOptionWidget.currentColor = new Color(160, 0, 0, 164));
-				GobCombatHighlight.COMBAT_FOE_COLOR = combatFoeColorOptionWidget.currentColor;
+				GobCombatHighlight.COMBAT_FOE_MIXCOLOR = new MixColor(combatFoeColorOptionWidget.currentColor.getRed(), combatFoeColorOptionWidget.currentColor.getGreen(), combatFoeColorOptionWidget.currentColor.getBlue(), combatFoeColorOptionWidget.currentColor.getAlpha());
 				AggroCircleSprite.COMBAT_FOE_COLOR = combatFoeColorOptionWidget.currentColor;
 				if (ui != null && ui.gui != null) {
 					ui.sess.glob.oc.gobAction(Gob::removeCombatFoeCircleOverlay);
