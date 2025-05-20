@@ -46,7 +46,7 @@ public class BaseFileCache implements ResCache {
 		Path appdata = Utils.path(path);
 		if(!Files.exists(appdata) || !Files.isDirectory(appdata) || !Files.isReadable(appdata) || !Files.isWritable(appdata))
 		    break windows;
-		Path base = pj(appdata, "Hurricane and Hearth", "cache");
+		Path base = pj(appdata, "Haven and Hearth", "cache");
 		if(!Files.exists(base)) {
 		    try {
 			Files.createDirectories(base);
