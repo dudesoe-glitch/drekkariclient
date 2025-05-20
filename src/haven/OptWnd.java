@@ -1438,6 +1438,7 @@ public class OptWnd extends Window {
 	public static CheckBox showMoundBedsRadiiCheckBox;
 	public static CheckBox showBarrelContentsTextCheckBox;
 	public static CheckBox showIconSignTextCheckBox;
+	public static CheckBox showCheeseRacksTierTextCheckBox;
 	public static CheckBox drawChaseVectorsCheckBox;
 	public static CheckBox drawYourCurrentPathCheckBox;
 	public static CheckBox highlightCliffsCheckBox;
@@ -2021,6 +2022,15 @@ public class OptWnd extends Window {
 					Utils.setprefb("showIconSignText", val);
 					if (ui != null && ui.gui != null){
 						ui.gui.optionInfoMsg("Icon Sign Text is now " + (val ? "SHOWN" : "HIDDEN") + "!", (val ? msgGreen : msgGray), Audio.resclip(val ? Toggle.sfxon : Toggle.sfxoff));
+					}
+				}
+			}, middleColumn.pos("bl").adds(0, 2));
+			middleColumn = add(showCheeseRacksTierTextCheckBox = new CheckBox("Show Cheese Racks Tier Text"){
+				{a = (Utils.getprefb("showCheeseRacksTierText", false));}
+				public void changed(boolean val) {
+					Utils.setprefb("showCheeseRacksTierText", val);
+					if (ui != null && ui.gui != null){
+						ui.gui.optionInfoMsg("Cheese Racks Tier Text is now " + (val ? "SHOWN" : "HIDDEN") + "!", (val ? msgGreen : msgGray), Audio.resclip(val ? Toggle.sfxon : Toggle.sfxoff));
 					}
 				}
 			}, middleColumn.pos("bl").adds(0, 2));

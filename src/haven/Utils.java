@@ -2522,4 +2522,9 @@ public class Utils {
 		return new SimpleDateFormat("HH:mm").format(new Date());
 	}
 
+	public static Optional<Gob> owner2ogob(Sprite.Owner owner) {
+		if(owner instanceof Gob) {return Optional.of((Gob) owner);}
+		return owner.ocontext(Gob.class);
+	}
+
 }

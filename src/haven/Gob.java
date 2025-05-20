@@ -110,6 +110,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	private Overlay archeryRadius;
 	BarrelContentsGobInfo barrelContentsGobInfo;
 	IconSignGobInfo iconSignGobInfo;
+	GobCheeseRackInfo cheeseRackInfo;
 	public boolean combatFoeHighlighted = false;
 	private GobSpeedInfo gobSpeedInfo;
 
@@ -1227,6 +1228,10 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 			if (res.name.startsWith("gfx/terobjs/iconsign") && iconSignGobInfo == null) {
 				iconSignGobInfo = new IconSignGobInfo(this);
 				setattr(IconSignGobInfo.class, iconSignGobInfo);
+			}
+			if (res.name.startsWith("gfx/terobjs/cheeserack") && cheeseRackInfo == null) {
+				cheeseRackInfo = new GobCheeseRackInfo(this);
+				setattr(GobCheeseRackInfo.class, cheeseRackInfo);
 			}
 			if(((res.name.contains("gfx/terobjs/trees") && !res.name.endsWith("log") && !res.name.endsWith("oldtrunk"))
 			|| (res.name.contains("gfx/terobjs/bushes"))
@@ -2485,6 +2490,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 		if (foodWaterInfo != null) foodWaterInfo.clear();
 		if (beeskepHarvestInfo != null) beeskepHarvestInfo.clear();
 		if (barrelContentsGobInfo != null) barrelContentsGobInfo.clear();
+		if (cheeseRackInfo != null) cheeseRackInfo.clear();
 		if (iconSignGobInfo != null) {
 			iconSignGobInfo.signInfoTex = null;
 			iconSignGobInfo.clear();
