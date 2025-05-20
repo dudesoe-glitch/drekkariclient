@@ -263,11 +263,13 @@ public class WItem extends Widget implements DTarget {
 					if (ah.str.text.equals("Well mined")) {
 						drawwellmined(g);
 					} else if (ah.str.text.equals("Black-truffled")) {
-						drawadhocicon(g, "gfx/invobjs/herbs/truffle-black", 18);
+						drawadhocicon(g, "gfx/invobjs/herbs/truffle-black", 18, 0);
 					} else if (ah.str.text.equals("White-truffled")) {
-						drawadhocicon(g, "gfx/invobjs/herbs/truffle-white", 9);
+						drawadhocicon(g, "gfx/invobjs/herbs/truffle-white", 9, 0);
 					} else if (ah.str.text.equals("Peppered")) {
-						drawadhocicon(g, "gfx/invobjs/pepper", 0);
+						drawadhocicon(g, "gfx/invobjs/pepper", 0, 0);
+					} else if (ah.str.text.equals("Salted")) {
+						drawadhocicon(g, "gfx/invobjs/salt", 18, 9);
 					}
 				}
 			}
@@ -499,10 +501,10 @@ public class WItem extends Widget implements DTarget {
 		g.chcolor();
 	}
 
-	private void drawadhocicon(GOut g, String resname, int offset) {
+	private void drawadhocicon(GOut g, String resname, int offsetX, int offsetY) {
 		Resource res = Resource.remote().load(resname).get();
 		BufferedImage bufferedimage = res.layer(Resource.imgc).img;
-		g.image(bufferedimage, new Coord(UI.scale(offset), sz.y-UI.scale(16)), new Coord(UI.scale(16),UI.scale(16)));
+		g.image(bufferedimage, new Coord(UI.scale(offsetX), sz.y-UI.scale(16+offsetY)), new Coord(UI.scale(16),UI.scale(16)));
 	}
 
 	private void drawnum(GOut g, Coord sz) {
