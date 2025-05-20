@@ -63,9 +63,9 @@ public class LoginScreen extends Widget {
 		add(Resource.local().loadwait("customclient/sfx/vikingTheme"));
 	}};
 	private static List<String> backgrounds = new ArrayList<>() {{
-		add("res/customclient/rogueScreen.png");
-		add("res/customclient/knightScreen.png");
-		add("res/customclient/vikingScreen.png");
+		add(haven.MainFrame.gameDir + "res/customclient/rogueScreen.png");
+		add(haven.MainFrame.gameDir + "res/customclient/knightScreen.png");
+		add(haven.MainFrame.gameDir + "res/customclient/vikingScreen.png");
 	}};
 	private OldDropBox backgroundDropBox;
 	static public int bgIndex = 1;
@@ -87,7 +87,7 @@ public class LoginScreen extends Widget {
     }
 
     public LoginScreen(String hostname) {
-	super(bg("res/customclient/bgsizer.png").sz());
+	super(bg(haven.MainFrame.gameDir + "res/customclient/bgsizer.png").sz());
 	if (Utils.getprefi("loginBgIndex", 0) == 0) {
 		Random rand = new Random();
 		bgIndex = rand.nextInt(3) + 1; // Generates 0–2, then add 1

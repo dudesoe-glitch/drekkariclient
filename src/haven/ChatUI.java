@@ -896,7 +896,7 @@ public class ChatUI extends Widget {
 	private final Map<Integer, Color> pc = new HashMap<Integer, Color>();
 	private Map<Integer, Boolean> muted = null;
 	private Integer mutewait = null;
-	static private final File mapPingFile = new File("res/customclient/sfx/mapPing.wav");
+	static private final File mapPingFile = new File(haven.MainFrame.gameDir + "res/customclient/sfx/mapPing.wav");
 
 	public class NamedMessage extends Message {
 	    public final int from;
