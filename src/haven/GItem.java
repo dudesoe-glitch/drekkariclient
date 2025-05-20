@@ -733,4 +733,19 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 		}
 		super.wdgmsg(msg, args);
 	}
+
+	public boolean isSalted(){
+		try {
+			for (ItemInfo info : info()) {
+				if (info instanceof ItemInfo.AdHoc) {
+					ItemInfo.AdHoc ah = (ItemInfo.AdHoc) info;
+					if (ah.str.text.equals("Salted")) {
+						return true;
+					}
+				}
+			}
+		} catch (Exception ignored) {
+		}
+		return false;
+	}
 }

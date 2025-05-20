@@ -88,6 +88,8 @@ public class FoodInfo extends ItemInfo.Tip {
 		double satiation = 1;
 		boolean calculateEfficiency = ui != null && !ui.modshift;
 		double tableFoodEventBonus = 1.0;
+		boolean isSalted = ((GItem) owner).isSalted();
+		double saltSatiation = 1;
 		Window feastingWindow = null;
 		if (ui != null && ui.gui != null && ui.gui.chrwdg != null && ui.gui.chrwdg.battr != null && ui.gui.chrwdg.battr.cons != null && ui.gui.chrwdg.battr.glut != null) {
 			for(int i = 0; i < ui.gui.chrwdg.battr.cons.els.size(); i++) {
@@ -95,9 +97,13 @@ public class FoodInfo extends ItemInfo.Tip {
 				for (int type : types) {
 					if (type == i) {
 						satiation = (1.0 - el.a);
-						hungerEfficiency = fepEfficiency = 100 * satiation;
+						hungerEfficiency = fepEfficiency *= satiation;
 						break;
 					}
+				}
+				if (isSalted && el.t.res.get().basename().equals("salt")) {
+					saltSatiation = (1.0 - el.a);
+					hungerEfficiency = fepEfficiency *= saltSatiation;
 				}
 			}
 			fepEfficiency *= ui.gui.chrwdg.battr.glut.gmod;
@@ -203,6 +209,8 @@ public class FoodInfo extends ItemInfo.Tip {
 			else if (GameUI.verifiedAccount) imgs.add(RichText.render("x 1.2 - $col[185,185,185]{Verified}", 300).img);
 			imgs.add(RichText.render(String.format("x %s - $col[185,185,185]{FEP Multiplier (Hunger Bar)}", Utils.odformat2(ui.gui.chrwdg.battr.glut.gmod, 2)), 300).img);
 			imgs.add(RichText.render(String.format("x %s - $col[185,185,185]{Satiation}", Utils.odformat2(satiation, 2)), 300).img);
+			if (isSalted)
+			imgs.add(RichText.render(String.format("x %s - $col[185,185,185]{Salt Satiation}", Utils.odformat2(saltSatiation, 2)), 300).img);
 			if (feastingWindow != null) {
 				imgs.add(RichText.render(String.format("x %s - $col[185,185,185]{Table Food Event Bonus}", Utils.odformat2(tableFoodEventBonus, 2)), 300).img);
 			}
