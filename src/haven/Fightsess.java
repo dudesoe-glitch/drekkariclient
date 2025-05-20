@@ -637,6 +637,7 @@ public class Fightsess extends Widget {
 			}
 			if (OptWnd.showDamagePredictUICheckBox.a) {
 				String name = act.res.get().basename();
+				String damage = "";
 				if(Config.MapAttInfo.containsKey(name)) {	//Exists?
 					Config.AttackInfo attack = Config.MapAttInfo.get(name);
 					double openingMul;
@@ -656,14 +657,14 @@ public class Fightsess extends Widget {
 					if(attack.isMC()) {
 						double weaponDamageCalc;
 						weaponDamageCalc = basedmg * Math.sqrt( Math.sqrt(ql* myStrength) / 10);
-						name = Integer.toString((int)Math.ceil( //I need to cast this into Integer so it doesnt print "0.0", printing "0" is prettier.
+						damage = Integer.toString((int)Math.ceil( //I need to cast this into Integer so it doesnt print "0.0", printing "0" is prettier.
 						weaponDamageCalc //Full damage
 						*attack.getDmgMul()
 						*openingMul
 					));
 					}
 					else {
-						name = Integer.toString((int)Math.ceil( //I need to cast this into Integer so it doesnt print "0.0", printing "0" is prettier.
+						damage = Integer.toString((int)Math.ceil( //I need to cast this into Integer so it doesnt print "0.0", printing "0" is prettier.
 							attack.getDmg()*Math.sqrt(myStrength/10) //Full damage
 							*openingMul
 						));
@@ -671,11 +672,11 @@ public class Fightsess extends Widget {
 					}
 				}
 				else{
-					name = "";
+					damage = "";
 				}
-				if(!name.isEmpty()) {
+				if(!damage.isEmpty()) {
 					infoY += 12;
-					g.aimage(new TexI(Utils.outline2(damageFoundry.render(name,Color.RED).img, Color.BLACK, true)), ca.add((int)(img.sz().x/2), img.sz().y + UI.scale(infoY)), 0.5, 0.5);
+					g.aimage(new TexI(Utils.outline2(damageFoundry.render(damage,Color.RED).img, Color.BLACK, true)), ca.add((int)(img.sz().x/2), img.sz().y + UI.scale(infoY)), 0.5, 0.5);
 				}
 			}
 		    if(i == use) {
@@ -1279,6 +1280,7 @@ public class Fightsess extends Widget {
 	}
 	private void setupOpeningArr(ArrayList<Buff> buffs){
 		try {
+			openingArr = new int[] {0,0,0,0};
 			for(Buff buff : buffs) {
 				switch(buff.res.get().name)	{
 					case "paginae/atk/offbalance":
