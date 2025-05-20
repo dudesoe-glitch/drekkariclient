@@ -206,11 +206,6 @@ public class Homo3D {
 	return(obj2view(c, state, state.get(States.viewport).area));
     }
 
-	public static Coord3f obj2view2(Coord3f objc, Pipe state, Area view) {
-		HomoCoord4f homo = obj2clip(objc, state);
-		return homo.clipped() ? null : homo.toview(view);
-	}
-
 	public static Coord obj2sc(Coord3f objc, Pipe state, Area view) {
 		HomoCoord4f homo = obj2clip(objc, state);
 		return homo.clipped() ? null : homo.toview(view).round2();
