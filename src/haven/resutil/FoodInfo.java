@@ -89,7 +89,7 @@ public class FoodInfo extends ItemInfo.Tip {
 		double satiation = 1;
 		boolean calculateEfficiency = ui != null && !ui.modshift;
 		double tableFoodEventBonus = 1.0;
-		boolean isSalted = ((GItem) owner).isSalted();
+		boolean isSalted = (owner instanceof GItem && ((GItem) owner).isSalted());
 		double saltSatiation = 1;
 		Window feastingWindow = null;
 		if (ui != null && ui.gui != null && ui.gui.chrwdg != null && ui.gui.chrwdg.battr != null && ui.gui.chrwdg.battr.cons != null && ui.gui.chrwdg.battr.glut != null) {
