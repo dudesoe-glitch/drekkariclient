@@ -297,6 +297,7 @@ public class RUtils {
 		try {
 			for(Slot slot : slots)
 				added.add(slot.add(node));
+		} catch (RenderTree.SlotRemoved ignored){
 		} catch(RuntimeException e) {
 			for(Slot slot : added)
 				slot.remove();
