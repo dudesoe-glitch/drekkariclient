@@ -61,11 +61,23 @@ public class LoginScreen extends Widget {
 		add(Resource.local().loadwait("customclient/sfx/rogueTheme"));
 		add(Resource.local().loadwait("customclient/sfx/knightTheme"));
 		add(Resource.local().loadwait("customclient/sfx/vikingTheme"));
+		add(Resource.local().loadwait("customclient/sfx/sorceressTheme"));
+		add(Resource.local().loadwait("customclient/sfx/huntressTheme"));
 	}};
 	private static List<String> backgrounds = new ArrayList<>() {{
 		add(haven.MainFrame.gameDir + "res/customclient/rogueScreen.png");
 		add(haven.MainFrame.gameDir + "res/customclient/knightScreen.png");
 		add(haven.MainFrame.gameDir + "res/customclient/vikingScreen.png");
+		add(haven.MainFrame.gameDir + "res/customclient/sorceressScreen.png");
+		add(haven.MainFrame.gameDir + "res/customclient/huntressScreen.png");
+	}};
+	final List<String> keys = new ArrayList<>(){{
+		add("Random!");
+		add("Rogue");
+		add("Knight");
+		add("Viking");
+		add("Sorceress");
+		add("Huntress");
 	}};
 	private OldDropBox backgroundDropBox;
 	static public int bgIndex = 1;
@@ -90,7 +102,7 @@ public class LoginScreen extends Widget {
 	super(bg(haven.MainFrame.gameDir + "res/customclient/bgsizer.png").sz());
 	if (Utils.getprefi("loginBgIndex", 0) == 0) {
 		Random rand = new Random();
-		bgIndex = rand.nextInt(3) + 1; // Generates 0–2, then add 1
+		bgIndex = rand.nextInt(keys.size()-1) + 1; // Generates 0–2, then add 1
 	} else {
 		bgIndex = Utils.getprefi("loginBgIndex", 0);
 	}
@@ -99,12 +111,6 @@ public class LoginScreen extends Widget {
 	setfocustab(true);
 	add(backgroundImg = new Img(bg), Coord.z);
 	backgroundDropBox = new OldDropBox<String>(UI.scale(66), 4, UI.scale(17)) {
-		final List<String> keys = new ArrayList<>(){{
-			add("Random!");
-			add("Rogue");
-			add("Knight");
-			add("Viking");
-		}};
 		{
 			super.change(Utils.getprefi("loginBgIndex", 0));
 		}
@@ -128,7 +134,7 @@ public class LoginScreen extends Widget {
 			Utils.setprefi("loginBgIndex", selindex);
 			if (selindex == 0) {
 				Random rand = new Random();
-				bgIndex = rand.nextInt(3) + 1; // Generates 0–2, then add 1
+				bgIndex = rand.nextInt(keys.size()-1) + 1;
 			} else {
 				bgIndex = selindex;
 			}
