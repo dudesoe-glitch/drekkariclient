@@ -145,7 +145,7 @@ public class GobReadyForHarvestInfo extends GobInfo {
 			System.out.println("Couldn't find content icon for \"" + resourceName + "\"! Tell Nightdawg to add it!");
 			img = null;
 		}
-		iconCache.put(basename, img);
+		iconCache.put(resourceName, img);
 		return img;
 	}
 
