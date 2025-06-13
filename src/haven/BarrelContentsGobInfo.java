@@ -1,17 +1,11 @@
 package haven;
 
 import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.util.List;
 import java.util.*;
-import java.util.regex.Pattern;
 
 public class BarrelContentsGobInfo extends GobInfo {
-    private static final Color BARREL_COL = new Color(252, 235, 255, 255);
-    private static final Color BG = new Color(0, 0, 0, 84);
-    private static final Map<Pair<Color, String>, Text.Line> TEXT_CACHE = new HashMap<>();
-    private String contents = null;
-	private Tex barrelInfoTex;
+
+	private static final Map<String, Tex> contentTexCache = new HashMap<>();
 
     protected BarrelContentsGobInfo(Gob owner) {
 	super(owner);
@@ -27,18 +21,10 @@ public class BarrelContentsGobInfo extends GobInfo {
     protected Tex render() {
 	if(gob == null || gob.getres() == null) {return null;}
 	up(6);
-	BufferedImage content = content();
-	if(content == null) {
-		barrelInfoTex = null;
-		return null;
-	}
-	if (barrelInfoTex != null)
-		return barrelInfoTex;
-	return barrelInfoTex = new TexI(ItemInfo.catimgsh(3, 0, BG, content));
+	return content();
     }
 
-    private BufferedImage content() {
-	this.contents = null;
+    private Tex content() {
 	String resName = gob.getres().name;
 	if(resName == null) {return null;}
 	Optional<String> contents = Optional.empty();
@@ -53,31 +39,25 @@ public class BarrelContentsGobInfo extends GobInfo {
 	}
 	
 	if(contents.isPresent()) {
-	    this.contents = contents.get();
-	    String text = this.contents;
+	    String text = contents.get();
 		if (!text.isEmpty()) {
 			text = text.substring(0, 1).toUpperCase() + text.substring(1);
 		}
 		text = addSpaceAndCapitalize(text);
 
 		try {
-        	return PUtils.strokeImg(text(text, BARREL_COL).img);
+			if (!contentTexCache.containsKey(text)) {
+				Tex contentTex = new TexI(ItemInfo.catimgsh(3, 0, null, PUtils.strokeImg(Text.std.renderstroked(text, Color.white, Color.black).img)));
+				contentTexCache.put(text, contentTex);
+				return contentTex;
+			} else {
+				return contentTexCache.get(text);
+			}
 		} catch (NullPointerException ignored) {
 			return null;
 		}
 	}
 	return null;
-    }
-    
-    private static Text.Line text(String text, Color col) {
-	Pair<Color, String> key = new Pair<>(col, text);
-	if(TEXT_CACHE.containsKey(key)) {
-	    return TEXT_CACHE.get(key);
-	} else {
-	    Text.Line line = Text.std.renderstroked(text, col, Color.black);
-	    TEXT_CACHE.put(key, line);
-	    return line;
-	}
     }
 
     @Override
