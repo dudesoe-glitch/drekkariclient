@@ -12,15 +12,18 @@ public class GobGrowthInfo extends GobInfo {
 	public static final int BUSH_START = 30;
 	public static final double TREE_MULT = 100.0 / (100.0 - TREE_START);
 	public static final double BUSH_MULT = 100.0 / (100.0 - BUSH_START);
-    private static final Color BG = new Color(0, 0, 0, 0);
-	private static final Map<String, BufferedImage> stageTextCache = new HashMap<>();
+	private static final Map<String, Tex> stageTextCache = new HashMap<>();
+	public static final BufferedImage SEEDS_STAGE_DOT = drawDot(new Color(0, 102, 255,255));
+	public static final BufferedImage FINAL_STAGE_DOT = drawDot(new Color(189, 0, 0,255));
+	public static final Tex SEEDS_STAGE_DOT_TEX = new TexI(ItemInfo.catimgsh(3, 0, null, SEEDS_STAGE_DOT));
+	public static final Tex FINAL_STAGE_DOT_TEX = new TexI(ItemInfo.catimgsh(3, 0, null, FINAL_STAGE_DOT));
 
 
-	public static BufferedImage getStageImage(int stage, int maxStage) {
+	public static Tex getStageTex(int stage, int maxStage) {
 		String key = String.valueOf(stage);
 		if (!stageTextCache.containsKey(key)) {
 			BufferedImage stageImage = renderStageText(key);
-			stageTextCache.put(key, stageImage);
+			stageTextCache.put(key, new TexI(ItemInfo.catimgsh(3, 0, null, stageImage)));
 		}
 		return stageTextCache.get(key);
 	}
@@ -45,13 +48,13 @@ public class GobGrowthInfo extends GobInfo {
     protected Tex render() {
 	if(gob == null || gob.getres() == null) { return null;}
 
-	BufferedImage growth = growth();
+	Tex growth = growth();
 
 	if(growth == null) {
 	    return null;
 	}
 
-	return new TexI(ItemInfo.catimgsh(3, 0, BG, growth));
+	return growth;
     }
     
     @Override
@@ -59,10 +62,7 @@ public class GobGrowthInfo extends GobInfo {
 	super.dispose();
     }
 
-	public final BufferedImage SEEDS_STAGE_DOT = drawDot(new Color(0, 102, 255,255));
-	public final BufferedImage FINAL_STAGE_DOT = drawDot(new Color(189, 0, 0,255));
-
-    private BufferedImage growth() {
+    private Tex growth() {
 	Text.Line line = null;
 	Resource res = gob.getres();
 	if(isSpriteKind(gob, "GrowingPlant", "TrellisPlant") && !(OptWnd.toggleGobHidingCheckBox.a && OptWnd.hideCropsCheckbox.a)) {
@@ -78,25 +78,25 @@ public class GobGrowthInfo extends GobInfo {
 		if(stage > maxStage) {stage = maxStage;}
 		if(res != null && (res.name.contains("carrot"))) {
 			if (stage == maxStage - 1) {
-				return SEEDS_STAGE_DOT;
+				return SEEDS_STAGE_DOT_TEX;
 			} else if (stage == maxStage) {
-				return FINAL_STAGE_DOT;
+				return FINAL_STAGE_DOT_TEX;
 			} else {
-				return getStageImage(stage, maxStage);
+				return getStageTex(stage, maxStage);
 			}
 		} else if (res != null && (res.name.contains("turnip") || res.name.contains("leek"))){
 			if (stage == maxStage - 2) {
-				return SEEDS_STAGE_DOT;
+				return SEEDS_STAGE_DOT_TEX;
 			} else if (stage == maxStage) {
-				return FINAL_STAGE_DOT;
+				return FINAL_STAGE_DOT_TEX;
 			} else {
-				return getStageImage(stage, maxStage);
+				return getStageTex(stage, maxStage);
 			}
 		} else {
 			if (stage == maxStage){
-				return FINAL_STAGE_DOT;
+				return FINAL_STAGE_DOT_TEX;
 			} else {
-				return getStageImage(stage, maxStage);
+				return getStageTex(stage, maxStage);
 			}
 
 		}
@@ -128,13 +128,13 @@ public class GobGrowthInfo extends GobInfo {
 	}
 
 	if(line != null) {
-	    return line.img;
+	    return new TexI(ItemInfo.catimgsh(3, 0, null, line.img));
 	}
 	return null;
     }
 
 
-	private BufferedImage drawDot(Color c) {
+	private static BufferedImage drawDot(Color c) {
 		int diameter = 11;
 		BufferedImage img = new BufferedImage(diameter, diameter * 2, BufferedImage.TYPE_INT_ARGB);
 		Graphics2D g = img.createGraphics();
