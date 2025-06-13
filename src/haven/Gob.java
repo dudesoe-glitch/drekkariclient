@@ -2491,10 +2491,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 		if (beeskepHarvestInfo != null) beeskepHarvestInfo.clear();
 		if (barrelContentsGobInfo != null) barrelContentsGobInfo.clear();
 		if (cheeseRackInfo != null) cheeseRackInfo.clear();
-		if (iconSignGobInfo != null) {
-			iconSignGobInfo.signInfoTex = null;
-			iconSignGobInfo.clear();
-		}
+		if (iconSignGobInfo != null) iconSignGobInfo.clear();
 		setGobSearchOverlay();
 	}
 
