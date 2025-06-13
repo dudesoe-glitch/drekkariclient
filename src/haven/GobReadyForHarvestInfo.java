@@ -8,6 +8,8 @@ import java.util.Map;
 
 public class GobReadyForHarvestInfo extends GobInfo {
 
+	private static final Map<String, Tex> contentTexCache = new HashMap<>();
+
 	public static final Map<String, String> SeedsMap = new HashMap<String, String>() {{
 		// ND: There's no goddamn consistency. Some work fine with "seed-basename", but others have different names:
 		// Pine trees are called "pine", and their seed is "seed-pine" (so this works by default)
@@ -73,7 +75,7 @@ public class GobReadyForHarvestInfo extends GobInfo {
 	up(6);
 	if(gob == null || gob.getres() == null) { return null;}
 		if (icons() != null)
-			return new TexI(icons());
+			return icons();
 		return null;
 	}
 
@@ -82,7 +84,8 @@ public class GobReadyForHarvestInfo extends GobInfo {
 	super.dispose();
     }
 
-	private BufferedImage icons() {
+	private Tex icons() {
+		StringBuilder keySB = new StringBuilder();
 		BufferedImage[] parts = null;
 		Message data = getDrawableData(gob);
 		Resource res = gob.getres();
@@ -92,30 +95,50 @@ public class GobReadyForHarvestInfo extends GobInfo {
 			if (growth != -1) {
 				if(res.name.contains("gfx/terobjs/trees") && !res.name.endsWith("log") && !res.name.endsWith("oldtrunk")) {
 					growth = (int) (GobGrowthInfo.TREE_MULT * (growth - GobGrowthInfo.TREE_START));
+					keySB.append("tree_");
 				} else if(res.name.startsWith("gfx/terobjs/bushes")) {
 					growth = (int) (GobGrowthInfo.BUSH_MULT * (growth - GobGrowthInfo.BUSH_START));
+					keySB.append("bush_");
 				}
 			}
 			if (growth == -1 || growth >= 100) {
 				if (isSpriteKind(gob, "Tree")) {
 					int sdt = gob.sdt();
 					String resBaseName = gob.getres().basename();
+					keySB.append(resBaseName).append("_");
 					boolean seed = (sdt & 1) != 1;
 					boolean leaf = (sdt & 2) != 2; // ND: If the tree/bush doesn't actually produce seeds, this is always true (smh)
+					if (seed) keySB.append("withSeed_");
+					if (leaf) keySB.append("withLeaf_");
+					Tex cachedTex = contentTexCache.get(keySB.toString());
+					if (cachedTex != null) {
+						return cachedTex;
+					}
 					parts = new BufferedImage[]{
 							leaf ? getIcon(resBaseName, "leaf") : null,
-							seed ? getIcon(resBaseName, "seed") : null,
+							seed ? getIcon(resBaseName, "seed") : null
 					};
+					// Combine parts only if at least one is not null
+					boolean hasPart = false;
+					for (BufferedImage part : parts) {
+						if (part != null) {
+							hasPart = true;
+							break;
+						}
+					}
+					if (!hasPart) {
+						return null;
+					}
+					BufferedImage combined = ItemInfo.catimgs(1, parts);
+					Tex contentTex = new TexI(combined);
+					contentTexCache.put(keySB.toString(), contentTex);
+					return contentTex;
 				}
 			}
 		}
-		if(parts == null) {return null;}
-		for (BufferedImage part : parts) {
-			if(part == null) {continue;}
-			return ItemInfo.catimgs(1, parts);
-		}
 		return null;
 	}
+
 
 	private static final Map<String, BufferedImage> iconCache = new HashMap<>();
 
