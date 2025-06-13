@@ -4,7 +4,6 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 
 public class GobHealthInfo extends GobInfo {
-    public static Color BG = new Color(0, 0, 0, 0);
     private static final Text.Foundry gobhpf = new Text.Foundry(Text.sans.deriveFont(Font.BOLD), 12);
 
     private GobHealth health;
@@ -28,7 +27,7 @@ public class GobHealthInfo extends GobInfo {
             return null;
         }
 
-        return new TexI(ItemInfo.catimgsh(3, 0, BG, health));
+        return new TexI(ItemInfo.catimgsh(3, 0, null, health));
     }
 
     @Override

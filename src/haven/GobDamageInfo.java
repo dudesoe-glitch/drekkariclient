@@ -12,14 +12,9 @@ public class GobDamageInfo extends GobInfo {
     private static final int ARM = 36751;
     private static final int PAD = UI.scale(3);
 
-    public static Color BG = new Color(0, 0, 0, 0);
     private static final Color SHP_C = Utils.col16(SHP);
     private static final Color HHP_C = Utils.col16(HHP);
     private static final Color ARM_C = Utils.col16(ARM);
-    public static void setDamageBackgroundColor(boolean enableBackground){
-        if (enableBackground) BG = new Color(0, 0, 0, 80);
-        else BG = new Color(0, 0, 0, 0);
-    }
 
     private static final Map<Long, DamageVO> gobDamage = new LinkedHashMap<Long, DamageVO>() {
         @Override
@@ -72,7 +67,7 @@ public class GobDamageInfo extends GobInfo {
                 arm = Text.std.renderstroked(String.format("%d", damage.armor), ARM_C, Color.BLACK).img;
             }
         }
-        return new TexI(Utils.outline2(ItemInfo.catimgsh(PAD, PAD, BG, hhp, shp, arm), Color.BLACK, true));
+        return new TexI(Utils.outline2(ItemInfo.catimgsh(PAD, PAD, null, hhp, shp, arm), Color.BLACK, true));
     }
 
     public void update(int c, int v) {

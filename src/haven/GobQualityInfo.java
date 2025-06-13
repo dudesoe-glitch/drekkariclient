@@ -10,8 +10,6 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 public class GobQualityInfo extends GobInfo {
-    private static final Color Q_COL = new Color(235, 252, 255, 255);
-    private static final Color BG = new Color(0, 0, 0, 0);
     public static Pattern GOB_Q = Pattern.compile("Quality: (\\d+)");
     private static final Map<Long, Integer> gobQ = new LinkedHashMap<Long, Integer>() {
 	@Override
@@ -47,7 +45,7 @@ public class GobQualityInfo extends GobInfo {
 	    return null;
 	}
 
-	return new TexI(ItemInfo.catimgsh(3, 0, BG, quality));
+	return new TexI(ItemInfo.catimgsh(3, 0, null, quality));
     }
     
     @Override
@@ -57,7 +55,7 @@ public class GobQualityInfo extends GobInfo {
 
     private BufferedImage quality() {
 	if(q != 0) {
-		return Text.renderstroked(String.format("Q: %d", q), Q_COL, Color.BLACK, Text.num12boldFnd).img;
+		return Text.renderstroked(String.format("Q: %d", q), Color.white, Color.BLACK, Text.num12boldFnd).img;
 	}
 	return null;
     }
