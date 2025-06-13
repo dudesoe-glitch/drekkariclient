@@ -98,6 +98,11 @@ public class Fightsess extends Widget {
 	}};
 	private boolean combatMedAlphaShiftUp = true;
 
+	private Tex myHealthBarTex = null;
+	private String myLastHealthBarText = "";
+	private Tex myStaminaBarTex = null;
+	private String myLastStaminaBarText = "";
+
 	private static Coord actc(int i) {
 		int rl = OptWnd.singleRowCombatMovesCheckBox.a ? 10 : 5;
 		return(new Coord((actpitch * (i % rl)) - (((rl - 1) * actpitch) / 2), UI.scale(125) + ((i / rl) * actpitch2)));
@@ -1201,49 +1206,75 @@ public class Fightsess extends Widget {
 	private void drawHealthMeterBar(GOut g, IMeter.Meter m, Coord sc, Coord msz) {
 		int w = msz.x;
 		int w1 = (int) Math.ceil(w * m.a);
-		int w2 = (int) Math.ceil(w * (IMeter.characterSoftHealthPercent/100));
+		int w2 = (int) Math.ceil(w * (IMeter.characterSoftHealthPercent / 100));
+
 		if (IMeter.sparring) {
 			g.chcolor(Fightsess.hpBarGray);
 			g.frect(sc, new Coord(w, msz.y));
 			g.chcolor(Fightsess.hpBarGreen);
 			g.frect(sc, new Coord(w2, msz.y));
 			g.chcolor(Color.BLACK);
-			g.line(new Coord(sc.x+w, sc.y), new Coord(sc.x+w, sc.y+msz.y), 2);
+			g.line(new Coord(sc.x + w, sc.y), new Coord(sc.x + w, sc.y + msz.y), 2);
 			g.rect(sc, new Coord(msz.x, msz.y));
 
 			g.chcolor(Color.WHITE);
-			g.aimage(Text.renderstroked((IMeter.characterCurrentHealth), Text.num12boldFnd).tex(), new Coord(sc.x+msz.x/2, sc.y+msz.y/2), 0.5, 0.5);
+			String currentText = IMeter.characterCurrentHealth;
+			if (!currentText.equals(myLastHealthBarText)) {
+				if (myHealthBarTex != null)
+					myHealthBarTex.dispose();
+				myHealthBarTex = Text.renderstroked(currentText, Text.num12boldFnd).tex();
+				myLastHealthBarText = currentText;
+			}
+			g.aimage(myHealthBarTex, new Coord(sc.x + msz.x / 2, sc.y + msz.y / 2), 0.5, 0.5);
 		} else {
 			g.chcolor(Fightsess.hpBarYellow);
 			g.frect(sc, new Coord(w1, msz.y));
 			g.chcolor(Fightsess.hpBarRed);
 			g.frect(sc, new Coord(w2, msz.y));
 			g.chcolor(Color.BLACK);
-			g.line(new Coord(sc.x+w1, sc.y), new Coord(sc.x+w1, sc.y+msz.y), 2);
+			g.line(new Coord(sc.x + w1, sc.y), new Coord(sc.x + w1, sc.y + msz.y), 2);
 			g.rect(sc, new Coord(msz.x, msz.y));
 
 			g.chcolor(Color.WHITE);
-			String HHPpercentage = OptWnd.includeHHPTextHealthBarCheckBox.a ? " ("+(Fightsess.fmt1DecPlace((int)(m.a*100))) + "% HHP)" : "";
-			g.aimage(Text.renderstroked((IMeter.characterCurrentHealth + HHPpercentage), Text.num12boldFnd).tex(), new Coord(sc.x+msz.x/2, sc.y+msz.y/2), 0.5, 0.5);
+			String HHPpercentage = OptWnd.includeHHPTextHealthBarCheckBox.a
+					? " (" + (Fightsess.fmt1DecPlace((int)(m.a * 100))) + "% HHP)"
+					: "";
+			String currentText = IMeter.characterCurrentHealth + HHPpercentage;
+			if (!currentText.equals(myLastHealthBarText)) {
+				if (myHealthBarTex != null)
+					myHealthBarTex.dispose();
+				myHealthBarTex = Text.renderstroked(currentText, Text.num12boldFnd).tex();
+				myLastHealthBarText = currentText;
+			}
+			g.aimage(myHealthBarTex, new Coord(sc.x + msz.x / 2, sc.y + msz.y / 2), 0.5, 0.5);
 		}
 	}
 
 	private void drawStamMeterBar(GOut g, IMeter.Meter m, Coord sc, Coord msz) {
 		int w = msz.x;
 		int w1 = (int) Math.ceil(w * m.a);
-		g.chcolor(stamBarBlue);
+		g.chcolor(Fightsess.stamBarBlue);
 		g.frect(sc, new Coord(w1, msz.y));
 		g.chcolor(Color.BLACK);
-		g.line(new Coord(sc.x+w1, sc.y), new Coord(sc.x+w1, sc.y+msz.y), 2);
+		g.line(new Coord(sc.x + w1, sc.y), new Coord(sc.x + w1, sc.y + msz.y), 2);
 		g.rect(sc, new Coord(msz.x, msz.y));
 		g.chcolor(Color.WHITE);
-		String staminaBarText = fmt1DecPlace((int)(m.a*100));
+
+		String staminaBarText = Fightsess.fmt1DecPlace((int)(m.a * 100));
 		Gob myself = ui.gui.map.player();
 		if (myself != null && myself.imDrinking) {
 			g.chcolor(new Color(0, 222, 0));
-			staminaBarText = staminaBarText + " (Drinking)";
+			staminaBarText += " (Drinking)";
 		}
-		g.aimage(Text.renderstroked(staminaBarText, Text.num12boldFnd).tex(), new Coord(sc.x+msz.x/2, sc.y+msz.y/2), 0.5, 0.5);
+
+		if (!staminaBarText.equals(myLastStaminaBarText)) {
+			if (myStaminaBarTex != null)
+				myStaminaBarTex.dispose();
+			myStaminaBarTex = Text.renderstroked(staminaBarText, Text.num12boldFnd).tex();
+			myLastStaminaBarText = staminaBarText;
+		}
+
+		g.aimage(myStaminaBarTex, new Coord(sc.x + msz.x / 2, sc.y + msz.y / 2), 0.5, 0.5);
 	}
 
 	private void targetNearestFoe(GameUI gui) {
