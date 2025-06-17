@@ -120,7 +120,7 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
 	public void resized() {
 	    float field = 0.5f;
 	    float aspect = ((float)sz.y) / ((float)sz.x);
-	    proj = Projection.frustum(-field, field, -aspect * field, aspect * field, 1, 5000); // ND: This is the max free cam distance, before it turns black.
+	    proj = Projection.frustum(-field, field, -aspect * field, aspect * field, 1, 8000); // ND: This is the max free cam distance, before it turns black.
 	}
 
 	public void apply(Pipe p) {
@@ -298,7 +298,7 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
 	    if(Math.abs(telev - elev) < 0.0001) elev = telev;
 
 	    dist = dist + ((tdist - dist) * cf);
-		if (dist > 4000) tdist = dist = 4000; // ND: Limit the zoom out distance
+		if (dist > 3000) tdist = dist = 3000; // ND: Limit the zoom out distance
 	    if(Math.abs(tdist - dist) < 0.0001) dist = tdist;
 
 	    Coord3f mc = getcc().invy();
@@ -325,7 +325,7 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
 		if (OptWnd.lockVerticalAngleAt45DegreesCheckBox.a)
 			telev = (float)Math.PI / 4.0f;
 		if (OptWnd.allowLowerFreeCamTiltCheckBox.a){
-			if(telev < -0.5f) telev = -0.5f;
+			if(telev < -0.9f) telev = -0.9f;
 		}
 		else {
 			if(telev < 0.0f) telev = 0.0f;
@@ -408,7 +408,7 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
 		vm = Location.makexlate(new Matrix4f(), corr).mul1(vm);
 	    }
 	    view = new haven.render.Camera(vm);
-	    proj = Projection.ortho(-field, field, -field * aspect, field * aspect, 1, 5000);
+	    proj = Projection.ortho(-field, field, -field * aspect, field * aspect, 1, 8000);
 	}
 
 	public float angle() {

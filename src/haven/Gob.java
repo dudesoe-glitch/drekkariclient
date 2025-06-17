@@ -87,6 +87,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	public Boolean knocked = null;  // knocked will be null if pose update request hasn't been received yet
 	private Overlay customAuraOverlay;
 	private Overlay customRadiusOverlay;
+	private Overlay skyboxOverlay;
 	public static Boolean batWingCapeEquipped = false; // ND: Check for Bat Wing Cape
 	public static Boolean nightQueenDefeated = false; // ND: Check for Bat Dungeon Experience (Defeated Bat Queen)
 	public String playerGender = "unknown";
@@ -560,6 +561,17 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	if (isMe != null) {
 		setCustomPlayerName();
 		playPlayerAlarm();
+		if (OptWnd.enableSkyboxCheckBox.a && !(GameUI.backgroundSong.equals("cabin") || GameUI.backgroundSong.equals("cave")) && skyboxOverlay == null && isMe) {
+			skyboxOverlay = new Overlay(this, new SkyBoxSprite(this, null));
+			synchronized (ols) {
+				addol(skyboxOverlay);
+			}
+		} else if (!OptWnd.enableSkyboxCheckBox.a || (GameUI.backgroundSong.equals("cabin") || GameUI.backgroundSong.equals("cave"))) {
+			if (skyboxOverlay != null) {
+				removeOl(skyboxOverlay);
+				skyboxOverlay = null;
+			}
+		}
 	}
 	if (getattr(Moving.class) instanceof Following){
 		Following following = (Following) getattr(Moving.class);

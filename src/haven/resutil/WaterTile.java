@@ -604,7 +604,7 @@ public class WaterTile extends Tiler {
 		}
 	    };
 	private static final ShaderMacro shader = prog -> {
-	    FragColor.fragcol(prog.fctx).mod(in -> BottomFog.rgbmix.call(in, allwaterfog.mfogcolor, clamp(div(fragd.ref(), l(BottomFog.maxdepth)), l(0.0), l(1.0))), 1000);
+	    FragColor.fragcol(prog.fctx).mod(in -> BottomFog.rgbmix.call(in, allwaterfog.mfogcolor, clamp(div(fragd.ref(), l(BottomFog.maxdepth)), l(0.0), l(0.0))), 1000);
 	};
 	public ShaderMacro shader() {return(shader);}
 

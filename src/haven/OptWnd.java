@@ -27,10 +27,13 @@
 package haven;
 
 import haven.render.*;
+import haven.render.sl.Type;
+import haven.render.sl.Uniform;
 import haven.res.gfx.fx.msrad.MSRad;
 import haven.res.ui.pag.toggle.Toggle;
 import haven.resutil.Ridges;
 import haven.sprites.AggroCircleSprite;
+import haven.sprites.SkyBoxSprite;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
@@ -57,6 +60,8 @@ public class OptWnd extends Window {
 	private static final ScheduledExecutorService simpleUIExecutor = Executors.newSingleThreadScheduledExecutor();
 	private static Future<?> simpleUIFuture;
 	public static boolean simpleUIChanged = false;
+	private static final ScheduledExecutorService skyboxExecutor = Executors.newSingleThreadScheduledExecutor();
+	private static Future<?> skyboxFuture;
 	public static final Color msgGreen = new Color(8, 211, 0);
 	public static final Color msgGray = new Color(145, 145, 145);
 	public static final Color msgRed = new Color(197, 0, 0);
@@ -3205,6 +3210,7 @@ public class OptWnd extends Window {
 	public static CheckBox disableDrunkennessDistortionCheckBox;
 	public static HSlider palisadeAndWallScaleSlider;
 	private Button palisadeAndWallScaleResetButton;
+	public static CheckBox enableSkyboxCheckBox;
 
 	public class WorldGraphicsSettingsPanel extends Panel {
 
@@ -3401,7 +3407,51 @@ public class OptWnd extends Window {
 			}), leftColumn.pos("bl").adds(210, -20));
 			palisadeAndWallScaleResetButton.tooltip = resetButtonTooltip;
 
-			rightColumn = add(new Label("Trees & Bushes Scale:"), UI.scale(290, 0));
+
+			rightColumn = add(enableSkyboxCheckBox = new CheckBox("Enable Skybox"){
+				{a = (Utils.getprefb("enableSkybox", false));}
+				public void changed(boolean val) {
+					Utils.setprefb("enableSkybox", val);
+				}
+			}, UI.scale(290, 0));
+
+
+			rightColumn = add(new Label("Skybox Style:"), rightColumn.pos("bl").adds(0, 4));
+			List<String> skyboxStyles = Arrays.asList("Clouds", "Galaxy");
+			add(new OldDropBox<String>(skyboxStyles.size(), skyboxStyles) {
+				{
+					super.change(skyboxStyles.get(Utils.getprefi("skyboxStyle", 0)));
+				}
+				@Override
+				protected String listitem(int i) {
+					return skyboxStyles.get(i);
+				}
+				@Override
+				protected int listitems() {
+					return skyboxStyles.size();
+				}
+				@Override
+				protected void drawitem(GOut g, String item, int i) {
+					g.aimage(Text.renderstroked(item).tex(), Coord.of(UI.scale(3), g.sz().y / 2), 0.0, 0.5);
+				}
+				@Override
+				public void change(String item) {
+					super.change(item);
+					for (int i = 0; i < skyboxStyles.size(); i++){
+						if (item.equals(skyboxStyles.get(i))){
+							Utils.setprefi("skyboxStyle", i);
+							if (enableSkyboxCheckBox.a) { // ND: It's easier to just reset the checkbox to load the new skybox, haha...
+								enableSkyboxCheckBox.set(false);
+								if (skyboxFuture != null)
+									skyboxFuture.cancel(true);
+								skyboxFuture = skyboxExecutor.scheduleWithFixedDelay(OptWnd.this::resetSkyboxCheckbox, 200, 3000, TimeUnit.MILLISECONDS);
+							}
+						}
+					}
+				}
+			}, rightColumn.pos("ur").adds(4, 0));
+
+			rightColumn = add(new Label("Trees & Bushes Scale:"), rightColumn.pos("bl").adds(0, 14).xs(290));
 			rightColumn = add(treeAndBushScaleSlider = new HSlider(UI.scale(200), 30, 100, Utils.getprefi("treeAndBushScale", 100)) {
 				protected void attach(UI ui) {
 					super.attach(ui);
@@ -4350,6 +4400,11 @@ public class OptWnd extends Window {
 	private void resetSimpleUIChanged(){
 		simpleUIChanged = false;
 		simpleUIFuture.cancel(true);
+	}
+
+	private void resetSkyboxCheckbox(){
+		enableSkyboxCheckBox.set(true);
+		skyboxFuture.cancel(true);
 	}
 
 	// ND: Setting Tooltips
