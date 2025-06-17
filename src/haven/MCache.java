@@ -536,9 +536,9 @@ public class MCache implements MapSource {
 	}
 
 		public void checkTiles() { // ND: Taken from Trollex
-			Coord2d origin = sess.ui.gui.map.player().rc;
+			Coord2d origin = new Coord2d(sess.ui.gui.map.getcc());
 			MCache mcache = MCache.this;
-
+//			GameUI.backgroundSong = "";
 			outerLoop:
 			for(int i = -45; i <= 45; ++i) {
 				for(int j = -45; j <= 45; ++j) {
