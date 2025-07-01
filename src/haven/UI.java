@@ -1088,6 +1088,9 @@ public class UI {
 			curs = root.cursor != null ? root.cursor.get() : null;
 		} catch (Loading ignored) {
 		}
+		if(curs == null) { // ND: Unless root.cursor changes at least once, it stays null, even when it's "gfx/hud/curs/arw" by default.
+			return RootWidget.defcurs.name.equals(name);
+		}
 		return curs != null && curs.name.equals(name);
 	}
 

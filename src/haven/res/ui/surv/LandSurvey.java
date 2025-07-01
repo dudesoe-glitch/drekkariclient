@@ -127,7 +127,7 @@ public class LandSurvey extends Window {
 		    dsp.update = true;
 		}
 	    } else if(ev instanceof MouseDownEvent) {
-		if(((MouseDownEvent)ev).b == 1) {
+		if(((MouseDownEvent)ev).b == 1 && ui.checkCursorImage("gfx/hud/curs/arw")) {
 		    Coord sel = dsp.mousetest(ev.c, false);
 		    if(sel != null) {
 			if(ui.modshift) {
