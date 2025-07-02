@@ -69,6 +69,7 @@ public class OptWnd extends Window {
 	public static FlowerMenuAutoSelectManagerWindow flowerMenuAutoSelectManagerWindow;
 	public static AutoDropManagerWindow autoDropManagerWindow;
 	AlarmWindow alarmWindow;
+	public static GSettings currentgprefs;
 
     public void chpanel(Panel p) {
 	if(current != null)
@@ -4646,6 +4647,8 @@ public class OptWnd extends Window {
 	@Override
 	protected void attached() {
 		super.attached();
+		if (ui != null)
+			currentgprefs = ui.gprefs;
 		if (ui.gui != null) {
 			ui.gui.add(autoDropManagerWindow); // ND: this.parent.parent is root widget in login screen or gui in game.
 			autoDropManagerWindow.hide();

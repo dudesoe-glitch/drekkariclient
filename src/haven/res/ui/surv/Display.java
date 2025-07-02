@@ -182,7 +182,7 @@ public class Display implements RenderTree.Node, TickList.Ticking, TickList.Tick
     }
 
     public void added(RenderTree.Slot slot) {
-	slot.ostate(Location.xlate(Coord3f.of(data.varea.ul.x * (float)tilesz.x, -data.varea.ul.y * (float)tilesz.y, 0)));
+	slot.ostate(Pipe.Op.compose(Location.xlate(Coord3f.of(data.varea.ul.x * (float)tilesz.x, -data.varea.ul.y * (float)tilesz.y, 0)), pointSize2()));
 	slot.add(surface, sdraw1);
 	slot.add(surface, sdraw2);
 	slot.add(vertices, vdraw);
@@ -232,6 +232,30 @@ public class Display implements RenderTree.Node, TickList.Ticking, TickList.Tick
 	}
 	return(sel);
     }
+
+	private static double pointSize(){
+		double size = 3.0;
+		if(OptWnd.currentgprefs != null) {
+			System.out.println("aaa");
+			if (OptWnd.currentgprefs.rscale.val > 1.01f)
+				size = 6.0;
+			if (OptWnd.currentgprefs.rscale.val > 1.99f)
+				size = 8.0;
+		}
+		return size;
+	}
+
+	private Pipe.Op pointSize2(){
+		float size = 3f;
+		if(OptWnd.currentgprefs != null) {
+			if (OptWnd.currentgprefs.rscale.val > 1.01f)
+				size = 6f;
+			if (OptWnd.currentgprefs.rscale.val > 1.99f)
+				size = 8f;
+		}
+		return new PointSize(size);
+	}
+
 }
 
 /* >wdg: LandSurvey */
