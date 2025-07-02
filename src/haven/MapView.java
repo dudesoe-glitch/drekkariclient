@@ -381,11 +381,11 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
     
     public class OrthoCam extends Camera {
 	public boolean exact = true;
-	protected float dfield = (float)(100 * Math.sqrt(2));
+	protected float dfield = (float)(150 * Math.sqrt(2));
 	protected float dist = 500.0f;
 	protected float elev = (float)Math.PI / 6.0f;
 	protected float angl = (float) (3 * Math.PI / 2);
-	protected float field = (float)(150 * Math.sqrt(2));
+	protected float field = dfield;
 	private Coord dragorig = null;
 	private float anglorig;
 	protected Coord3f cc, jc;
@@ -2258,7 +2258,7 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
 	if (ev.b == 1 && areaSelect) {
 		synchronized (this) {
 			if (selection == null) {
-				selection = new Selector();
+				selection = new Selector(null);
 			} else {
 				selection.destroy();
 				selection = null;
