@@ -2266,7 +2266,7 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
 			}
 		}
 	}
-	if(ev.b == 2) {
+	if(ev.b == 2 || (OptWnd.allowMouse4CamDragCheckBox.a && ev.b == 4) || (OptWnd.allowMouse5CamDragCheckBox.a && ev.b == 5)) {
 		new Click(ev.c, ev.b).run();
         if((camdrag == null) && ((Camera)camera).click(ev.c)) {
 		camdrag = ui.grabmouse(this);
@@ -2432,7 +2432,7 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
     }
     
     public boolean mouseup(MouseUpEvent ev) {
-	if(ev.b == 2) {
+		if(ev.b == 2 || (OptWnd.allowMouse4CamDragCheckBox.a && ev.b == 4) || (OptWnd.allowMouse5CamDragCheckBox.a && ev.b == 5)) {
 	    if(camdrag != null) {
 		camera.release();
 		camdrag.remove();

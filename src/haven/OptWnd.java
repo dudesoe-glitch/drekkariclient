@@ -27,13 +27,10 @@
 package haven;
 
 import haven.render.*;
-import haven.render.sl.Type;
-import haven.render.sl.Uniform;
 import haven.res.gfx.fx.msrad.MSRad;
 import haven.res.ui.pag.toggle.Toggle;
 import haven.resutil.Ridges;
 import haven.sprites.AggroCircleSprite;
-import haven.sprites.SkyBoxSprite;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
@@ -2960,6 +2957,8 @@ public class OptWnd extends Window {
 	}
 
 
+	public static CheckBox allowMouse4CamDragCheckBox;
+	public static CheckBox allowMouse5CamDragCheckBox;
 	private Label freeCamZoomSpeedLabel;
 	public static HSlider freeCamZoomSpeedSlider;
 	private Button freeCamZoomSpeedResetButton;
@@ -3019,6 +3018,19 @@ public class OptWnd extends Window {
 				};
 			TopPrev = camGrp.add("Free Camera", TopPrev.pos("bl").adds(16, 2));
 			TopPrev = camGrp.add("Ortho Camera", TopPrev.pos("bl").adds(0, 1));
+			TopPrev = add(new Label("Camera Dragging:"), TopPrev.pos("bl").adds(0, 6).x(0));
+				TopPrev = add(allowMouse4CamDragCheckBox = new CheckBox("Also allow Mouse 4 Button to drag the Camera"){
+					{a = (Utils.getprefb("allowMouse4CamDrag", false));}
+					public void changed(boolean val) {
+						Utils.setprefb("allowMouse4CamDrag", val);
+					};
+				}, TopPrev.pos("bl").adds(12, 2));
+				TopPrev = add(allowMouse5CamDragCheckBox = new CheckBox("Also allow Mouse 5 Button to drag the Camera"){
+					{a = Utils.getprefb("allowMouse5CamDrag", false);}
+					public void changed(boolean val) {
+						Utils.setprefb("allowMouse5CamDrag", val);
+					}
+				}, TopPrev.pos("bl").adds(0, 2));
 			TopPrev = add(new Label("Selected Camera Settings:"), TopPrev.pos("bl").adds(0, 6).x(0));
 			// ND: The Ortho Camera Settings
 			OrthoPrev = add(reverseOrthoCameraAxesCheckBox = new CheckBox("Reverse Ortho Look Axis"){
