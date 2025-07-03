@@ -1356,7 +1356,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 			this.time = time;
 		}
 	}
-	Deque<SysTimedMessage> msgDeque = new ArrayDeque<>();
+	Deque<SysTimedMessage> msgDeque = new ConcurrentLinkedDeque<>();
 
 	public void draw(GOut g) {
 //	beltwdg.c = new Coord(chat.c.x, Math.min(chat.c.y - beltwdg.sz.y, sz.y - beltwdg.sz.y));
