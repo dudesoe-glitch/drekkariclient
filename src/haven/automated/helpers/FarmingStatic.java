@@ -4,9 +4,10 @@ import haven.Grainslot;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class FarmingStatic {
-    public static List<Grainslot> grainSlots = new ArrayList<>();
+    public static final List<Grainslot> grainSlots = new CopyOnWriteArrayList<>();
 
     public static volatile boolean turnipDrop = false;
 }
