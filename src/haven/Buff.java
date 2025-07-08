@@ -52,12 +52,6 @@ public class Buff extends Widget implements ItemInfo.ResOwner, Bufflist.Managed 
     int ameter = -1;
     int nmeter = -1;
     Tex ntext = null;
-	public static final Map<String, Color> improvedOpeningsImageColor = new HashMap<String, Color>(4) {{
-		put("paginae/atk/offbalance", new Color(0, 128, 3));
-		put("paginae/atk/reeling", new Color(217, 177, 20));
-		put("paginae/atk/dizzy", new Color(39, 82, 191));
-		put("paginae/atk/cornered", new Color(192, 28, 28));
-	}};
 
     @RName("buff")
     public static class $_ implements Factory {

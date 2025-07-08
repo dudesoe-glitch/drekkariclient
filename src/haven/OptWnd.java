@@ -45,10 +45,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
 import java.util.concurrent.Future;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 public class OptWnd extends Window {
     public final Panel main;
@@ -67,6 +65,7 @@ public class OptWnd extends Window {
 	public static AutoDropManagerWindow autoDropManagerWindow;
 	AlarmWindow alarmWindow;
 	public static GSettings currentgprefs;
+	public static final Map<String, Color> improvedOpeningsImageColor =	new ConcurrentHashMap<>(4);
 
     public void chpanel(Panel p) {
 	if(current != null)
@@ -1015,6 +1014,19 @@ public class OptWnd extends Window {
 	public static CheckBox showDamagePredictUICheckBox;
 	public static CheckBox singleRowCombatMovesCheckBox;
 	public static CheckBox includeHHPTextHealthBarCheckBox;
+	public static ColorOptionWidget greenCombatColorOptionWidget;
+	public static String[] greenCombatColorSetting = Utils.getprefsa("greenCombat" + "_colorSetting", new String[]{"0", "128", "3", "255"});
+	public static ColorOptionWidget blueCombatColorOptionWidget;
+	public static String[] blueCombatColorSetting = Utils.getprefsa("blueCombat" + "_colorSetting", new String[]{"39", "82", "191", "255"});
+	public static ColorOptionWidget yellowCombatColorOptionWidget;
+	public static String[] yellowCombatColorSetting = Utils.getprefsa("yellowCombat" + "_colorSetting", new String[]{"217", "177", "20", "255"});
+	public static ColorOptionWidget redCombatColorOptionWidget;
+	public static String[] redCombatColorSetting = Utils.getprefsa("redCombat" + "_colorSetting", new String[]{"192", "28", "28", "255"});
+	public static CheckBox showCombatOpeningsAsLettersCheckBox;
+	public static ColorOptionWidget myIPCombatColorOptionWidget;
+	public static String[] myIPCombatColorSetting = Utils.getprefsa("myIPCombat" + "_colorSetting", new String[]{"0", "201", "4", "255"});
+	public static ColorOptionWidget enemyIPCombatColorOptionWidget;
+	public static String[] enemyIPCombatColorSetting = Utils.getprefsa("enemyIPCombat" + "_colorSetting", new String[]{"245", "0", "0", "255"});
 	public static CheckBox showEstimatedAgilityTextCheckBox;
 	public static CheckBox drawFloatingCombatDataCheckBox;
 	public static CheckBox drawFloatingCombatDataOnCurrentTargetCheckBox;
@@ -1084,7 +1096,71 @@ public class OptWnd extends Window {
 				}
 			}, prev.pos("bl").adds(0, 12));
 
-			prev = add(new Label("Stamina Bar Location:"), prev.pos("bl").adds(0, 8));{
+			prev = add(showCombatOpeningsAsLettersCheckBox = new CheckBox("Show Combat Openings as Letters"){
+				{a = Utils.getprefb("showCombatOpeningsAsLetters", false);}
+				public void changed(boolean val) {
+					Utils.setprefb("showCombatOpeningsAsLetters", val);
+				}
+			}, prev.pos("bl").adds(0, 12));
+
+			prev = add(new Label("Combat Openings Colors:"), prev.pos("bl").adds(0, 10));
+			prev = add(new Label("Green"), prev.pos("bl").adds(2, 1));
+			add(greenCombatColorOptionWidget = new ColorOptionWidget("", "greenCombat", 0,
+					Integer.parseInt(greenCombatColorSetting[0]), Integer.parseInt(greenCombatColorSetting[1]), Integer.parseInt(greenCombatColorSetting[2]), Integer.parseInt(greenCombatColorSetting[3]), (Color col) -> {
+				improvedOpeningsImageColor.put("paginae/atk/offbalance", OptWnd.greenCombatColorOptionWidget.currentColor);
+			}){}, prev.pos("bl").adds(6, 0));
+			prev = add(new Label("Blue"), prev.pos("ur").adds(12, 0));
+			add(blueCombatColorOptionWidget = new ColorOptionWidget("", "blueCombat", 0,
+					Integer.parseInt(blueCombatColorSetting[0]), Integer.parseInt(blueCombatColorSetting[1]), Integer.parseInt(blueCombatColorSetting[2]), Integer.parseInt(blueCombatColorSetting[3]), (Color col) -> {
+				improvedOpeningsImageColor.put("paginae/atk/dizzy", OptWnd.blueCombatColorOptionWidget.currentColor);
+			}){}, prev.pos("bl").adds(2, 0));
+			prev = add(new Label("Yellow"), prev.pos("ur").adds(12, 0));
+			add(yellowCombatColorOptionWidget = new ColorOptionWidget("", "yellowCombat", 0,
+					Integer.parseInt(yellowCombatColorSetting[0]), Integer.parseInt(yellowCombatColorSetting[1]), Integer.parseInt(yellowCombatColorSetting[2]), Integer.parseInt(yellowCombatColorSetting[3]), (Color col) -> {
+				improvedOpeningsImageColor.put("paginae/atk/reeling", OptWnd.yellowCombatColorOptionWidget.currentColor);
+			}){}, prev.pos("bl").adds(8, 0));
+			prev = add(new Label("Red"), prev.pos("ur").adds(12, 0));
+			prev = add(redCombatColorOptionWidget = new ColorOptionWidget("", "redCombat", 0,
+					Integer.parseInt(redCombatColorSetting[0]), Integer.parseInt(redCombatColorSetting[1]), Integer.parseInt(redCombatColorSetting[2]), Integer.parseInt(redCombatColorSetting[3]), (Color col) -> {
+				improvedOpeningsImageColor.put("paginae/atk/cornered", OptWnd.redCombatColorOptionWidget.currentColor);
+			}){}, prev.pos("bl").adds(1, 0));
+			prev = add(new Button(UI.scale(100), "Reset Colors", false).action(() -> {
+				Utils.setprefsa("greenCombat" + "_colorSetting", new String[]{"0", "128", "3", "255"});
+				Utils.setprefsa("blueCombat" + "_colorSetting", new String[]{"39", "82", "191", "255"});
+				Utils.setprefsa("yellowCombat" + "_colorSetting", new String[]{"217", "177", "20", "255"});
+				Utils.setprefsa("redCombat" + "_colorSetting", new String[]{"192", "28", "28", "255"});
+				greenCombatColorOptionWidget.cb.colorChooser.setColor(greenCombatColorOptionWidget.currentColor = new Color(0, 128, 3, 255));
+				blueCombatColorOptionWidget.cb.colorChooser.setColor(blueCombatColorOptionWidget.currentColor = new Color(39, 82, 191, 255));
+				yellowCombatColorOptionWidget.cb.colorChooser.setColor(yellowCombatColorOptionWidget.currentColor = new Color(217, 177, 20, 255));
+				redCombatColorOptionWidget.cb.colorChooser.setColor(redCombatColorOptionWidget.currentColor = new Color(192, 28, 28, 255));
+				improvedOpeningsImageColor.put("paginae/atk/offbalance", OptWnd.greenCombatColorOptionWidget.currentColor);
+				improvedOpeningsImageColor.put("paginae/atk/dizzy", OptWnd.blueCombatColorOptionWidget.currentColor);
+				improvedOpeningsImageColor.put("paginae/atk/reeling", OptWnd.yellowCombatColorOptionWidget.currentColor);
+				improvedOpeningsImageColor.put("paginae/atk/cornered", OptWnd.redCombatColorOptionWidget.currentColor);
+			}), prev.pos("ur").adds(16, 0));
+			improvedOpeningsImageColor.put("paginae/atk/offbalance", OptWnd.greenCombatColorOptionWidget.currentColor);
+			improvedOpeningsImageColor.put("paginae/atk/dizzy", OptWnd.blueCombatColorOptionWidget.currentColor);
+			improvedOpeningsImageColor.put("paginae/atk/reeling", OptWnd.yellowCombatColorOptionWidget.currentColor);
+			improvedOpeningsImageColor.put("paginae/atk/cornered", OptWnd.redCombatColorOptionWidget.currentColor);
+
+			prev = add(new Label("Combat IP (Coins) Colors:"), prev.pos("bl").adds(0, 10).x(0));
+			prev = add(new Label("Your IP"), prev.pos("bl").adds(2, 1));
+			add(myIPCombatColorOptionWidget = new ColorOptionWidget("", "myIPCombat", 0,
+					Integer.parseInt(myIPCombatColorSetting[0]), Integer.parseInt(myIPCombatColorSetting[1]), Integer.parseInt(myIPCombatColorSetting[2]), Integer.parseInt(myIPCombatColorSetting[3]), (Color col) -> {
+			}){}, prev.pos("bl").adds(8, 0));
+			prev = add(new Label("Enemy IP"), prev.pos("ur").adds(12, 0));
+			prev = add(enemyIPCombatColorOptionWidget = new ColorOptionWidget("", "enemyIPCombat", 0,
+					Integer.parseInt(enemyIPCombatColorSetting[0]), Integer.parseInt(enemyIPCombatColorSetting[1]), Integer.parseInt(enemyIPCombatColorSetting[2]), Integer.parseInt(enemyIPCombatColorSetting[3]), (Color col) -> {
+			}){}, prev.pos("bl").adds(12, 0));
+
+			prev = add(new Button(UI.scale(100), "Reset Colors", false).action(() -> {
+				Utils.setprefsa("myIPCombat" + "_colorSetting", new String[]{"0", "201", "4", "255"});
+				Utils.setprefsa("enemyIPCombat" + "_colorSetting", new String[]{"245", "0", "0", "255"});
+				myIPCombatColorOptionWidget.cb.colorChooser.setColor(myIPCombatColorOptionWidget.currentColor = new Color(0, 201, 4, 255));
+				enemyIPCombatColorOptionWidget.cb.colorChooser.setColor(enemyIPCombatColorOptionWidget.currentColor = new Color(245, 0, 0, 255));
+			}), prev.pos("ur").adds(16, 0));
+
+			prev = add(new Label("Stamina Bar Location:"), prev.pos("bl").adds(0, 10).x(0));{
 				RadioGroup expWindowGrp = new RadioGroup(this) {
 					public void changed(int btn, String lbl) {
 						try {

@@ -56,6 +56,7 @@ public class Fightsess extends Widget {
     public Coord pcc;
     public int pho;
     private Fightview fv;
+	public static final Text.Foundry ipFoundry = new Text.Foundry(Text.serif.deriveFont(Font.BOLD), 22);
 	public static final Text.Foundry ipAdditionalFont = new Text.Foundry(Text.dfont.deriveFont(Font.BOLD), 12);
 	public static final Text.Foundry openingAdditionalFont = new Text.Foundry(Text.dfont.deriveFont(Font.BOLD), 10);
 	public static final Text.Foundry cleaveAdditionalFont = new Text.Foundry(Text.dfont.deriveFont(Font.BOLD), 10);
@@ -63,19 +64,7 @@ public class Fightsess extends Widget {
 	int combatMedColorShift = 0;
 	public static final Text.Foundry keybindsFoundry = new Text.Foundry(Text.sans.deriveFont(java.awt.Font.BOLD), 14);
 	public static final Text.Foundry damageFoundry = new Text.Foundry(Text.sans.deriveFont(java.awt.Font.BOLD), 11);
-	private static final Color coinsInfoBG = new Color(0, 0, 0, 120);
-	public static final Color ipInfoColorMe = new Color(0, 201, 4);
-	public static final Color ipInfoColorEnemy = new Color(245, 0, 0);
-	private static final Text.Furnace ipf = new PUtils.BlurFurn(new Text.Foundry(Text.serif.deriveFont(Font.BOLD), 22, new Color(0, 201, 4)).aa(true), 1, 1, new Color(0, 0, 0));
-	private static final Text.Furnace ipfEnemy = new PUtils.BlurFurn(new Text.Foundry(Text.serif.deriveFont(Font.BOLD), 22, new Color(245, 0, 0)).aa(true), 1, 1, new Color(0, 0, 0));
-	private final Text.UText<?> ip = new Text.UText<Integer>(ipf) {
-		public String text(Integer v) {return("" + v);} // ND: Removed "IP" text. I only need to see the number, we already know it's the IP/Coins
-		public Integer value() {return(fv.current.ip);}
-	};
-	private final Text.UText<?> oip = new Text.UText<Integer>(ipfEnemy) { // Changed this so I can give the enemy IP a different color
-		public String text(Integer v) {return("" + v);} // ND: Removed "IP" text. I only need to see the number, we already know it's the IP/Coins
-		public Integer value() {return(fv.current.oip);}
-	};
+
 	public static final Color stamBarBlue = new Color(47, 58, 207, 200);
 	public static final Color hpBarGreen = new Color(0, 166, 10, 255);
 	public static final Color hpBarGray = new Color(113, 113, 113, 255);
@@ -90,12 +79,6 @@ public class Fightsess extends Widget {
 	private static int basedmg = 0;
 	public static double myStrength = 1;
 
-	Map<String, Color> openingsColorMap = new HashMap<>() {{
-		put("paginae/atk/offbalance", new Color(0, 128, 3));
-		put("paginae/atk/dizzy", new Color(39, 82, 191));
-		put("paginae/atk/reeling", new Color(217, 177, 20));
-		put("paginae/atk/cornered", new Color(192, 28, 28));
-	}};
 	private boolean combatMedAlphaShiftUp = true;
 
 	private Tex myHealthBarTex = null;
@@ -367,9 +350,12 @@ public class Fightsess extends Widget {
 			} else {
 				g.image(Buff.frame, new Coord(x + myLocation - UI.scale(3), y - UI.scale(20) - UI.scale(3)));
 			}
-			if (Buff.improvedOpeningsImageColor.containsKey(buff.res.get().name)) {
-				g.chcolor(Buff.improvedOpeningsImageColor.get(buff.res.get().name));
-				g.frect(new Coord(x + myLocation, y - UI.scale(20)), isz);
+			if (OptWnd.improvedOpeningsImageColor.containsKey(buff.res.get().name)) {
+				g.chcolor(OptWnd.improvedOpeningsImageColor.get(buff.res.get().name));
+				if (OptWnd.showCombatOpeningsAsLettersCheckBox.a)
+					g.image(img, new Coord(x + myLocation, y - UI.scale(20)));
+				else
+					g.frect(new Coord(x + myLocation, y - UI.scale(20)), isz);
 				g.chcolor(Color.WHITE);
 				if(ameteri != buff.nmeter) {
 					buff.ntext = null;
@@ -427,9 +413,12 @@ public class Fightsess extends Widget {
 				} else {
 					g.image(Buff.frame, new Coord(x + location - UI.scale(3), y - UI.scale(20) - UI.scale(3)));
 				}
-				if (Buff.improvedOpeningsImageColor.containsKey(name)) {
-					g.chcolor(Buff.improvedOpeningsImageColor.get(name));
-					g.frect(new Coord(x + location, y - UI.scale(20)), isz);
+				if (OptWnd.improvedOpeningsImageColor.containsKey(name)) {
+					g.chcolor(OptWnd.improvedOpeningsImageColor.get(name));
+					if (OptWnd.showCombatOpeningsAsLettersCheckBox.a)
+						g.image(img, new Coord(x + location, y - UI.scale(20)));
+					else
+						g.frect(new Coord(x + location, y - UI.scale(20)), isz);
 					g.chcolor(Color.WHITE);
 					if(ameteri != buff.nmeter) {
 						buff.ntext = null;
@@ -451,8 +440,12 @@ public class Fightsess extends Widget {
 			}
 		}
 
-	    g.aimage(ip.get().tex(), new Coord(x - UI.scale(40), y - UI.scale(30)), 1, 0.5);
-	    g.aimage(oip.get().tex(), new Coord(x + UI.scale(40), y - UI.scale(30)), 0, 0.5);
+//	    g.aimage(ip.get().tex(), new Coord(x - UI.scale(40), y - UI.scale(30)), 1, 0.5);
+		g.aimage(PUtils.strokeTex(Text.renderstroked(Integer.toString(fv.current.ip), OptWnd.myIPCombatColorOptionWidget.currentColor, Color.BLACK, ipFoundry)), new Coord(x - UI.scale(40), y - UI.scale(30)), 1, 0.5);
+
+//	    g.aimage(oip.get().tex(), new Coord(x + UI.scale(40), y - UI.scale(30)), 0, 0.5);
+		g.aimage(PUtils.strokeTex(Text.renderstroked(Integer.toString(fv.current.oip), OptWnd.enemyIPCombatColorOptionWidget.currentColor, Color.BLACK, ipFoundry)), new Coord(x + UI.scale(40), y - UI.scale(30)), 0, 0.5);
+
 
 //	    if(fv.lsrel.size() > 1)
 //		curtgtfx = fxon(fv.current.gobid, tgtfx, curtgtfx);
@@ -587,9 +580,9 @@ public class Fightsess extends Widget {
 			if (fv.current.minAgi != 0 && fv.current.maxAgi != 2D) {
 				g.aimage(Text.renderstroked("" + fv.current.minAgi + "x - " + fv.current.maxAgi + "x").tex(), cdc3, 0, 0.5);
 			} else if (fv.current.minAgi == 0 && fv.current.maxAgi != 2D) {
-				g.aimage(Text.renderstroked("<" + fv.current.maxAgi + "x", ipInfoColorMe, Color.BLACK).tex(), cdc3, 0, 0.5);
+				g.aimage(Text.renderstroked("<" + fv.current.maxAgi + "x", OptWnd.myIPCombatColorOptionWidget.currentColor, Color.BLACK).tex(), cdc3, 0, 0.5);
 			} else if (fv.current.minAgi != 0 && fv.current.maxAgi == 2D) {
-				g.aimage(Text.renderstroked(">" + fv.current.minAgi + "x", ipInfoColorEnemy, Color.BLACK).tex(), cdc3, 0, 0.5);
+				g.aimage(Text.renderstroked(">" + fv.current.minAgi + "x", OptWnd.enemyIPCombatColorOptionWidget.currentColor, Color.BLACK).tex(), cdc3, 0, 0.5);
 			} else {
 				g.aimage(Text.renderstroked("Unknown").tex(), cdc3, 0, 0.5);
 			}
@@ -1006,9 +999,9 @@ public class Fightsess extends Widget {
 			g.frect(new Coord(topLeft.x + UI.scale(3), topLeft.y + UI.scale(9)), UI.scale(new Coord(39, 20)));
 			g.chcolor(255, 255, 255, 255);
 			int oipOffset = rels.oip < 10 ? 35 : 40;
-			g.aimage(Text.renderstroked(Integer.toString(rels.ip), ipInfoColorMe, Color.BLACK, ipAdditionalFont).tex(), new Coord(topLeft.x + UI.scale(20), topLeft.y + UI.scale(19)), 1, 0.5);
-			g.aimage(Text.renderstroked("/", Color.WHITE, Color.BLACK, ipAdditionalFont).tex(), new Coord(topLeft.x + UI.scale(25), topLeft.y + UI.scale(19)), 1, 0.5);
-			g.aimage(Text.renderstroked(Integer.toString(rels.oip), ipInfoColorEnemy, Color.BLACK, ipAdditionalFont).tex(), new Coord(topLeft.x + UI.scale(oipOffset), topLeft.y + UI.scale(19)), 1, 0.5);
+			g.aimage(Text.renderstroked(Integer.toString(rels.ip), OptWnd.myIPCombatColorOptionWidget.currentColor, Color.BLACK, ipAdditionalFont).tex(), new Coord(topLeft.x + UI.scale(20), topLeft.y + UI.scale(19)), 1, 0.5);
+			g.aimage(Text.renderstroked("-", Color.WHITE, Color.BLACK, ipAdditionalFont).tex(), new Coord(topLeft.x + UI.scale(26), topLeft.y + UI.scale(18)), 1, 0.5);
+			g.aimage(Text.renderstroked(Integer.toString(rels.oip), OptWnd.enemyIPCombatColorOptionWidget.currentColor, Color.BLACK, ipAdditionalFont).tex(), new Coord(topLeft.x + UI.scale(oipOffset), topLeft.y + UI.scale(19)), 1, 0.5);
 		}
 
 		// Maneuver
@@ -1056,10 +1049,11 @@ public class Fightsess extends Widget {
 			for (Buff buff : rels.buffs.children(Buff.class)) {
 				try {
 					if (buff.res != null && buff.res.get() != null) {
+						Tex img = buff.res.get().flayer(Resource.imgc).tex();
 						String name = buff.res.get().name;
-						if (openingsColorMap.containsKey(name)) {
+						if (OptWnd.improvedOpeningsImageColor.containsKey(name)) {
 							int meterValue = getOpeningValue(buff);
-							openingList.add(new TemporaryOpening(meterValue, openingsColorMap.get(name)));
+							openingList.add(new TemporaryOpening(meterValue, name, OptWnd.improvedOpeningsImageColor.get(name), img));
 						}
 					}
 				} catch (Loading ignored) {
@@ -1080,7 +1074,10 @@ public class Fightsess extends Widget {
 					g.chcolor(0, 0, 0, 255);
 					g.frect(new Coord(topLeft.x + UI.scale(openingOffsetX) - UI.scale(1), topLeft.y + UI.scale(30) - UI.scale(1)), UI.scale(new Coord(20, 20)));
 					g.chcolor(opening.color);
-					g.frect(new Coord(topLeft.x + UI.scale(openingOffsetX), topLeft.y + UI.scale(30)), UI.scale(new Coord(18, 18)));
+					if (OptWnd.showCombatOpeningsAsLettersCheckBox.a)
+						g.image(opening.img, new Coord(topLeft.x + UI.scale(openingOffsetX), topLeft.y + UI.scale(30)), UI.scale(new Coord(18, 18)));
+					else
+						g.frect(new Coord(topLeft.x + UI.scale(openingOffsetX), topLeft.y + UI.scale(30)), UI.scale(new Coord(18, 18)));
 					g.chcolor(255, 255, 255, 255);
 
 					int valueOffset = opening.value < 10 ? 15 : opening.value< 100 ? 18 : 20;
@@ -1145,10 +1142,11 @@ public class Fightsess extends Widget {
 		for (Buff buff : fv.buffs.children(Buff.class)) {
 			try {
 				if (buff.res != null && buff.res.get() != null) {
+					Tex img = buff.res.get().flayer(Resource.imgc).tex();
 					String name = buff.res.get().name;
-					if (openingsColorMap.containsKey(name)) {
+					if (OptWnd.improvedOpeningsImageColor.containsKey(name)) {
 						int meterValue = getOpeningValue(buff);
-						openingList.add(new TemporaryOpening(meterValue, openingsColorMap.get(name)));
+						openingList.add(new TemporaryOpening(meterValue, name, OptWnd.improvedOpeningsImageColor.get(name), img));
 					}
 				}
 			} catch (Loading ignored) {
@@ -1160,7 +1158,10 @@ public class Fightsess extends Widget {
 			g.chcolor(0, 0, 0, 255);
 			g.frect(new Coord(topLeft.x + UI.scale(openingOffsetX) - UI.scale(1), topLeft.y + UI.scale(30) - UI.scale(1)), UI.scale(new Coord(20, 20)));
 			g.chcolor(opening.color);
-			g.frect(new Coord(topLeft.x + UI.scale(openingOffsetX), topLeft.y + UI.scale(30)), UI.scale(new Coord(18, 18)));
+			if (OptWnd.showCombatOpeningsAsLettersCheckBox.a)
+				g.image(opening.img, new Coord(topLeft.x + UI.scale(openingOffsetX), topLeft.y + UI.scale(30)), UI.scale(new Coord(18, 18)));
+			else
+				g.frect(new Coord(topLeft.x + UI.scale(openingOffsetX), topLeft.y + UI.scale(30)), UI.scale(new Coord(18, 18)));
 			g.chcolor(255, 255, 255, 255);
 
 			int valueOffset = opening.value < 10 ? 15 : opening.value< 100 ? 18 : 20;
@@ -1180,11 +1181,15 @@ public class Fightsess extends Widget {
 
 	private static class TemporaryOpening{
 		private int value;
+		private String name;
 		private Color color;
+		private Tex img;
 
-		public TemporaryOpening(int value, Color color) {
+		public TemporaryOpening(int value, String name, Color color, Tex img) {
 			this.value = value;
+			this.name = name;
 			this.color = color;
+			this.img = img;
 		}
 	}
 
