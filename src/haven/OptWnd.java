@@ -2217,16 +2217,16 @@ public class OptWnd extends Window {
 				refreshCurrentTargetSpriteColor = true;
 			}), combatFoeColorOptionWidget.pos("ur").adds(10, 0));
 
-			rightColumn = add(new Label("Target Sprite Size:"), rightColumn.pos("bl").adds(0, 4).x(480));
+			rightColumn = add(new Label("Target Sprite Size:"), rightColumn.pos("bl").adds(0, 4).xs(480));
 			rightColumn = add(targetSpriteSizeSlider = new HSlider(UI.scale(100), 3, 7, Utils.getprefi("targetSpriteSize", 5)) {
 				public void changed() {
 					Utils.setprefi("targetSpriteSize", val);
 					haven.sprites.CurrentAggroSprite.size = val;
 					refreshCurrentTargetSpriteColor = true;
 				}
-			}, rightColumn.pos("ur").adds(24, 4));
+			}, rightColumn.pos("ur").adds(26, 4));
 
-			rightColumn = add(new Label("Object Pinging Colors:"), rightColumn.pos("bl").adds(0, 12).x(480));
+			rightColumn = add(new Label("Object Pinging Colors:"), rightColumn.pos("bl").adds(0, 12).xs(480));
 			rightColumn = add(areaChatPingColorOptionWidget = new ColorOptionWidget("Area Chat (Alt+LClick):", "areaChatPing", 115, Integer.parseInt(areaChatPingColorSetting[0]), Integer.parseInt(areaChatPingColorSetting[1]), Integer.parseInt(areaChatPingColorSetting[2]), Integer.parseInt(areaChatPingColorSetting[3]), (Color col) -> {
 			}){}, rightColumn.pos("bl").adds(1, 1));
 			add(new Button(UI.scale(70), "Reset", false).action(() -> {
