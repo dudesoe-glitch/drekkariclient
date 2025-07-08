@@ -714,19 +714,60 @@ public class Fightsess extends Widget {
 	int y = (int)(ui.gui.sz.y - ((ui.gui.sz.y / 500.0) * OptWnd.combatUITopPanelHeightSlider.val));
 	int bottom = (int)(ui.gui.sz.y - ((ui.gui.sz.y / 500.0) * OptWnd.combatUIBottomPanelHeightSlider.val));
 
-	for(Buff buff : fv.buffs.children(Buff.class)) {
-	    Coord dc = new Coord(x - buff.c.x - Buff.cframe.sz().x - UI.scale(80), y - UI.scale(20));
+	ArrayList<Buff> myOpenings = new ArrayList<>(fv.buffs.children(Buff.class));
+	myOpenings.sort((o2, o1) -> Integer.compare(getOpeningValue(o1), getOpeningValue(o2)));
+	Buff myManeuver = null;
+	for (Buff buff : myOpenings) {
+		try {
+			if (buff.res != null && buff.res.get() != null) {
+				String name = buff.res.get().name;
+				if (Config.maneuvers.contains(name)) {
+					myManeuver = buff;
+					break;
+				}
+			}
+		} catch (Loading ignored) {
+		}
+	}
+	if (myManeuver != null && myOpenings.size() > 1) {
+		myOpenings.remove(myManeuver);
+		myOpenings.add(myOpenings.size(), myManeuver);
+	}
+	int myLocation = - Buff.cframe.sz().x - UI.scale(80);
+	for(Buff buff : myOpenings) {
+	    Coord dc = new Coord(x + myLocation, y - UI.scale(20));
 	    if(c.isect(dc, buff.sz)) {
 		Object ret = buff.tooltip(c.sub(dc), prevtt);
 		if(ret != null) {
 		    prevtt = buff;
 		    return(ret);
 		}
+			myLocation -= UI.scale(40);
 	    }
 	}
 	if(fv.current != null) {
-	    for(Buff buff : fv.current.buffs.children(Buff.class)) {
-		Coord dc = new Coord(x + buff.c.x + UI.scale(80), y - UI.scale(20));
+		ArrayList<Buff> enemyOpenings = new ArrayList<>(fv.current.buffs.children(Buff.class));
+		enemyOpenings.sort((o1, o2) -> Integer.compare(getOpeningValue(o2), getOpeningValue(o1)));
+		Buff maneuver = null;
+		for (Buff buff : enemyOpenings) {
+			try {
+				if (buff.res != null && buff.res.get() != null) {
+					String name = buff.res.get().name;
+					if (Config.maneuvers.contains(name)) {
+						maneuver = buff;
+						break;
+					}
+				}
+			} catch (Loading ignored) {
+			}
+		}
+		if (maneuver != null && enemyOpenings.size() > 1) {
+			enemyOpenings.remove(maneuver);
+			enemyOpenings.add(enemyOpenings.size(), maneuver);
+		}
+		int location = UI.scale(80);
+	    for(Buff buff : enemyOpenings) {
+		Coord dc = new Coord(x + location, y - UI.scale(20));
 		if(c.isect(dc, buff.sz)) {
 		    Object ret = buff.tooltip(c.sub(dc), prevtt);
 		    if(ret != null) {
@@ -734,6 +775,7 @@ public class Fightsess extends Widget {
 			return(ret);
 		    }
 		}
+			location += UI.scale(40);
 	    }
 	}
 	final int rl = 5;
