@@ -1563,6 +1563,7 @@ public class OptWnd extends Window {
 	public static CheckBox highlightCombatFoesCheckBox;
 	public static CheckBox showCirclesUnderCombatFoesCheckBox;
 	public static ColorOptionWidget combatFoeColorOptionWidget;
+	public static boolean refreshCurrentTargetSpriteColor = false;
 	public static String[] combatFoeColorSetting = Utils.getprefsa("combatFoe" + "_colorSetting", new String[]{"180", "0", "0", "196"});
 	public static ColorOptionWidget areaChatPingColorOptionWidget;
 	public static String[] areaChatPingColorSetting = Utils.getprefsa("areaChatPing" + "_colorSetting", new String[]{"255", "183", "0", "255"});
@@ -2197,6 +2198,8 @@ public class OptWnd extends Window {
 					ui.sess.glob.oc.gobAction(Gob::removeCombatFoeCircleOverlay);
 					ui.sess.glob.oc.gobAction(Gob::removeCombatFoeHighlight);
 				}
+				haven.sprites.CurrentAggroSprite.col = new BaseColor(col);
+				refreshCurrentTargetSpriteColor = true;
 			}){}, rightColumn.pos("bl").adds(1, 1));
 			add(new Button(UI.scale(70), "Reset", false).action(() -> {
 				Utils.setprefsa("combatFoes" + "_colorSetting", new String[]{"180", "0", "0", "196"});
@@ -2207,6 +2210,8 @@ public class OptWnd extends Window {
 					ui.sess.glob.oc.gobAction(Gob::removeCombatFoeCircleOverlay);
 					ui.sess.glob.oc.gobAction(Gob::removeCombatFoeHighlight);
 				}
+				haven.sprites.CurrentAggroSprite.col = new BaseColor(combatFoeColorOptionWidget.currentColor);
+				refreshCurrentTargetSpriteColor = true;
 			}), combatFoeColorOptionWidget.pos("ur").adds(10, 0));
 
 			rightColumn = add(new Label("Object Pinging Colors:"), rightColumn.pos("bl").adds(0, 12).x(480));

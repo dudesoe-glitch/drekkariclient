@@ -1,9 +1,6 @@
 package haven.sprites;
 
-import haven.Coord2d;
-import haven.Gob;
-import haven.Resource;
-import haven.Sprite;
+import haven.*;
 import haven.render.BaseColor;
 import haven.render.RenderTree;
 
@@ -11,7 +8,7 @@ import java.awt.*;
 
 public class CurrentAggroSprite extends Sprite { // ND: From Trollex's decompiled client
    private static final ObstMesh mesh;
-   private static BaseColor col = new BaseColor(new Color(215, 0, 0, 255));
+   public static BaseColor col = new BaseColor(OptWnd.combatFoeColorOptionWidget.currentColor);
    public CurrentAggroSprite(Gob g) {
       super(g, (Resource)null);
    }

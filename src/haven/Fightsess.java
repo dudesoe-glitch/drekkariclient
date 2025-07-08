@@ -449,7 +449,10 @@ public class Fightsess extends Widget {
 
 //	    if(fv.lsrel.size() > 1)
 //		curtgtfx = fxon(fv.current.gobid, tgtfx, curtgtfx);
-		curtgtfx2 = fxon2(fv.current.gobid, tgtfx, curtgtfx2);
+		if (!OptWnd.refreshCurrentTargetSpriteColor)
+			curtgtfx2 = fxon2(fv.current.gobid, tgtfx, curtgtfx2);
+		else
+			OptWnd.refreshCurrentTargetSpriteColor = false;
 	}
 
 	    Coord cdc = new Coord(x, y);
