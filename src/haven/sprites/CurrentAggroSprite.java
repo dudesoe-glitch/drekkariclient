@@ -7,19 +7,12 @@ import haven.render.RenderTree;
 import java.awt.*;
 
 public class CurrentAggroSprite extends Sprite { // ND: From Trollex's decompiled client
-   private static final ObstMesh mesh;
+   private static ObstMesh mesh;
    public static BaseColor col = new BaseColor(OptWnd.combatFoeColorOptionWidget.currentColor);
+   public static int size = Utils.getprefi("targetSpriteSize", 8);
    public CurrentAggroSprite(Gob g) {
       super(g, (Resource)null);
-   }
-
-   public void added(RenderTree.Slot slot) {
-      super.added(slot);
-      slot.add(mesh, col);
-   }
-
-   static {
-      Coord2d[][] shapes = new Coord2d[28][3];
+      Coord2d[][] shapes = new Coord2d[42][3];
 
       int i;
       double angle;
@@ -27,8 +20,8 @@ public class CurrentAggroSprite extends Sprite { // ND: From Trollex's decompile
       double centerY;
       for(i = 0; i < 14; ++i) {
          angle = Math.toRadians(25.714285714285715D * (double)i);
-         centerX = 9.0D * Math.cos(angle);
-         centerY = 9.0D * Math.sin(angle);
+         centerX = (size+1) * Math.cos(angle);
+         centerY = (size+1) * Math.sin(angle);
          if (i % 2 == 0) {
             shapes[i][0] = new Coord2d(centerX + 2.7D * Math.cos(angle), centerY + 2.7D * Math.sin(angle));
             shapes[i][1] = new Coord2d(centerX - 2.1D * Math.cos(angle + 1.5707963267948966D), centerY - 2.1D * Math.sin(angle + 1.5707963267948966D));
@@ -42,13 +35,28 @@ public class CurrentAggroSprite extends Sprite { // ND: From Trollex's decompile
 
       for(i = 0; i < 14; ++i) {
          angle = Math.toRadians(25.714285714285715D * (double)i);
-         centerX = 8.0D * Math.cos(angle);
-         centerY = 8.0D * Math.sin(angle);
+         centerX = (size+1) * Math.cos(angle);
+         centerY = (size+1) * Math.sin(angle);
          shapes[14 + i][0] = new Coord2d(centerX + 1.2D * Math.cos(angle + 3.141592653589793D), centerY + 1.2D * Math.sin(angle + 3.141592653589793D));
          shapes[14 + i][1] = new Coord2d(centerX - 1.85D * Math.cos(angle + 1.5707963267948966D), centerY - 1.85D * Math.sin(angle + 1.5707963267948966D));
          shapes[14 + i][2] = new Coord2d(centerX + 1.85D * Math.cos(angle + 1.5707963267948966D), centerY + 1.85D * Math.sin(angle + 1.5707963267948966D));
       }
 
-      mesh = Obst.makeMesh(shapes, col.color(), 1.0F);
+      for(i = 0; i < 14; ++i) {
+         angle = Math.toRadians(25.714285714285715D * (double)i);
+         centerX = size * Math.cos(angle);
+         centerY = size * Math.sin(angle);
+         shapes[28 + i][0] = new Coord2d(centerX + 1.2D * Math.cos(angle + 3.141592653589793D), centerY + 1.2D * Math.sin(angle + 3.141592653589793D));
+         shapes[28 + i][1] = new Coord2d(centerX - 1.85D * Math.cos(angle + 1.5707963267948966D), centerY - 1.85D * Math.sin(angle + 1.5707963267948966D));
+         shapes[28 + i][2] = new Coord2d(centerX + 1.85D * Math.cos(angle + 1.5707963267948966D), centerY + 1.85D * Math.sin(angle + 1.5707963267948966D));
+      }
+
+      mesh = Obst.makeMesh(shapes, col.color(), 0.7f);
    }
+
+   public void added(RenderTree.Slot slot) {
+      super.added(slot);
+      slot.add(mesh, col);
+   }
+
 }

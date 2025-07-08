@@ -1563,8 +1563,9 @@ public class OptWnd extends Window {
 	public static CheckBox highlightCombatFoesCheckBox;
 	public static CheckBox showCirclesUnderCombatFoesCheckBox;
 	public static ColorOptionWidget combatFoeColorOptionWidget;
-	public static boolean refreshCurrentTargetSpriteColor = false;
 	public static String[] combatFoeColorSetting = Utils.getprefsa("combatFoe" + "_colorSetting", new String[]{"180", "0", "0", "196"});
+	public static boolean refreshCurrentTargetSpriteColor = false;
+	public static HSlider targetSpriteSizeSlider;
 	public static ColorOptionWidget areaChatPingColorOptionWidget;
 	public static String[] areaChatPingColorSetting = Utils.getprefsa("areaChatPing" + "_colorSetting", new String[]{"255", "183", "0", "255"});
 	public static ColorOptionWidget partyChatPingColorOptionWidget;
@@ -2213,6 +2214,15 @@ public class OptWnd extends Window {
 				haven.sprites.CurrentAggroSprite.col = new BaseColor(combatFoeColorOptionWidget.currentColor);
 				refreshCurrentTargetSpriteColor = true;
 			}), combatFoeColorOptionWidget.pos("ur").adds(10, 0));
+
+			rightColumn = add(new Label("Target Sprite Size:"), rightColumn.pos("bl").adds(0, 4).x(480));
+			rightColumn = add(targetSpriteSizeSlider = new HSlider(UI.scale(100), 3, 7, Utils.getprefi("targetSpriteSize", 5)) {
+				public void changed() {
+					Utils.setprefi("targetSpriteSize", val);
+					haven.sprites.CurrentAggroSprite.size = val;
+					refreshCurrentTargetSpriteColor = true;
+				}
+			}, rightColumn.pos("ur").adds(24, 4));
 
 			rightColumn = add(new Label("Object Pinging Colors:"), rightColumn.pos("bl").adds(0, 12).x(480));
 			rightColumn = add(areaChatPingColorOptionWidget = new ColorOptionWidget("Area Chat (Alt+LClick):", "areaChatPing", 115, Integer.parseInt(areaChatPingColorSetting[0]), Integer.parseInt(areaChatPingColorSetting[1]), Integer.parseInt(areaChatPingColorSetting[2]), Integer.parseInt(areaChatPingColorSetting[3]), (Color col) -> {
