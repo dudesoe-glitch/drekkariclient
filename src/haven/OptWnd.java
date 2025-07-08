@@ -1047,84 +1047,139 @@ public class OptWnd extends Window {
 	public static boolean stamBarLocationIsTop = Utils.getprefb("stamBarLocationIsTop", true);
 	public class CombatUIPanel extends Panel {
 		public CombatUIPanel(Panel back) {
-			Widget prev;
+			Widget leftColumn, rightColumn;
 
-			prev = add(new Label("Top panel height:"), 0, 0);
-			prev = add(combatUITopPanelHeightSlider = new HSlider(UI.scale(200), 36, 480, Utils.getprefi("combatTopPanelHeight", 400)) {
+			leftColumn = add(new Label("Top panel height:"), 0, 0);
+			leftColumn = add(combatUITopPanelHeightSlider = new HSlider(UI.scale(200), 36, 480, Utils.getprefi("combatTopPanelHeight", 400)) {
 				public void changed() {
 					Utils.setprefi("combatTopPanelHeight", val);
 				}
-			}, prev.pos("bl").adds(0, 2));
+			}, leftColumn.pos("bl").adds(0, 2));
 			add(new Button(UI.scale(70), "Reset", false).action(() -> {
 				combatUITopPanelHeightSlider.val = 400;
 				Utils.setprefi("combatTopPanelHeight", 400);
-			}), prev.pos("bl").adds(210, -20));
-			prev = add(new Label("Bottom panel height:"), prev.pos("bl").adds(0, 10));
-			prev = add(combatUIBottomPanelHeightSlider = new HSlider(UI.scale(200), 10, 480, Utils.getprefi("combatBottomPanelHeight", 100)) {
+			}), leftColumn.pos("bl").adds(210, -20));
+			leftColumn = add(new Label("Bottom panel height:"), leftColumn.pos("bl").adds(0, 10));
+			leftColumn = add(combatUIBottomPanelHeightSlider = new HSlider(UI.scale(200), 10, 480, Utils.getprefi("combatBottomPanelHeight", 100)) {
 				public void changed() {
 					Utils.setprefi("combatBottomPanelHeight", val);
 				}
-			}, prev.pos("bl").adds(0, 2));
+			}, leftColumn.pos("bl").adds(0, 2));
 			add(new Button(UI.scale(70), "Reset", false).action(() -> {
 				combatUIBottomPanelHeightSlider.val = 100;
 				Utils.setprefi("combatBottomPanelHeight", 100);
-			}), prev.pos("bl").adds(210, -20));
-			prev = add(showCombatHotkeysUICheckBox = new CheckBox("Show Combat Move Hotkeys (Bottom Panel)"){
+			}), leftColumn.pos("bl").adds(210, -20));
+			leftColumn = add(showCombatHotkeysUICheckBox = new CheckBox("Show Combat Move Hotkeys (Bottom Panel)"){
 				{a = Utils.getprefb("showCombatHotkeysUI", true);}
 				public void changed(boolean val) {
 					Utils.setprefb("showCombatHotkeysUI", val);
 				}
-			}, prev.pos("bl").adds(0, 10));
-			prev = add(singleRowCombatMovesCheckBox = new CheckBox("Single row for Combat Moves (Bottom Panel)"){
+			}, leftColumn.pos("bl").adds(0, 10));
+			leftColumn = add(singleRowCombatMovesCheckBox = new CheckBox("Single row for Combat Moves (Bottom Panel)"){
 				{a = Utils.getprefb("singleRowCombatMoves", false);}
 				public void set(boolean val) {
 					Utils.setprefb("singleRowCombatMoves", val);
 					a = val;
 				}
-			}, prev.pos("bl").adds(0, 2));
-			prev = add(showDamagePredictUICheckBox = new CheckBox("Show Combat Move Damage Prediction (Bottom Panel)"){
+			}, leftColumn.pos("bl").adds(0, 2));
+			leftColumn = add(showDamagePredictUICheckBox = new CheckBox("Show Combat Move Damage Prediction (Bottom Panel)"){
 				{a = Utils.getprefb("showDamagePredictUI", true);}
 				public void changed(boolean val) {
 					Utils.setprefb("showDamagePredictUI", val);
 				}
-			}, prev.pos("bl").adds(0, 10));
+			}, leftColumn.pos("bl").adds(0, 10));
 
-			prev = add(includeHHPTextHealthBarCheckBox = new CheckBox("Include HHP% text in Health Bar"){
+			leftColumn = add(includeHHPTextHealthBarCheckBox = new CheckBox("Include HHP% text in Health Bar"){
 				{a = Utils.getprefb("includeHHPTextHealthBar", false);}
 				public void changed(boolean val) {
 					Utils.setprefb("includeHHPTextHealthBar", val);
 				}
-			}, prev.pos("bl").adds(0, 12));
+			}, leftColumn.pos("bl").adds(0, 12));
 
-			prev = add(showCombatOpeningsAsLettersCheckBox = new CheckBox("Show Combat Openings as Letters"){
-				{a = Utils.getprefb("showCombatOpeningsAsLetters", false);}
+			leftColumn = add(showEstimatedAgilityTextCheckBox = new CheckBox("Show Target Estimated Agility"){
+				{a = Utils.getprefb("showEstimatedAgility", true);}
 				public void changed(boolean val) {
-					Utils.setprefb("showCombatOpeningsAsLetters", val);
+					Utils.setprefb("showEstimatedAgility", val);
 				}
-			}, prev.pos("bl").adds(0, 12));
+			}, leftColumn.pos("bl").adds(0, 12).x(0));
 
-			prev = add(new Label("Combat Openings Colors:"), prev.pos("bl").adds(0, 10));
-			prev = add(new Label("Green"), prev.pos("bl").adds(2, 1));
+			leftColumn = add(new HRuler(UI.scale(280)), leftColumn.pos("bl").adds(0, 12).x(0));
+			leftColumn = add(drawFloatingCombatOpeningsAboveYourselfCheckBox = new CheckBox("Display Combat Openings above Yourself"){
+				{a = Utils.getprefb("drawFloatingCombatDataAboveYourself", true);}
+				public void changed(boolean val) {
+					Utils.setprefb("drawFloatingCombatDataAboveYourself", val);
+				}
+			}, leftColumn.pos("bl").adds(0, 10).x(0));
+
+			leftColumn = add(drawFloatingCombatDataCheckBox = new CheckBox("Display Combat Data above Combat Foes"){
+				{a = Utils.getprefb("drawFloatingCombatData", true);}
+				public void changed(boolean val) {
+					Utils.setprefb("drawFloatingCombatData", val);
+				}
+			}, leftColumn.pos("bl").adds(0, 10));
+			leftColumn = add(drawFloatingCombatDataOnCurrentTargetCheckBox = new CheckBox("Show on Current Target"){
+				{a = Utils.getprefb("drawFloatingCombatDataOnCurrentTarget", true);}
+				public void changed(boolean val) {
+					Utils.setprefb("drawFloatingCombatDataOnCurrentTarget", val);
+				}
+			}, leftColumn.pos("bl").adds(20, 4));
+			leftColumn = add(drawFloatingCombatDataOnOthersCheckBox = new CheckBox("Show on other Combat Foes"){
+				{a = Utils.getprefb("drawFloatingCombatDataOnOthers", true);}
+				public void changed(boolean val) {
+					Utils.setprefb("drawFloatingCombatDataOnOthers", val);
+				}
+			}, leftColumn.pos("bl").adds(0, 2));
+			leftColumn = add(showCombatManeuverCombatInfoCheckBox = new CheckBox("Show Combat Stance/Maneuver"){
+				{a = Utils.getprefb("showCombatManeuverCombatInfo", true);}
+				public void changed(boolean val) {
+					Utils.setprefb("showCombatManeuverCombatInfo", val);
+				}
+			}, leftColumn.pos("bl").adds(0, 2));
+			leftColumn = add(onlyShowOpeningsAbovePercentageCombatInfoCheckBox = new CheckBox("Only show openings when higher than:"){
+				{a = Utils.getprefb("onlyShowOpeningsAbovePercentage", false);}
+				public void changed(boolean val) {
+					Utils.setprefb("onlyShowOpeningsAbovePercentage", val);
+				}
+			}, leftColumn.pos("bl").adds(0, 6));
+			onlyShowOpeningsAbovePercentageCombatInfoCheckBox.tooltip = onlyShowOpeningsAbovePercentageCombatInfoTooltip;
+			add(minimumOpeningTextEntry = new TextEntry(UI.scale(40), Utils.getpref("minimumOpening", "30")){
+				protected void changed() {
+					this.settext(this.text().replaceAll("[^\\d]", "")); // Only numbers
+					this.settext(this.text().replaceAll("(?<=^.{2}).*", "")); // No more than 2 digits
+					Utils.setpref("minimumOpening", this.buf.line());
+					super.changed();
+				}
+			}, leftColumn.pos("ur").adds(10, 0));
+
+			leftColumn = add(onlyShowCoinsAbove4CombatInfoCheckBox = new CheckBox("Only show coins when higher than 4"){
+				{a = Utils.getprefb("onlyShowCoinsAbove4", false);}
+				public void changed(boolean val) {
+					Utils.setprefb("onlyShowCoinsAbove4", val);
+				}
+			}, leftColumn.pos("bl").adds(0, 2));
+
+			rightColumn = add(new Label("Combat Openings Colors:"), UI.scale(320, 0));
+			rightColumn = add(new Label("Green"), rightColumn.pos("bl").adds(2, 1));
 			add(greenCombatColorOptionWidget = new ColorOptionWidget("", "greenCombat", 0,
 					Integer.parseInt(greenCombatColorSetting[0]), Integer.parseInt(greenCombatColorSetting[1]), Integer.parseInt(greenCombatColorSetting[2]), Integer.parseInt(greenCombatColorSetting[3]), (Color col) -> {
 				improvedOpeningsImageColor.put("paginae/atk/offbalance", OptWnd.greenCombatColorOptionWidget.currentColor);
-			}){}, prev.pos("bl").adds(6, 0));
-			prev = add(new Label("Blue"), prev.pos("ur").adds(12, 0));
+			}){}, rightColumn.pos("bl").adds(6, 0));
+			rightColumn = add(new Label("Blue"), rightColumn.pos("ur").adds(12, 0));
 			add(blueCombatColorOptionWidget = new ColorOptionWidget("", "blueCombat", 0,
 					Integer.parseInt(blueCombatColorSetting[0]), Integer.parseInt(blueCombatColorSetting[1]), Integer.parseInt(blueCombatColorSetting[2]), Integer.parseInt(blueCombatColorSetting[3]), (Color col) -> {
 				improvedOpeningsImageColor.put("paginae/atk/dizzy", OptWnd.blueCombatColorOptionWidget.currentColor);
-			}){}, prev.pos("bl").adds(2, 0));
-			prev = add(new Label("Yellow"), prev.pos("ur").adds(12, 0));
+			}){}, rightColumn.pos("bl").adds(2, 0));
+			rightColumn = add(new Label("Yellow"), rightColumn.pos("ur").adds(12, 0));
 			add(yellowCombatColorOptionWidget = new ColorOptionWidget("", "yellowCombat", 0,
 					Integer.parseInt(yellowCombatColorSetting[0]), Integer.parseInt(yellowCombatColorSetting[1]), Integer.parseInt(yellowCombatColorSetting[2]), Integer.parseInt(yellowCombatColorSetting[3]), (Color col) -> {
 				improvedOpeningsImageColor.put("paginae/atk/reeling", OptWnd.yellowCombatColorOptionWidget.currentColor);
-			}){}, prev.pos("bl").adds(8, 0));
-			prev = add(new Label("Red"), prev.pos("ur").adds(12, 0));
-			prev = add(redCombatColorOptionWidget = new ColorOptionWidget("", "redCombat", 0,
+			}){}, rightColumn.pos("bl").adds(8, 0));
+			rightColumn = add(new Label("Red"), rightColumn.pos("ur").adds(12, 0));
+			rightColumn = add(redCombatColorOptionWidget = new ColorOptionWidget("", "redCombat", 0,
 					Integer.parseInt(redCombatColorSetting[0]), Integer.parseInt(redCombatColorSetting[1]), Integer.parseInt(redCombatColorSetting[2]), Integer.parseInt(redCombatColorSetting[3]), (Color col) -> {
 				improvedOpeningsImageColor.put("paginae/atk/cornered", OptWnd.redCombatColorOptionWidget.currentColor);
-			}){}, prev.pos("bl").adds(1, 0));
-			prev = add(new Button(UI.scale(100), "Reset Colors", false).action(() -> {
+			}){}, rightColumn.pos("bl").adds(1, 0));
+			rightColumn = add(new Button(UI.scale(100), "Reset Colors", false).action(() -> {
 				Utils.setprefsa("greenCombat" + "_colorSetting", new String[]{"0", "128", "3", "255"});
 				Utils.setprefsa("blueCombat" + "_colorSetting", new String[]{"39", "82", "191", "255"});
 				Utils.setprefsa("yellowCombat" + "_colorSetting", new String[]{"217", "177", "20", "255"});
@@ -1137,30 +1192,39 @@ public class OptWnd extends Window {
 				improvedOpeningsImageColor.put("paginae/atk/dizzy", OptWnd.blueCombatColorOptionWidget.currentColor);
 				improvedOpeningsImageColor.put("paginae/atk/reeling", OptWnd.yellowCombatColorOptionWidget.currentColor);
 				improvedOpeningsImageColor.put("paginae/atk/cornered", OptWnd.redCombatColorOptionWidget.currentColor);
-			}), prev.pos("ur").adds(16, 0));
+			}), rightColumn.pos("ur").adds(16, -2));
 			improvedOpeningsImageColor.put("paginae/atk/offbalance", OptWnd.greenCombatColorOptionWidget.currentColor);
 			improvedOpeningsImageColor.put("paginae/atk/dizzy", OptWnd.blueCombatColorOptionWidget.currentColor);
 			improvedOpeningsImageColor.put("paginae/atk/reeling", OptWnd.yellowCombatColorOptionWidget.currentColor);
 			improvedOpeningsImageColor.put("paginae/atk/cornered", OptWnd.redCombatColorOptionWidget.currentColor);
 
-			prev = add(new Label("Combat IP (Coins) Colors:"), prev.pos("bl").adds(0, 10).x(0));
-			prev = add(new Label("Your IP"), prev.pos("bl").adds(2, 1));
+			rightColumn = add(showCombatOpeningsAsLettersCheckBox = new CheckBox("Show Combat Openings as Colored Letters"){
+				{a = Utils.getprefb("showCombatOpeningsAsLetters", false);}
+				public void changed(boolean val) {
+					Utils.setprefb("showCombatOpeningsAsLetters", val);
+				}
+			}, rightColumn.pos("bl").adds(0, 10).xs(320));
+
+			rightColumn = add(new Label("Combat IP (Coins) Colors:"), rightColumn.pos("bl").adds(0, 10).xs(320));
+			rightColumn = add(new Label("Your IP"), rightColumn.pos("bl").adds(2, 1));
 			add(myIPCombatColorOptionWidget = new ColorOptionWidget("", "myIPCombat", 0,
 					Integer.parseInt(myIPCombatColorSetting[0]), Integer.parseInt(myIPCombatColorSetting[1]), Integer.parseInt(myIPCombatColorSetting[2]), Integer.parseInt(myIPCombatColorSetting[3]), (Color col) -> {
-			}){}, prev.pos("bl").adds(8, 0));
-			prev = add(new Label("Enemy IP"), prev.pos("ur").adds(12, 0));
-			prev = add(enemyIPCombatColorOptionWidget = new ColorOptionWidget("", "enemyIPCombat", 0,
+			}){}, rightColumn.pos("bl").adds(8, 0));
+			rightColumn = add(new Label("Enemy IP"), rightColumn.pos("ur").adds(12, 0));
+			rightColumn = add(enemyIPCombatColorOptionWidget = new ColorOptionWidget("", "enemyIPCombat", 0,
 					Integer.parseInt(enemyIPCombatColorSetting[0]), Integer.parseInt(enemyIPCombatColorSetting[1]), Integer.parseInt(enemyIPCombatColorSetting[2]), Integer.parseInt(enemyIPCombatColorSetting[3]), (Color col) -> {
-			}){}, prev.pos("bl").adds(12, 0));
+			}){}, rightColumn.pos("bl").adds(12, 0));
 
-			prev = add(new Button(UI.scale(100), "Reset Colors", false).action(() -> {
+			rightColumn = add(new Button(UI.scale(100), "Reset Colors", false).action(() -> {
 				Utils.setprefsa("myIPCombat" + "_colorSetting", new String[]{"0", "201", "4", "255"});
 				Utils.setprefsa("enemyIPCombat" + "_colorSetting", new String[]{"245", "0", "0", "255"});
 				myIPCombatColorOptionWidget.cb.colorChooser.setColor(myIPCombatColorOptionWidget.currentColor = new Color(0, 201, 4, 255));
 				enemyIPCombatColorOptionWidget.cb.colorChooser.setColor(enemyIPCombatColorOptionWidget.currentColor = new Color(245, 0, 0, 255));
-			}), prev.pos("ur").adds(16, 0));
+			}), rightColumn.pos("ur").adds(24, -2));
 
-			prev = add(new Label("Stamina Bar Location:"), prev.pos("bl").adds(0, 10).x(0));{
+			rightColumn = add(new HRuler(UI.scale(280)), rightColumn.pos("bl").adds(0, 12).x(320));
+
+			rightColumn = add(new Label("Stamina Bar Location:"), rightColumn.pos("bl").adds(0, 10).xs(320));{
 				RadioGroup expWindowGrp = new RadioGroup(this) {
 					public void changed(int btn, String lbl) {
 						try {
@@ -1177,8 +1241,8 @@ public class OptWnd extends Window {
 						}
 					}
 				};
-				prev = expWindowGrp.add("Top Panel", prev.pos("bl").adds(0, 3));
-				prev = expWindowGrp.add("Bottom Panel", prev.pos("ur").adds(30, 0));
+				rightColumn = expWindowGrp.add("Top Panel", rightColumn.pos("bl").adds(0, 3));
+				rightColumn = expWindowGrp.add("Bottom Panel", rightColumn.pos("ur").adds(30, 0));
 				if (Utils.getprefb("stamBarLocationIsTop", true)){
 					expWindowGrp.check(0);
 				} else {
@@ -1186,114 +1250,52 @@ public class OptWnd extends Window {
 				}
 			}
 
-			prev = add(showEstimatedAgilityTextCheckBox = new CheckBox("Show Target Estimated Agility"){
-				{a = Utils.getprefb("showEstimatedAgility", true);}
-				public void changed(boolean val) {
-					Utils.setprefb("showEstimatedAgility", val);
-				}
-			}, prev.pos("bl").adds(0, 12).x(0));
+			rightColumn = add(new HRuler(UI.scale(280)), rightColumn.pos("bl").adds(0, 12).xs(320));
 
-			prev = add(new HRuler(UI.scale(280)), prev.pos("bl").adds(0, 12).x(0));
-			prev = add(drawFloatingCombatDataCheckBox = new CheckBox("Display Combat Data above Combat Foes"){
-				{a = Utils.getprefb("drawFloatingCombatData", true);}
-				public void changed(boolean val) {
-					Utils.setprefb("drawFloatingCombatData", val);
-				}
-			}, prev.pos("bl").adds(0, 4));
-			prev = add(drawFloatingCombatDataOnCurrentTargetCheckBox = new CheckBox("Show on Current Target"){
-				{a = Utils.getprefb("drawFloatingCombatDataOnCurrentTarget", true);}
-				public void changed(boolean val) {
-					Utils.setprefb("drawFloatingCombatDataOnCurrentTarget", val);
-				}
-			}, prev.pos("bl").adds(20, 2));
-			prev = add(drawFloatingCombatDataOnOthersCheckBox = new CheckBox("Show on other Combat Foes"){
-				{a = Utils.getprefb("drawFloatingCombatDataOnOthers", true);}
-				public void changed(boolean val) {
-					Utils.setprefb("drawFloatingCombatDataOnOthers", val);
-				}
-			}, prev.pos("bl").adds(0, 2));
-			prev = add(showCombatManeuverCombatInfoCheckBox = new CheckBox("Show Combat Stance/Maneuver"){
-				{a = Utils.getprefb("showCombatManeuverCombatInfo", true);}
-				public void changed(boolean val) {
-					Utils.setprefb("showCombatManeuverCombatInfo", val);
-				}
-			}, prev.pos("bl").adds(0, 2));
-			prev = add(onlyShowOpeningsAbovePercentageCombatInfoCheckBox = new CheckBox("Only show openings when higher than:"){
-				{a = Utils.getprefb("onlyShowOpeningsAbovePercentage", false);}
-				public void changed(boolean val) {
-					Utils.setprefb("onlyShowOpeningsAbovePercentage", val);
-				}
-			}, prev.pos("bl").adds(0, 6));
-			onlyShowOpeningsAbovePercentageCombatInfoCheckBox.tooltip = onlyShowOpeningsAbovePercentageCombatInfoTooltip;
-			add(minimumOpeningTextEntry = new TextEntry(UI.scale(40), Utils.getpref("minimumOpening", "30")){
-				protected void changed() {
-					this.settext(this.text().replaceAll("[^\\d]", "")); // Only numbers
-					this.settext(this.text().replaceAll("(?<=^.{2}).*", "")); // No more than 2 digits
-					Utils.setpref("minimumOpening", this.buf.line());
-					super.changed();
-				}
-			}, prev.pos("ur").adds(10, 0));
-
-			prev = add(onlyShowCoinsAbove4CombatInfoCheckBox = new CheckBox("Only show coins when higher than 4"){
-				{a = Utils.getprefb("onlyShowCoinsAbove4", false);}
-				public void changed(boolean val) {
-					Utils.setprefb("onlyShowCoinsAbove4", val);
-				}
-			}, prev.pos("bl").adds(0, 6));
-
-			prev = add(drawFloatingCombatOpeningsAboveYourselfCheckBox = new CheckBox("Display Combat Openings above Yourself"){
-				{a = Utils.getprefb("drawFloatingCombatDataAboveYourself", true);}
-				public void changed(boolean val) {
-					Utils.setprefb("drawFloatingCombatDataAboveYourself", val);
-				}
-			}, prev.pos("bl").adds(0, 12).x(0));
-
-			prev = add(new HRuler(UI.scale(280)), prev.pos("bl").adds(0, 12).x(0));
-
-			prev = add(toggleGobDamageInfoCheckBox = new CheckBox("Display Damage Info:"){
+			rightColumn = add(toggleGobDamageInfoCheckBox = new CheckBox("Display Damage Info:"){
 				{a = Utils.getprefb("GobDamageInfoToggled", true);}
 				public void changed(boolean val) {
 					Utils.setprefb("GobDamageInfoToggled", val);
 				}
-			}, prev.pos("bl").adds(0, 4));
-			prev = add(new Label("> Include:"), prev.pos("bl").adds(0, 1));
-			prev = add(toggleGobDamageWoundInfoCheckBox = new CheckBox("Wounds"){
+			}, rightColumn.pos("bl").adds(0, 10));
+			rightColumn = add(new Label("> Include:"), rightColumn.pos("bl").adds(0, 1));
+			rightColumn = add(toggleGobDamageWoundInfoCheckBox = new CheckBox("Wounds"){
 				{a = Utils.getprefb("GobDamageInfoWoundsToggled", true);}
 				public void changed(boolean val) {
 					Utils.setprefb("GobDamageInfoWoundsToggled", val);
 				}
-			}, prev.pos("bl").adds(56, -17));
+			}, rightColumn.pos("bl").adds(56, -17));
 			toggleGobDamageWoundInfoCheckBox.lbl = Text.create("Wounds", PUtils.strokeImg(Text.std.render("Wounds", new Color(255, 232, 0, 255))));
-			prev = add(toggleGobDamageArmorInfoCheckBox = new CheckBox("Armor"){
+			rightColumn = add(toggleGobDamageArmorInfoCheckBox = new CheckBox("Armor"){
 				{a = Utils.getprefb("GobDamageInfoArmorToggled", true);}
 				public void changed(boolean val) {
 					Utils.setprefb("GobDamageInfoArmorToggled", val);
 				}
-			}, prev.pos("bl").adds(66, -18));
+			}, rightColumn.pos("bl").adds(66, -18));
 			toggleGobDamageArmorInfoCheckBox.lbl = Text.create("Armor", PUtils.strokeImg(Text.std.render("Armor", new Color(50, 255, 92, 255))));
 			add(damageInfoClearButton = new Button(UI.scale(70), "Clear", false).action(() -> {
 				GobDamageInfo.clearAllDamage(ui.gui);
 				if (ui != null && ui.gui != null) {
 					ui.gui.optionInfoMsg("All Combat Damage Info has been CLEARED!", msgYellow, Audio.resclip(Toggle.sfxoff));
 				}
-			}), prev.pos("bl").adds(0, -34).x(UI.scale(210)));
+			}), rightColumn.pos("bl").adds(0, -34).x(UI.scale(530)));
 			damageInfoClearButton.tooltip = damageInfoClearTooltip;
-			prev = add(new Label("> Also show on:"), prev.pos("bl").adds(0, 2).x(0));
-			prev = add(yourselfDamageInfoCheckBox = new CheckBox("Yourself"){
+			rightColumn = add(new Label("> Also show on:"), rightColumn.pos("bl").adds(0, 2).xs(320));
+			rightColumn = add(yourselfDamageInfoCheckBox = new CheckBox("Yourself"){
 				{a = Utils.getprefb("yourselfDamageInfo", true);}
 				public void changed(boolean val) {
 					Utils.setprefb("yourselfDamageInfo", val);
 				}
-			}, prev.pos("bl").adds(80, -17));
-			prev = add(partyMembersDamageInfoCheckBox = new CheckBox("Party Members"){
+			}, rightColumn.pos("bl").adds(80, -17));
+			rightColumn = add(partyMembersDamageInfoCheckBox = new CheckBox("Party Members"){
 				{a = Utils.getprefb("(partyMembersDamageInfo", true);}
 				public void changed(boolean val) {
 					Utils.setprefb("(partyMembersDamageInfo", val);
 				}
-			}, prev.pos("ur").adds(6, 0));
+			}, rightColumn.pos("ur").adds(6, 0));
 
 			Widget backButton;
-			add(backButton = new PButton(UI.scale(200), "Back", 27, back, "Advanced Settings"), prev.pos("bl").adds(0, 18).x(0));
+			add(backButton = new PButton(UI.scale(200), "Back", 27, back, "Advanced Settings"), leftColumn.pos("bl").adds(0, 18).x(0));
 			pack();
 			centerBackButton(backButton, this);
 		}
