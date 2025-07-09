@@ -4,6 +4,8 @@ package haven.res.ui.surv;
 import haven.*;
 import haven.render.*;
 import haven.render.sl.*;
+import haven.res.ui.pag.toggle.Toggle;
+
 import java.util.*;
 import java.nio.*;
 import java.awt.Color;
@@ -21,18 +23,28 @@ public class LandSurvey extends Window {
     private MapView mv;
     private Display dsp;
     private RenderTree.Slot s_dsp;
+	private static CheckBox lockSurveyPointsCheckBox;
 
     public LandSurvey(Area area, Data data) {
 	super(Coord.z, "Land survey", true);
 	this.area = area;
 	this.data = data;
 	Widget prev = add(new Label(String.format("Area: %d m\u00b2", area.area())), 0, 0);
+	add(lockSurveyPointsCheckBox = new CheckBox("Lock Survey Points"){
+		{a = Utils.getprefb("lockSurveyPoints", false);}
+	}, UI.scale(136, 0));
 	zdlbl = add(new Label("..."), prev.pos("bl").adds(0, 1));
 	wlbl = add(new Label("..."), zdlbl.pos("bl").adds(0, 1));
 	dlbl = add(new Label("..."), wlbl.pos("bl").adds(0, 1));
-	prev = add(new Button(UI.scale(125), "Ground level", false).action(this::initsurf),
+	prev = add(new Button(UI.scale(125), "Ground level", false).action(() -> {
+				if (lockSurveyPointsCheckBox.a) return;
+				initsurf();
+			}),
 		   dlbl.pos("bl").adds(0, 20));
-	add(new Button(UI.scale(125), "Ground plane", false).action(this::initplane),
+	add(new Button(UI.scale(125), "Ground plane", false).action(() -> {
+				if (lockSurveyPointsCheckBox.a) return;
+				initplane();
+			}),
 	    prev.pos("ur").adds(10, 0));
 	prev = add(new Button(UI.scale(125), "Dig", false).action(() -> wdgmsg("lvl")),
 		   prev.pos("bl").adds(0, 10));
@@ -127,6 +139,7 @@ public class LandSurvey extends Window {
 		    dsp.update = true;
 		}
 	    } else if(ev instanceof MouseDownEvent) {
+		if (lockSurveyPointsCheckBox.a) return(false);
 		if(((MouseDownEvent)ev).b == 1 && ui.checkCursorImage("gfx/hud/curs/arw")) {
 		    Coord sel = dsp.mousetest(ev.c, false);
 		    if(sel != null) {
