@@ -224,6 +224,16 @@
     </exec>
   </target>
 
+  <target name="Util: Find fetched resource updates" depends="bin">
+    <exec executable="cmd" spawn="true">
+      <arg value="/c" />
+      <arg value="start" />
+      <arg value="cmd" />
+      <arg value="/k" />
+      <arg value="java -cp bin/hafen.jar haven.Resource find-updates" />
+    </exec>
+  </target>
+
     <target name="clean">
     <delete dir="build" />
     <delete dir="lib/ext" />

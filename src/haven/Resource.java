@@ -2229,6 +2229,7 @@ public class Resource implements Serializable {
 	} catch(IOException e) {
 	    throw(new RuntimeException(e));
 	}
+		List<String[]> updates = new ArrayList<>();
 	for(Map.Entry<String, Integer> ent : found.entrySet()) {
 	    String nm = ent.getKey();
 	    int fver = ent.getValue();
@@ -2240,7 +2241,7 @@ public class Resource implements Serializable {
 		}
 		int resver = fp.uint16();
 		if(resver > fver) {
-		    System.out.println(nm);
+			updates.add(new String[] { nm, "v" + fver, "v" + resver });
 		} else if(resver < fver) {
 		    System.err.println("find-updates: warning: " + nm + " is, strangely, newer locally (" + fver + " locally, " + resver + " remotely)");
 		}
@@ -2250,6 +2251,18 @@ public class Resource implements Serializable {
 		System.err.println("find-updates: warning: error when checking " + nm + ": " + e);
 	    }
 	}
+		if(updates.isEmpty()) {
+			System.out.println("All fetched resources are up to date.");
+		} else {
+			System.out.println("The following resources need to be updated:");
+			System.out.println();
+			System.out.println("Resource                 Local Version    Server Version");
+			System.out.println("-------------------------------------------------------");
+			for(String[] update : updates) {
+				System.out.printf("%-25s %-15s %-15s%n", update[0], update[1], update[2]);
+			}
+			System.out.println();
+		}
     }
 
     public static void main(String[] args) throws Exception {
