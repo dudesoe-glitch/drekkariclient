@@ -234,6 +234,13 @@
     </exec>
   </target>
 
+  <target name="Util: Upload to steam workshop" depends="bin">
+    <java classname="haven.SteamWorkshop" fork="true" failonerror="true" classpath="bin/hafen.jar">
+      <arg value="upload"/>
+      <arg value="bin"/>
+    </java>
+  </target>
+
     <target name="clean">
     <delete dir="build" />
     <delete dir="lib/ext" />
