@@ -1296,8 +1296,8 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 		}
 		updateCritterAuras();
 		updateBeastDangerRadii();
-		if (this.getres().name.equals("gfx/borka/body") && isMannequin != null && !isMannequin && isSkeleton != null && !isSkeleton){
-			setPlayerGender();
+		if (this.getres().name.equals("gfx/borka/body") && isSkeleton != null && !isSkeleton){
+			checkIfPlayerOrMannequin();
 			if  (!isDeadPlayer){
 				checkIfPlayerIsDead(poses);
 				if (playerPoseUpdatedCounter >= 2) { // ND: Do this to prevent the sounds from being played if you load in an already knocked/killed hearthling.
@@ -2065,7 +2065,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 		}
 	}
 
-	private void setPlayerGender(){
+	private void checkIfPlayerOrMannequin(){
 		try {
 			if (getres() != null) {
 				for (GAttrib g : attr.values()) {
@@ -2078,6 +2078,8 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 										playerGender = "male";
 									} else if (item.mod.get().basename().equals("female")) {
 										playerGender = "female";
+									} else {
+										isMannequin = true;
 									}
 								}
 							}
