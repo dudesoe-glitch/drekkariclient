@@ -114,6 +114,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	GobCheeseRackInfo cheeseRackInfo;
 	public boolean combatFoeHighlighted = false;
 	private GobSpeedInfo gobSpeedInfo;
+	Audio.CS playerAlarmClip = null;
 
     public static class Overlay implements RenderTree.Node, Sprite.Owner {
 	public final int id;
@@ -1419,9 +1420,11 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 				if (getres().name.equals("gfx/borka/body")) {
 					long plgobid = glob.sess.ui.gui.map.plgob;
 					if (plgobid != -1 && plgobid != id) {
-						if (isLoftar)
+						if (isLoftar) {
 							setattr(new Buddy(this, -1, "Loftar", Color.WHITE));
-						else if ((getattr(Vilmate.class) != null))
+							if (playerAlarmClip != null)
+								((Audio.Mixer) Audio.player.stream).stop(playerAlarmClip);
+						} else if ((getattr(Vilmate.class) != null))
 							setattr(new Buddy(this, -1, "Village/Realm Member", Color.WHITE));
 						else {
 							setattr(new Buddy(this, -1, "Unknown", Color.GRAY));
@@ -2301,8 +2304,8 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 					AudioInputStream in = AudioSystem.getAudioInputStream(file);
 					AudioFormat tgtFormat = new AudioFormat(AudioFormat.Encoding.PCM_SIGNED, 44100, 16, 2, 4, 44100, false);
 					AudioInputStream pcmStream = AudioSystem.getAudioInputStream(tgtFormat, in);
-					Audio.CS klippi = new Audio.PCMClip(pcmStream, 2, 2);
-					((Audio.Mixer) Audio.player.stream).add(new Audio.VolAdjust(klippi, val / 50.0));
+					playerAlarmClip = new Audio.VolAdjust(new Audio.PCMClip(pcmStream, 2, 2), val / 50.0);
+					((Audio.Mixer) Audio.player.stream).add(playerAlarmClip);
 					alarmPlayed.add(id);
 				}
 			} catch (Exception ignored) {
