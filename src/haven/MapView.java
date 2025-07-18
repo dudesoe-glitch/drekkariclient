@@ -2358,13 +2358,13 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
 											Composite c = (Composite) g;
 											StringBuilder sb = new StringBuilder();
 											if (c.comp.cequ.size() > 0) {
-												sb.append("$col[255,200,0]{Composite Equipment:} \n");
+												sb.append("$col[255,200,0]{Composited Equipment:} \n");
 												for (Composited.ED item : c.comp.cequ) {
 													sb.append("   "+item.res.res.get().name+" \n");
 												}
 											}
 											if (c.comp.cmod.size() > 0) {
-												sb.append("$col[255,200,0]{Composite Modifiers:} \n");
+												sb.append("$col[255,200,0]{Composited Models:} \n");
 												for (Composited.MD item : c.comp.cmod) {
 													StringBuilder result = new StringBuilder();
 													for (ResData resdata : item.tex) {
