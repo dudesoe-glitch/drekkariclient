@@ -330,7 +330,7 @@ public class Shopbox extends Widget implements ItemInfo.SpriteOwner, GSprite.Own
 					return getQBuff(((ItemInfo.Contents) info).sub);
 			}
 			return getQBuff(info());
-		} catch (Loading l) {
+		} catch (Exception ignored) {
 		}
 		return null;
 	}
