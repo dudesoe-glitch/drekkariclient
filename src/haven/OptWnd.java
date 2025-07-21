@@ -1069,12 +1069,53 @@ public class OptWnd extends Window {
 				combatUIBottomPanelHeightSlider.val = 100;
 				Utils.setprefi("combatBottomPanelHeight", 100);
 			}), leftColumn.pos("bl").adds(210, -20));
+
+			leftColumn = add(showEstimatedAgilityTextCheckBox = new CheckBox("Show Target Estimated Agility (Top Panel)"){
+				{a = Utils.getprefb("showEstimatedAgility", true);}
+				public void changed(boolean val) {
+					Utils.setprefb("showEstimatedAgility", val);
+				}
+			}, leftColumn.pos("bl").adds(0, 12).x(0));
+
+			leftColumn = add(includeHHPTextHealthBarCheckBox = new CheckBox("Include HHP% text in Health Bar (Top Panel)"){
+				{a = Utils.getprefb("includeHHPTextHealthBar", false);}
+				public void changed(boolean val) {
+					Utils.setprefb("includeHHPTextHealthBar", val);
+				}
+			}, leftColumn.pos("bl").adds(0, 2));
+
+			leftColumn = add(new Label("Stamina Bar Location:"), leftColumn.pos("bl").adds(0, 10));{
+				RadioGroup expWindowGrp = new RadioGroup(this) {
+					public void changed(int btn, String lbl) {
+						try {
+							if(btn==0) {
+								Utils.setprefb("stamBarLocationIsTop", true);
+								stamBarLocationIsTop = true;
+							}
+							if(btn==1) {
+								Utils.setprefb("stamBarLocationIsTop", false);
+								stamBarLocationIsTop = false;
+							}
+						} catch (Exception e) {
+							throw new RuntimeException(e);
+						}
+					}
+				};
+				leftColumn = expWindowGrp.add("Top Panel", leftColumn.pos("bl").adds(20, 3));
+				leftColumn = expWindowGrp.add("Bottom Panel", leftColumn.pos("ur").adds(30, 0));
+				if (Utils.getprefb("stamBarLocationIsTop", true)){
+					expWindowGrp.check(0);
+				} else {
+					expWindowGrp.check(1);
+				}
+			}
+
 			leftColumn = add(showCombatHotkeysUICheckBox = new CheckBox("Show Combat Move Hotkeys (Bottom Panel)"){
 				{a = Utils.getprefb("showCombatHotkeysUI", true);}
 				public void changed(boolean val) {
 					Utils.setprefb("showCombatHotkeysUI", val);
 				}
-			}, leftColumn.pos("bl").adds(0, 10));
+			}, leftColumn.pos("bl").adds(0, 12).xs(0));
 			leftColumn = add(singleRowCombatMovesCheckBox = new CheckBox("Single row for Combat Moves (Bottom Panel)"){
 				{a = Utils.getprefb("singleRowCombatMoves", false);}
 				public void set(boolean val) {
@@ -1082,26 +1123,12 @@ public class OptWnd extends Window {
 					a = val;
 				}
 			}, leftColumn.pos("bl").adds(0, 2));
-			leftColumn = add(showDamagePredictUICheckBox = new CheckBox("Show Combat Move Damage Prediction (Bottom Panel)"){
+			leftColumn = add(showDamagePredictUICheckBox = new CheckBox("Show Combat Damage Prediction (Bottom Panel)"){
 				{a = Utils.getprefb("showDamagePredictUI", true);}
 				public void changed(boolean val) {
 					Utils.setprefb("showDamagePredictUI", val);
 				}
-			}, leftColumn.pos("bl").adds(0, 10));
-
-			leftColumn = add(includeHHPTextHealthBarCheckBox = new CheckBox("Include HHP% text in Health Bar"){
-				{a = Utils.getprefb("includeHHPTextHealthBar", false);}
-				public void changed(boolean val) {
-					Utils.setprefb("includeHHPTextHealthBar", val);
-				}
-			}, leftColumn.pos("bl").adds(0, 12));
-
-			leftColumn = add(showEstimatedAgilityTextCheckBox = new CheckBox("Show Target Estimated Agility"){
-				{a = Utils.getprefb("showEstimatedAgility", true);}
-				public void changed(boolean val) {
-					Utils.setprefb("showEstimatedAgility", val);
-				}
-			}, leftColumn.pos("bl").adds(0, 12).x(0));
+			}, leftColumn.pos("bl").adds(0, 2));
 
 			leftColumn = add(new HRuler(UI.scale(280)), leftColumn.pos("bl").adds(0, 12).x(0));
 			leftColumn = add(drawFloatingCombatOpeningsAboveYourselfCheckBox = new CheckBox("Display Combat Openings above Yourself"){
@@ -1111,36 +1138,40 @@ public class OptWnd extends Window {
 				}
 			}, leftColumn.pos("bl").adds(0, 10).x(0));
 
-			leftColumn = add(drawFloatingCombatDataCheckBox = new CheckBox("Display Combat Data above Combat Foes"){
+			leftColumn = add(drawFloatingCombatDataCheckBox = new CheckBox("Display Combat Data above Combat Foes:"){
 				{a = Utils.getprefb("drawFloatingCombatData", true);}
 				public void changed(boolean val) {
 					Utils.setprefb("drawFloatingCombatData", val);
 				}
-			}, leftColumn.pos("bl").adds(0, 10));
+			}, leftColumn.pos("bl").adds(0, 4));
+			add(new Label(" >"), leftColumn.pos("bl").adds(0, 4).xs(0));
 			leftColumn = add(drawFloatingCombatDataOnCurrentTargetCheckBox = new CheckBox("Show on Current Target"){
 				{a = Utils.getprefb("drawFloatingCombatDataOnCurrentTarget", true);}
 				public void changed(boolean val) {
 					Utils.setprefb("drawFloatingCombatDataOnCurrentTarget", val);
 				}
 			}, leftColumn.pos("bl").adds(20, 4));
+			add(new Label(" >"), leftColumn.pos("bl").adds(0, 3).xs(0));
 			leftColumn = add(drawFloatingCombatDataOnOthersCheckBox = new CheckBox("Show on other Combat Foes"){
 				{a = Utils.getprefb("drawFloatingCombatDataOnOthers", true);}
 				public void changed(boolean val) {
 					Utils.setprefb("drawFloatingCombatDataOnOthers", val);
 				}
 			}, leftColumn.pos("bl").adds(0, 2));
+			add(new Label(" >"), leftColumn.pos("bl").adds(0, 3).xs(0));
 			leftColumn = add(showCombatManeuverCombatInfoCheckBox = new CheckBox("Show Combat Stance/Maneuver"){
 				{a = Utils.getprefb("showCombatManeuverCombatInfo", true);}
 				public void changed(boolean val) {
 					Utils.setprefb("showCombatManeuverCombatInfo", val);
 				}
 			}, leftColumn.pos("bl").adds(0, 2));
+			add(new Label(" >"), leftColumn.pos("bl").adds(0, 3).xs(0));
 			leftColumn = add(onlyShowOpeningsAbovePercentageCombatInfoCheckBox = new CheckBox("Only show openings when higher than:"){
 				{a = Utils.getprefb("onlyShowOpeningsAbovePercentage", false);}
 				public void changed(boolean val) {
 					Utils.setprefb("onlyShowOpeningsAbovePercentage", val);
 				}
-			}, leftColumn.pos("bl").adds(0, 6));
+			}, leftColumn.pos("bl").adds(0, 4));
 			onlyShowOpeningsAbovePercentageCombatInfoCheckBox.tooltip = onlyShowOpeningsAbovePercentageCombatInfoTooltip;
 			add(minimumOpeningTextEntry = new TextEntry(UI.scale(40), Utils.getpref("minimumOpening", "30")){
 				protected void changed() {
@@ -1150,6 +1181,7 @@ public class OptWnd extends Window {
 					super.changed();
 				}
 			}, leftColumn.pos("ur").adds(10, 0));
+			add(new Label(" >"), leftColumn.pos("bl").adds(0, 2).xs(0));
 
 			leftColumn = add(onlyShowCoinsAbove4CombatInfoCheckBox = new CheckBox("Only show coins when higher than 4"){
 				{a = Utils.getprefb("onlyShowCoinsAbove4", false);}
@@ -1223,34 +1255,6 @@ public class OptWnd extends Window {
 			}), rightColumn.pos("ur").adds(24, -2));
 
 			rightColumn = add(new HRuler(UI.scale(280)), rightColumn.pos("bl").adds(0, 12).x(320));
-
-			rightColumn = add(new Label("Stamina Bar Location:"), rightColumn.pos("bl").adds(0, 10).xs(320));{
-				RadioGroup expWindowGrp = new RadioGroup(this) {
-					public void changed(int btn, String lbl) {
-						try {
-							if(btn==0) {
-								Utils.setprefb("stamBarLocationIsTop", true);
-								stamBarLocationIsTop = true;
-							}
-							if(btn==1) {
-								Utils.setprefb("stamBarLocationIsTop", false);
-								stamBarLocationIsTop = false;
-							}
-						} catch (Exception e) {
-							throw new RuntimeException(e);
-						}
-					}
-				};
-				rightColumn = expWindowGrp.add("Top Panel", rightColumn.pos("bl").adds(0, 3));
-				rightColumn = expWindowGrp.add("Bottom Panel", rightColumn.pos("ur").adds(30, 0));
-				if (Utils.getprefb("stamBarLocationIsTop", true)){
-					expWindowGrp.check(0);
-				} else {
-					expWindowGrp.check(1);
-				}
-			}
-
-			rightColumn = add(new HRuler(UI.scale(280)), rightColumn.pos("bl").adds(0, 12).xs(320));
 
 			rightColumn = add(toggleGobDamageInfoCheckBox = new CheckBox("Display Damage Info:"){
 				{a = Utils.getprefb("GobDamageInfoToggled", true);}
