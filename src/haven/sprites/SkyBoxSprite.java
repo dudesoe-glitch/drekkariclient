@@ -13,8 +13,7 @@ import static haven.render.sl.Cons.*;
 public class SkyBoxSprite extends Sprite {
 
 	public static final TextureCube.SamplerCube clouds = new TextureCube.SamplerCube(new RUtils.CubeFill(() -> Resource.local().loadwait("customclient/skybox/clouds").layer(Resource.imgc).img).mktex());
-		public static final TextureCube.SamplerCube galaxy = new TextureCube.SamplerCube(new RUtils.CubeFill(() -> Resource.local().loadwait("customclient/skybox/galaxy").layer(Resource.imgc).img).mktex());
-
+	public static final TextureCube.SamplerCube galaxy = new TextureCube.SamplerCube(new RUtils.CubeFill(() -> Resource.local().loadwait("customclient/skybox/galaxy").layer(Resource.imgc).img).mktex());
 	static final Pipe.Op smat;
 	VertexBuf.VertexData posa;
 	VertexBuf vbuf;
@@ -22,6 +21,9 @@ public class SkyBoxSprite extends Sprite {
 
 	public SkyBoxSprite(final Owner owner, final Resource resource) {
 		super(owner, resource);
+		// ND: the wrapmode fixes the texture edges being off by 1 pixel. I don't understand render code, but chatgpt figured it out
+		clouds.wrapmode(Texture.Wrapping.CLAMP);
+		galaxy.wrapmode(Texture.Wrapping.CLAMP);
 		init();
 	}
 
@@ -58,11 +60,11 @@ public class SkyBoxSprite extends Sprite {
 		wfbuf.put(21, -size).put(22, size).put(23, -size);
 		wfbuf2.put(21, 0).put(22, 0).put(23, -1);
 
-		for (int i = 8; i < 12; i++) {
-			int off = i * 3;
-			wfbuf.put(off, -size).put(off + 1, -size).put(off + 2, size);
-			wfbuf2.put(off, 0).put(off + 1, 0).put(off + 2, 1);
-		}
+//		for (int i = 8; i < 12; i++) {
+//			int off = i * 3;
+//			wfbuf.put(off, -size).put(off + 1, -size).put(off + 2, size);
+//			wfbuf2.put(off, 0).put(off + 1, 0).put(off + 2, 1);
+//		}
 
 		this.posa = new VertexBuf.VertexData(wfbuf);
 		this.vbuf = new VertexBuf(this.posa, new VertexBuf.NormalData(wfbuf2));
