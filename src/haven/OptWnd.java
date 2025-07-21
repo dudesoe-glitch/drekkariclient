@@ -1045,8 +1045,8 @@ public class OptWnd extends Window {
 	public static CheckBox yourselfDamageInfoCheckBox;
 	public static CheckBox partyMembersDamageInfoCheckBox;
 	public static boolean stamBarLocationIsTop = Utils.getprefb("stamBarLocationIsTop", true);
-	public class CombatUIPanel extends Panel {
-		public CombatUIPanel(Panel back) {
+	public class CombatSettingsPanel extends Panel {
+		public CombatSettingsPanel(Panel back) {
 			Widget leftColumn, rightColumn;
 
 			leftColumn = add(new Label("Top panel height:"), 0, 0);
@@ -4420,7 +4420,7 @@ public class OptWnd extends Window {
 		Panel worldgraphicssettings = add(new WorldGraphicsSettingsPanel(advancedSettings));
 		Panel hidingsettings = add(new HidingSettingsPanel(advancedSettings));
 		Panel alarmsettings = add(new AlarmsAndSoundsSettingsPanel(advancedSettings));
-		Panel combatuipanel = add(new CombatUIPanel(advancedSettings));
+		Panel combatsettings = add(new CombatSettingsPanel(advancedSettings));
 		Panel combataggrosettings = add(new AggroExclusionSettingsPanel(advancedSettings));
 		Panel serverintegrationsettings = add(new ServerIntegrationSettingsPanel(advancedSettings));
 		Panel autolootsettings = add(new AutoLootSettingsPanel(advancedSettings));
@@ -4428,7 +4428,7 @@ public class OptWnd extends Window {
 		int leftY = UI.scale(6);
 		leftY = advancedSettings.add(new PButton(UI.scale(200), "Interface Settings", -1, interfacesettings, "Interface Settings"), 0, leftY).pos("bl").adds(0, 5).y;
 		leftY = advancedSettings.add(new PButton(UI.scale(200), "Action Bars Settings", -1, actionbarssettings, "Action Bars Settings"), 0, leftY).pos("bl").adds(0, 5).y;
-		leftY = advancedSettings.add(new PButton(UI.scale(200), "Combat UI Settings", -1, combatuipanel, "Combat UI Settings"), 0, leftY).pos("bl").adds(0, 5).y;
+		leftY = advancedSettings.add(new PButton(UI.scale(200), "Combat Settings", -1, combatsettings, "Combat Settings"), 0, leftY).pos("bl").adds(0, 5).y;
 		leftY = advancedSettings.add(new PButton(UI.scale(200), "Quality Display Settings", -1, qualitydisplaysettings, "Quality Display Settings"), 0, leftY).pos("bl").adds(0, 5).y;
 		leftY = advancedSettings.add(new PButton(UI.scale(200), "Chat Settings", -1, chatsettings, "Chat Settings"), 0, leftY).pos("bl").adds(0, 5).y;
 
