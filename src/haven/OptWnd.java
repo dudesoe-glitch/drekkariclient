@@ -1133,19 +1133,21 @@ public class OptWnd extends Window {
 					Utils.setprefb("showCombatHotkeysUI", val);
 				}
 			}, leftColumn.pos("bl").adds(0, 12).xs(0));
-			leftColumn = add(singleRowCombatMovesCheckBox = new CheckBox("Single row for Combat Moves (Bottom Panel)"){
+			leftColumn = add(singleRowCombatMovesCheckBox = new CheckBox("Single Row for Combat Moves (Bottom Panel)"){
 				{a = Utils.getprefb("singleRowCombatMoves", false);}
 				public void set(boolean val) {
 					Utils.setprefb("singleRowCombatMoves", val);
 					a = val;
 				}
 			}, leftColumn.pos("bl").adds(0, 2));
+			singleRowCombatMovesCheckBox.tooltip = singleRowCombatMovesTooltip;
 			leftColumn = add(showDamagePredictUICheckBox = new CheckBox("Show Combat Damage Prediction (Bottom Panel)"){
 				{a = Utils.getprefb("showDamagePredictUI", true);}
 				public void changed(boolean val) {
 					Utils.setprefb("showDamagePredictUI", val);
 				}
 			}, leftColumn.pos("bl").adds(0, 2));
+			showDamagePredictUICheckBox.tooltip = showDamagePredictUITooltip;
 
 			leftColumn = add(drawFloatingCombatOpeningsAboveYourselfCheckBox = new CheckBox("Display Combat Openings above Yourself"){
 				{a = Utils.getprefb("drawFloatingCombatDataAboveYourself", true);}
@@ -1254,6 +1256,7 @@ public class OptWnd extends Window {
 					Utils.setprefb("showCombatOpeningsAsLetters", val);
 				}
 			}, UI.scale(320, 0));
+			showCombatOpeningsAsLettersCheckBox.tooltip = showCombatOpeningsAsLettersTooltip;
 
 			rightColumn = add(new Label("Combat Openings Colors:"), rightColumn.pos("bl").adds(0, 4));
 			rightColumn = add(new Label("Green"), rightColumn.pos("bl").adds(2, 1));
@@ -1368,12 +1371,14 @@ public class OptWnd extends Window {
 					Utils.setprefb("highlightCombatFoes", val);
 				}
 			}, rightColumn.pos("bl").adds(0, 12).xs(320));
+			highlightCombatFoesCheckBox.tooltip = highlightCombatFoesTooltip;
 			rightColumn = add(showCirclesUnderCombatFoesCheckBox = new CheckBox("Show Circles under Combat Foes"){
 				{a = Utils.getprefb("showCirclesUnderCombatFoes", true);}
 				public void changed(boolean val) {
 					Utils.setprefb("showCirclesUnderCombatFoes", val);
 				}
 			}, rightColumn.pos("bl").adds(0, 2));
+			showCirclesUnderCombatFoesCheckBox.tooltip = showCirclesUnderCombatFoesTooltip;
 
 			rightColumn = add(combatFoeColorOptionWidget = new ColorOptionWidget("Combat Foes:", "combatFoes", 120, Integer.parseInt(combatFoeColorSetting[0]), Integer.parseInt(combatFoeColorSetting[1]), Integer.parseInt(combatFoeColorSetting[2]), Integer.parseInt(combatFoeColorSetting[3]), (Color col) -> {
 				GobCombatHighlight.COMBAT_FOE_MIXCOLOR = new MixColor(col.getRed(), col.getGreen(), col.getBlue(), col.getAlpha());
@@ -1399,6 +1404,7 @@ public class OptWnd extends Window {
 			}), combatFoeColorOptionWidget.pos("ur").adds(16, 0));
 
 			rightColumn = add(new Label("Target Sprite Size:"), rightColumn.pos("bl").adds(0, 4).xs(325));
+			rightColumn.tooltip = targetSpriteTooltip;
 			rightColumn = add(targetSpriteSizeSlider = new HSlider(UI.scale(110), 3, 7, Utils.getprefi("targetSpriteSize", 5)) {
 				public void changed() {
 					Utils.setprefi("targetSpriteSize", val);
@@ -1406,6 +1412,7 @@ public class OptWnd extends Window {
 					refreshCurrentTargetSpriteColor = true;
 				}
 			}, rightColumn.pos("ur").adds(26, 4));
+			targetSpriteSizeSlider.tooltip = targetSpriteTooltip;
 
 			rightColumn = add(drawChaseVectorsCheckBox = new CheckBox("Draw Chase Vectors"){
 				{a = Utils.getprefb("drawChaseVectors", true);}
@@ -1420,7 +1427,7 @@ public class OptWnd extends Window {
 					Utils.setprefb("drawYourCurrentPath", val);
 				}
 			}, rightColumn.pos("bl").adds(0, 2));
-
+			drawYourCurrentPathCheckBox.tooltip = drawYourCurrentPathTooltip;
 
 			Widget backButton;
 			add(backButton = new PButton(UI.scale(200), "Back", 27, back, "Advanced Settings"), leftColumn.pos("bl").adds(0, 18).x(0));
@@ -2082,6 +2089,7 @@ public class OptWnd extends Window {
 					Utils.setprefb("displayObjectHealthPercentage", val);
 				}
 			}, middleColumn.pos("bl").adds(0, 12).x(UI.scale(240)));
+			displayObjectHealthPercentageCheckBox.tooltip = displayObjectHealthPercentageTooltip;
 			middleColumn = add(displayObjectQualityOnInspectionCheckBox = new CheckBox("Display Object Quality on Inspection"){
 				{a = (Utils.getprefb("displayObjectQualityOnInspection", true));}
 				public void changed(boolean val) {
@@ -4562,20 +4570,34 @@ public class OptWnd extends Window {
 			"\n" +
 			"\n$col[185,185,185]{It doesn't work with Gems. Don't ask me why.}", UI.scale(300));
 	private final Object lockStudyReportTooltip = RichText.render("Enabling this will prevent moving or dropping items from the Study Report", UI.scale(300));
-	private final Object alwaysShowCombatUiBarTooltip = RichText.render("For more options for this bar, check the Combat UI Settings.", UI.scale(320));
+	private final Object alwaysShowCombatUiBarTooltip = RichText.render("For more options for this bar, check the Combat Settings.", UI.scale(320));
 
 	// Combat Settings Tooltips
+	private final Object singleRowCombatMovesTooltip = RichText.render("If this is enabled, the Bottom Panel combat moves will be shown in just one row, rather than two.", UI.scale(300));
+	private final Object showDamagePredictUITooltip = RichText.render("If this is enabled, Combat Moves that can deal damage will display a number below them." +
+			"\n" +
+			"\nThis is calculated depending on the following:" +
+			"\n$col[185,185,185]{- How high your current target's $col[218,163,0]{Openings} are (depending on the openings the combat move applies to)" +
+			"\n- How much total $col[218,163,0]{Strength} your character has" +
+			"\n- How much $col[218,163,0]{Damage} your currently equipped $col[218,163,0]{Weapon} has (if the move uses the weapon)}", UI.scale(320));
 	private final Object damageInfoClearTooltip = RichText.render("Clears all damage info." +
 			"\n$col[218,163,0]{Action Button:} $col[185,185,185]{This setting can also be turned on/off using an action button from the menu grid (Custom Client Extras → Toggles).}", UI.scale(320));
 	private final Object onlyShowOpeningsAbovePercentageCombatInfoTooltip = RichText.render("Only show the combat info openings if at least one of them is above the set number. If one of them is above that, show all of them." +
 			"\n" +
 			"\nThis does NOT apply to your current target, only other combat foes.}", UI.scale(320));
+	private final Object showCombatOpeningsAsLettersTooltip = RichText.render("Enabling this will change the openings from full squares into colored letters. For example, the red square will become a colored R, blue will become B, etc." +
+			"\nThe color settings from below still apply to the letters." +
+			"\n" +
+			"\n$col[185,185,185]{I only added this as an extra aid for colorblind people, but I doubt anybody will use it...}", UI.scale(300));
 	private final Object highlightPartyMembersTooltip = RichText.render("Enabling this will put a color highlight over all party members." +
 			"\n" +
-			"\n$col[185,185,185]{If you are the party leader, your color highlight will always be the $col[255,255,255]{Leader's Color}.}", UI.scale(310));
+			"\n$col[185,185,185]{If you are the party leader, your color highlight will always be the $col[218,163,0]{Leader's Color}, regardless of what you set $col[218,163,0]{Your Color} to.}", UI.scale(310));
 	private final Object showCirclesUnderPartyMembersTooltip = RichText.render("Enabling this will put a colored circle under all party members." +
 			"\n" +
-			"\n$col[185,185,185]{If you are the party leader, your circle's color will always be the $col[255,255,255]{Leader's Color}.}", UI.scale(300));
+			"\n$col[185,185,185]{If you are the party leader, your circle's color will always be the $col[218,163,0]{Leader's Color}, regardless of what you set $col[218,163,0]{Your Color} to.}", UI.scale(300));
+	private final Object highlightCombatFoesTooltip = RichText.render("Enabling this will put a color highlight over all enemies that you are currently in combat with.", UI.scale(310));
+	private final Object showCirclesUnderCombatFoesTooltip = RichText.render("Enabling this will put a colored circle under all enemies that you are currently in combat with.", UI.scale(300));
+	private final Object targetSpriteTooltip = RichText.render("The target sprite uses the same color you set for Combat Foes.", UI.scale(300));
 	private final Object drawChaseVectorsTooltip = RichText.render("If this setting is enabled, colored lines will be drawn between chasers and chased targets." +
 			"\n=====================" +
 			"\n$col[255,255,255]{White: }You are the chaser." +
@@ -4585,7 +4607,9 @@ public class OptWnd extends Window {
 			"\n=====================" +
 			"\n$col[218,163,0]{Note:} $col[185,185,185]{Chase vectors include queuing attacks, clicking a critter to pick up, or simply following someone.}" +
 			"\n$col[218,163,0]{Disclaimer:} $col[185,185,185]{Chase vectors sometimes don't show when chasing a critter that is standing still. The client treats this as something else for some reason and I can't fix it.}", UI.scale(430));
-
+	private final Object drawYourCurrentPathTooltip = RichText.render("When this is enabled, a straight line will be drawn between your character and wherever you clicked" +
+			"\n" +
+			"\n$col[185,185,185]{You can use this to make sure you won't run into a tree or something, I guess.}", UI.scale(300));
 
 	// Display Settings Tooltips
 	private final Object granularityPositionTooltip = RichText.render("Equivalent of the :placegrid console command, this allows you to have more freedom when placing constructions/objects.", UI.scale(300));
@@ -4606,6 +4630,7 @@ public class OptWnd extends Window {
 	private final Object showWorkstationProgressTooltip = RichText.render("Colors workstations (Drying Racks, Tanning Tubs, Cheese Racks, Flower Pots), depending on their current progress." +
 			"\n" +
 			"\n$col[185,185,185]{Select from below what states you want to be highlighted, and what colors you want each of them to show.}", UI.scale(330));
+	private final Object displayObjectHealthPercentageTooltip = RichText.render("If this is enabled, objects that took decay hits will also show a percentage number, on top of the cracked texture overlay.", UI.scale(300));
 	private final Object showBeeSkepsRadiiTooltip = RichText.render("$col[218,163,0]{Action Button:} $col[185,185,185]{This setting can also be turned on/off using an action button from the menu grid (Custom Client Extras → Toggles).}", UI.scale(320));
 	private final Object showFoodThroughsRadiiTooltip = RichText.render("$col[218,163,0]{Action Button:} $col[185,185,185]{This setting can also be turned on/off using an action button from the menu grid (Custom Client Extras → Toggles).}", UI.scale(320));
 	private final Object showMoundBedsRadiiTooltip = RichText.render("$col[218,163,0]{Action Button:} $col[185,185,185]{This setting can also be turned on/off using an action button from the menu grid (Custom Client Extras → Toggles).}", UI.scale(320));
