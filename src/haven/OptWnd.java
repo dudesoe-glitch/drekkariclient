@@ -1045,6 +1045,23 @@ public class OptWnd extends Window {
 	public static CheckBox yourselfDamageInfoCheckBox;
 	public static CheckBox partyMembersDamageInfoCheckBox;
 	public static boolean stamBarLocationIsTop = Utils.getprefb("stamBarLocationIsTop", true);
+	public static CheckBox highlightPartyMembersCheckBox;
+	public static CheckBox showCirclesUnderPartyMembersCheckBox;
+	public static ColorOptionWidget yourselfPartyColorOptionWidget;
+	public static String[] yourselfPartyColorSetting = Utils.getprefsa("yourselfParty" + "_colorSetting", new String[]{"255", "255", "255", "128"});
+	public static ColorOptionWidget leaderPartyColorOptionWidget;
+	public static String[] leaderPartyColorSetting = Utils.getprefsa("leaderParty" + "_colorSetting", new String[]{"0", "74", "208", "164"});
+	public static ColorOptionWidget memberPartyColorOptionWidget;
+	public static String[] memberPartyColorSetting = Utils.getprefsa("memberParty" + "_colorSetting", new String[]{"0", "160", "0", "164"});
+	public static CheckBox highlightCombatFoesCheckBox;
+	public static CheckBox showCirclesUnderCombatFoesCheckBox;
+	public static ColorOptionWidget combatFoeColorOptionWidget;
+	public static String[] combatFoeColorSetting = Utils.getprefsa("combatFoe" + "_colorSetting", new String[]{"180", "0", "0", "196"});
+	public static boolean refreshCurrentTargetSpriteColor = false;
+	public static HSlider targetSpriteSizeSlider;
+	public static CheckBox drawChaseVectorsCheckBox;
+	public static CheckBox drawYourCurrentPathCheckBox;
+
 	public class CombatSettingsPanel extends Panel {
 		public CombatSettingsPanel(Panel back) {
 			Widget leftColumn, rightColumn;
@@ -1130,13 +1147,12 @@ public class OptWnd extends Window {
 				}
 			}, leftColumn.pos("bl").adds(0, 2));
 
-			leftColumn = add(new HRuler(UI.scale(280)), leftColumn.pos("bl").adds(0, 12).x(0));
 			leftColumn = add(drawFloatingCombatOpeningsAboveYourselfCheckBox = new CheckBox("Display Combat Openings above Yourself"){
 				{a = Utils.getprefb("drawFloatingCombatDataAboveYourself", true);}
 				public void changed(boolean val) {
 					Utils.setprefb("drawFloatingCombatDataAboveYourself", val);
 				}
-			}, leftColumn.pos("bl").adds(0, 10).x(0));
+			}, leftColumn.pos("bl").adds(0, 18).x(0));
 
 			leftColumn = add(drawFloatingCombatDataCheckBox = new CheckBox("Display Combat Data above Combat Foes:"){
 				{a = Utils.getprefb("drawFloatingCombatData", true);}
@@ -1190,28 +1206,77 @@ public class OptWnd extends Window {
 				}
 			}, leftColumn.pos("bl").adds(0, 2));
 
-			rightColumn = add(new Label("Combat Openings Colors:"), UI.scale(320, 0));
+			leftColumn = add(toggleGobDamageInfoCheckBox = new CheckBox("Display Damage Info:"){
+				{a = Utils.getprefb("GobDamageInfoToggled", true);}
+				public void changed(boolean val) {
+					Utils.setprefb("GobDamageInfoToggled", val);
+				}
+			}, leftColumn.pos("bl").adds(0, 10).xs(0));
+			leftColumn = add(new Label("> Include:"), leftColumn.pos("bl").adds(0, 1).xs(0));
+			leftColumn = add(toggleGobDamageWoundInfoCheckBox = new CheckBox("Wounds"){
+				{a = Utils.getprefb("GobDamageInfoWoundsToggled", true);}
+				public void changed(boolean val) {
+					Utils.setprefb("GobDamageInfoWoundsToggled", val);
+				}
+			}, leftColumn.pos("bl").adds(56, -17));
+			toggleGobDamageWoundInfoCheckBox.lbl = Text.create("Wounds", PUtils.strokeImg(Text.std.render("Wounds", new Color(255, 232, 0, 255))));
+			leftColumn = add(toggleGobDamageArmorInfoCheckBox = new CheckBox("Armor"){
+				{a = Utils.getprefb("GobDamageInfoArmorToggled", true);}
+				public void changed(boolean val) {
+					Utils.setprefb("GobDamageInfoArmorToggled", val);
+				}
+			}, leftColumn.pos("bl").adds(66, -18));
+			toggleGobDamageArmorInfoCheckBox.lbl = Text.create("Armor", PUtils.strokeImg(Text.std.render("Armor", new Color(50, 255, 92, 255))));
+			add(damageInfoClearButton = new Button(UI.scale(70), "Clear", false).action(() -> {
+				GobDamageInfo.clearAllDamage(ui.gui);
+				if (ui != null && ui.gui != null) {
+					ui.gui.optionInfoMsg("All Combat Damage Info has been CLEARED!", msgYellow, Audio.resclip(Toggle.sfxoff));
+				}
+			}), leftColumn.pos("ur").adds(37, -16));
+			damageInfoClearButton.tooltip = damageInfoClearTooltip;
+			leftColumn = add(new Label("> Also show on:"), leftColumn.pos("bl").adds(0, 2).xs(0));
+			leftColumn = add(yourselfDamageInfoCheckBox = new CheckBox("Yourself"){
+				{a = Utils.getprefb("yourselfDamageInfo", true);}
+				public void changed(boolean val) {
+					Utils.setprefb("yourselfDamageInfo", val);
+				}
+			}, leftColumn.pos("bl").adds(80, -17));
+			leftColumn = add(partyMembersDamageInfoCheckBox = new CheckBox("Party Members"){
+				{a = Utils.getprefb("(partyMembersDamageInfo", true);}
+				public void changed(boolean val) {
+					Utils.setprefb("(partyMembersDamageInfo", val);
+				}
+			}, leftColumn.pos("ur").adds(6, 0));
+
+			rightColumn = add(showCombatOpeningsAsLettersCheckBox = new CheckBox("Show Combat Openings as Colored Letters"){
+				{a = Utils.getprefb("showCombatOpeningsAsLetters", false);}
+				public void changed(boolean val) {
+					Utils.setprefb("showCombatOpeningsAsLetters", val);
+				}
+			}, UI.scale(320, 0));
+
+			rightColumn = add(new Label("Combat Openings Colors:"), rightColumn.pos("bl").adds(0, 4));
 			rightColumn = add(new Label("Green"), rightColumn.pos("bl").adds(2, 1));
 			add(greenCombatColorOptionWidget = new ColorOptionWidget("", "greenCombat", 0,
 					Integer.parseInt(greenCombatColorSetting[0]), Integer.parseInt(greenCombatColorSetting[1]), Integer.parseInt(greenCombatColorSetting[2]), Integer.parseInt(greenCombatColorSetting[3]), (Color col) -> {
 				improvedOpeningsImageColor.put("paginae/atk/offbalance", OptWnd.greenCombatColorOptionWidget.currentColor);
 			}){}, rightColumn.pos("bl").adds(6, 0));
-			rightColumn = add(new Label("Blue"), rightColumn.pos("ur").adds(12, 0));
+			rightColumn = add(new Label("Blue"), rightColumn.pos("ur").adds(8, 0));
 			add(blueCombatColorOptionWidget = new ColorOptionWidget("", "blueCombat", 0,
 					Integer.parseInt(blueCombatColorSetting[0]), Integer.parseInt(blueCombatColorSetting[1]), Integer.parseInt(blueCombatColorSetting[2]), Integer.parseInt(blueCombatColorSetting[3]), (Color col) -> {
 				improvedOpeningsImageColor.put("paginae/atk/dizzy", OptWnd.blueCombatColorOptionWidget.currentColor);
 			}){}, rightColumn.pos("bl").adds(2, 0));
-			rightColumn = add(new Label("Yellow"), rightColumn.pos("ur").adds(12, 0));
+			rightColumn = add(new Label("Yellow"), rightColumn.pos("ur").adds(6, 0));
 			add(yellowCombatColorOptionWidget = new ColorOptionWidget("", "yellowCombat", 0,
 					Integer.parseInt(yellowCombatColorSetting[0]), Integer.parseInt(yellowCombatColorSetting[1]), Integer.parseInt(yellowCombatColorSetting[2]), Integer.parseInt(yellowCombatColorSetting[3]), (Color col) -> {
 				improvedOpeningsImageColor.put("paginae/atk/reeling", OptWnd.yellowCombatColorOptionWidget.currentColor);
 			}){}, rightColumn.pos("bl").adds(8, 0));
-			rightColumn = add(new Label("Red"), rightColumn.pos("ur").adds(12, 0));
+			rightColumn = add(new Label("Red"), rightColumn.pos("ur").adds(8, 0));
 			rightColumn = add(redCombatColorOptionWidget = new ColorOptionWidget("", "redCombat", 0,
 					Integer.parseInt(redCombatColorSetting[0]), Integer.parseInt(redCombatColorSetting[1]), Integer.parseInt(redCombatColorSetting[2]), Integer.parseInt(redCombatColorSetting[3]), (Color col) -> {
 				improvedOpeningsImageColor.put("paginae/atk/cornered", OptWnd.redCombatColorOptionWidget.currentColor);
 			}){}, rightColumn.pos("bl").adds(1, 0));
-			rightColumn = add(new Button(UI.scale(100), "Reset Colors", false).action(() -> {
+			rightColumn = add(new Button(UI.scale(70), "Reset All", false).action(() -> {
 				Utils.setprefsa("greenCombat" + "_colorSetting", new String[]{"0", "128", "3", "255"});
 				Utils.setprefsa("blueCombat" + "_colorSetting", new String[]{"39", "82", "191", "255"});
 				Utils.setprefsa("yellowCombat" + "_colorSetting", new String[]{"217", "177", "20", "255"});
@@ -1224,79 +1289,138 @@ public class OptWnd extends Window {
 				improvedOpeningsImageColor.put("paginae/atk/dizzy", OptWnd.blueCombatColorOptionWidget.currentColor);
 				improvedOpeningsImageColor.put("paginae/atk/reeling", OptWnd.yellowCombatColorOptionWidget.currentColor);
 				improvedOpeningsImageColor.put("paginae/atk/cornered", OptWnd.redCombatColorOptionWidget.currentColor);
-			}), rightColumn.pos("ur").adds(16, -2));
+			}), rightColumn.pos("ur").adds(21, -2));
 			improvedOpeningsImageColor.put("paginae/atk/offbalance", OptWnd.greenCombatColorOptionWidget.currentColor);
 			improvedOpeningsImageColor.put("paginae/atk/dizzy", OptWnd.blueCombatColorOptionWidget.currentColor);
 			improvedOpeningsImageColor.put("paginae/atk/reeling", OptWnd.yellowCombatColorOptionWidget.currentColor);
 			improvedOpeningsImageColor.put("paginae/atk/cornered", OptWnd.redCombatColorOptionWidget.currentColor);
 
-			rightColumn = add(showCombatOpeningsAsLettersCheckBox = new CheckBox("Show Combat Openings as Colored Letters"){
-				{a = Utils.getprefb("showCombatOpeningsAsLetters", false);}
-				public void changed(boolean val) {
-					Utils.setprefb("showCombatOpeningsAsLetters", val);
-				}
-			}, rightColumn.pos("bl").adds(0, 10).xs(320));
-
 			rightColumn = add(new Label("Combat IP (Coins) Colors:"), rightColumn.pos("bl").adds(0, 10).xs(320));
-			rightColumn = add(new Label("Your IP"), rightColumn.pos("bl").adds(2, 1));
+			rightColumn = add(new Label("Your IP"), rightColumn.pos("bl").adds(20, 1));
 			add(myIPCombatColorOptionWidget = new ColorOptionWidget("", "myIPCombat", 0,
 					Integer.parseInt(myIPCombatColorSetting[0]), Integer.parseInt(myIPCombatColorSetting[1]), Integer.parseInt(myIPCombatColorSetting[2]), Integer.parseInt(myIPCombatColorSetting[3]), (Color col) -> {
 			}){}, rightColumn.pos("bl").adds(8, 0));
-			rightColumn = add(new Label("Enemy IP"), rightColumn.pos("ur").adds(12, 0));
+			rightColumn = add(new Label("Enemy IP"), rightColumn.pos("ur").adds(24, 0));
 			rightColumn = add(enemyIPCombatColorOptionWidget = new ColorOptionWidget("", "enemyIPCombat", 0,
 					Integer.parseInt(enemyIPCombatColorSetting[0]), Integer.parseInt(enemyIPCombatColorSetting[1]), Integer.parseInt(enemyIPCombatColorSetting[2]), Integer.parseInt(enemyIPCombatColorSetting[3]), (Color col) -> {
 			}){}, rightColumn.pos("bl").adds(12, 0));
 
-			rightColumn = add(new Button(UI.scale(100), "Reset Colors", false).action(() -> {
+			rightColumn = add(new Button(UI.scale(70), "Reset All", false).action(() -> {
 				Utils.setprefsa("myIPCombat" + "_colorSetting", new String[]{"0", "201", "4", "255"});
 				Utils.setprefsa("enemyIPCombat" + "_colorSetting", new String[]{"245", "0", "0", "255"});
 				myIPCombatColorOptionWidget.cb.colorChooser.setColor(myIPCombatColorOptionWidget.currentColor = new Color(0, 201, 4, 255));
 				enemyIPCombatColorOptionWidget.cb.colorChooser.setColor(enemyIPCombatColorOptionWidget.currentColor = new Color(245, 0, 0, 255));
-			}), rightColumn.pos("ur").adds(24, -2));
+			}), rightColumn.pos("ur").adds(46, -2));
 
-			rightColumn = add(new HRuler(UI.scale(280)), rightColumn.pos("bl").adds(0, 12).x(320));
+			rightColumn = add(highlightPartyMembersCheckBox = new CheckBox("Highlight Party Members"){
+				{a = Utils.getprefb("highlightPartyMembers", false);}
+				public void changed(boolean val) {
+					Utils.setprefb("highlightPartyMembers", val);
+					if (ui != null && ui.gui != null && ui.gui.map != null && ui.gui.map.partyHighlight != null)
+						ui.gui.map.partyHighlight.update();
+				}
+			}, rightColumn.pos("bl").adds(0, 16).xs(320));
+			highlightPartyMembersCheckBox.tooltip = highlightPartyMembersTooltip;
+			rightColumn = add(showCirclesUnderPartyMembersCheckBox = new CheckBox("Show Circles under Party Members"){
+				{a = Utils.getprefb("showCirclesUnderPartyMembers", true);}
+				public void changed(boolean val) {
+					Utils.setprefb("showCirclesUnderPartyMembers", val);
+					if (ui != null && ui.gui != null && ui.gui.map != null && ui.gui.map.partyCircles != null)
+						ui.gui.map.partyCircles.update();
+				}
+			}, rightColumn.pos("bl").adds(0, 2));
+			showCirclesUnderPartyMembersCheckBox.tooltip = showCirclesUnderPartyMembersTooltip;
 
-			rightColumn = add(toggleGobDamageInfoCheckBox = new CheckBox("Display Damage Info:"){
-				{a = Utils.getprefb("GobDamageInfoToggled", true);}
+			rightColumn = add(yourselfPartyColorOptionWidget = new ColorOptionWidget("Yourself (Party Color):", "yourselfParty", 120, Integer.parseInt(yourselfPartyColorSetting[0]), Integer.parseInt(yourselfPartyColorSetting[1]), Integer.parseInt(yourselfPartyColorSetting[2]), Integer.parseInt(yourselfPartyColorSetting[3]), (Color col) -> {
+				PartyHighlight.YOURSELF_OL_COLOR = col;
+				PartyCircles.YOURSELF_OL_COLOR = col;
+			}){}, rightColumn.pos("bl").adds(6, 2));
+			add(new Button(UI.scale(70), "Reset", false).action(() -> {
+				Utils.setprefsa("yourselfParty" + "_colorSetting", new String[]{"255", "255", "255", "128"});
+				yourselfPartyColorOptionWidget.cb.colorChooser.setColor(yourselfPartyColorOptionWidget.currentColor = new Color(255, 255, 255, 128));
+				PartyHighlight.YOURSELF_OL_COLOR = yourselfPartyColorOptionWidget.currentColor;
+				PartyCircles.YOURSELF_OL_COLOR = yourselfPartyColorOptionWidget.currentColor;
+			}), yourselfPartyColorOptionWidget.pos("ur").adds(16, 0));
+			rightColumn = add(leaderPartyColorOptionWidget = new ColorOptionWidget("Leader (Party Color):", "leaderParty", 120, Integer.parseInt(leaderPartyColorSetting[0]), Integer.parseInt(leaderPartyColorSetting[1]), Integer.parseInt(leaderPartyColorSetting[2]), Integer.parseInt(leaderPartyColorSetting[3]), (Color col) -> {
+				PartyHighlight.LEADER_OL_COLOR = col;
+				PartyCircles.LEADER_OL_COLOR = col;
+			}){}, rightColumn.pos("bl").adds(0, 4));
+			add(new Button(UI.scale(70), "Reset", false).action(() -> {
+				Utils.setprefsa("leaderParty" + "_colorSetting", new String[]{"0", "74", "208", "164"});
+				leaderPartyColorOptionWidget.cb.colorChooser.setColor(leaderPartyColorOptionWidget.currentColor = new Color(0, 74, 208, 164));
+				PartyHighlight.LEADER_OL_COLOR = leaderPartyColorOptionWidget.currentColor;
+				PartyCircles.LEADER_OL_COLOR = leaderPartyColorOptionWidget.currentColor;
+			}), leaderPartyColorOptionWidget.pos("ur").adds(16, 0));
+			rightColumn = add(memberPartyColorOptionWidget = new ColorOptionWidget("Member (Party Color):", "memberParty", 120, Integer.parseInt(memberPartyColorSetting[0]), Integer.parseInt(memberPartyColorSetting[1]), Integer.parseInt(memberPartyColorSetting[2]), Integer.parseInt(memberPartyColorSetting[3]), (Color col) -> {
+				PartyHighlight.MEMBER_OL_COLOR = col;
+				PartyCircles.MEMBER_OL_COLOR = col;
+			}){}, rightColumn.pos("bl").adds(0, 4));
+			add(new Button(UI.scale(70), "Reset", false).action(() -> {
+				Utils.setprefsa("memberParty" + "_colorSetting", new String[]{"0", "160", "0", "164"});
+				memberPartyColorOptionWidget.cb.colorChooser.setColor(memberPartyColorOptionWidget.currentColor = new Color(0, 160, 0, 164));
+				PartyHighlight.MEMBER_OL_COLOR = memberPartyColorOptionWidget.currentColor;
+				PartyCircles.MEMBER_OL_COLOR = memberPartyColorOptionWidget.currentColor;
+			}), memberPartyColorOptionWidget.pos("ur").adds(16, 0));
+
+			rightColumn = add(highlightCombatFoesCheckBox = new CheckBox("Highlight Combat Foes"){
+				{a = Utils.getprefb("highlightCombatFoes", false);}
 				public void changed(boolean val) {
-					Utils.setprefb("GobDamageInfoToggled", val);
+					Utils.setprefb("highlightCombatFoes", val);
 				}
-			}, rightColumn.pos("bl").adds(0, 10));
-			rightColumn = add(new Label("> Include:"), rightColumn.pos("bl").adds(0, 1));
-			rightColumn = add(toggleGobDamageWoundInfoCheckBox = new CheckBox("Wounds"){
-				{a = Utils.getprefb("GobDamageInfoWoundsToggled", true);}
+			}, rightColumn.pos("bl").adds(0, 12).xs(320));
+			rightColumn = add(showCirclesUnderCombatFoesCheckBox = new CheckBox("Show Circles under Combat Foes"){
+				{a = Utils.getprefb("showCirclesUnderCombatFoes", true);}
 				public void changed(boolean val) {
-					Utils.setprefb("GobDamageInfoWoundsToggled", val);
+					Utils.setprefb("showCirclesUnderCombatFoes", val);
 				}
-			}, rightColumn.pos("bl").adds(56, -17));
-			toggleGobDamageWoundInfoCheckBox.lbl = Text.create("Wounds", PUtils.strokeImg(Text.std.render("Wounds", new Color(255, 232, 0, 255))));
-			rightColumn = add(toggleGobDamageArmorInfoCheckBox = new CheckBox("Armor"){
-				{a = Utils.getprefb("GobDamageInfoArmorToggled", true);}
-				public void changed(boolean val) {
-					Utils.setprefb("GobDamageInfoArmorToggled", val);
-				}
-			}, rightColumn.pos("bl").adds(66, -18));
-			toggleGobDamageArmorInfoCheckBox.lbl = Text.create("Armor", PUtils.strokeImg(Text.std.render("Armor", new Color(50, 255, 92, 255))));
-			add(damageInfoClearButton = new Button(UI.scale(70), "Clear", false).action(() -> {
-				GobDamageInfo.clearAllDamage(ui.gui);
+			}, rightColumn.pos("bl").adds(0, 2));
+
+			rightColumn = add(combatFoeColorOptionWidget = new ColorOptionWidget("Combat Foes:", "combatFoes", 120, Integer.parseInt(combatFoeColorSetting[0]), Integer.parseInt(combatFoeColorSetting[1]), Integer.parseInt(combatFoeColorSetting[2]), Integer.parseInt(combatFoeColorSetting[3]), (Color col) -> {
+				GobCombatHighlight.COMBAT_FOE_MIXCOLOR = new MixColor(col.getRed(), col.getGreen(), col.getBlue(), col.getAlpha());
+				AggroCircleSprite.COMBAT_FOE_COLOR = col;
 				if (ui != null && ui.gui != null) {
-					ui.gui.optionInfoMsg("All Combat Damage Info has been CLEARED!", msgYellow, Audio.resclip(Toggle.sfxoff));
+					ui.sess.glob.oc.gobAction(Gob::removeCombatFoeCircleOverlay);
+					ui.sess.glob.oc.gobAction(Gob::removeCombatFoeHighlight);
 				}
-			}), rightColumn.pos("bl").adds(0, -34).x(UI.scale(530)));
-			damageInfoClearButton.tooltip = damageInfoClearTooltip;
-			rightColumn = add(new Label("> Also show on:"), rightColumn.pos("bl").adds(0, 2).xs(320));
-			rightColumn = add(yourselfDamageInfoCheckBox = new CheckBox("Yourself"){
-				{a = Utils.getprefb("yourselfDamageInfo", true);}
+				haven.sprites.CurrentAggroSprite.col = new BaseColor(col);
+				refreshCurrentTargetSpriteColor = true;
+			}){}, rightColumn.pos("bl").adds(6, 2));
+			add(new Button(UI.scale(70), "Reset", false).action(() -> {
+				Utils.setprefsa("combatFoes" + "_colorSetting", new String[]{"180", "0", "0", "196"});
+				combatFoeColorOptionWidget.cb.colorChooser.setColor(combatFoeColorOptionWidget.currentColor = new Color(180, 0, 0, 196));
+				GobCombatHighlight.COMBAT_FOE_MIXCOLOR = new MixColor(combatFoeColorOptionWidget.currentColor.getRed(), combatFoeColorOptionWidget.currentColor.getGreen(), combatFoeColorOptionWidget.currentColor.getBlue(), combatFoeColorOptionWidget.currentColor.getAlpha());
+				AggroCircleSprite.COMBAT_FOE_COLOR = combatFoeColorOptionWidget.currentColor;
+				if (ui != null && ui.gui != null) {
+					ui.sess.glob.oc.gobAction(Gob::removeCombatFoeCircleOverlay);
+					ui.sess.glob.oc.gobAction(Gob::removeCombatFoeHighlight);
+				}
+				haven.sprites.CurrentAggroSprite.col = new BaseColor(combatFoeColorOptionWidget.currentColor);
+				refreshCurrentTargetSpriteColor = true;
+			}), combatFoeColorOptionWidget.pos("ur").adds(16, 0));
+
+			rightColumn = add(new Label("Target Sprite Size:"), rightColumn.pos("bl").adds(0, 4).xs(325));
+			rightColumn = add(targetSpriteSizeSlider = new HSlider(UI.scale(110), 3, 7, Utils.getprefi("targetSpriteSize", 5)) {
+				public void changed() {
+					Utils.setprefi("targetSpriteSize", val);
+					haven.sprites.CurrentAggroSprite.size = val;
+					refreshCurrentTargetSpriteColor = true;
+				}
+			}, rightColumn.pos("ur").adds(26, 4));
+
+			rightColumn = add(drawChaseVectorsCheckBox = new CheckBox("Draw Chase Vectors"){
+				{a = Utils.getprefb("drawChaseVectors", true);}
 				public void changed(boolean val) {
-					Utils.setprefb("yourselfDamageInfo", val);
+					Utils.setprefb("drawChaseVectors", val);
 				}
-			}, rightColumn.pos("bl").adds(80, -17));
-			rightColumn = add(partyMembersDamageInfoCheckBox = new CheckBox("Party Members"){
-				{a = Utils.getprefb("(partyMembersDamageInfo", true);}
+			}, rightColumn.pos("bl").adds(0, 12).xs(320));
+			drawChaseVectorsCheckBox.tooltip = drawChaseVectorsTooltip;
+			rightColumn = add(drawYourCurrentPathCheckBox = new CheckBox("Draw Your Current Path"){
+				{a = Utils.getprefb("drawYourCurrentPath", false);}
 				public void changed(boolean val) {
-					Utils.setprefb("(partyMembersDamageInfo", val);
+					Utils.setprefb("drawYourCurrentPath", val);
 				}
-			}, rightColumn.pos("ur").adds(6, 0));
+			}, rightColumn.pos("bl").adds(0, 2));
+
 
 			Widget backButton;
 			add(backButton = new PButton(UI.scale(200), "Back", 27, back, "Advanced Settings"), leftColumn.pos("bl").adds(0, 18).x(0));
@@ -1524,8 +1648,6 @@ public class OptWnd extends Window {
 	public static CheckBox showBarrelContentsTextCheckBox;
 	public static CheckBox showIconSignTextCheckBox;
 	public static CheckBox showCheeseRacksTierTextCheckBox;
-	public static CheckBox drawChaseVectorsCheckBox;
-	public static CheckBox drawYourCurrentPathCheckBox;
 	public static CheckBox highlightCliffsCheckBox;
 	public static ColorOptionWidget highlightCliffsColorOptionWidget;
 	public static String[] highlightCliffsColorSetting = Utils.getprefsa("highlightCliffs" + "_colorSetting", new String[]{"255", "0", "0", "200"});
@@ -1558,20 +1680,7 @@ public class OptWnd extends Window {
 	public static OldDropBox<Integer> sweeperDurationDropbox;
 	public static final List<Integer> sweeperDurations = Arrays.asList(5, 10, 15, 30, 45, 60, 120);
 	public static int sweeperSetDuration = Utils.getprefi("sweeperSetDuration", 1);
-	public static CheckBox highlightPartyMembersCheckBox;
-	public static CheckBox showCirclesUnderPartyMembersCheckBox;
-	public static ColorOptionWidget yourselfPartyColorOptionWidget;
-	public static String[] yourselfPartyColorSetting = Utils.getprefsa("yourselfParty" + "_colorSetting", new String[]{"255", "255", "255", "128"});
-	public static ColorOptionWidget leaderPartyColorOptionWidget;
-	public static String[] leaderPartyColorSetting = Utils.getprefsa("leaderParty" + "_colorSetting", new String[]{"0", "74", "208", "164"});
-	public static ColorOptionWidget memberPartyColorOptionWidget;
-	public static String[] memberPartyColorSetting = Utils.getprefsa("memberParty" + "_colorSetting", new String[]{"0", "160", "0", "164"});
-	public static CheckBox highlightCombatFoesCheckBox;
-	public static CheckBox showCirclesUnderCombatFoesCheckBox;
-	public static ColorOptionWidget combatFoeColorOptionWidget;
-	public static String[] combatFoeColorSetting = Utils.getprefsa("combatFoe" + "_colorSetting", new String[]{"180", "0", "0", "196"});
-	public static boolean refreshCurrentTargetSpriteColor = false;
-	public static HSlider targetSpriteSizeSlider;
+
 	public static ColorOptionWidget areaChatPingColorOptionWidget;
 	public static String[] areaChatPingColorSetting = Utils.getprefsa("areaChatPing" + "_colorSetting", new String[]{"255", "183", "0", "255"});
 	public static ColorOptionWidget partyChatPingColorOptionWidget;
@@ -2122,115 +2231,7 @@ public class OptWnd extends Window {
 				}
 			}, middleColumn.pos("bl").adds(0, 2));
 
-			rightColumn = add(drawChaseVectorsCheckBox = new CheckBox("Draw Chase Vectors"){
-				{a = Utils.getprefb("drawChaseVectors", true);}
-				public void changed(boolean val) {
-					Utils.setprefb("drawChaseVectors", val);
-				}
-			}, UI.scale(480, 0));
-			rightColumn = add(drawYourCurrentPathCheckBox = new CheckBox("Draw Your Current Path"){
-				{a = Utils.getprefb("drawYourCurrentPath", false);}
-				public void changed(boolean val) {
-					Utils.setprefb("drawYourCurrentPath", val);
-				}
-			}, rightColumn.pos("bl").adds(0, 2));
-			drawChaseVectorsCheckBox.tooltip = drawChaseVectorsTooltip;
-			rightColumn = add(highlightPartyMembersCheckBox = new CheckBox("Highlight Party Members"){
-				{a = Utils.getprefb("highlightPartyMembers", false);}
-				public void changed(boolean val) {
-					Utils.setprefb("highlightPartyMembers", val);
-					if (ui != null && ui.gui != null && ui.gui.map != null && ui.gui.map.partyHighlight != null)
-						ui.gui.map.partyHighlight.update();
-				}
-			}, rightColumn.pos("bl").adds(0, 12));
-			highlightPartyMembersCheckBox.tooltip = highlightPartyMembersTooltip;
-			rightColumn = add(showCirclesUnderPartyMembersCheckBox = new CheckBox("Show Circles under Party Members"){
-				{a = Utils.getprefb("showCirclesUnderPartyMembers", true);}
-				public void changed(boolean val) {
-					Utils.setprefb("showCirclesUnderPartyMembers", val);
-					if (ui != null && ui.gui != null && ui.gui.map != null && ui.gui.map.partyCircles != null)
-						ui.gui.map.partyCircles.update();
-				}
-			}, rightColumn.pos("bl").adds(0, 2));
-			showCirclesUnderPartyMembersCheckBox.tooltip = showCirclesUnderPartyMembersTooltip;
-
-			rightColumn = add(yourselfPartyColorOptionWidget = new ColorOptionWidget("Yourself (Party Color):", "yourselfParty", 115, Integer.parseInt(yourselfPartyColorSetting[0]), Integer.parseInt(yourselfPartyColorSetting[1]), Integer.parseInt(yourselfPartyColorSetting[2]), Integer.parseInt(yourselfPartyColorSetting[3]), (Color col) -> {
-				PartyHighlight.YOURSELF_OL_COLOR = col;
-				PartyCircles.YOURSELF_OL_COLOR = col;
-			}){}, rightColumn.pos("bl").adds(1, 1));
-			add(new Button(UI.scale(70), "Reset", false).action(() -> {
-				Utils.setprefsa("yourselfParty" + "_colorSetting", new String[]{"255", "255", "255", "128"});
-				yourselfPartyColorOptionWidget.cb.colorChooser.setColor(yourselfPartyColorOptionWidget.currentColor = new Color(255, 255, 255, 128));
-				PartyHighlight.YOURSELF_OL_COLOR = yourselfPartyColorOptionWidget.currentColor;
-				PartyCircles.YOURSELF_OL_COLOR = yourselfPartyColorOptionWidget.currentColor;
-			}), yourselfPartyColorOptionWidget.pos("ur").adds(10, 0));
-			rightColumn = add(leaderPartyColorOptionWidget = new ColorOptionWidget("Leader (Party Color):", "leaderParty", 115, Integer.parseInt(leaderPartyColorSetting[0]), Integer.parseInt(leaderPartyColorSetting[1]), Integer.parseInt(leaderPartyColorSetting[2]), Integer.parseInt(leaderPartyColorSetting[3]), (Color col) -> {
-				PartyHighlight.LEADER_OL_COLOR = col;
-				PartyCircles.LEADER_OL_COLOR = col;
-			}){}, rightColumn.pos("bl").adds(0, 4));
-			add(new Button(UI.scale(70), "Reset", false).action(() -> {
-				Utils.setprefsa("leaderParty" + "_colorSetting", new String[]{"0", "74", "208", "164"});
-				leaderPartyColorOptionWidget.cb.colorChooser.setColor(leaderPartyColorOptionWidget.currentColor = new Color(0, 74, 208, 164));
-				PartyHighlight.LEADER_OL_COLOR = leaderPartyColorOptionWidget.currentColor;
-				PartyCircles.LEADER_OL_COLOR = leaderPartyColorOptionWidget.currentColor;
-			}), leaderPartyColorOptionWidget.pos("ur").adds(10, 0));
-			rightColumn = add(memberPartyColorOptionWidget = new ColorOptionWidget("Member (Party Color):", "memberParty", 115, Integer.parseInt(memberPartyColorSetting[0]), Integer.parseInt(memberPartyColorSetting[1]), Integer.parseInt(memberPartyColorSetting[2]), Integer.parseInt(memberPartyColorSetting[3]), (Color col) -> {
-				PartyHighlight.MEMBER_OL_COLOR = col;
-				PartyCircles.MEMBER_OL_COLOR = col;
-			}){}, rightColumn.pos("bl").adds(0, 4));
-			add(new Button(UI.scale(70), "Reset", false).action(() -> {
-				Utils.setprefsa("memberParty" + "_colorSetting", new String[]{"0", "160", "0", "164"});
-				memberPartyColorOptionWidget.cb.colorChooser.setColor(memberPartyColorOptionWidget.currentColor = new Color(0, 160, 0, 164));
-				PartyHighlight.MEMBER_OL_COLOR = memberPartyColorOptionWidget.currentColor;
-				PartyCircles.MEMBER_OL_COLOR = memberPartyColorOptionWidget.currentColor;
-			}), memberPartyColorOptionWidget.pos("ur").adds(10, 0));
-
-			rightColumn = add(highlightCombatFoesCheckBox = new CheckBox("Highlight Combat Foes"){
-				{a = Utils.getprefb("highlightCombatFoes", false);}
-				public void changed(boolean val) {
-					Utils.setprefb("highlightCombatFoes", val);
-				}
-			}, rightColumn.pos("bl").adds(0, 12).x(UI.scale(480)));
-			rightColumn = add(showCirclesUnderCombatFoesCheckBox = new CheckBox("Show Circles under Combat Foes"){
-				{a = Utils.getprefb("showCirclesUnderCombatFoes", true);}
-				public void changed(boolean val) {
-					Utils.setprefb("showCirclesUnderCombatFoes", val);
-				}
-			}, rightColumn.pos("bl").adds(0, 2));
-
-			rightColumn = add(combatFoeColorOptionWidget = new ColorOptionWidget("Combat Foes:", "combatFoes", 115, Integer.parseInt(combatFoeColorSetting[0]), Integer.parseInt(combatFoeColorSetting[1]), Integer.parseInt(combatFoeColorSetting[2]), Integer.parseInt(combatFoeColorSetting[3]), (Color col) -> {
-				GobCombatHighlight.COMBAT_FOE_MIXCOLOR = new MixColor(col.getRed(), col.getGreen(), col.getBlue(), col.getAlpha());
-				AggroCircleSprite.COMBAT_FOE_COLOR = col;
-				if (ui != null && ui.gui != null) {
-					ui.sess.glob.oc.gobAction(Gob::removeCombatFoeCircleOverlay);
-					ui.sess.glob.oc.gobAction(Gob::removeCombatFoeHighlight);
-				}
-				haven.sprites.CurrentAggroSprite.col = new BaseColor(col);
-				refreshCurrentTargetSpriteColor = true;
-			}){}, rightColumn.pos("bl").adds(1, 1));
-			add(new Button(UI.scale(70), "Reset", false).action(() -> {
-				Utils.setprefsa("combatFoes" + "_colorSetting", new String[]{"180", "0", "0", "196"});
-				combatFoeColorOptionWidget.cb.colorChooser.setColor(combatFoeColorOptionWidget.currentColor = new Color(180, 0, 0, 196));
-				GobCombatHighlight.COMBAT_FOE_MIXCOLOR = new MixColor(combatFoeColorOptionWidget.currentColor.getRed(), combatFoeColorOptionWidget.currentColor.getGreen(), combatFoeColorOptionWidget.currentColor.getBlue(), combatFoeColorOptionWidget.currentColor.getAlpha());
-				AggroCircleSprite.COMBAT_FOE_COLOR = combatFoeColorOptionWidget.currentColor;
-				if (ui != null && ui.gui != null) {
-					ui.sess.glob.oc.gobAction(Gob::removeCombatFoeCircleOverlay);
-					ui.sess.glob.oc.gobAction(Gob::removeCombatFoeHighlight);
-				}
-				haven.sprites.CurrentAggroSprite.col = new BaseColor(combatFoeColorOptionWidget.currentColor);
-				refreshCurrentTargetSpriteColor = true;
-			}), combatFoeColorOptionWidget.pos("ur").adds(10, 0));
-
-			rightColumn = add(new Label("Target Sprite Size:"), rightColumn.pos("bl").adds(0, 4).xs(480));
-			rightColumn = add(targetSpriteSizeSlider = new HSlider(UI.scale(100), 3, 7, Utils.getprefi("targetSpriteSize", 5)) {
-				public void changed() {
-					Utils.setprefi("targetSpriteSize", val);
-					haven.sprites.CurrentAggroSprite.size = val;
-					refreshCurrentTargetSpriteColor = true;
-				}
-			}, rightColumn.pos("ur").adds(26, 4));
-
-			rightColumn = add(new Label("Object Pinging Colors:"), rightColumn.pos("bl").adds(0, 12).xs(480));
+			rightColumn = add(new Label("Object Pinging Colors:"), UI.scale(480, 0));
 			rightColumn = add(areaChatPingColorOptionWidget = new ColorOptionWidget("Area Chat (Alt+LClick):", "areaChatPing", 115, Integer.parseInt(areaChatPingColorSetting[0]), Integer.parseInt(areaChatPingColorSetting[1]), Integer.parseInt(areaChatPingColorSetting[2]), Integer.parseInt(areaChatPingColorSetting[3]), (Color col) -> {
 			}){}, rightColumn.pos("bl").adds(1, 1));
 			add(new Button(UI.scale(70), "Reset", false).action(() -> {
@@ -4563,12 +4564,28 @@ public class OptWnd extends Window {
 	private final Object lockStudyReportTooltip = RichText.render("Enabling this will prevent moving or dropping items from the Study Report", UI.scale(300));
 	private final Object alwaysShowCombatUiBarTooltip = RichText.render("For more options for this bar, check the Combat UI Settings.", UI.scale(320));
 
-	// Combat UI Settings Tooltips
+	// Combat Settings Tooltips
 	private final Object damageInfoClearTooltip = RichText.render("Clears all damage info." +
 			"\n$col[218,163,0]{Action Button:} $col[185,185,185]{This setting can also be turned on/off using an action button from the menu grid (Custom Client Extras → Toggles).}", UI.scale(320));
 	private final Object onlyShowOpeningsAbovePercentageCombatInfoTooltip = RichText.render("Only show the combat info openings if at least one of them is above the set number. If one of them is above that, show all of them." +
 			"\n" +
 			"\nThis does NOT apply to your current target, only other combat foes.}", UI.scale(320));
+	private final Object highlightPartyMembersTooltip = RichText.render("Enabling this will put a color highlight over all party members." +
+			"\n" +
+			"\n$col[185,185,185]{If you are the party leader, your color highlight will always be the $col[255,255,255]{Leader's Color}.}", UI.scale(310));
+	private final Object showCirclesUnderPartyMembersTooltip = RichText.render("Enabling this will put a colored circle under all party members." +
+			"\n" +
+			"\n$col[185,185,185]{If you are the party leader, your circle's color will always be the $col[255,255,255]{Leader's Color}.}", UI.scale(300));
+	private final Object drawChaseVectorsTooltip = RichText.render("If this setting is enabled, colored lines will be drawn between chasers and chased targets." +
+			"\n=====================" +
+			"\n$col[255,255,255]{White: }You are the chaser." +
+			"\n$col[0,160,0]{Green: }A party member is the chaser." +
+			"\n$col[185,0,0]{Red: }A player is chasing you or a party member." +
+			"\n$col[165,165,165]{Gray: }An animal is the chaser, OR random (non-party) players are chasing each other." +
+			"\n=====================" +
+			"\n$col[218,163,0]{Note:} $col[185,185,185]{Chase vectors include queuing attacks, clicking a critter to pick up, or simply following someone.}" +
+			"\n$col[218,163,0]{Disclaimer:} $col[185,185,185]{Chase vectors sometimes don't show when chasing a critter that is standing still. The client treats this as something else for some reason and I can't fix it.}", UI.scale(430));
+
 
 	// Display Settings Tooltips
 	private final Object granularityPositionTooltip = RichText.render("Equivalent of the :placegrid console command, this allows you to have more freedom when placing constructions/objects.", UI.scale(300));
@@ -4592,15 +4609,6 @@ public class OptWnd extends Window {
 	private final Object showBeeSkepsRadiiTooltip = RichText.render("$col[218,163,0]{Action Button:} $col[185,185,185]{This setting can also be turned on/off using an action button from the menu grid (Custom Client Extras → Toggles).}", UI.scale(320));
 	private final Object showFoodThroughsRadiiTooltip = RichText.render("$col[218,163,0]{Action Button:} $col[185,185,185]{This setting can also be turned on/off using an action button from the menu grid (Custom Client Extras → Toggles).}", UI.scale(320));
 	private final Object showMoundBedsRadiiTooltip = RichText.render("$col[218,163,0]{Action Button:} $col[185,185,185]{This setting can also be turned on/off using an action button from the menu grid (Custom Client Extras → Toggles).}", UI.scale(320));
-	private final Object drawChaseVectorsTooltip = RichText.render("If this setting is enabled, colored lines will be drawn between chasers and chased targets." +
-			"\n=====================" +
-			"\n$col[255,255,255]{White: }You are the chaser." +
-			"\n$col[0,160,0]{Green: }A party member is the chaser." +
-			"\n$col[185,0,0]{Red: }A player is chasing you or a party member." +
-			"\n$col[165,165,165]{Gray: }An animal is the chaser, OR random (non-party) players are chasing each other." +
-			"\n=====================" +
-			"\n$col[218,163,0]{Note:} $col[185,185,185]{Chase vectors include queuing attacks, clicking a critter to pick up, or simply following someone.}" +
-			"\n$col[218,163,0]{Disclaimer:} $col[185,185,185]{Chase vectors sometimes don't show when chasing a critter that is standing still. The client treats this as something else for some reason and I can't fix it.}", UI.scale(430));
 	private final Object showMineSupportRadiiTooltip = RichText.render("$col[218,163,0]{Action Button:} $col[185,185,185]{This setting can also be turned on/off using an action button from the menu grid (Custom Client Extras → Toggles).}", UI.scale(320));
 	private final Object showMineSupportSafeTilesTooltip = RichText.render("$col[218,163,0]{Action Button:} $col[185,185,185]{This setting can also be turned on/off using an action button from the menu grid (Custom Client Extras → Toggles).}", UI.scale(320));
 	private final Object enableMineSweeperTooltip = RichText.render("Enabling this will cause cave dust tiles to show the number of potential cave-ins surrounding them, just like in Minesweeper." +
@@ -4609,12 +4617,6 @@ public class OptWnd extends Window {
 			"\n" +
 			"\n$col[200,0,0]{NOTE:} $col[185,185,185]{There's a bug with the falling dust particles, that we can't really \"fix\". If you mine them out on a level, the same particles can also show up on different levels or the overworld. If you want them to vanish, you can just relog, but they will despawn from their original location too.}" +
 			"\n$col[218,163,0]{Action Button:} $col[185,185,185]{This setting can also be turned on/off using an action button from the menu grid (Custom Client Extras → Toggles).}", UI.scale(320));
-	private final Object highlightPartyMembersTooltip = RichText.render("Enabling this will put a color highlight over all party members." +
-			"\n" +
-			"\n$col[185,185,185]{If you are the party leader, your color highlight will always be the $col[255,255,255]{Leader's Color}.}", UI.scale(310));
-	private final Object showCirclesUnderPartyMembersTooltip = RichText.render("Enabling this will put a colored circle under all party members." +
-			"\n" +
-			"\n$col[185,185,185]{If you are the party leader, your circle's color will always be the $col[255,255,255]{Leader's Color}.}", UI.scale(300));
 	private final Object showObjectsSpeedTooltip = RichText.render("Enabling this will show the speed of moving objects (Players, Mobs, Vehicles, etc.) below them." +
 			"\n" +
 			"\n$col[218,163,0]{Keybind:} $col[185,185,185]{This can also be toggled using a keybind.}", UI.scale(300));
