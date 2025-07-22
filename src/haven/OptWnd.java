@@ -1634,7 +1634,7 @@ public class OptWnd extends Window {
 	public static CheckBox toggleGobCollisionBoxesCheckBox;
 	public static ColorOptionWidget collisionBoxColorOptionWidget;
 	public static String[] collisionBoxColorSetting = Utils.getprefsa("collisionBox" + "_colorSetting", new String[]{"255", "255", "255", "210"});
-	public static CheckBox displayObjectHealthPercentageCheckBox;
+	public static CheckBox displayObjectDurabilityPercentageCheckBox;
 	public static CheckBox displayObjectQualityOnInspectionCheckBox;
 	public static CheckBox displayGrowthInfoCheckBox;
 	public static CheckBox alsoShowOversizedTreesAbovePercentageCheckBox;
@@ -2083,13 +2083,13 @@ public class OptWnd extends Window {
 				}
 			}), collisionBoxColorOptionWidget.pos("ur").adds(10, 0));
 
-			middleColumn = add(displayObjectHealthPercentageCheckBox = new CheckBox("Display Object Health Percentage"){
+			middleColumn = add(displayObjectDurabilityPercentageCheckBox = new CheckBox("Display Object Durability Percentage"){
 				{a = (Utils.getprefb("displayObjectHealthPercentage", true));}
 				public void changed(boolean val) {
 					Utils.setprefb("displayObjectHealthPercentage", val);
 				}
 			}, middleColumn.pos("bl").adds(0, 12).x(UI.scale(240)));
-			displayObjectHealthPercentageCheckBox.tooltip = displayObjectHealthPercentageTooltip;
+			displayObjectDurabilityPercentageCheckBox.tooltip = displayObjectDurabilityPercentageTooltip;
 			middleColumn = add(displayObjectQualityOnInspectionCheckBox = new CheckBox("Display Object Quality on Inspection"){
 				{a = (Utils.getprefb("displayObjectQualityOnInspection", true));}
 				public void changed(boolean val) {
@@ -4630,7 +4630,7 @@ public class OptWnd extends Window {
 	private final Object showWorkstationProgressTooltip = RichText.render("Colors workstations (Drying Racks, Tanning Tubs, Cheese Racks, Flower Pots), depending on their current progress." +
 			"\n" +
 			"\n$col[185,185,185]{Select from below what states you want to be highlighted, and what colors you want each of them to show.}", UI.scale(330));
-	private final Object displayObjectHealthPercentageTooltip = RichText.render("If this is enabled, objects that took decay hits will also show a percentage number, on top of the cracked texture overlay.", UI.scale(300));
+	private final Object displayObjectDurabilityPercentageTooltip = RichText.render("If this is enabled, objects that took decay hits will also show a percentage number, on top of the cracked texture overlay.", UI.scale(300));
 	private final Object showBeeSkepsRadiiTooltip = RichText.render("$col[218,163,0]{Action Button:} $col[185,185,185]{This setting can also be turned on/off using an action button from the menu grid (Custom Client Extras → Toggles).}", UI.scale(320));
 	private final Object showFoodThroughsRadiiTooltip = RichText.render("$col[218,163,0]{Action Button:} $col[185,185,185]{This setting can also be turned on/off using an action button from the menu grid (Custom Client Extras → Toggles).}", UI.scale(320));
 	private final Object showMoundBedsRadiiTooltip = RichText.render("$col[218,163,0]{Action Button:} $col[185,185,185]{This setting can also be turned on/off using an action button from the menu grid (Custom Client Extras → Toggles).}", UI.scale(320));

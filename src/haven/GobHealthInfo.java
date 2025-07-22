@@ -14,7 +14,7 @@ public class GobHealthInfo extends GobInfo {
 
     @Override
     protected boolean enabled() {
-        return OptWnd.displayObjectHealthPercentageCheckBox.a;
+        return OptWnd.displayObjectDurabilityPercentageCheckBox.a;
     }
 
     @Override
