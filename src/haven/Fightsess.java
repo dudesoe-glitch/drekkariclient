@@ -525,25 +525,12 @@ public class Fightsess extends Widget {
 				boolean cutbladeEquipped = false;
 				boolean pickaxeEquipped = false;
 				if (gob != null) {
-					for (GAttrib gobAttrib : gob.attr.values()) {
-						if (gobAttrib instanceof Composite) {
-							Composite c = (Composite) gobAttrib;
-							if (c.comp.cequ.size() > 0) {
-								for (Composited.ED item : c.comp.cequ) { // ND: Check for the equipped weapon
-									if (item.res.res.get().basename().equals("b12axe")){
-										b12Equipped = true;
-										break;
-									} else if (item.res.res.get().basename().equals("cutblade")){
-										cutbladeEquipped = true;
-										break;
-									} else if (item.res.res.get().basename().equals("pickaxe")){
-										pickaxeEquipped = true;
-										break;
-									}
-								}
-							}
-						}
-					}
+					if (gob.currentWeapon.equals("b12axe"))
+						b12Equipped = true;
+					else if (gob.currentWeapon.equals("cutblade"))
+						cutbladeEquipped = true;
+					else if (gob.currentWeapon.equals("pickaxe"))
+						pickaxeEquipped = true;
 					if (!b12Equipped && !cutbladeEquipped && !pickaxeEquipped) { // ND: Default cooldowns, weapon has 100% attack speed
 						if (Config.attackCooldownNumbers.keySet().stream().anyMatch(moveDefaultCooldown::equals)){
 							if (Config.attackCooldownNumbers.get(moveDefaultCooldown).keySet().stream().anyMatch(lastMoveCooldown::equals)){
@@ -1063,25 +1050,11 @@ public class Fightsess extends Widget {
 		//Check if cleave indicator is needed
 		if (rels.lastActCleave != null) {
 			Gob gob = ui.sess.glob.oc.getgob(rels.gobid);
-			for (GAttrib gobAttrib : gob.attr.values()) { // ND: Do the following stuff to figure out the *MINIMUM* cooldown someone can have after cleaving.
-				if (gobAttrib instanceof Composite) {
-					Composite c = (Composite) gobAttrib;
-					if (c.comp.cequ.size() > 0) {
-						for (Composited.ED item : c.comp.cequ) { // ND: Check for the equipped weapon
-							if (item.res.res.get().basename().equals("b12axe")) { // 5.4
-								cleaveDuration = 5400;
-								break;
-							}
-							if (item.res.res.get().basename().equals("cutblade")) { // 5.2
-								cleaveDuration = 5200;
-								break;
-							} else { // 4.3 seconds for anything else
-								cleaveDuration = 4300;
-							}
-						}
-					}
-				}
-			}
+			// ND: Figure out the *MINIMUM* cooldown someone can have after cleaving.
+			if (gob.currentWeapon.equals("b12axe"))
+				cleaveDuration = 5400;
+			else if (gob.currentWeapon.equals("cutblade"))
+				cleaveDuration = 5200;
 			cleaveUsed = System.currentTimeMillis() - rels.lastActCleave < cleaveDuration;
 		}
 		boolean defenseUsed = false;
