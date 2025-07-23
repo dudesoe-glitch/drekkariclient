@@ -13,8 +13,8 @@ import java.nio.ShortBuffer;
 import static haven.MCache.tilesz;
 
 public class ColoredCircleSprite extends Sprite {
-    static final Pipe.Op smat = new BaseColor(new Color(0, 0, 0, 140));
-    static final Pipe.Op blacc = Pipe.Op.compose(new BaseColor(new Color(0, 0, 0, 140)), new States.LineWidth(2));
+    static final Pipe.Op smat = new BaseColor(new Color(0, 0, 0, 200));
+    static final Pipe.Op blacc = Pipe.Op.compose(new BaseColor(new Color(0, 0, 0, 200)), new States.LineWidth(2));
     VertexBuf.VertexData posa;
     VertexBuf vbuf;
     Model smod, emod;
