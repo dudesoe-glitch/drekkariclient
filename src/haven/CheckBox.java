@@ -100,7 +100,8 @@ public class CheckBox extends ACheckBox {
 	return(super.mousedown(ev));
     }
 
-	public void setTextColor(String text, Color color){
-		lbl = Text.create(text, PUtils.strokeImg(Text.std.render(text, color)));
+	public void setTextColor(Color color){
+		lbl = Text.create(lbl.text, PUtils.strokeImg(Text.std.render(lbl.text, color)));
 	}
+
 }
