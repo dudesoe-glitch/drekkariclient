@@ -1662,7 +1662,7 @@ public class OptWnd extends Window {
 	public static ColorOptionWidget speedBuffAuraColorOptionWidget;
 	public static String[] speedBuffAuraColorSetting = Utils.getprefsa("speedBuffAura" + "_colorSetting", new String[]{"255", "255", "255", "140"});
 	public static CheckBox showMidgesCircleAurasCheckBox;
-	public static CheckBox showBeastDangerRadiiCheckBox;
+	public static CheckBox showDangerousBeastRadiiCheckBox;
 	public static CheckBox showBeeSkepsRadiiCheckBox;
 	public static CheckBox showFoodTroughsRadiiCheckBox;
 	public static CheckBox showMoundBedsRadiiCheckBox;
@@ -2186,16 +2186,16 @@ public class OptWnd extends Window {
 			}, middleColumn.pos("bl").adds(0, 18).x(UI.scale(240)));
 			showMidgesCircleAurasCheckBox.tooltip = showMidgesCircleAurasTooltip;
 
-			middleColumn = add(showBeastDangerRadiiCheckBox = new CheckBox("Show Beast Danger Radii"){
-				{a = (Utils.getprefb("showBeastDangerRadii", true));}
+			middleColumn = add(showDangerousBeastRadiiCheckBox = new CheckBox("Show Dangerous Beast Radii"){
+				{a = (Utils.getprefb("showDangerousBeastRadii", true));}
 				public void changed(boolean val) {
-					Utils.setprefb("showBeastDangerRadii", val);
+					Utils.setprefb("showDangerousBeastRadii", val);
 					if (ui != null && ui.gui != null) {
-						ui.sess.glob.oc.gobAction(Gob::updateBeastDangerRadii);
+						ui.sess.glob.oc.gobAction(Gob::updateDangerousBeastRadii);
 					}
 				}
 			}, middleColumn.pos("bl").adds(0, 2));
-			showBeastDangerRadiiCheckBox.tooltip = showBeastDangerRadiiTooltip;
+			showDangerousBeastRadiiCheckBox.tooltip = showDangerousBeastRadiiTooltip;
 
 			middleColumn = add(showBeeSkepsRadiiCheckBox = new CheckBox("Show Bee Skep Radii"){
 				{a = (Utils.getprefb("showBeeSkepsRadii", false));}
@@ -4689,7 +4689,7 @@ public class OptWnd extends Window {
 			"\n" +
 			"\n$col[185,185,185]{This circle is not clickable, but it shows you where exactly the speed buff is on the ground plane.}" , UI.scale(300));
 	private static final Object showMidgesCircleAurasTooltip = RichText.render("This will draw a red circle under midges, to make it easier to spot and avoid them.", UI.scale(300));
-	private static final Object showBeastDangerRadiiTooltip = RichText.render("This will draw a large red radius around dangerous animals to make it easier to spot them." +
+	private static final Object showDangerousBeastRadiiTooltip = RichText.render("This will draw a large red radius around dangerous animals to make it easier to spot them." +
 			"\n" +
 			"\n$col[200,0,0]{WARNING: This doesn't show you how close you can get to it!}" +
 			"\n" +

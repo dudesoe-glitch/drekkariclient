@@ -1270,7 +1270,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 		updateCritterAuras();
 		updateSpeedBuffAuras();
 		updateMidgesAuras();
-		updateBeastDangerRadii();
+		updateDangerousBeastRadii();
 		updateTroughsRadius();
 		updateBeeSkepRadius();
 		updateMoundBedsRadius();
@@ -1296,7 +1296,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 			isSkeleton = (poses.contains("deadskeletonpose"));
 		}
 		updateCritterAuras();
-		updateBeastDangerRadii();
+		updateDangerousBeastRadii();
 		if (this.getres().name.equals("gfx/borka/body") && isSkeleton != null && !isSkeleton){
 			checkIfPlayerOrMannequin();
 			if  (!isDeadPlayer){
@@ -1987,7 +1987,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 		}
 	}
 
-	public void updateBeastDangerRadii() {
+	public void updateDangerousBeastRadii() {
 		if (getres() != null) {
 			String resourceName = getres().name;
 			if (knocked != null && knocked == false) {
@@ -1996,10 +1996,10 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 						if (nightQueenDefeated || batWingCapeEquipped) {
 							setRadiusOverlay(false, null, 0f);
 						} else {
-							setRadiusOverlay(OptWnd.showBeastDangerRadiiCheckBox.a, new Color(192, 0, 0, 140), 120F);
+							setRadiusOverlay(OptWnd.showDangerousBeastRadiiCheckBox.a, new Color(192, 0, 0, 140), 120F);
 						}
 					} else {
-						setRadiusOverlay(OptWnd.showBeastDangerRadiiCheckBox.a, new Color(192, 0, 0, 140), 120F);
+						setRadiusOverlay(OptWnd.showDangerousBeastRadiiCheckBox.a, new Color(192, 0, 0, 140), 120F);
 					}
 				}
 			} else if (knocked != null && knocked == true) {
@@ -2013,10 +2013,10 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 						if (nightQueenDefeated || batWingCapeEquipped) {
 							setRadiusOverlay(false, null, 0f);
 						} else {
-							setRadiusOverlay(OptWnd.showBeastDangerRadiiCheckBox.a, new Color(192, 0, 0, 140), 120F);
+							setRadiusOverlay(OptWnd.showDangerousBeastRadiiCheckBox.a, new Color(192, 0, 0, 140), 120F);
 						}
 					} else {
-						setRadiusOverlay(OptWnd.showBeastDangerRadiiCheckBox.a, new Color(192, 0, 0, 140), 120F);
+						setRadiusOverlay(OptWnd.showDangerousBeastRadiiCheckBox.a, new Color(192, 0, 0, 140), 120F);
 					}
 				}
 			}

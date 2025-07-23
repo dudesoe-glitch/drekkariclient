@@ -224,7 +224,7 @@ public class Equipory extends Widget implements DTarget {
 		try {
 			if (g.resource() != null && g.resource().name.equals("gfx/invobjs/batcape")) {
 				Gob.batWingCapeEquipped = true;
-				ui.sess.glob.oc.gobAction(Gob::updateBeastDangerRadii);
+				ui.sess.glob.oc.gobAction(Gob::updateDangerousBeastRadii);
 			}
 		} catch (Exception ignored){}
 		}
@@ -256,7 +256,7 @@ public class Equipory extends Widget implements DTarget {
 		try {
 			if (i.resource() != null && i.resource().name.equals("gfx/invobjs/batcape")) {
 				Gob.batWingCapeEquipped = false;
-				ui.sess.glob.oc.gobAction(Gob::updateBeastDangerRadii);
+				ui.sess.glob.oc.gobAction(Gob::updateDangerousBeastRadii);
 			}
 		} catch (Exception ignored){}
 	}

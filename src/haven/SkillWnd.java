@@ -136,7 +136,7 @@ public class SkillWnd extends Widget {
 		try {
 			if (res.get().name.equals("paginae/exp/nightqueen")) { // ND: Bat Dungeon Experience (Defeated Bat Queen)
 				Gob.nightQueenDefeated = true;
-				ui.sess.glob.oc.gobAction(Gob::updateBeastDangerRadii);
+				ui.sess.glob.oc.gobAction(Gob::updateDangerousBeastRadii);
 			}
 		} catch (Exception ignored){}
 	}
