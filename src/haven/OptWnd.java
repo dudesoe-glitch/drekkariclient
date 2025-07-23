@@ -734,6 +734,7 @@ public class OptWnd extends Window {
 				a = val;
 			}
 		}, leftColumn.pos("bl").adds(0, 2));
+		soundAlertForFinishedCuriositiesCheckBox.tooltip = soundAlertForFinishedCuriositiesTooltip;
 
 		leftColumn = add(alwaysOpenMiniStudyOnLoginCheckBox = new CheckBox("Always Open Mini-Study on Login"){
 			{a = (Utils.getprefb("alwaysOpenMiniStudyOnLogin", false));}
@@ -851,7 +852,7 @@ public class OptWnd extends Window {
 		add(new Button(UI.scale(60), "Reset", false).action(() -> {
 			mapZoomSpeedSlider.val = 15;
 			Utils.setprefi("mapZoomSpeed", 15);
-		}), rightColumn.pos("ur").adds(6, -4));
+		}), rightColumn.pos("ur").adds(6, -4)).tooltip = resetButtonTooltip;
 
 		rightColumn = add(new Label("Map Icons Size:"), rightColumn.pos("bl").adds(0, 10).x(UI.scale(230)));
 		rightColumn = add(mapIconsSizeSlider = new HSlider(UI.scale(110), 16, 40, Utils.getprefi("mapIconsSize", 20)) {
@@ -888,7 +889,7 @@ public class OptWnd extends Window {
 				tsz = new Coord((GobIcon.size * buf.getWidth()) / buf.getHeight(), GobIcon.size);
 			buf = PUtils.convolve(buf, tsz, GobIcon.filter);
 			MiniMap.plp = new TexI(buf);
-		}), rightColumn.pos("ur").adds(6, -4));
+		}), rightColumn.pos("ur").adds(6, -4)).tooltip = resetButtonTooltip;
 
 		Widget backButton;
 		add(backButton = new PButton(UI.scale(200), "Back", 27, back, "Advanced Settings"), leftColumn.pos("bl").adds(0, 30).x(0));
@@ -1075,7 +1076,7 @@ public class OptWnd extends Window {
 			add(new Button(UI.scale(70), "Reset", false).action(() -> {
 				combatUITopPanelHeightSlider.val = 400;
 				Utils.setprefi("combatTopPanelHeight", 400);
-			}), leftColumn.pos("bl").adds(210, -20));
+			}), leftColumn.pos("bl").adds(210, -20)).tooltip = resetButtonTooltip;
 			leftColumn = add(new Label("Bottom panel height:"), leftColumn.pos("bl").adds(0, 10));
 			leftColumn = add(combatUIBottomPanelHeightSlider = new HSlider(UI.scale(200), 10, 480, Utils.getprefi("combatBottomPanelHeight", 100)) {
 				public void changed() {
@@ -1085,7 +1086,7 @@ public class OptWnd extends Window {
 			add(new Button(UI.scale(70), "Reset", false).action(() -> {
 				combatUIBottomPanelHeightSlider.val = 100;
 				Utils.setprefi("combatBottomPanelHeight", 100);
-			}), leftColumn.pos("bl").adds(210, -20));
+			}), leftColumn.pos("bl").adds(210, -20)).tooltip = resetButtonTooltip;
 
 			leftColumn = add(showEstimatedAgilityTextCheckBox = new CheckBox("Show Target Estimated Agility (Top Panel)"){
 				{a = Utils.getprefb("showEstimatedAgility", true);}
@@ -1343,7 +1344,7 @@ public class OptWnd extends Window {
 				yourselfPartyColorOptionWidget.cb.colorChooser.setColor(yourselfPartyColorOptionWidget.currentColor = new Color(255, 255, 255, 128));
 				PartyHighlight.YOURSELF_OL_COLOR = yourselfPartyColorOptionWidget.currentColor;
 				PartyCircles.YOURSELF_OL_COLOR = yourselfPartyColorOptionWidget.currentColor;
-			}), yourselfPartyColorOptionWidget.pos("ur").adds(16, 0));
+			}), yourselfPartyColorOptionWidget.pos("ur").adds(16, 0)).tooltip = resetButtonTooltip;
 			rightColumn = add(leaderPartyColorOptionWidget = new ColorOptionWidget("Leader (Party Color):", "leaderParty", 120, Integer.parseInt(leaderPartyColorSetting[0]), Integer.parseInt(leaderPartyColorSetting[1]), Integer.parseInt(leaderPartyColorSetting[2]), Integer.parseInt(leaderPartyColorSetting[3]), (Color col) -> {
 				PartyHighlight.LEADER_OL_COLOR = col;
 				PartyCircles.LEADER_OL_COLOR = col;
@@ -1353,7 +1354,7 @@ public class OptWnd extends Window {
 				leaderPartyColorOptionWidget.cb.colorChooser.setColor(leaderPartyColorOptionWidget.currentColor = new Color(0, 74, 208, 164));
 				PartyHighlight.LEADER_OL_COLOR = leaderPartyColorOptionWidget.currentColor;
 				PartyCircles.LEADER_OL_COLOR = leaderPartyColorOptionWidget.currentColor;
-			}), leaderPartyColorOptionWidget.pos("ur").adds(16, 0));
+			}), leaderPartyColorOptionWidget.pos("ur").adds(16, 0)).tooltip = resetButtonTooltip;
 			rightColumn = add(memberPartyColorOptionWidget = new ColorOptionWidget("Member (Party Color):", "memberParty", 120, Integer.parseInt(memberPartyColorSetting[0]), Integer.parseInt(memberPartyColorSetting[1]), Integer.parseInt(memberPartyColorSetting[2]), Integer.parseInt(memberPartyColorSetting[3]), (Color col) -> {
 				PartyHighlight.MEMBER_OL_COLOR = col;
 				PartyCircles.MEMBER_OL_COLOR = col;
@@ -1363,7 +1364,7 @@ public class OptWnd extends Window {
 				memberPartyColorOptionWidget.cb.colorChooser.setColor(memberPartyColorOptionWidget.currentColor = new Color(0, 160, 0, 164));
 				PartyHighlight.MEMBER_OL_COLOR = memberPartyColorOptionWidget.currentColor;
 				PartyCircles.MEMBER_OL_COLOR = memberPartyColorOptionWidget.currentColor;
-			}), memberPartyColorOptionWidget.pos("ur").adds(16, 0));
+			}), memberPartyColorOptionWidget.pos("ur").adds(16, 0)).tooltip = resetButtonTooltip;
 
 			rightColumn = add(highlightCombatFoesCheckBox = new CheckBox("Highlight Combat Foes"){
 				{a = Utils.getprefb("highlightCombatFoes", false);}
@@ -1401,7 +1402,7 @@ public class OptWnd extends Window {
 				}
 				haven.sprites.CurrentAggroSprite.col = new BaseColor(combatFoeColorOptionWidget.currentColor);
 				refreshCurrentTargetSpriteColor = true;
-			}), combatFoeColorOptionWidget.pos("ur").adds(16, 0));
+			}), combatFoeColorOptionWidget.pos("ur").adds(16, 0)).tooltip = resetButtonTooltip;
 
 			rightColumn = add(new Label("Target Sprite Size:"), rightColumn.pos("bl").adds(0, 4).xs(325));
 			rightColumn.tooltip = targetSpriteTooltip;
@@ -1730,6 +1731,7 @@ public class OptWnd extends Window {
 								}
 							},
 							dpy);
+					leftColumn.tooltip = granularityPositionTooltip;
 				}
 				{
 					Label dpy = new Label("");
@@ -1755,6 +1757,7 @@ public class OptWnd extends Window {
 								}
 							},
 							dpy);
+					leftColumn.tooltip = granularityAngleTooltip;
 				}
 			}
 			leftColumn = add(highlightCliffsCheckBox = new CheckBox("Highlight Cliffs (Color Overlay)"){
@@ -1783,6 +1786,8 @@ public class OptWnd extends Window {
 				if (ui.sess != null)
 					ui.sess.glob.map.invalidateAll();
 			}), leftColumn.pos("ur").adds(10, 0));
+			leftColumn.tooltip = resetButtonTooltip;
+
 			leftColumn = add(showContainerFullnessCheckBox = new CheckBox("Highlight Container Fullness:"){
 				{a = (Utils.getprefb("showContainerFullness", true));}
 				public void changed(boolean val) {
@@ -1817,7 +1822,7 @@ public class OptWnd extends Window {
 					ui.sess.glob.oc.gobAction(Gob::updateContainerFullnessHighlight);
 					ui.gui.map.updatePlobContainerHighlight();
 				}
-			}), showContainerFullnessFullColorOptionWidget.pos("ur").adds(10, 0));
+			}), showContainerFullnessFullColorOptionWidget.pos("ur").adds(10, 0)).tooltip = resetButtonTooltip;
 			leftColumn = add(showContainerFullnessPartialCheckBox = new CheckBox("Partial"){
 				{a = (Utils.getprefb("showContainerFullnessPartial", true));}
 				public void changed(boolean val) {
@@ -1841,7 +1846,7 @@ public class OptWnd extends Window {
 					ui.sess.glob.oc.gobAction(Gob::updateContainerFullnessHighlight);
 					ui.gui.map.updatePlobContainerHighlight();
 				}
-			}), showContainerFullnessPartialColorOptionWidget.pos("ur").adds(10, 0));
+			}), showContainerFullnessPartialColorOptionWidget.pos("ur").adds(10, 0)).tooltip = resetButtonTooltip;
 			leftColumn = add(showContainerFullnessEmptyCheckBox = new CheckBox("Empty"){
 				{a = (Utils.getprefb("showContainerFullnessEmpty", true));}
 				public void changed(boolean val) {
@@ -1866,7 +1871,7 @@ public class OptWnd extends Window {
 					ui.sess.glob.oc.gobAction(Gob::updateContainerFullnessHighlight);
 					ui.gui.map.updatePlobContainerHighlight();
 				}
-			}), showContainerFullnessEmptyColorOptionWidget.pos("ur").adds(10, 0));
+			}), showContainerFullnessEmptyColorOptionWidget.pos("ur").adds(10, 0)).tooltip = resetButtonTooltip;
 			leftColumn = add(showWorkstationProgressCheckBox = new CheckBox("Highlight Workstation Progress:"){
 				{a = (Utils.getprefb("showWorkstationProgress", true));}
 				public void changed(boolean val) {
@@ -1901,7 +1906,7 @@ public class OptWnd extends Window {
 					ui.sess.glob.oc.gobAction(Gob::updateWorkstationProgressHighlight);
 					ui.gui.map.updatePlobWorkstationProgressHighlight();
 				}
-			}), showWorkstationProgressFinishedColorOptionWidget.pos("ur").adds(10, 0));
+			}), showWorkstationProgressFinishedColorOptionWidget.pos("ur").adds(10, 0)).tooltip = resetButtonTooltip;
 			leftColumn = add(showWorkstationProgressInProgressCheckBox = new CheckBox("In progress"){
 				{a = (Utils.getprefb("showWorkstationProgressInProgress", true));}
 				public void changed(boolean val) {
@@ -1925,7 +1930,7 @@ public class OptWnd extends Window {
 					ui.sess.glob.oc.gobAction(Gob::updateWorkstationProgressHighlight);
 					ui.gui.map.updatePlobWorkstationProgressHighlight();
 				}
-			}), showWorkstationProgressInProgressColorOptionWidget.pos("ur").adds(10, 0));
+			}), showWorkstationProgressInProgressColorOptionWidget.pos("ur").adds(10, 0)).tooltip = resetButtonTooltip;
 			leftColumn = add(showWorkstationProgressReadyForUseCheckBox = new CheckBox("Ready for use"){
 				{a = (Utils.getprefb("showWorkstationProgressReadyForUse", true));}
 				public void changed(boolean val) {
@@ -1949,7 +1954,7 @@ public class OptWnd extends Window {
 					ui.sess.glob.oc.gobAction(Gob::updateWorkstationProgressHighlight);
 					ui.gui.map.updatePlobWorkstationProgressHighlight();
 				}
-			}), showWorkstationProgressReadyForUseColorOptionWidget.pos("ur").adds(10, 0));
+			}), showWorkstationProgressReadyForUseColorOptionWidget.pos("ur").adds(10, 0)).tooltip = resetButtonTooltip;
 			leftColumn = add(showWorkstationProgressUnpreparedCheckBox = new CheckBox("Unprepared"){
 				{a = (Utils.getprefb("showWorkstationProgressUnprepared", true));}
 				public void changed(boolean val) {
@@ -1973,7 +1978,7 @@ public class OptWnd extends Window {
 					ui.sess.glob.oc.gobAction(Gob::updateWorkstationProgressHighlight);
 					ui.gui.map.updatePlobWorkstationProgressHighlight();
 				}
-			}), showWorkstationProgressUnpreparedColorOptionWidget.pos("ur").adds(10, 0));
+			}), showWorkstationProgressUnpreparedColorOptionWidget.pos("ur").adds(10, 0)).tooltip = resetButtonTooltip;
 			leftColumn = add(showMineSupportRadiiCheckBox = new CheckBox("Show Mine Support Radii"){
 				{a = (Utils.getprefb("showMineSupportRadii", false));}
 				public void set(boolean val) {
@@ -2014,6 +2019,7 @@ public class OptWnd extends Window {
 			enableMineSweeperCheckBox.tooltip = enableMineSweeperTooltip;
 			leftColumn = add(new Label("Sweeper Display Duration (Min):"), leftColumn.pos("bl").adds(0, 2));
 			leftColumn.tooltip = RichText.render("Use this to set how long you want the numbers to be displayed on the ground, in minutes. The numbers will be visible as long as the dust particle effect stays on the tile." +
+					"\n" +
 					"\n$col[218,163,0]{Note:} $col[185,185,185]{Changing this option will only affect the duration of newly spawned cave dust tiles. The duration is set once the wall tile is mined and the cave dust spawns in.}", UI.scale(300));
 			add(sweeperDurationDropbox = new OldDropBox<Integer>(UI.scale(40), sweeperDurations.size(), UI.scale(17)) {
 				{
@@ -2081,7 +2087,7 @@ public class OptWnd extends Window {
 					ui.sess.glob.oc.gobAction(Gob::updateCollisionBoxes);
 					ui.gui.map.updatePlobCollisionBox();
 				}
-			}), collisionBoxColorOptionWidget.pos("ur").adds(10, 0));
+			}), collisionBoxColorOptionWidget.pos("ur").adds(10, 0)).tooltip = resetButtonTooltip;
 
 			middleColumn = add(displayObjectDurabilityPercentageCheckBox = new CheckBox("Display Object Durability Percentage"){
 				{a = (Utils.getprefb("displayObjectHealthPercentage", true));}
@@ -2117,7 +2123,7 @@ public class OptWnd extends Window {
 				if (ui != null && ui.gui != null) {
 					ui.sess.glob.oc.gobAction(Gob::updateCritterAuras);
 				}
-			}), rabbitAuraColorOptionWidget.pos("ur").adds(10, 0));
+			}), rabbitAuraColorOptionWidget.pos("ur").adds(10, 0)).tooltip = resetButtonTooltip;
 			middleColumn = add(genericCritterAuraColorOptionWidget = new ColorOptionWidget("Generic Critter Aura:", "genericCritterAura", 115, Integer.parseInt(genericCritterAuraColorSetting[0]), Integer.parseInt(genericCritterAuraColorSetting[1]), Integer.parseInt(genericCritterAuraColorSetting[2]), Integer.parseInt(genericCritterAuraColorSetting[3]), (Color col) -> {
 				if (ui != null && ui.gui != null) {
 					ui.sess.glob.oc.gobAction(Gob::updateCritterAuras);
@@ -2129,7 +2135,7 @@ public class OptWnd extends Window {
 				if (ui != null && ui.gui != null) {
 					ui.sess.glob.oc.gobAction(Gob::updateCritterAuras);
 				}
-			}), genericCritterAuraColorOptionWidget.pos("ur").adds(10, 0));
+			}), genericCritterAuraColorOptionWidget.pos("ur").adds(10, 0)).tooltip = resetButtonTooltip;
 
 			middleColumn = add(showSpeedBuffAurasCheckBox = new CheckBox("Show Speed Buff Circle Auras"){
 				{a = (Utils.getprefb("showSpeedBuffAuras", true));}
@@ -2152,7 +2158,7 @@ public class OptWnd extends Window {
 				if (ui != null && ui.gui != null) {
 					ui.sess.glob.oc.gobAction(Gob::updateSpeedBuffAuras);
 				}
-			}), speedBuffAuraColorOptionWidget.pos("ur").adds(10, 0));
+			}), speedBuffAuraColorOptionWidget.pos("ur").adds(10, 0)).tooltip = resetButtonTooltip;
 
 			middleColumn = add(showMidgesCircleAurasCheckBox = new CheckBox("Show Midges Circle Auras"){
 				{a = (Utils.getprefb("showMidgesCircleAuras", true));}
@@ -2245,13 +2251,13 @@ public class OptWnd extends Window {
 			add(new Button(UI.scale(70), "Reset", false).action(() -> {
 				Utils.setprefsa("areaChatPing" + "_colorSetting", new String[]{"255", "183", "0", "255"});
 				areaChatPingColorOptionWidget.cb.colorChooser.setColor(areaChatPingColorOptionWidget.currentColor = new Color(255, 183, 0, 255));
-			}), areaChatPingColorOptionWidget.pos("ur").adds(10, 0));
+			}), areaChatPingColorOptionWidget.pos("ur").adds(10, 0)).tooltip = resetButtonTooltip;
 			rightColumn = add(partyChatPingColorOptionWidget = new ColorOptionWidget("Party Chat (Alt+RClick):", "partyChatPing", 115, Integer.parseInt(partyChatPingColorSetting[0]), Integer.parseInt(partyChatPingColorSetting[1]), Integer.parseInt(partyChatPingColorSetting[2]), Integer.parseInt(partyChatPingColorSetting[3]), (Color col) -> {
 			}){}, rightColumn.pos("bl").adds(0, 4));
 			add(new Button(UI.scale(70), "Reset", false).action(() -> {
 				Utils.setprefsa("partyChatPing" + "_colorSetting", new String[]{"243", "0", "0", "255"});
 				partyChatPingColorOptionWidget.cb.colorChooser.setColor(partyChatPingColorOptionWidget.currentColor = new Color(243, 0, 0, 255));
-			}), partyChatPingColorOptionWidget.pos("ur").adds(10, 0));
+			}), partyChatPingColorOptionWidget.pos("ur").adds(10, 0)).tooltip = resetButtonTooltip;
 			rightColumn = add(showObjectsSpeedCheckBox = new CheckBox("Show Objects Speed"){
 				{a = Utils.getprefb("showObjectsSpeed", false);}
 				public void changed(boolean val) {
@@ -2390,6 +2396,7 @@ public class OptWnd extends Window {
 				q7ColorOptionWidget.cb.colorChooser.setColor(q7ColorOptionWidget.currentColor = new Color(255, 0, 0, 255));
 				if (ui != null && ui.gui != null) ui.gui.reloadAllItemOverlays();
 			}), prev.pos("ur").adds(30, 0));
+			prev.tooltip = resetButtonTooltip;
 
 			prev = add(q6ColorTextEntry = new TextEntry(UI.scale(60), Utils.getpref("q6ColorTextEntry", "300")){
 				protected void changed() {
@@ -2407,6 +2414,7 @@ public class OptWnd extends Window {
 				Utils.setprefsa("q6ColorSetting_colorSetting", new String[]{"255","114","0","255"});
 				q6ColorOptionWidget.cb.colorChooser.setColor(q6ColorOptionWidget.currentColor = new Color(255, 114, 0, 255));
 			}), prev.pos("ur").adds(30, 0));
+			prev.tooltip = resetButtonTooltip;
 
 			prev = add(q5ColorTextEntry = new TextEntry(UI.scale(60), Utils.getpref("q5ColorTextEntry", "200")){
 				protected void changed() {
@@ -2425,6 +2433,7 @@ public class OptWnd extends Window {
 				q5ColorOptionWidget.cb.colorChooser.setColor(q5ColorOptionWidget.currentColor = new Color(165, 0, 255, 255));
 				if (ui != null && ui.gui != null) ui.gui.reloadAllItemOverlays();
 			}), prev.pos("ur").adds(30, 0));
+			prev.tooltip = resetButtonTooltip;
 
 			prev = add(q4ColorTextEntry = new TextEntry(UI.scale(60), Utils.getpref("q4ColorTextEntry", "100")){
 				protected void changed() {
@@ -2443,6 +2452,7 @@ public class OptWnd extends Window {
 				q4ColorOptionWidget.cb.colorChooser.setColor(q4ColorOptionWidget.currentColor = new Color(0, 131, 255, 255));
 				if (ui != null && ui.gui != null) ui.gui.reloadAllItemOverlays();
 			}), prev.pos("ur").adds(30, 0));
+			prev.tooltip = resetButtonTooltip;
 
 			prev = add(q3ColorTextEntry = new TextEntry(UI.scale(60), Utils.getpref("q3ColorTextEntry", "50")){
 				protected void changed() {
@@ -2461,7 +2471,7 @@ public class OptWnd extends Window {
 				q3ColorOptionWidget.cb.colorChooser.setColor(q3ColorOptionWidget.currentColor = new Color(0, 214, 10, 255));
 				if (ui != null && ui.gui != null) ui.gui.reloadAllItemOverlays();
 			}), prev.pos("ur").adds(30, 0));
-
+			prev.tooltip = resetButtonTooltip;
 
 			prev = add(q2ColorTextEntry = new TextEntry(UI.scale(60), Utils.getpref("q2ColorTextEntry", "10")){
 				protected void changed() {
@@ -2480,6 +2490,7 @@ public class OptWnd extends Window {
 				q2ColorOptionWidget.cb.colorChooser.setColor(q2ColorOptionWidget.currentColor = new Color(255, 255, 255, 255));
 				if (ui != null && ui.gui != null) ui.gui.reloadAllItemOverlays();
 			}), prev.pos("ur").adds(30, 0));
+			prev.tooltip = resetButtonTooltip;
 
 			prev = add(q1ColorTextEntry = new TextEntry(UI.scale(60), Utils.getpref("q1ColorTextEntry", "1")){
 				protected void changed() {
@@ -2498,6 +2509,7 @@ public class OptWnd extends Window {
 				q1ColorOptionWidget.cb.colorChooser.setColor(q1ColorOptionWidget.currentColor = new Color(180, 180, 180, 255));
 				if (ui != null && ui.gui != null) ui.gui.reloadAllItemOverlays();
 			}), prev.pos("ur").adds(30, 0));
+			prev.tooltip = resetButtonTooltip;
 
 			Widget backButton;
 			add(backButton = new PButton(UI.scale(200), "Back", 27, back, "Advanced Settings"), prev.pos("bl").adds(0, 18).x(0));
@@ -2568,11 +2580,6 @@ public class OptWnd extends Window {
 	    y = addbtn(cont, "Display Tile Grid", MapView.kb_grid, y);
 
 	    y = cont.adda(new Label("Camera control"), cont.sz.x / 2, y + UI.scale(10), 0.5, 0.0).pos("bl").adds(0, 5).y;
-//	    y = addbtn(cont, "Rotate left", MapView.kb_camleft, y);
-//	    y = addbtn(cont, "Rotate right", MapView.kb_camright, y);
-//	    y = addbtn(cont, "Zoom in", MapView.kb_camin, y);
-//	    y = addbtn(cont, "Zoom out", MapView.kb_camout, y);
-//	    y = addbtn(cont, "Reset", MapView.kb_camreset, y);
 		y = addbtn(cont, "Snap North", MapView.kb_camSnapNorth, y);
 		y = addbtn(cont, "Snap South", MapView.kb_camSnapSouth, y);
 		y = addbtn(cont, "Snap East", MapView.kb_camSnapEast, y);
@@ -3411,19 +3418,21 @@ public class OptWnd extends Window {
 					}
 				}
 			}, leftColumn.pos("bl").adds(0, 12));
+			hideFlavorObjectsCheckBox.tooltip = hideFlavorObjectsTooltip;
 			leftColumn = add(simplifiedCropsCheckBox = new CheckBox("Simplified Crops (Requires Reload)"){
 				{a = Utils.getprefb("simplifiedCrops", false);}
 				public void changed(boolean val) {
 					Utils.setprefb("simplifiedCrops", val);
 				}
 			}, leftColumn.pos("bl").adds(0, 2));
+			simplifiedCropsCheckBox.tooltip = simplifiedCropsTooltip;
 			leftColumn = add(simplifiedForageablesCheckBox = new CheckBox("Simplified Forageables (Requires Reload)"){
 				{a = Utils.getprefb("simplifiedForageables", false);}
 				public void changed(boolean val) {
 					Utils.setprefb("simplifiedForageables", val);
 				}
 			}, leftColumn.pos("bl").adds(0, 2));
-			hideFlavorObjectsCheckBox.tooltip = hideFlavorObjectsTooltip;
+			simplifiedForageablesCheckBox.tooltip = simplifiedForageablesTooltip;
 			leftColumn = add(flatCaveWallsCheckBox = new CheckBox("Flat Cave Walls"){
 				{a = Utils.getprefb("flatCaveWalls", false);}
 				public void changed(boolean val) {
@@ -3434,6 +3443,7 @@ public class OptWnd extends Window {
 						ui.gui.optionInfoMsg("Flat Cave Walls are now " + (val ? "ENABLED" : "DISABLED") + "!", (val ? msgGreen : msgRed), Audio.resclip(val ? Toggle.sfxon : Toggle.sfxoff));
 				}
 			}, leftColumn.pos("bl").adds(0, 12));
+			flatCaveWallsCheckBox.tooltip = flatCaveWallsTooltip;
 			leftColumn = add(straightCliffEdgesCheckBox = new CheckBox("Straight Cliff Edges"){
 				{a = Utils.getprefb("straightCliffEdges", false);}
 				public void changed(boolean val) {
@@ -3444,6 +3454,7 @@ public class OptWnd extends Window {
 						ui.gui.optionInfoMsg("Straight Cliff Edges are now " + (val ? "ENABLED" : "DISABLED") + "!", (val ? msgGreen : msgRed), Audio.resclip(val ? Toggle.sfxon : Toggle.sfxoff));
 				}
 			}, leftColumn.pos("bl").adds(0, 2));
+			straightCliffEdgesCheckBox.tooltip = straightCliffEdgesTooltip;
 			leftColumn = add(new Label("Other Altered Objects:"), leftColumn.pos("bl").adds(0, 10).x(UI.scale(0)));
 			leftColumn = add(flatCupboardsCheckBox = new CheckBox("Flat Cupboards"){
 				{a = (Utils.getprefb("flatCupboards", true));}
@@ -3458,6 +3469,7 @@ public class OptWnd extends Window {
 					}
 				}
 			}, leftColumn.pos("bl").adds(12, 8));
+			flatCupboardsCheckBox.tooltip = flatCupboardsTooltip;
 
 			// TODO: ND: Would be nice if this was a scrollable list with selectable items, rather than individual checkboxes
 			leftColumn = add(new Label("Disable Variable Materials for Objects:"), leftColumn.pos("bl").adds(0, 10).x(UI.scale(0)));
@@ -3498,7 +3510,7 @@ public class OptWnd extends Window {
 				}
 			}, leftColumn.pos("bl").adds(0, 2));
 
-			leftColumn = add(disableAllObjectsVarMatsCheckBox = new CheckBox("ALL OBJECTS Variable Materials (you weirdo)"){
+			leftColumn = add(disableAllObjectsVarMatsCheckBox = new CheckBox("ALL OBJECTS Variable Materials (YES, ALL!)"){
 				{a = (Utils.getprefb("disableAllObjectsVarMats", false));}
 				public void changed(boolean val) {
 					Utils.setprefb("disableAllObjectsVarMats", val);
@@ -3526,14 +3538,13 @@ public class OptWnd extends Window {
 			}), leftColumn.pos("bl").adds(210, -20));
 			palisadeAndWallScaleResetButton.tooltip = resetButtonTooltip;
 
-
 			rightColumn = add(enableSkyboxCheckBox = new CheckBox("Enable Skybox"){
 				{a = (Utils.getprefb("enableSkybox", false));}
 				public void changed(boolean val) {
 					Utils.setprefb("enableSkybox", val);
 				}
-			}, UI.scale(290, 0));
-
+			}, UI.scale(302, 0));
+			enableSkyboxCheckBox.tooltip = enableSkyboxTooltip;
 
 			rightColumn = add(new Label("Skybox Style:"), rightColumn.pos("bl").adds(0, 4));
 			List<String> skyboxStyles = Arrays.asList("Clouds", "Galaxy");
@@ -3656,7 +3667,7 @@ public class OptWnd extends Window {
 				}
 			}, rightColumn.pos("bl").adds(0, 2));
 
-			rightColumn = add(disableRainCheckBox = new CheckBox("Disable Rain"){
+			rightColumn = add(disableRainCheckBox = new CheckBox("Disable Raining Particles"){
 				{a = (Utils.getprefb("disableRain", false));}
 				public void changed(boolean val) {
 					Utils.setprefb("disableRain", val);
@@ -3670,7 +3681,7 @@ public class OptWnd extends Window {
 				}
 			}, rightColumn.pos("bl").adds(0, 2));
 
-			rightColumn = add(disableSnowingCheckBox = new CheckBox("Disable Snowing"){
+			rightColumn = add(disableSnowingCheckBox = new CheckBox("Disable Snowing Particles"){
 				{a = (Utils.getprefb("disableSnowing", false));}
 				public void changed(boolean val) {
 					Utils.setprefb("disableSnowing", val);
@@ -3808,6 +3819,7 @@ public class OptWnd extends Window {
 					ui.gui.map.updatePlobHidingBox();
 				}
 			}), prev.pos("ur").adds(30, 0));
+			prev.tooltip = resetButtonTooltip;
 
 			prev = add(new Label("Objects that will be hidden:"), prev.pos("bl").adds(0, 20).x(0));
 
@@ -4528,77 +4540,78 @@ public class OptWnd extends Window {
 
 	// ND: Setting Tooltips
 	// Interface Settings Tooltips
-	private final Object interfaceScaleTooltip = RichText.render("$col[218,163,0]{Warning:} This setting is by no means perfect, and it can mess up many UI related things." +
+	private static final Object interfaceScaleTooltip = RichText.render("$col[218,163,0]{Warning:} This setting is by no means perfect, and it can mess up many UI related things." +
 			"\nSome windows might just break when this is set above 1.00x." +
 			"\n" +
 			"\n$col[185,185,185]{I really try my best to support this setting, but I can't guarantee everything will work." +
 			"\nUnless you're on a 4K or 8K display, I'd keep this at 1.00x.}", UI.scale(300));
-	private final Object simplifiedUIThemeCheckBoxTooltip = RichText.render("$col[185,185,185]{A more boring theme for the UI...}", UI.scale(300));
-	private final Object extendedMouseoverInfoTooltip = RichText.render("Holding Ctrl+Shift shows the Resource Path when mousing over Objects or Tiles. " +
-			"\nEnabling this setting will add a lot of additional information on top of that." +
+	private static final Object simplifiedUIThemeCheckBoxTooltip = RichText.render("$col[185,185,185]{A more boring theme for the UI...}", UI.scale(300));
+	private static final Object extendedMouseoverInfoTooltip = RichText.render("Holding Ctrl+Shift shows the Resource Path when mousing over Objects or Tiles. " +
+			"\nThis setting will add a lot of additional information on top of that." +
 			"\n" +
 			"\n$col[185,185,185]{Unless you're a client dev, you don't really need to enable this setting, like ever.}", UI.scale(300));
-	private final Object disableMenuGridHotkeysTooltip = RichText.render("This completely disables the hotkeys for the action buttons & categories in the bottom right corner menu (aka the menu grid)." +
+	private static final Object disableMenuGridHotkeysTooltip = RichText.render("This completely disables the hotkeys for the action buttons & categories in the bottom right corner menu (aka the menu grid)." +
 			"\n" +
 			"\n$col[185,185,185]{Your action bar keybinds are NOT affected by this setting.}", UI.scale(300));
 
-	private final Object alwaysOpenBeltOnLoginTooltip = RichText.render("Enabling this will cause your belt window to always open when you log in." +
+	private static final Object alwaysOpenBeltOnLoginTooltip = RichText.render("This will cause your belt window to always open when you log in." +
 			"\n" +
 			"\n$col[185,185,185]{By default, Loftar saves the status of the belt at logout. So if you don't enable this setting, but leave the belt window open when you log out/exit the game, it will still open on login.}", UI.scale(300));
-	private final Object showMapMarkerNamesTooltip = RichText.render("$col[185,185,185]{The marker names are NOT visible in compact mode.}", UI.scale(320));
-	private final Object verticalContainerIndicatorsTooltip = RichText.render("Orientation for inventory container indicators." +
+	private static final Object showMapMarkerNamesTooltip = RichText.render("$col[185,185,185]{The marker names are NOT visible in compact mode.}", UI.scale(320));
+	private static final Object verticalContainerIndicatorsTooltip = RichText.render("Orientation for inventory container indicators." +
 			"\n" +
 			"\n$col[185,185,185]{For example, the amount of water in waterskins, seeds in a bucket, etc.}", UI.scale(230));
-	private final Object experienceWindowLocationTooltip = RichText.render("Select where you want the experience event pop-up window to show up." +
+	private static final Object experienceWindowLocationTooltip = RichText.render("Select where you want the experience event pop-up window to show up." +
 			"\n" +
 			"\n$col[185,185,185]{The default client pops it up in the middle of your screen, which can be annoying.}", UI.scale(300));
 
-	private final Object showFramerateTooltip = RichText.render("Shows the current FPS in the top-right corner of the game window.", UI.scale(300));
-	private final Object snapWindowsBackInsideTooltip = RichText.render("Enabling this will cause most windows, that are not too large, to be fully snapped back into your game's window." +
+	private static final Object showFramerateTooltip = RichText.render("Shows the current FPS in the top-right corner of the game window.", UI.scale(300));
+	private static final Object snapWindowsBackInsideTooltip = RichText.render("This will cause most windows, that are not too large, to be fully snapped back into your game's window." +
 			"\nBy default, when you try to drag a window outside of your game window, it will only pop 25% of it back in." +
 			"\n" +
 			"\n$col[185,185,185]{Very large windows are not affected by this setting. Only the 25% rule applies to them." +
 			"\nThe map window is always fully snapped back.}", UI.scale(300));
-	private final Object dragWindowsInWhenResizingTooltip = RichText.render("Enabling this will force ALL windows to be dragged back inside the game window, whenever you resize it." +
+	private static final Object dragWindowsInWhenResizingTooltip = RichText.render("This will force ALL windows to be dragged back inside the game window, whenever you resize it." +
 			"\n" +
 			"\n$col[185,185,185]{Without this setting, windows remain in the same spot when you resize your game window, even if they end up outside of it. They will only come back if closed and reopened (for example, via keybinds)", UI.scale(300));
-	private final Object showQuickSlotsTooltip = RichText.render("Just a small interactable widget that shows your hands, belt, backpack and cape slots, so you don't have to open your equipment window." +
+	private static final Object showQuickSlotsTooltip = RichText.render("Just a small interactable widget that shows your hands, belt, backpack and cape slots, so you don't have to open your equipment window." +
 			"\nTo drag this widget to a new position: hold down Shift, click and drag." +
 			"\n" +
 			"\n$col[185,185,185]{Your quick-switch keybinds ('Right Hand' and 'Left Hand') are NOT affected by this setting.}", UI.scale(300));
-	private final Object showStudyReportHistoryTooltip = RichText.render("Shows what curiosity was formerly placed in each slot. The history is saved separately for every character and account." +
+	public static final Object showStudyReportHistoryTooltip = RichText.render("Shows what curiosity was formerly placed in each slot. " +
+			"\nThe history is saved separately for every character, on every account." +
 			"\n" +
 			"\n$col[185,185,185]{It doesn't work with Gems. Don't ask me why.}", UI.scale(300));
-	private final Object lockStudyReportTooltip = RichText.render("Enabling this will prevent moving or dropping items from the Study Report", UI.scale(300));
-	private final Object alwaysShowCombatUiBarTooltip = RichText.render("For more options for this bar, check the Combat Settings.", UI.scale(320));
+	static final Object lockStudyReportTooltip = RichText.render("This will prevent grabbing or dropping items from the Study Report", UI.scale(300));
+	private static final Object alwaysShowCombatUiBarTooltip = RichText.render("For more options for this bar, check the Combat Settings.", UI.scale(320));
 
 	// Combat Settings Tooltips
-	private final Object singleRowCombatMovesTooltip = RichText.render("If this is enabled, the Bottom Panel combat moves will be shown in just one row, rather than two.", UI.scale(300));
-	private final Object showDamagePredictUITooltip = RichText.render("If this is enabled, Combat Moves that can deal damage will display a number below them." +
+	private static final Object singleRowCombatMovesTooltip = RichText.render("If this is enabled, the Bottom Panel combat moves will be shown in just one row, rather than two.", UI.scale(300));
+	private static final Object showDamagePredictUITooltip = RichText.render("If this is enabled, Combat Moves that can deal damage will display a number below them." +
 			"\n" +
 			"\nThis is calculated depending on the following:" +
 			"\n$col[185,185,185]{- How high your current target's $col[218,163,0]{Openings} are (depending on the openings the combat move applies to)" +
 			"\n- How much total $col[218,163,0]{Strength} your character has" +
 			"\n- How much $col[218,163,0]{Damage} your currently equipped $col[218,163,0]{Weapon} has (if the move uses the weapon)}", UI.scale(320));
-	private final Object damageInfoClearTooltip = RichText.render("Clears all damage info." +
+	private static final Object damageInfoClearTooltip = RichText.render("Clears all damage info." +
 			"\n$col[218,163,0]{Action Button:} $col[185,185,185]{This setting can also be turned on/off using an action button from the menu grid (Custom Client Extras → Toggles).}", UI.scale(320));
-	private final Object onlyShowOpeningsAbovePercentageCombatInfoTooltip = RichText.render("Only show the combat info openings if at least one of them is above the set number. If one of them is above that, show all of them." +
+	private static final Object onlyShowOpeningsAbovePercentageCombatInfoTooltip = RichText.render("Only show the combat info openings if at least one of them is above the set number. If one of them is above that, show all of them." +
 			"\n" +
 			"\nThis does NOT apply to your current target, only other combat foes.}", UI.scale(320));
-	private final Object showCombatOpeningsAsLettersTooltip = RichText.render("Enabling this will change the openings from full squares into colored letters. For example, the red square will become a colored R, blue will become B, etc." +
-			"\nThe color settings from below still apply to the letters." +
+	private static final Object showCombatOpeningsAsLettersTooltip = RichText.render("This will change the openings from full squares into colored letters. For example, the red square will become a colored R, blue will become B, etc." +
 			"\n" +
+			"\n$col[185,185,185]{The color settings from below still apply to the letters.}" +
 			"\n$col[185,185,185]{I only added this as an extra aid for colorblind people, but I doubt anybody will use it...}", UI.scale(300));
-	private final Object highlightPartyMembersTooltip = RichText.render("Enabling this will put a color highlight over all party members." +
+	private static final Object highlightPartyMembersTooltip = RichText.render("This will put a color highlight over all party members." +
 			"\n" +
 			"\n$col[185,185,185]{If you are the party leader, your color highlight will always be the $col[218,163,0]{Leader's Color}, regardless of what you set $col[218,163,0]{Your Color} to.}", UI.scale(310));
-	private final Object showCirclesUnderPartyMembersTooltip = RichText.render("Enabling this will put a colored circle under all party members." +
+	private static final Object showCirclesUnderPartyMembersTooltip = RichText.render("This will put a colored circle under all party members." +
 			"\n" +
 			"\n$col[185,185,185]{If you are the party leader, your circle's color will always be the $col[218,163,0]{Leader's Color}, regardless of what you set $col[218,163,0]{Your Color} to.}", UI.scale(300));
-	private final Object highlightCombatFoesTooltip = RichText.render("Enabling this will put a color highlight over all enemies that you are currently in combat with.", UI.scale(310));
-	private final Object showCirclesUnderCombatFoesTooltip = RichText.render("Enabling this will put a colored circle under all enemies that you are currently in combat with.", UI.scale(300));
-	private final Object targetSpriteTooltip = RichText.render("The target sprite uses the same color you set for Combat Foes.", UI.scale(300));
-	private final Object drawChaseVectorsTooltip = RichText.render("If this setting is enabled, colored lines will be drawn between chasers and chased targets." +
+	private static final Object highlightCombatFoesTooltip = RichText.render("This will put a color highlight over all enemies that you are currently in combat with.", UI.scale(310));
+	private static final Object showCirclesUnderCombatFoesTooltip = RichText.render("This will put a colored circle under all enemies that you are currently in combat with.", UI.scale(300));
+	private static final Object targetSpriteTooltip = RichText.render("The target sprite uses the same color you set for Combat Foes.", UI.scale(300));
+	private static final Object drawChaseVectorsTooltip = RichText.render("If this setting is enabled, colored lines will be drawn between chasers and chased targets." +
 			"\n=====================" +
 			"\n$col[255,255,255]{White: }You are the chaser." +
 			"\n$col[0,160,0]{Green: }A party member is the chaser." +
@@ -4607,14 +4620,16 @@ public class OptWnd extends Window {
 			"\n=====================" +
 			"\n$col[218,163,0]{Note:} $col[185,185,185]{Chase vectors include queuing attacks, clicking a critter to pick up, or simply following someone.}" +
 			"\n$col[218,163,0]{Disclaimer:} $col[185,185,185]{Chase vectors sometimes don't show when chasing a critter that is standing still. The client treats this as something else for some reason and I can't fix it.}", UI.scale(430));
-	private final Object drawYourCurrentPathTooltip = RichText.render("When this is enabled, a straight line will be drawn between your character and wherever you clicked" +
+	private static final Object drawYourCurrentPathTooltip = RichText.render("When this is enabled, a straight line will be drawn between your character and wherever you clicked" +
 			"\n" +
 			"\n$col[185,185,185]{You can use this to make sure you won't run into a tree or something, I guess.}", UI.scale(300));
 
 	// Display Settings Tooltips
-	private final Object granularityPositionTooltip = RichText.render("Equivalent of the :placegrid console command, this allows you to have more freedom when placing constructions/objects.", UI.scale(300));
-	private final Object granularityAngleTooltip = RichText.render("Equivalent of the :placeangle console command, this allows you to have more freedom when rotating constructions/objects before placement.", UI.scale(300));
-	private final Object displayGrowthInfoTooltip = RichText.render("Enabling this will show the following growth information:" +
+	private static final Object granularityPositionTooltip = RichText.render("This works like the :placegrid console command. " +
+			"\nIt allows you to have more freedom when placing constructions/objects.", UI.scale(300));
+	private static final Object granularityAngleTooltip = RichText.render("This works like the :placeangle console command. " +
+			"\nIt allows you to have more freedom when rotating constructions/objects before placement.", UI.scale(300));
+	private static final Object displayGrowthInfoTooltip = RichText.render("This will show the following growth information:" +
 			"\n" +
 			"\n> Trees and Bushes will display their growth percentage (below 100%) and extra size percentage, if you enable the \"Also Show Trees Above %\" setting." +
 			"\n$col[185,185,185]{If a Tree or Bush is not showing a percentage below 100%, that means it reached full growth.}" +
@@ -4623,95 +4638,95 @@ public class OptWnd extends Window {
 			"\n$col[185,185,185]{Crops with a seeds stage (carrots, turnips, leeks, etc.) will also display a blue dot during the seeds stage.}" +
 			"\n" +
 			"\n$col[218,163,0]{Keybind:} $col[185,185,185]{This can also be toggled using a keybind.}", UI.scale(330));
-	private final Object highlightCliffsTooltip = RichText.render("$col[218,163,0]{Action Button:} $col[185,185,185]{This setting can also be turned on/off using an action button from the menu grid (Custom Client Extras → Toggles).}", UI.scale(320));
-	private final Object showContainerFullnessTooltip = RichText.render("Colors containers (Cupboards, Chests, Crates, etc.), depending on how much stuff is in them." +
+	private static final Object highlightCliffsTooltip = RichText.render("$col[218,163,0]{Action Button:} $col[185,185,185]{This setting can also be turned on/off using an action button from the menu grid (Custom Client Extras → Toggles).}", UI.scale(320));
+	private static final Object showContainerFullnessTooltip = RichText.render("Colors containers (Cupboards, Chests, Crates, etc.), depending on how much stuff is in them." +
 			"\n" +
 			"\n$col[185,185,185]{Select from below what states you want to be highlighted, and what colors you want each of them to show.}", UI.scale(330));
-	private final Object showWorkstationProgressTooltip = RichText.render("Colors workstations (Drying Racks, Tanning Tubs, Cheese Racks, Flower Pots), depending on their current progress." +
+	private static final Object showWorkstationProgressTooltip = RichText.render("Colors workstations (Drying Racks, Tanning Tubs, Cheese Racks, Flower Pots), depending on their current progress." +
 			"\n" +
 			"\n$col[185,185,185]{Select from below what states you want to be highlighted, and what colors you want each of them to show.}", UI.scale(330));
-	private final Object displayObjectDurabilityPercentageTooltip = RichText.render("If this is enabled, objects that took decay hits will also show a percentage number, on top of the cracked texture overlay.", UI.scale(300));
-	private final Object showBeeSkepsRadiiTooltip = RichText.render("$col[218,163,0]{Action Button:} $col[185,185,185]{This setting can also be turned on/off using an action button from the menu grid (Custom Client Extras → Toggles).}", UI.scale(320));
-	private final Object showFoodThroughsRadiiTooltip = RichText.render("$col[218,163,0]{Action Button:} $col[185,185,185]{This setting can also be turned on/off using an action button from the menu grid (Custom Client Extras → Toggles).}", UI.scale(320));
-	private final Object showMoundBedsRadiiTooltip = RichText.render("$col[218,163,0]{Action Button:} $col[185,185,185]{This setting can also be turned on/off using an action button from the menu grid (Custom Client Extras → Toggles).}", UI.scale(320));
-	private final Object showMineSupportRadiiTooltip = RichText.render("$col[218,163,0]{Action Button:} $col[185,185,185]{This setting can also be turned on/off using an action button from the menu grid (Custom Client Extras → Toggles).}", UI.scale(320));
-	private final Object showMineSupportSafeTilesTooltip = RichText.render("$col[218,163,0]{Action Button:} $col[185,185,185]{This setting can also be turned on/off using an action button from the menu grid (Custom Client Extras → Toggles).}", UI.scale(320));
-	private final Object enableMineSweeperTooltip = RichText.render("Enabling this will cause cave dust tiles to show the number of potential cave-ins surrounding them, just like in Minesweeper." +
+	private static final Object displayObjectDurabilityPercentageTooltip = RichText.render("If this is enabled, objects that took decay hits will also show a percentage number, on top of the cracked texture overlay.", UI.scale(300));
+	private static final Object showBeeSkepsRadiiTooltip = RichText.render("$col[218,163,0]{Action Button:} $col[185,185,185]{This setting can also be turned on/off using an action button from the menu grid (Custom Client Extras → Toggles).}", UI.scale(320));
+	private static final Object showFoodThroughsRadiiTooltip = RichText.render("$col[218,163,0]{Action Button:} $col[185,185,185]{This setting can also be turned on/off using an action button from the menu grid (Custom Client Extras → Toggles).}", UI.scale(320));
+	private static final Object showMoundBedsRadiiTooltip = RichText.render("$col[218,163,0]{Action Button:} $col[185,185,185]{This setting can also be turned on/off using an action button from the menu grid (Custom Client Extras → Toggles).}", UI.scale(320));
+	private static final Object showMineSupportRadiiTooltip = RichText.render("$col[218,163,0]{Action Button:} $col[185,185,185]{This setting can also be turned on/off using an action button from the menu grid (Custom Client Extras → Toggles).}", UI.scale(320));
+	private static final Object showMineSupportSafeTilesTooltip = RichText.render("$col[218,163,0]{Action Button:} $col[185,185,185]{This setting can also be turned on/off using an action button from the menu grid (Custom Client Extras → Toggles).}", UI.scale(320));
+	private static final Object enableMineSweeperTooltip = RichText.render("This will cause cave dust tiles to show the number of potential cave-ins surrounding them, just like in Minesweeper." +
 			"\n$col[218,163,0]{Note:} $col[185,185,185]{If a cave-in has been mined out, the tiles surrounding it will still drop cave dust, and they will still show a number on the ground. The cave dust tiles are pre-generated with the world. That's just how Loftar coded it.}" +
 			"\n$col[218,163,0]{Note:} $col[185,185,185]{You can still pick up the cave dust item off the ground. The numbers are affected only by the duration of the falling dust particles effect (aka dust rain), which can be set below}" +
 			"\n" +
 			"\n$col[200,0,0]{NOTE:} $col[185,185,185]{There's a bug with the falling dust particles, that we can't really \"fix\". If you mine them out on a level, the same particles can also show up on different levels or the overworld. If you want them to vanish, you can just relog, but they will despawn from their original location too.}" +
 			"\n$col[218,163,0]{Action Button:} $col[185,185,185]{This setting can also be turned on/off using an action button from the menu grid (Custom Client Extras → Toggles).}", UI.scale(320));
-	private final Object showObjectsSpeedTooltip = RichText.render("Enabling this will show the speed of moving objects (Players, Mobs, Vehicles, etc.) below them." +
+	private static final Object showObjectsSpeedTooltip = RichText.render("This will show the speed of moving objects (Players, Mobs, Vehicles, etc.) below them." +
 			"\n" +
 			"\n$col[218,163,0]{Keybind:} $col[185,185,185]{This can also be toggled using a keybind.}", UI.scale(300));
-	private final Object showTreesBushesHarvestIconsTooltip = RichText.render("Enabling this will show the icons of seeds and leaves that can be collected on fully grown trees and bushes." +
+	private static final Object showTreesBushesHarvestIconsTooltip = RichText.render("This will show the icons of seeds and leaves that can be collected on fully grown trees and bushes." +
 			"\n" +
 			"\n$col[185,185,185]{It won't show the icons on trees/bushes that are not 100% grown, even if they can already be harvested.}" +
 			"\n" +
 			"\n$col[218,163,0]{Keybind:} $col[185,185,185]{This can also be toggled using a keybind.}", UI.scale(300));
-	private final Object showLowFoodWaterIconsTooltip = RichText.render("Enabling this will show warning icons for low food and low water over Chicken Coops and Rabbit Hutches" +
+	private static final Object showLowFoodWaterIconsTooltip = RichText.render("This will show warning icons for low food and low water over Chicken Coops and Rabbit Hutches" +
 			"\n" +
 			"\n$col[185,185,185]{For Chicken Coops, the icons show up when they go below 50% Food/Water. " +
 			"\nFor Rabbit Hutches, the icons show up when they go below 33% for Food and below 50% for Water." +
 			"\nI can't change this because the game does not differentiate between any other values for them.}" +
 			"\n" +
 			"\n$col[218,163,0]{Keybind:} $col[185,185,185]{This can also be toggled using a keybind.}", UI.scale(300));
-	private final Object showBeeSkepsHarvestIconsTooltip = RichText.render("Enabling this will show icons for Wax and Honey when they can be harvested from Bee Skeps." +
+	private static final Object showBeeSkepsHarvestIconsTooltip = RichText.render("This will show icons for Wax and Honey when they can be harvested from Bee Skeps." +
 			"\n" +
 			"\n$col[218,163,0]{Keybind:} $col[185,185,185]{This can also be toggled using a keybind.}", UI.scale(300));
 
 
 	// Quality Display Settings Tooltips
-	private final Object customQualityColorsTooltip = RichText.render("These numbers and colors are completely arbitrary, and you can change them to whatever you like." +
+	private static final Object customQualityColorsTooltip = RichText.render("These numbers and colors are completely arbitrary, and you can change them to whatever you like." +
 			"\n" +
 			"\n$col[218,163,0]{Note:} $col[185,185,185]{The quality color for container liquids is not affected by this setting.}", UI.scale(300));
 
 	// Audio Settings Tooltips
-	private final Object audioLatencyTooltip = RichText.render("Sets the size of the audio buffer." +
+	private static final Object audioLatencyTooltip = RichText.render("Sets the size of the audio buffer." +
 			"\n" +
 			"\n$col[185,185,185]{Loftar claims that smaller sizes are better, but anything below 50ms always seems to stutter, so I limited it to that." +
 			"\nIncrease this if your audio is still stuttering.}", UI.scale(300));
 
 	// Gameplay Automation Settings Tooltips
-	private final Object autoReloadCuriositiesFromInventoryTooltip = RichText.render("If enabled, curiosities will be automatically reloaded into the Study Report once they finish being studied." +
+	static final Object autoReloadCuriositiesFromInventoryTooltip = RichText.render("If enabled, curiosities will be automatically reloaded into the Study Report once they finish being studied." +
 			"\nThis picks items only from your Inventory and currently open Cupboards. No other containers." +
 			"\n" +
 			"\n$col[185,185,185]{It only reloads curiosities that are currently being studied. It can't add new curiosities.}", UI.scale(300));
-	private final Object preventTablewareFromBreakingTooltip = RichText.render("Prevents eating when the table contains Tableware with only 1 durability left." +
+	private static final Object preventTablewareFromBreakingTooltip = RichText.render("Prevents eating when the table contains Tableware with only 1 durability left." +
 			"\n" +
 			"\n$col[185,185,185]{A system warning message will be shown, to let you know which Tableware is at 1 durability.}", UI.scale(300));
-    private final Object autoSelect1stFlowerMenuTooltip = RichText.render("Holding Ctrl before right clicking an item or object will auto-select the first available option from the flower menu." +
+    private static final Object autoSelect1stFlowerMenuTooltip = RichText.render("Holding Ctrl before right clicking an item or object will auto-select the first available option from the flower menu." +
 			"\n" +
 			"\n$col[185,185,185]{Except for the Head of Lettuce. It will select the 2nd option there, so you split it rather than eat it.}", UI.scale(300));
-	private final Object autoRepeatFlowerMenuTooltip = RichText.render("Enabling this will trigger the Auto-Repeat Flower-Menu Script to run when you Right Click an item while holding Ctrl + Shift." +
+	private static final Object autoRepeatFlowerMenuTooltip = RichText.render("This will trigger the Auto-Repeat Flower-Menu Script to run when you Right Click an item while holding Ctrl + Shift." +
 			"\n\n$col[185,185,185]{You have} $col[218,163,0]{2 seconds} $col[185,185,185]{to select a Flower Menu option, after which the script will automatically click the selected option for ALL items that have the same name in your inventory.}" +
 			"\n$col[200,0,0]{If you don't select an option within} $col[218,163,0]{2 seconds}$col[200,0,0]{, the script won't run.}" +
 			"\n\nYou can stop the script before it finishes by pressing ESC." +
 			"\n\n$col[218,163,0]{Example:} You have 10 Oak Blocks in your inventory. You hold Ctrl + Shift and right click one of the Oak Blocks and select \"Split\" in the flower menu. The script starts running and it splits all 10 Oak Blocks." +
 			"\n\n$col[218,163,0]{Note:} $col[185,185,185]{This script only runs on items that have the same name inside your inventory. It does not take into consideration items of the same \"type\" (for example, if you run the script on Oak Blocks, it won't also run on Spruce Blocks).} ", UI.scale(310));
-	private final Object alsoUseContainersWithRepeaterTooltip = RichText.render("Allow the Auto-Repeat Flower-Menu Script to run through all inventories, such as open cupboards, chests, crates, or any other containers.", UI.scale(300));
-	private final Object flowerMenuAutoSelectManagerTooltip = RichText.render("An advanced menu to automatically select specific flower menu options all the time. New options are added to the list as you discover them." +
+	private static final Object alsoUseContainersWithRepeaterTooltip = RichText.render("Allow the Auto-Repeat Flower-Menu Script to run through all inventories, such as open cupboards, chests, crates, or any other containers.", UI.scale(300));
+	private static final Object flowerMenuAutoSelectManagerTooltip = RichText.render("An advanced menu to automatically select specific flower menu options all the time. New options are added to the list as you discover them." +
 			"\n" +
 			"\n$col[185,185,185]{I don't recommend using this, but nevertheless it exists due to popular demand.}", UI.scale(300));
-	private final Object autoEquipBunnySlippersPlateBootsTooltip = RichText.render("Switches your currently equipped shoes to Bunny Slippers when you right click to chase a rabbit, or Plate Boots if you click on anything else." +
+	private static final Object autoEquipBunnySlippersPlateBootsTooltip = RichText.render("Switches your currently equipped shoes to Bunny Slippers when you right click to chase a rabbit, or Plate Boots if you click on anything else." +
 			"\n" +
 			"\n$col[185,185,185]{I suggest always using this setting in PVP.}", UI.scale(300));
-	private final Object autoPeaceAnimalsWhenCombatStartsTooltip = RichText.render("Enabling this will automatically set your status to 'Peace' when combat is initiated with a new target (animals only). " +
+	private static final Object autoPeaceAnimalsWhenCombatStartsTooltip = RichText.render("This will automatically set your status to 'Peace' when combat is initiated with a new target (animals only). " +
 			"\nToggling this on, while in combat, will also autopeace all animals you are currently fighting." +
 			"\n\n$col[218,163,0]{Action Button:} $col[185,185,185]{This setting can also be turned on/off using an action button from the menu grid (Custom Client Extras → Toggles).}", UI.scale(320));
-	private final Object autoDrinkingTooltip = RichText.render("When your Stamina Bar goes below the set threshold, try to drink Water. If the threshold box is empty, it defaults to 75%." +
+	private static final Object autoDrinkingTooltip = RichText.render("When your Stamina Bar goes below the set threshold, try to drink Water. If the threshold box is empty, it defaults to 75%." +
 			"\n" +
 			"\n$col[218,163,0]{Action Button:} $col[185,185,185]{This setting can also be turned on/off using an action button from the menu grid (Custom Client Extras → Toggles).}", UI.scale(320));
-	private final Object enableQueuedMovementTooltip = RichText.render("$col[218,163,0]{Action Button:} $col[185,185,185]{This setting can also be turned on/off using an action button from the menu grid (Custom Client Extras → Toggles).}", UI.scale(300));
+	private static final Object enableQueuedMovementTooltip = RichText.render("$col[218,163,0]{Action Button:} $col[185,185,185]{This setting can also be turned on/off using an action button from the menu grid (Custom Client Extras → Toggles).}", UI.scale(300));
 
 	// Altered Gameplay Settings Tooltips
-	private final Object overrideCursorItemWhenHoldingAltTooltip = RichText.render("Holding Alt while having an item on your cursor will allow you to left click to walk, or right click to interact with objects, rather than drop it on the ground." +
+	private static final Object overrideCursorItemWhenHoldingAltTooltip = RichText.render("Holding Alt while having an item on your cursor will allow you to left click to walk, or right click to interact with objects, rather than drop it on the ground." +
 			"\n" +
 			"\n$col[185,185,185]{Left click ignores the UI when you do this, so don't try to click on the map to walk while holding an item.}" +
 			"\n" +
 			"\n$col[200,0,0]{SETTING OVERRIDE:} This doesn't work with the \"No Cursor Dropping\" settings, and it will toggle them off when this is enabled.", UI.scale(320));
-	private final Object noCursorItemDroppingAnywhereTooltip = RichText.render("This will allow you to have an item on your cursor and still be able to left click to walk." +
+	private static final Object noCursorItemDroppingAnywhereTooltip = RichText.render("This will allow you to have an item on your cursor and still be able to left click to walk." +
 			"\n" +
 			"\n$col[185,185,185]{You can drop the item from your cursor if you hold Alt.}" +
 			"\n" +
@@ -4720,7 +4735,7 @@ public class OptWnd extends Window {
 			"\n$col[218,163,0]{Action Button:} $col[185,185,185]{This setting can also be turned on/off using an action button from the menu grid (Custom Client Extras → Toggles).}" +
 			"\n" +
 			"\n$col[200,0,0]{SETTING OVERRIDE:} This doesn't work with the \"Override Cursor Item\" setting, and it will toggle it off when this is enabled.", UI.scale(320));
-	private final Object noCursorItemDroppingInWaterTooltip =  RichText.render("This will allow you to have an item on your cursor and still be able to left click to walk, while you are in water. " +
+	private static final Object noCursorItemDroppingInWaterTooltip =  RichText.render("This will allow you to have an item on your cursor and still be able to left click to walk, while you are in water. " +
 			"\nIf the previous setting is Enabled, this one will be ignored." +
 			"\n" +
 			"\n$col[185,185,185]{You can drop the item from your cursor if you hold Alt.}" +
@@ -4730,55 +4745,86 @@ public class OptWnd extends Window {
 			"\n$col[218,163,0]{Action Button:} $col[185,185,185]{This setting can also be turned on/off using an action button from the menu grid (Custom Client Extras → Toggles).}" +
 			"\n" +
 			"\n$col[200,0,0]{SETTING OVERRIDE:} This doesn't work with the \"Override Cursor Item\" setting, and it will toggle it off when this is enabled.", UI.scale(320));
-	private final Object useOGControlsForBuildingAndPlacingTooltip = RichText.render("Hold Ctrl to smoothly place, and Ctrl+Shift to also smoothly rotate. To walk to the place you click (rather than build/place the object) hold Alt." +
+	private static final Object useOGControlsForBuildingAndPlacingTooltip = RichText.render("Hold Ctrl to smoothly place, and Ctrl+Shift to also smoothly rotate. To walk to the place you click (rather than build/place the object) hold Alt." +
 			"\n" +
 			"\n$col[185,185,185]{Idk why Loftar changed them when he did, but some of you might be used to the new controls rather than the OG ones, so you have the option to disable this.}", UI.scale(320));
-	private final Object useImprovedInventoryTransferControlsTooltip = RichText.render("Alt+Left Click for descending order, and Alt+Right click for ascending order.", UI.scale(320));
-	private final Object tileCenteringTooltip = RichText.render("This forces your left and right clicks in the world to go to the center of the tile you clicked. So you will always walk to the center of the tile, or place items down on the center." +
+	private static final Object useImprovedInventoryTransferControlsTooltip = RichText.render("Alt+Left Click for descending order, and Alt+Right click for ascending order.", UI.scale(320));
+	private static final Object tileCenteringTooltip = RichText.render("This forces your left and right clicks in the world to go to the center of the tile you clicked. So you will always walk to the center of the tile, or place items down on the center." +
+			"\n" +
 			"\n$col[185,185,185]{It doesn't affect the manual precise placement of objects, just the quick right-click one.}" +
 			"\n" +
 			"\n$col[218,163,0]{Action Button:} $col[185,185,185]{This setting can also be turned on/off using an action button from the menu grid (Custom Client Extras → Toggles).}", UI.scale(320));
 
 	// Camera Settings Tooltips
-	private final Object reverseOrthoCameraAxesTooltip = RichText.render("Enabling this will reverse the Horizontal axis when dragging the camera to look around." +
+	private static final Object reverseOrthoCameraAxesTooltip = RichText.render("This will reverse the Horizontal axis when dragging the camera to look around." +
 			"\n" +
 			"\n$col[185,185,185]{I don't know why Loftar inverts it in the first place...}", UI.scale(280));
-	private final Object unlockedOrthoCamTooltip = RichText.render("Enabling this allows you to rotate the Ortho camera freely, without locking it to only 4 view angles.", UI.scale(280));
-	private final Object allowLowerFreeCamTiltTooltip = RichText.render("Enabling this will allow you to tilt the camera below the character (and under the ground), to look upwards." +
+	private static final Object unlockedOrthoCamTooltip = RichText.render("This allows you to rotate the Ortho camera freely, without locking it to only 4 view angles.", UI.scale(280));
+	private static final Object allowLowerFreeCamTiltTooltip = RichText.render("This will allow you to tilt the camera below the character (and under the ground), to look upwards." +
 			"\n" +
 			"\n$col[200,0,0]{WARNING: Be careful when using this setting, especially in combat! You're NOT able to click on the ground when looking at the world from below.}" +
 			"\n" +
 			"\n$col[185,185,185]{Honestly just enable this when you need to take a screenshot or something, and keep it disabled the rest of the time. I added this setting for fun.}", UI.scale(300));
-	private final Object freeCamHeightTooltip = RichText.render("This affects the height of the point at which the free camera is pointed. By default, it is pointed right above the player's head." +
+	private static final Object freeCamHeightTooltip = RichText.render("This affects the height of the point at which the free camera is pointed. By default, it is pointed right above the player's head." +
 			"\n" +
 			"\n$col[185,185,185]{This doesn't really affect gameplay that much, if at all. With this setting, you can make the camera point at the feet, torso, head, slightly above you, or whatever's in between.}", UI.scale(300));
 
 	// World Graphics Settings Tooltips
-	private final Object nightVisionTooltip = RichText.render("Increasing this will simulate daytime lighting during the night." +
+	private static final Object nightVisionTooltip = RichText.render("Increasing this will simulate daytime lighting during the night." +
+			"\n" +
 			"\n$col[185,185,185]{It can slightly affect the light levels during the day too, but it is barely noticeable.}" +
 			"\n" +
 			"\n$col[218,163,0]{Keybind:} $col[185,185,185]{This slider can also be switched between minimum and maximum by using the 'Night Vision' keybind.}", UI.scale(300));
-	private final Object hideFlavorObjectsTooltip = RichText.render("This hides the random objects that appear in the world, which you cannot interact with." +
+	private static final Object hideFlavorObjectsTooltip = RichText.render("This hides the random objects that appear in the world, like random weeds on the ground and whatnot, which you cannot interact with." +
+			"\n" +
 			"\n$col[185,185,185]{Players usually disable flavor objects to improve visibility, especially in combat.}" +
 			"\n" +
 			"\n$col[218,163,0]{Action Button:} $col[185,185,185]{This setting can also be turned on/off using an action button from the menu grid (Custom Client Extras → Toggles).}", UI.scale(320));
-	private final Object flatWorldTooltip = RichText.render("Enabling this will make the entire game world terrain flat." +
-			"\n$col[185,185,185]{Cliffs will still be drawn with their relative height, scaled down.}" +
+	private static final Object flatWorldTooltip = RichText.render("This will make the entire game world terrain flat, except for cliffs." +
+			"\n" +
+			"\n$col[185,185,185]{Cliffs will still be visible, but with their relative height scaled down.}" +
+			"\n" +
 			"\n$col[218,163,0]{Action Button:} $col[185,185,185]{This setting can also be turned on/off using an action button from the menu grid (Custom Client Extras → Toggles).}", UI.scale(320));
-	private final Object disableTileSmoothingTooltip = RichText.render("$col[218,163,0]{Action Button:} $col[185,185,185]{This setting can also be turned on/off using an action button from the menu grid (Custom Client Extras → Toggles).}", UI.scale(320));
-	private final Object disableTileTransitionsTooltip = RichText.render("$col[218,163,0]{Action Button:} $col[185,185,185]{This setting can also be turned on/off using an action button from the menu grid (Custom Client Extras → Toggles).}", UI.scale(320));
+	private static final Object disableTileSmoothingTooltip = RichText.render("This will cause all biome tiles to look the same, with no variations." +
+			"\n" +
+			"\n$col[185,185,185]{I guess some people think this makes it easier to differentiate between terrain types, or maybe it's just preference.}" +
+			"\n" +
+			"\n$col[218,163,0]{Action Button:} $col[185,185,185]{This setting can also be turned on/off using an action button from the menu grid (Custom Client Extras → Toggles).}", UI.scale(320));
+	private static final Object disableTileTransitionsTooltip = RichText.render("This will turn all tiles into squares, so you can determine where one biome ends and another one starts, or where the shoreline meets the water." +
+			"\n" +
+			"\n$col[185,185,185]{It can be useful in some niche cases I won't bother listing, but it's preference.}" +
+			"\n" +
+			"\n$col[218,163,0]{Action Button:} $col[185,185,185]{This setting can also be turned on/off using an action button from the menu grid (Custom Client Extras → Toggles).}", UI.scale(320));
+	private static final Object simplifiedCropsTooltip = RichText.render("This reduces each crop tile to a single plant for a cleaner, more minimal look." +
+			"\n" +
+			"\n$col[185,185,185]{No more random clumps. Just a single sprout in the center of the tile, for each crop type.}", UI.scale(300));
+	private static final Object simplifiedForageablesTooltip = RichText.render("This makes forageable spawns appear as a single item per tile instead of a cluster, for simplified visuals." +
+			"\n" +
+			"\n$col[185,185,185]{I never liked how they look like 10 things in a cluster, but you only pick one up... lol.}", UI.scale(300));
+	private static final Object flatCaveWallsTooltip = RichText.render("This lowers the height of cave walls significantly, and also displays their texture on the ground." +
+			"\n" +
+			"\n$col[185,185,185]{It makes it easier to see what you're looking at, from all angles.}", UI.scale(300));
+	private static final Object straightCliffEdgesTooltip = RichText.render("This disables the variations for cliffs, making it a bit easier to distinguish their angles." +
+			"\n" +
+			"\n$col[185,185,185]{The difference is very small, honestly.}", UI.scale(300));
+	private static final Object flatCupboardsTooltip = RichText.render("This turns cupboards into short boxes that open towards the ceiling." +
+			"\n" +
+			"\n$col[185,185,185]{Parchements that are placed on the cupboards are also moved to the top.}", UI.scale(300));
+	private static final Object enableSkyboxTooltip = RichText.render("Adds a skybox to the game world." +
+			"\n" +
+			"\n$col[185,185,185]{Summon the sky above the hearthlands, and banish the endless void!}", UI.scale(190));
 
 	// Server Integration Settings Tooltips
-	private final Object uploadMapTilesTooltip = RichText.render("Enable this to upload your map tiles to your web map server.", UI.scale(300));
-	private final Object sendLiveLocationTooltip = RichText.render("Enable this to show your current location on your web map server.", UI.scale(320));
-	private final Object liveLocationNameTooltip = RichText.render("If you send your location to the server, your name will appear as whatever you set in this text entry + your current character name." +
+	private static final Object uploadMapTilesTooltip = RichText.render("Enable this to upload your map tiles to your web map server.", UI.scale(300));
+	private static final Object sendLiveLocationTooltip = RichText.render("Enable this to show your current location on your web map server.", UI.scale(320));
+	private static final Object liveLocationNameTooltip = RichText.render("If you send your location to the server, your name will appear as whatever you set in this text entry + your current character name." +
 			"\n" +
 			"\n$col[218,163,0]{For example:} Nightdawg (VillageCrafter)$col[185,185,185]{, where }\"Nightdawg\" $col[185,185,185]{is the name I set in this text entry, and} \"VillageCrafter\" $col[185,185,185]{is the character's original name." +
 			"\nThe character's original name is the one you see in the character selection screen, NOT the presentation name.}", UI.scale(320));
 
 	// Misc/Other
-	private final Object resetButtonTooltip = RichText.render("Reset to default", UI.scale(300));
-	private final Object genericHasKeybindTooltip = RichText.render("$col[218,163,0]{Keybind:} $col[185,185,185]{This can also be toggled using a keybind.}", UI.scale(300));
+	private static final Object resetButtonTooltip = RichText.render("Reset to default value.", UI.scale(300));
+	private static final Object genericHasKeybindTooltip = RichText.render("$col[218,163,0]{Keybind:} $col[185,185,185]{This can also be toggled using a keybind.}", UI.scale(300));
 
 	@Override
 	protected void attached() {
