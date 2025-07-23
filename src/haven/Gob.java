@@ -2549,10 +2549,14 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 			for (Composited.ED item : equ) {
 				if (Config.WEAPON_NAMES_AND_RANGES.containsKey(item.res.res.get().basename())){
 					currentWeapon = item.res.res.get().basename();
+					if (isMe != null && isMe)
+						OptWnd.refreshMyWeaponRange = true;
 					return;
 				}
 			}
 			currentWeapon = "";
+			if (isMe != null && isMe)
+				OptWnd.refreshMyWeaponRange = true;
 		}
 	}
 

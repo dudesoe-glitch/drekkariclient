@@ -1075,6 +1075,13 @@ public class OptWnd extends Window {
 	public static HSlider targetSpriteSizeSlider;
 	public static CheckBox drawChaseVectorsCheckBox;
 	public static CheckBox drawYourCurrentPathCheckBox;
+	public static CheckBox showYourCombatRangeCirclesCheckBox;
+	public static boolean refreshMyUnarmedRange = false;
+	public static boolean refreshMyWeaponRange = false;
+	public static ColorOptionWidget unarmedCombatRangeColorOptionWidget;
+	public static String[] unarmedCombatRangeColorSetting = Utils.getprefsa("unarmedCombatRange" + "_colorSetting", new String[]{"0", "160", "0", "255"});
+	public static ColorOptionWidget weaponCombatRangeColorOptionWidget;
+	public static String[] weaponCombatRangeColorSetting = Utils.getprefsa("weaponCombatRange" + "_colorSetting", new String[]{"130", "0", "172", "255"});
 
 	public class CombatSettingsPanel extends Panel {
 		public CombatSettingsPanel(Panel back) {
@@ -1442,6 +1449,30 @@ public class OptWnd extends Window {
 				}
 			}, rightColumn.pos("bl").adds(0, 2));
 			drawYourCurrentPathCheckBox.tooltip = drawYourCurrentPathTooltip;
+			rightColumn = add(showYourCombatRangeCirclesCheckBox = new CheckBox("Show Your Combat Range Circles"){
+				{a = Utils.getprefb("showYourCombatRangeCircles", false);}
+				public void changed(boolean val) {
+					Utils.setprefb("showYourCombatRangeCircles", val);
+				}
+			}, rightColumn.pos("bl").adds(0, 2));
+			showYourCombatRangeCirclesCheckBox.tooltip = showYourCombatRangeCirclesTooltip;
+			rightColumn = add(new Label("Unarmed"), rightColumn.pos("bl").adds(16, 1));
+			add(unarmedCombatRangeColorOptionWidget = new ColorOptionWidget("", "unarmedCombatRange", 0, Integer.parseInt(unarmedCombatRangeColorSetting[0]), Integer.parseInt(unarmedCombatRangeColorSetting[1]), Integer.parseInt(unarmedCombatRangeColorSetting[2]), Integer.parseInt(unarmedCombatRangeColorSetting[3]), (Color col) -> {
+				refreshMyUnarmedRange = true;
+			}){}, rightColumn.pos("bl").adds(12, 0));
+			rightColumn = add(new Label("Weapon"), rightColumn.pos("ur").adds(20, 0));
+			rightColumn = add(weaponCombatRangeColorOptionWidget = new ColorOptionWidget("", "weaponCombatRange", 0, Integer.parseInt(weaponCombatRangeColorSetting[0]), Integer.parseInt(weaponCombatRangeColorSetting[1]), Integer.parseInt(weaponCombatRangeColorSetting[2]), Integer.parseInt(weaponCombatRangeColorSetting[3]), (Color col) -> {
+				refreshMyWeaponRange = true;
+			}){}, rightColumn.pos("bl").adds(10, 0));
+			rightColumn = add(new Button(UI.scale(70), "Reset All", false).action(() -> {
+				Utils.setprefsa("unarmedCombatRange" + "_colorSetting", new String[]{"0", "160", "0", "255"});
+				Utils.setprefsa("weaponCombatRange" + "_colorSetting", new String[]{"130", "0", "172", "255"});
+				unarmedCombatRangeColorOptionWidget.cb.colorChooser.setColor(unarmedCombatRangeColorOptionWidget.currentColor = new Color(0, 160, 0, 255));
+				weaponCombatRangeColorOptionWidget.cb.colorChooser.setColor(weaponCombatRangeColorOptionWidget.currentColor = new Color(130, 0, 172, 255));
+				refreshMyUnarmedRange = true;
+				refreshMyWeaponRange = true;
+			}), rightColumn.pos("ur").adds(46, -2));
+			
 
 			Widget backButton;
 			add(backButton = new PButton(UI.scale(200), "Back", 27, back, "Advanced Settings"), leftColumn.pos("bl").adds(0, 18).x(0));
@@ -4693,6 +4724,7 @@ public class OptWnd extends Window {
 	private static final Object drawYourCurrentPathTooltip = RichText.render("When this is enabled, a straight line will be drawn between your character and wherever you clicked" +
 			"\n" +
 			"\n$col[185,185,185]{You can use this to make sure you won't run into a tree or something, I guess.}", UI.scale(300));
+	private static final Object showYourCombatRangeCirclesTooltip = RichText.render("This will display two circles under your character, that show your unarmed range, and currently equipped weapon range (if you have a weapon equipped).", UI.scale(300));
 
 	// Display Settings Tooltips
 	private static final Object granularityPositionTooltip = RichText.render("This works like the :placegrid console command. " +

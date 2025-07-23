@@ -27,6 +27,7 @@
 package haven;
 
 import haven.render.*;
+import haven.sprites.CombatRangeSprite;
 import haven.sprites.CurrentAggroSprite;
 
 import javax.sound.sampled.AudioFormat;
@@ -246,6 +247,8 @@ public class Fightsess extends Widget {
     private Text lastacttip1 = null, lastacttip2 = null;
     private Effect curtgtfx;
 	private Effect curtgtfx2;
+	private Effect unarmedRangeFx;
+	private Effect weaponRangeFx;
     public void draw(GOut g) {
 //	updatepos();
 	relations.clear();
@@ -453,6 +456,16 @@ public class Fightsess extends Widget {
 			curtgtfx2 = fxon2(fv.current.gobid, tgtfx, curtgtfx2);
 		else
 			OptWnd.refreshCurrentTargetSpriteColor = false;
+		if (OptWnd.showYourCombatRangeCirclesCheckBox.a) {
+			if (!OptWnd.refreshMyUnarmedRange)
+				unarmedRangeFx = unarmedRangeFx(unarmedRangeFx);
+			else
+				OptWnd.refreshMyUnarmedRange = false;
+			if (!OptWnd.refreshMyWeaponRange)
+				weaponRangeFx = weaponRangeFx(weaponRangeFx);
+			else
+				OptWnd.refreshMyWeaponRange = false;
+		}
 	}
 
 	    Coord cdc = new Coord(x, y);
@@ -983,6 +996,62 @@ public class Fightsess extends Widget {
 		}
 		cur.used = true;
 		return(cur);
+	}
+
+	private Effect unarmedRangeFx(Effect currentMeleeRangeFx) {
+		MapView map = getparent(GameUI.class).map;
+		if (map == null)
+			return null;
+		Gob player = ui.gui.map.player();
+		if (player == null)
+			return null;
+		Pipe.Op place;
+		try {
+			place = player.placed.curplace();
+		} catch(Loading l) {
+			return(null);
+		}
+		if((currentMeleeRangeFx == null) || (currentMeleeRangeFx.slot == null)) {
+			try {
+				currentMeleeRangeFx = new Effect(new CombatRangeSprite(null, 13.7f, OptWnd.unarmedCombatRangeColorOptionWidget.currentColor));
+				currentMeleeRangeFx.slot = map.basic.add(currentMeleeRangeFx.spr, place);
+			} catch(Loading l) {
+				return(null);
+			}
+			curfx.add(currentMeleeRangeFx);
+		} else {
+			currentMeleeRangeFx.slot.cstate(place);
+		}
+		currentMeleeRangeFx.used = true;
+		return(currentMeleeRangeFx);
+	}
+
+	private Effect weaponRangeFx(Effect currentWeaponRangeFx) {
+		MapView map = getparent(GameUI.class).map;
+		if (map == null)
+			return null;
+		Gob player = ui.gui.map.player();
+		if (player == null)
+			return null;
+		Pipe.Op place;
+		try {
+			place = player.placed.curplace();
+		} catch(Loading l) {
+			return(null);
+		}
+		if((currentWeaponRangeFx == null) || (currentWeaponRangeFx.slot == null) && !player.currentWeapon.equals("")) {
+			try {
+				currentWeaponRangeFx = new Effect(new CombatRangeSprite(null, Config.WEAPON_NAMES_AND_RANGES.get(player.currentWeapon), OptWnd.weaponCombatRangeColorOptionWidget.currentColor));
+				currentWeaponRangeFx.slot = map.basic.add(currentWeaponRangeFx.spr, place);
+			} catch(Loading l) {
+				return(null);
+			}
+			curfx.add(currentWeaponRangeFx);
+		} else {
+			currentWeaponRangeFx.slot.cstate(place);
+		}
+		currentWeaponRangeFx.used = true;
+		return(currentWeaponRangeFx);
 	}
 
 	private void drawCombatData(GOut g, Fightview.Relation rels, Coord sc, boolean showAllOpenings, boolean alwaysShowCoins) {
