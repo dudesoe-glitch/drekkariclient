@@ -2125,6 +2125,7 @@ public class OptWnd extends Window {
 					}
 				}
 			}, middleColumn.pos("bl").adds(0, 17));
+			showCritterAurasCheckBox.tooltip = showCritterAurasTooltip;
 			middleColumn = add(rabbitAuraColorOptionWidget = new ColorOptionWidget("Rabbit Aura:", "rabbitAura", 115, Integer.parseInt(rabbitAuraColorSetting[0]), Integer.parseInt(rabbitAuraColorSetting[1]), Integer.parseInt(rabbitAuraColorSetting[2]), Integer.parseInt(rabbitAuraColorSetting[3]), (Color col) -> {
 				if (ui != null && ui.gui != null) {
 					ui.sess.glob.oc.gobAction(Gob::updateCritterAuras);
@@ -2160,6 +2161,7 @@ public class OptWnd extends Window {
 					}
 				}
 			}, middleColumn.pos("bl").adds(0, 18).x(UI.scale(240)));
+			showSpeedBuffAurasCheckBox.tooltip = showSpeedBuffAurasTooltip;
 			middleColumn = add(speedBuffAuraColorOptionWidget = new ColorOptionWidget("Speed Buff Aura:", "speedBuffAura", 115, Integer.parseInt(speedBuffAuraColorSetting[0]), Integer.parseInt(speedBuffAuraColorSetting[1]), Integer.parseInt(speedBuffAuraColorSetting[2]), Integer.parseInt(speedBuffAuraColorSetting[3]), (Color col) -> {
 				if (ui != null && ui.gui != null) {
 					ui.sess.glob.oc.gobAction(Gob::updateSpeedBuffAuras);
@@ -2182,6 +2184,7 @@ public class OptWnd extends Window {
 					}
 				}
 			}, middleColumn.pos("bl").adds(0, 18).x(UI.scale(240)));
+			showMidgesCircleAurasCheckBox.tooltip = showMidgesCircleAurasTooltip;
 
 			middleColumn = add(showBeastDangerRadiiCheckBox = new CheckBox("Show Beast Danger Radii"){
 				{a = (Utils.getprefb("showBeastDangerRadii", true));}
@@ -2192,6 +2195,7 @@ public class OptWnd extends Window {
 					}
 				}
 			}, middleColumn.pos("bl").adds(0, 2));
+			showBeastDangerRadiiCheckBox.tooltip = showBeastDangerRadiiTooltip;
 
 			middleColumn = add(showBeeSkepsRadiiCheckBox = new CheckBox("Show Bee Skep Radii"){
 				{a = (Utils.getprefb("showBeeSkepsRadii", false));}
@@ -2238,6 +2242,7 @@ public class OptWnd extends Window {
 					}
 				}
 			}, middleColumn.pos("bl").adds(0, 13));
+			showBarrelContentsTextCheckBox.tooltip = showBarrelContentsTextTooltip;
 
 			middleColumn = add(showIconSignTextCheckBox = new CheckBox("Show Icon Sign Text"){
 				{a = (Utils.getprefb("showIconSignText", true));}
@@ -2248,6 +2253,7 @@ public class OptWnd extends Window {
 					}
 				}
 			}, middleColumn.pos("bl").adds(0, 2));
+			showIconSignTextCheckBox.tooltip = showIconSignTextTooltip;
 			middleColumn = add(showCheeseRacksTierTextCheckBox = new CheckBox("Show Cheese Racks Tier Text"){
 				{a = (Utils.getprefb("showCheeseRacksTierText", false));}
 				public void changed(boolean val) {
@@ -2257,6 +2263,7 @@ public class OptWnd extends Window {
 					}
 				}
 			}, middleColumn.pos("bl").adds(0, 2));
+			showCheeseRacksTierTextCheckBox.tooltip = showCheeseRacksTierTextTooltip;
 
 			rightColumn = add(new Label("Object Pinging Colors:"), UI.scale(480, 0));
 			rightColumn = add(areaChatPingColorOptionWidget = new ColorOptionWidget("Area Chat (Alt+LClick):", "areaChatPing", 115, Integer.parseInt(areaChatPingColorSetting[0]), Integer.parseInt(areaChatPingColorSetting[1]), Integer.parseInt(areaChatPingColorSetting[2]), Integer.parseInt(areaChatPingColorSetting[3]), (Color col) -> {
@@ -3324,7 +3331,7 @@ public class OptWnd extends Window {
 	public static CheckBox flatCaveWallsCheckBox;
 	public static CheckBox straightCliffEdgesCheckBox;
 	public static CheckBox disableSeasonalGroundColorsCheckBox;
-	public static CheckBox disableCloudShadowsCheckBox;
+	public static CheckBox disableGroundCloudShadowsCheckBox;
 	public static CheckBox disableRainCheckBox;
 	public static CheckBox disableWetGroundOverlayCheckBox;
 	public static CheckBox disableSnowingCheckBox;
@@ -3347,8 +3354,8 @@ public class OptWnd extends Window {
 	public static CheckBox disableOpiumHighCheckBox;
 	public static CheckBox disableLibertyCapsHighCheckBox;
 	public static CheckBox disableDrunkennessDistortionCheckBox;
-	public static HSlider palisadeAndWallScaleSlider;
-	private Button palisadeAndWallScaleResetButton;
+	public static HSlider palisadesAndBrickWallsScaleSlider;
+	private Button palisadesAndBrickWallsScaleResetButton;
 	public static CheckBox enableSkyboxCheckBox;
 
 	public class WorldGraphicsSettingsPanel extends Panel {
@@ -3530,26 +3537,28 @@ public class OptWnd extends Window {
 				}
 			}, leftColumn.pos("bl").adds(0, 2));
 
-			leftColumn = add(new Label("Palisades & Walls Scale:"), leftColumn.pos("bl").adds(0, 10).x(0));
-			leftColumn = add(palisadeAndWallScaleSlider = new HSlider(UI.scale(200), 40, 100, Utils.getprefi("palisadeAndWallScale", 100)) {
+			leftColumn = add(new Label("Palisades & Brick Walls Scale:"), leftColumn.pos("bl").adds(0, 10).x(0));
+			leftColumn.tooltip = palisadesAndBrickWallsScaleTooltip;
+			leftColumn = add(palisadesAndBrickWallsScaleSlider = new HSlider(UI.scale(200), 40, 100, Utils.getprefi("palisadesAndBrickWallsScale", 100)) {
 				protected void attach(UI ui) {
 					super.attach(ui);
-					val = Utils.getprefi("palisadeAndWallScale", 100);
+					val = Utils.getprefi("palisadesAndBrickWallsScale", 100);
 				}
 				public void changed() {
-					Utils.setprefi("palisadeAndWallScale", val);
+					Utils.setprefi("palisadesAndBrickWallsScale", val);
 					if (ui != null && ui.gui != null) {
 						ui.sess.glob.oc.gobAction(Gob::reloadPalisadeScale);
 					}
 				}
 			}, leftColumn.pos("bl").adds(0, 6));
-			add(palisadeAndWallScaleResetButton = new Button(UI.scale(70), "Reset", false).action(() -> {
-				palisadeAndWallScaleSlider.val = 100;
+			palisadesAndBrickWallsScaleSlider.tooltip = palisadesAndBrickWallsScaleTooltip;
+			add(palisadesAndBrickWallsScaleResetButton = new Button(UI.scale(70), "Reset", false).action(() -> {
+				palisadesAndBrickWallsScaleSlider.val = 100;
 				if (ui != null && ui.gui != null)
 					ui.sess.glob.oc.gobAction(Gob::reloadPalisadeScale);
-				Utils.setprefi("palisadeAndWallScale", 100);
+				Utils.setprefi("palisadesAndBrickWallsScale", 100);
 			}), leftColumn.pos("bl").adds(210, -20));
-			palisadeAndWallScaleResetButton.tooltip = resetButtonTooltip;
+			palisadesAndBrickWallsScaleResetButton.tooltip = resetButtonTooltip;
 
 			rightColumn = add(enableSkyboxCheckBox = new CheckBox("Enable Skybox"){
 				{a = (Utils.getprefb("enableSkybox", false));}
@@ -3624,6 +3633,7 @@ public class OptWnd extends Window {
 						ui.sess.glob.oc.gobAction(Gob::reloadTreeSwaying);
 				}
 			}, rightColumn.pos("bl").adds(12, 14));
+			disableTreeAndBushSwayingCheckBox.tooltip = disableTreeAndBushSwayingTooltip;
 			rightColumn = add(disableIndustrialSmokeCheckBox = new CheckBox("Disable Industrial Smoke (Requires Reload)"){
 				{a = (Utils.getprefb("disableIndustrialSmoke", false));}
 				public void changed(boolean val) {
@@ -3644,6 +3654,7 @@ public class OptWnd extends Window {
 					}
 				}
 			}, rightColumn.pos("bl").adds(0, 2));
+			disableIndustrialSmokeCheckBox.tooltip = disableIndustrialSmokeTooltip;
 			rightColumn = add(disableScentSmokeCheckBox = new CheckBox("Disable Scent Smoke (Requires Reload)"){
 				{a = (Utils.getprefb("disableScentSmoke", false));}
 				public void changed(boolean val) {
@@ -3664,6 +3675,7 @@ public class OptWnd extends Window {
 					}
 				}
 			}, rightColumn.pos("bl").adds(0, 2));
+			disableScentSmokeCheckBox.tooltip = disableScentSmokeTooltip;
 
 			rightColumn = add(new Label("World Effects:"), rightColumn.pos("bl").adds(0, 10).x(UI.scale(290)));
 			rightColumn = add(disableSeasonalGroundColorsCheckBox = new CheckBox("Disable Seasonal Ground Colors"){
@@ -3672,13 +3684,15 @@ public class OptWnd extends Window {
 					Utils.setprefb("disableSeasonalGroundColors", val);
 				}
 			}, rightColumn.pos("bl").adds(12, 8));
+			disableSeasonalGroundColorsCheckBox.tooltip = disableSeasonalGroundColorsTooltip;
 
-			rightColumn = add(disableCloudShadowsCheckBox = new CheckBox("Disable Cloud Shadows"){
-				{a = (Utils.getprefb("disableCloudShadows", false));}
+			rightColumn = add(disableGroundCloudShadowsCheckBox = new CheckBox("Disable Ground Cloud Shadows"){
+				{a = (Utils.getprefb("disableGroundCloudShadows", false));}
 				public void changed(boolean val) {
-					Utils.setprefb("disableCloudShadows", val);
+					Utils.setprefb("disableGroundCloudShadows", val);
 				}
 			}, rightColumn.pos("bl").adds(0, 2));
+			disableGroundCloudShadowsCheckBox.tooltip = disableGroundCloudShadowsTooltip;
 
 			rightColumn = add(disableRainCheckBox = new CheckBox("Disable Raining Particles"){
 				{a = (Utils.getprefb("disableRain", false));}
@@ -3693,6 +3707,7 @@ public class OptWnd extends Window {
 					Utils.setprefb("disableWetGroundOverlay", val);
 				}
 			}, rightColumn.pos("bl").adds(0, 2));
+			disableWetGroundOverlayCheckBox.tooltip = disableWetGroundOverlayTooltip;
 
 			rightColumn = add(disableSnowingCheckBox = new CheckBox("Disable Snowing Particles"){
 				{a = (Utils.getprefb("disableSnowing", false));}
@@ -3702,12 +3717,13 @@ public class OptWnd extends Window {
 			}, rightColumn.pos("bl").adds(0, 2));
 
 			rightColumn = add(new Label("Screen Effects:"), rightColumn.pos("bl").adds(0, 10).x(UI.scale(290)));
-			rightColumn = add(disableValhallaFilterCheckBox = new CheckBox("Disable Valhalla Filter"){
+			rightColumn = add(disableValhallaFilterCheckBox = new CheckBox("Disable Valhalla Desaturation Filter"){
 				{a = (Utils.getprefb("disableValhallaFilter", true));}
 				public void changed(boolean val) {
 					Utils.setprefb("disableValhallaFilter", val);
 				}
 			}, rightColumn.pos("bl").adds(12, 8));
+			disableValhallaFilterCheckBox.tooltip = disableValhallaFilterTooltip;
 
 			rightColumn = add(disableScreenShakingCheckBox = new CheckBox("Disable Screen Shaking"){
 				{a = (Utils.getprefb("disableScreenShaking", true));}
@@ -3715,6 +3731,7 @@ public class OptWnd extends Window {
 					Utils.setprefb("disableScreenShaking", val);
 				}
 			}, rightColumn.pos("bl").adds(0, 2));
+			disableScreenShakingCheckBox.tooltip = disableScreenShakingTooltip;
 
 			rightColumn = add(disableHempHighCheckBox = new CheckBox("Disable Hemp High"){
 				{a = (Utils.getprefb("disableHempHigh", true));}
@@ -3734,6 +3751,8 @@ public class OptWnd extends Window {
 					Utils.setprefb("disableLibertyCapsHigh", val);
 				}
 			}, rightColumn.pos("bl").adds(0, 2));
+			disableLibertyCapsHighCheckBox.setTextColor(Color.red);
+			disableLibertyCapsHighCheckBox.tooltip = disableLibertyCapsHighTooltip;
 			rightColumn = add(disableDrunkennessDistortionCheckBox = new CheckBox("Disable Drunkenness Distortion"){
 				{a = (Utils.getprefb("disableDrunkennessDistortion", true));}
 				public void changed(boolean val) {
@@ -4602,8 +4621,8 @@ public class OptWnd extends Window {
 	private static final Object alwaysShowCombatUiBarTooltip = RichText.render("For more options for this bar, check the Combat Settings.", UI.scale(320));
 
 	// Combat Settings Tooltips
-	private static final Object singleRowCombatMovesTooltip = RichText.render("If this is enabled, the Bottom Panel combat moves will be shown in just one row, rather than two.", UI.scale(300));
-	private static final Object showDamagePredictUITooltip = RichText.render("If this is enabled, Combat Moves that can deal damage will display a number below them." +
+	private static final Object singleRowCombatMovesTooltip = RichText.render("This makes the Bottom Panel show the combat moves in one row, rather than two.", UI.scale(300));
+	private static final Object showDamagePredictUITooltip = RichText.render("This makes the Combat Moves that can deal damage show how much damage they can potentially do, when used." +
 			"\n" +
 			"\nThis is calculated depending on the following:" +
 			"\n$col[185,185,185]{- How high your current target's $col[218,163,0]{Openings} are (depending on the openings the combat move applies to)" +
@@ -4661,10 +4680,32 @@ public class OptWnd extends Window {
 	private static final Object showWorkstationProgressTooltip = RichText.render("Colors workstations (Drying Racks, Tanning Tubs, Cheese Racks, Flower Pots), depending on their current progress." +
 			"\n" +
 			"\n$col[185,185,185]{Select from below what states you want to be highlighted, and what colors you want each of them to show.}", UI.scale(330));
-	private static final Object displayObjectDurabilityPercentageTooltip = RichText.render("If this is enabled, objects that took decay hits will also show a percentage number, on top of the cracked texture overlay.", UI.scale(300));
+	private static final Object displayObjectDurabilityPercentageTooltip = RichText.render("This makes objects that took decay hits to also show a percentage number, on top of the cracked texture overlay.", UI.scale(300));
+	private static final Object showCritterAurasTooltip = RichText.render("This will draw clickable circles under all critters, which makes it easier to spot them, and right-click to chase them." +
+			"\n" +
+			"\n$col[185,185,185]{This can be very nice during combat, due to the $col[218,163,0]{Speed Boost provided by the Forager Credo} when chasing critters. " +
+			"\nIt can also just make your life easier when foraging in general.}", UI.scale(300));
+	private static final Object showSpeedBuffAurasTooltip = RichText.render("This will draw a circle under speed buffs that spawn in the world, to make it easier to spot them." +
+			"\n" +
+			"\n$col[185,185,185]{This circle is not clickable, but it shows you where exactly the speed buff is on the ground plane.}" , UI.scale(300));
+	private static final Object showMidgesCircleAurasTooltip = RichText.render("This will draw a red circle under midges, to make it easier to spot and avoid them.", UI.scale(300));
+	private static final Object showBeastDangerRadiiTooltip = RichText.render("This will draw a large red radius around dangerous animals to make it easier to spot them." +
+			"\n" +
+			"\n$col[200,0,0]{WARNING: This doesn't show you how close you can get to it!}" +
+			"\n" +
+			"\n$col[185,185,185]{If you don't know how dangerous an animal is and how close you can get to it, just stay as far as possible.}", UI.scale(300));
 	private static final Object showBeeSkepsRadiiTooltip = RichText.render("$col[218,163,0]{Action Button:} $col[185,185,185]{This setting can also be turned on/off using an action button from the menu grid (Custom Client Extras → Toggles).}", UI.scale(320));
 	private static final Object showFoodThroughsRadiiTooltip = RichText.render("$col[218,163,0]{Action Button:} $col[185,185,185]{This setting can also be turned on/off using an action button from the menu grid (Custom Client Extras → Toggles).}", UI.scale(320));
 	private static final Object showMoundBedsRadiiTooltip = RichText.render("$col[218,163,0]{Action Button:} $col[185,185,185]{This setting can also be turned on/off using an action button from the menu grid (Custom Client Extras → Toggles).}", UI.scale(320));
+	private static final Object showBarrelContentsTextTooltip = RichText.render("This adds text on top of barrels, to make it easier to determine what’s inside of them." +
+			"\n" +
+			"\n$col[185,185,185]{Empty barrels won't show any text.}", UI.scale(300));
+	private static final Object showIconSignTextTooltip = RichText.render("This adds text on top of icon signs, that shows the name of the currently displayed icon." +
+			"\n" +
+			"\n$col[185,185,185]{Icon signs that don't have any icon set won't show any text.}", UI.scale(300));
+	private static final Object showCheeseRacksTierTextTooltip = RichText.render("This adds text on top of each cheese tray inside cheese racks, that shows the current tier of the cheese present in the tray." +
+			"\n" +
+			"\n$col[185,185,185]{Unfortunately, the server only sends the tier info, so the client can't tell which exact cheese is in the trays.}", UI.scale(300));
 	private static final Object showMineSupportRadiiTooltip = RichText.render("$col[218,163,0]{Action Button:} $col[185,185,185]{This setting can also be turned on/off using an action button from the menu grid (Custom Client Extras → Toggles).}", UI.scale(320));
 	private static final Object showMineSupportSafeTilesTooltip = RichText.render("$col[218,163,0]{Action Button:} $col[185,185,185]{This setting can also be turned on/off using an action button from the menu grid (Custom Client Extras → Toggles).}", UI.scale(320));
 	private static final Object enableMineSweeperTooltip = RichText.render("This will cause cave dust tiles to show the number of potential cave-ins surrounding them, just like in Minesweeper." +
@@ -4826,9 +4867,36 @@ public class OptWnd extends Window {
 	private static final Object flatCupboardsTooltip = RichText.render("This turns cupboards into short boxes that open towards the ceiling." +
 			"\n" +
 			"\n$col[185,185,185]{Parchements that are placed on the cupboards are also moved to the top.}", UI.scale(300));
+	private static final Object palisadesAndBrickWallsScaleTooltip = RichText.render("This changes how tall Palisades and Brick Walls are." +
+			"\n" +
+			"\n$col[185,185,185]{Only wall sections, NOT gates!}", UI.scale(300));
 	private static final Object enableSkyboxTooltip = RichText.render("Adds a skybox to the game world." +
 			"\n" +
 			"\n$col[185,185,185]{Summon the sky above the hearthlands, and banish the endless void!}", UI.scale(190));
+	private static final Object disableTreeAndBushSwayingTooltip = RichText.render("Trees and bushes will no longer move as if the wind is blowing them around." +
+			"\n" +
+			"\n$col[185,185,185]{Disabling swaying can improve your framerate.}", UI.scale(300));
+	private static final Object disableIndustrialSmokeTooltip = RichText.render("Completely removes the smoke particles from things like smelters and kilns." +
+			"\n" +
+			"\n$col[185,185,185]{It *might* improve your framerate around smelters and stuff, but I'm not sure though.}", UI.scale(300));
+	private static final Object disableScentSmokeTooltip = RichText.render("Completely removes the smoke particles from crime scents." +
+			"\n" +
+			"\n$col[185,185,185]{It can significantly improve your framerate during big battles, but I still recommend disabling scents completely when you're participating in big fights.}", UI.scale(300));
+	private static final Object disableSeasonalGroundColorsTooltip = RichText.render("This makes all biomes keep their summer colors, during any season." +
+			"\n" +
+			"\n$col[185,185,185]{Have you noticed how all biome colors shift their hue when the season changes?}", UI.scale(300));
+	private static final Object disableGroundCloudShadowsTooltip = RichText.render("$col[185,185,185]{They look kinda nice to be honest.}", UI.scale(300));
+	private static final Object disableWetGroundOverlayTooltip = RichText.render("$col[185,185,185]{Honestly just keep it disabled. It looks VERY UGLY, lmao.}", UI.scale(300));
+	private static final Object disableValhallaFilterTooltip = RichText.render("This makes Valhalla look the same as the normal world." +
+			"\n" +
+			"\n$col[185,185,185]{I hate how it makes Valhalla look more gray, as if it's some weird purgatory.}", UI.scale(300));
+	private static final Object disableScreenShakingTooltip = RichText.render("$col[185,185,185]{This usually happens when a dungeon is about to collapse, after you've defeated the boss.}", UI.scale(300));
+	private static final Object disableLibertyCapsHighTooltip = RichText.render("$col[200,0,0]{WARNING:} This is the only screen effect in the game that displays intense flashing lights and has sharp sounds." +
+			"\n" +
+			"\nIf you have epilepsy or are sensitive to these kinds of effects, I BEG YOU to keep it DISABLED if you are at risk." +
+			"\n" +
+			"\n$col[185,185,185]{I have no idea why this disgusting effect exists at all. " +
+			"\nThe vanilla client does not warn you about it in any way, shape or form.}", UI.scale(280));
 
 	// Server Integration Settings Tooltips
 	private static final Object uploadMapTilesTooltip = RichText.render("Enable this to upload your map tiles to your web map server.", UI.scale(300));
