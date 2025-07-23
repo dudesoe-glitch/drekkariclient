@@ -2084,7 +2084,7 @@ public class OptWnd extends Window {
 					}
 				}
 			}, UI.scale(240, 0));
-			showObjectCollisionBoxesCheckBox.tooltip = genericHasKeybindTooltip;
+			showObjectCollisionBoxesCheckBox.tooltip = showObjectCollisionBoxesTooltip;
 			middleColumn = add(collisionBoxColorOptionWidget = new ColorOptionWidget("Collision Box Color:", "collisionBox", 115, Integer.parseInt(collisionBoxColorSetting[0]), Integer.parseInt(collisionBoxColorSetting[1]), Integer.parseInt(collisionBoxColorSetting[2]), Integer.parseInt(collisionBoxColorSetting[3]), (Color col) -> {
 				CollisionBox.SOLID_HOLLOW = Pipe.Op.compose(new ColorMask(col), new States.LineWidth(CollisionBox.WIDTH), CollisionBox.TOP);
 				if (ui != null && ui.gui != null) {
@@ -2115,6 +2115,7 @@ public class OptWnd extends Window {
 					Utils.setprefb("displayObjectQualityOnInspection", val);
 				}
 			}, middleColumn.pos("bl").adds(0, 2));
+			displayObjectQualityOnInspectionCheckBox.tooltip = displayObjectQualityOnInspectionTooltip;
 
 			middleColumn = add(showCritterAurasCheckBox = new CheckBox("Show Critter Circle Auras (Clickable)"){
 				{a = (Utils.getprefb("showCritterAuras", true));}
@@ -4680,7 +4681,11 @@ public class OptWnd extends Window {
 	private static final Object showWorkstationProgressTooltip = RichText.render("Colors workstations (Drying Racks, Tanning Tubs, Cheese Racks, Flower Pots), depending on their current progress." +
 			"\n" +
 			"\n$col[185,185,185]{Select from below what states you want to be highlighted, and what colors you want each of them to show.}", UI.scale(330));
-	private static final Object displayObjectDurabilityPercentageTooltip = RichText.render("This makes objects that took decay hits to also show a percentage number, on top of the cracked texture overlay.", UI.scale(300));
+	private static final Object showObjectCollisionBoxesTooltip = RichText.render("This shows the collision boundaries of objects in the world by outlining each edge with a line." +
+			"\n" +
+			"\n$col[218,163,0]{Keybind:} $col[185,185,185]{This can also be toggled using a keybind.}", UI.scale(300));
+	private static final Object displayObjectDurabilityPercentageTooltip = RichText.render("This makes objects that took decay hits also show a percentage number, on top of the cracked texture overlay.", UI.scale(300));
+	private static final Object displayObjectQualityOnInspectionTooltip = RichText.render("This makes objects that have been inspected show their quality number on top, until unload them.", UI.scale(300));
 	private static final Object showCritterAurasTooltip = RichText.render("This will draw clickable circles under all critters, which makes it easier to spot them, and right-click to chase them." +
 			"\n" +
 			"\n$col[185,185,185]{This can be very nice during combat, due to the $col[218,163,0]{Speed Boost provided by the Forager Credo} when chasing critters. " +
