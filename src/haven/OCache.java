@@ -71,7 +71,7 @@ public class OCache implements Iterable<Gob> {
     public OCache(Glob glob) {
 	this.glob = glob;
 	if (OptWnd.toggleGobHidingCheckBox.a) gobAction(Gob::updateHidingBoxes);
-	if (OptWnd.toggleGobCollisionBoxesCheckBox.a) gobAction(Gob::updateCollisionBoxes);
+	if (OptWnd.showObjectCollisionBoxesCheckBox.a) gobAction(Gob::updateCollisionBoxes);
 	if (OptWnd.showContainerFullnessCheckBox.a) gobAction(Gob::updateContainerFullnessHighlight);
 	gobAction(Gob::updateCustomSizeAndRotation);
 	if (OptWnd.showWorkstationProgressCheckBox.a) gobAction(Gob::updateWorkstationProgressHighlight);

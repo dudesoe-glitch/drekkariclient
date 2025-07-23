@@ -1582,7 +1582,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 		}
 		Resource res = Gob.this.getres();
 		if (res != null) {
-			if ((OptWnd.toggleGobCollisionBoxesCheckBox.a)) {
+			if ((OptWnd.showObjectCollisionBoxesCheckBox.a)) {
 				if (collisionBox != null) {
 					if (!collisionBox.show(true)) {
 						collisionBox.fx.updateState();

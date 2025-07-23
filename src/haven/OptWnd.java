@@ -1645,7 +1645,7 @@ public class OptWnd extends Window {
 	}
 
 
-	public static CheckBox toggleGobCollisionBoxesCheckBox;
+	public static CheckBox showObjectCollisionBoxesCheckBox;
 	public static ColorOptionWidget collisionBoxColorOptionWidget;
 	public static String[] collisionBoxColorSetting = Utils.getprefsa("collisionBox" + "_colorSetting", new String[]{"255", "255", "255", "210"});
 	public static CheckBox displayObjectDurabilityPercentageCheckBox;
@@ -2073,10 +2073,10 @@ public class OptWnd extends Window {
 				}
 			}, leftColumn.pos("bl").adds(0, 12).x(0));
 
-			middleColumn = add(toggleGobCollisionBoxesCheckBox = new CheckBox("Show Object Collision Boxes"){
-				{a = (Utils.getprefb("gobCollisionBoxesDisplayToggle", false));}
+			middleColumn = add(showObjectCollisionBoxesCheckBox = new CheckBox("Show Object Collision Boxes"){
+				{a = (Utils.getprefb("showObjectCollisionBoxes", false));}
 				public void set(boolean val) {
-					Utils.setprefb("gobCollisionBoxesDisplayToggle", val);
+					Utils.setprefb("showObjectCollisionBoxes", val);
 					a = val;
 					if (ui != null && ui.gui != null) {
 						ui.sess.glob.oc.gobAction(Gob::updateCollisionBoxes);
@@ -2084,7 +2084,7 @@ public class OptWnd extends Window {
 					}
 				}
 			}, UI.scale(240, 0));
-			toggleGobCollisionBoxesCheckBox.tooltip = genericHasKeybindTooltip;
+			showObjectCollisionBoxesCheckBox.tooltip = genericHasKeybindTooltip;
 			middleColumn = add(collisionBoxColorOptionWidget = new ColorOptionWidget("Collision Box Color:", "collisionBox", 115, Integer.parseInt(collisionBoxColorSetting[0]), Integer.parseInt(collisionBoxColorSetting[1]), Integer.parseInt(collisionBoxColorSetting[2]), Integer.parseInt(collisionBoxColorSetting[3]), (Color col) -> {
 				CollisionBox.SOLID_HOLLOW = Pipe.Op.compose(new ColorMask(col), new States.LineWidth(CollisionBox.WIDTH), CollisionBox.TOP);
 				if (ui != null && ui.gui != null) {

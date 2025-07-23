@@ -606,7 +606,7 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
 	clmaptree.add(clickmap);
 	setcanfocus(true);
 	if (OptWnd.toggleGobHidingCheckBox.a) updatePlobHidingBox();
-	if (OptWnd.toggleGobCollisionBoxesCheckBox.a) updatePlobCollisionBox();
+	if (OptWnd.showObjectCollisionBoxesCheckBox.a) updatePlobCollisionBox();
 	if (OptWnd.showContainerFullnessCheckBox.a) updatePlobContainerHighlight();
 	updatePlobCustomSizeAndRotation();
 	if (OptWnd.showWorkstationProgressCheckBox.a) updatePlobWorkstationProgressHighlight();

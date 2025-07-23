@@ -1958,7 +1958,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 		OptWnd.toggleGobHidingCheckBox.set(!OptWnd.toggleGobHidingCheckBox.a);
 		return(true);
 	} else if(kb_toggleCollisionBoxes.key().match(ev)) {
-		OptWnd.toggleGobCollisionBoxesCheckBox.set(!OptWnd.toggleGobCollisionBoxesCheckBox.a);
+		OptWnd.showObjectCollisionBoxesCheckBox.set(!OptWnd.showObjectCollisionBoxesCheckBox.a);
 		return(true);
 	} else if(kb_toggleGrowthInfo.key().match(ev)) {
 		OptWnd.displayGrowthInfoCheckBox.set(!OptWnd.displayGrowthInfoCheckBox.a);
