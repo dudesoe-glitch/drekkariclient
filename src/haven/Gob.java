@@ -115,6 +115,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	public boolean combatFoeHighlighted = false;
 	private GobSpeedInfo gobSpeedInfo;
 	Audio.CS playerAlarmClip = null;
+	public String currentWeapon = "";
 
     public static class Overlay implements RenderTree.Node, Sprite.Owner {
 	public final int id;
@@ -2540,6 +2541,18 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 			if ((getres().name.startsWith("gfx/terobjs/arch/palisade") || getres().name.startsWith("gfx/terobjs/arch/brickwall")) && !getres().name.contains("gate")) {
 				customSizeAndRotation.update(this);
 			}
+		}
+	}
+
+	public void updateCurrentWeapon(List<Composited.ED> equ) {
+		if (!equ.isEmpty()) {
+			for (Composited.ED item : equ) {
+				if (Config.WEAPON_NAMES_AND_RANGES.containsKey(item.res.res.get().basename())){
+					currentWeapon = item.res.res.get().basename();
+					return;
+				}
+			}
+			currentWeapon = "";
 		}
 	}
 

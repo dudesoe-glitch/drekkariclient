@@ -108,6 +108,7 @@ public class Composite extends Drawable implements EquipTarget {
 	}
 	if(nequ != null) {
 	    try {
+			gob.updateCurrentWeapon(nequ);
 		comp.chequ(nequ);
 		nequ = null;
 	    } catch(Loading l) {

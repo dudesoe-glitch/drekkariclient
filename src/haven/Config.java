@@ -1154,4 +1154,13 @@ public class Config {
 		STONE_FULL_NAMES.put("corund", "Korund (Corund)");
 	}
 
+	public static final Map<String, Float> WEAPON_NAMES_AND_RANGES = new LinkedHashMap<>() {{
+		put("hirdsword", 16f);
+		put("bronzesword", 16f);
+		put("pickaxe", 16f);
+		put("b12axe", 18f);
+		put("cutblade", 19f);
+		put("boarspear", 20f);
+	}};
+
 }
