@@ -2090,12 +2090,17 @@ public class OptWnd extends Window {
 				}
 			}), collisionBoxColorOptionWidget.pos("ur").adds(10, 0)).tooltip = resetButtonTooltip;
 
+			Scrollport scroll = add(new Scrollport(UI.scale(new Coord(230, 40))), middleColumn.pos("bl").adds(0, 8).xs(240));
+			middleColumn = scroll;
+			Widget cont = scroll.cont;
+			addbtn(cont, "Show Collision Boxes Hotkey:", GameUI.kb_toggleCollisionBoxes, 0);
+
 			middleColumn = add(displayObjectDurabilityPercentageCheckBox = new CheckBox("Display Object Durability Percentage"){
 				{a = (Utils.getprefb("displayObjectHealthPercentage", true));}
 				public void changed(boolean val) {
 					Utils.setprefb("displayObjectHealthPercentage", val);
 				}
-			}, middleColumn.pos("bl").adds(0, 12).x(UI.scale(240)));
+			}, middleColumn.pos("bl").adds(0, -6).x(UI.scale(240)));
 			displayObjectDurabilityPercentageCheckBox.tooltip = displayObjectDurabilityPercentageTooltip;
 			middleColumn = add(displayObjectQualityOnInspectionCheckBox = new CheckBox("Display Object Quality on Inspection"){
 				{a = (Utils.getprefb("displayObjectQualityOnInspection", true));}
@@ -2377,6 +2382,13 @@ public class OptWnd extends Window {
 			pack();
 			centerBackButton(backButton, this);
 		}
+
+		private int addbtn(Widget cont, String nm, KeyBinding cmd, int y) {
+			return (cont.addhl(new Coord(0, y), cont.sz.x,
+					new Label(nm), new SetButton(UI.scale(70), cmd))
+					+ UI.scale(2));
+		}
+
 	}
 
 
