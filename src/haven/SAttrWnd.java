@@ -287,6 +287,7 @@ public class SAttrWnd extends Widget {
 		prevStudyCheckbox = add(lockStudyReportCheckBox, prevStudyCheckbox.pos("bl").adds(0, 2));
 		prevStudyCheckbox.tooltip = OptWnd.lockStudyReportTooltip;
 		prevStudyCheckbox = add(soundAlertForFinishedCuriositiesCheckBox, prevStudyCheckbox.pos("bl").adds(0, 2));
+		prevStudyCheckbox.tooltip = OptWnd.soundAlertForFinishedCuriositiesTooltip;
 		prevStudyCheckbox = add(autoReloadCuriositiesFromInventoryCheckBox, prevStudyCheckbox.pos("bl").adds(0, 2));
 		prevStudyCheckbox.tooltip = OptWnd.autoReloadCuriositiesFromInventoryTooltip;
 	    Widget inf = add(new StudyInfo(new Coord(attrw - child.sz.x - wbox.bisz().x - UI.scale(5), child.sz.y), child), child.pos("ur").add(wbox.bisz().x + UI.scale(5), 0));

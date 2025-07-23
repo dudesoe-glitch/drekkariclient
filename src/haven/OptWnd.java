@@ -732,6 +732,19 @@ public class OptWnd extends Window {
 				SAttrWnd.soundAlertForFinishedCuriositiesCheckBox.a = val;
 				Utils.setprefb("soundAlertForFinishedCuriosities", val);
 				a = val;
+				if (val) {
+					try {
+						File file = new File(haven.MainFrame.gameDir + "res/customclient/sfx/CurioFinished.wav");
+						if (file.exists()) {
+							AudioInputStream in = AudioSystem.getAudioInputStream(file);
+							AudioFormat tgtFormat = new AudioFormat(AudioFormat.Encoding.PCM_SIGNED, 44100, 16, 2, 4, 44100, false);
+							AudioInputStream pcmStream = AudioSystem.getAudioInputStream(tgtFormat, in);
+							Audio.CS klippi = new Audio.PCMClip(pcmStream, 2, 2);
+							((Audio.Mixer) Audio.player.stream).add(new Audio.VolAdjust(klippi, 0.8));
+						}
+					} catch (Exception e) {
+					}
+				}
 			}
 		}, leftColumn.pos("bl").adds(0, 2));
 		soundAlertForFinishedCuriositiesCheckBox.tooltip = soundAlertForFinishedCuriositiesTooltip;
@@ -4583,6 +4596,9 @@ public class OptWnd extends Window {
 			"\n" +
 			"\n$col[185,185,185]{It doesn't work with Gems. Don't ask me why.}", UI.scale(300));
 	static final Object lockStudyReportTooltip = RichText.render("This will prevent grabbing or dropping items from the Study Report", UI.scale(300));
+	public static final Object soundAlertForFinishedCuriositiesTooltip = RichText.render("A violin sound will be played every time a curiosity is finished." +
+			"\n" +
+			"\n$col[218,163,0]{Preview:}$col[185,185,185]{Enable this to hear the sound!", UI.scale(300));
 	private static final Object alwaysShowCombatUiBarTooltip = RichText.render("For more options for this bar, check the Combat Settings.", UI.scale(320));
 
 	// Combat Settings Tooltips
