@@ -2233,6 +2233,7 @@ public class OptWnd extends Window {
 					}
 				}
 			}, middleColumn.pos("bl").adds(0, 20));
+			objectPermanentHighlightingCheckBox.tooltip = objectPermanentHighlightingTooltip;
 			// ND: Doing funny workaround with 2 separate labels to split the checkbox on 2 rows haha
 			add(new Label("Permanently Highlight Objects with"){
 				@Override
@@ -2243,7 +2244,7 @@ public class OptWnd extends Window {
 					}
 					return(super.mousedown(ev));
 				}
-			}, middleColumn.pos("ur").adds(6, -10));
+			}, middleColumn.pos("ur").adds(6, -10)).tooltip = objectPermanentHighlightingTooltip;;
 			add(new Label("Alt + Middle Click (Mouse Scroll Click)"){
 				@Override
 				public boolean mousedown(MouseDownEvent ev) {
@@ -2253,7 +2254,7 @@ public class OptWnd extends Window {
 					}
 					return(super.mousedown(ev));
 				}
-			}, middleColumn.pos("bl").adds(21, -6));
+			}, middleColumn.pos("bl").adds(21, -6)).tooltip = objectPermanentHighlightingTooltip;;
 
 			rightColumn = add(new Label("Object Pinging Colors:"), UI.scale(480, 0));
 			rightColumn = add(areaChatPingColorOptionWidget = new ColorOptionWidget("Area Chat (Alt+LClick):", "areaChatPing", 115, Integer.parseInt(areaChatPingColorSetting[0]), Integer.parseInt(areaChatPingColorSetting[1]), Integer.parseInt(areaChatPingColorSetting[2]), Integer.parseInt(areaChatPingColorSetting[3]), (Color col) -> {
@@ -4723,6 +4724,11 @@ public class OptWnd extends Window {
 	private static final Object showBeeSkepsRadiiTooltip = RichText.render("$col[218,163,0]{Action Button:} $col[185,185,185]{This setting can also be turned on/off using an action button from the menu grid (Custom Client Extras → Toggles).}", UI.scale(320));
 	private static final Object showFoodThroughsRadiiTooltip = RichText.render("$col[218,163,0]{Action Button:} $col[185,185,185]{This setting can also be turned on/off using an action button from the menu grid (Custom Client Extras → Toggles).}", UI.scale(320));
 	private static final Object showMoundBedsRadiiTooltip = RichText.render("$col[218,163,0]{Action Button:} $col[185,185,185]{This setting can also be turned on/off using an action button from the menu grid (Custom Client Extras → Toggles).}", UI.scale(320));
+	private static final Object objectPermanentHighlightingTooltip = RichText.render("This allows you to set a purple highlight on objects that persists even if you reload the objects, switch character, log out, etc." +
+			"\n" +
+			"\n$col[185,185,185]{For example, you can use this to keep track of which cows you milked already, or whatever.}" +
+			"\n" +
+			"\n$col[218,163,0]{Note:} $col[185,185,185]{Disabling this setting will reset the current list of highlighted objects.}", UI.scale(300));
 	private static final Object showBarrelContentsTextTooltip = RichText.render("This adds text on top of barrels, to make it easier to determine what’s inside of them." +
 			"\n" +
 			"\n$col[185,185,185]{Empty barrels won't show any text.}", UI.scale(300));
