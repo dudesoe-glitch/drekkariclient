@@ -4740,7 +4740,7 @@ public class OptWnd extends Window {
 			"\n" +
 			"\n$col[185,185,185]{For example, you can use this to keep track of which cows you milked already, or whatever.}" +
 			"\n" +
-			"\n$col[218,163,0]{Note:} $col[185,185,185]{Disabling this setting will reset the current list of highlighted objects.}", UI.scale(300));
+			"\n$col[218,163,0]{Note:} $col[185,185,185]{Disabling this setting will also reset the current list of highlighted objects.}", UI.scale(300));
 	private static final Object showBarrelContentsTextTooltip = RichText.render("This adds text on top of barrels, to make it easier to determine what’s inside of them." +
 			"\n" +
 			"\n$col[185,185,185]{Empty barrels won't show any text.}", UI.scale(300));
