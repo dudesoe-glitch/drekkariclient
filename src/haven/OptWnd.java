@@ -2061,18 +2061,6 @@ public class OptWnd extends Window {
 				}
 			}, leftColumn.pos("ul").adds(160, 2));
 
-			leftColumn = add(objectPermanentHighlightingCheckBox = new CheckBox("Permanently Highlight Objects with on Alt + Middle Click (Mouse Scroll Click)"){
-				{a = (Utils.getprefb("objectPermanentHighlighting", false));}
-				public void changed(boolean val) {
-					Utils.setprefb("objectPermanentHighlighting", val);
-					if (!val) {
-						if (ui != null && ui.gui != null)
-							ui.sess.glob.oc.gobAction(Gob::removePermanentHighlightOverlay);
-						Gob.permanentHighlightList.clear();
-					}
-				}
-			}, leftColumn.pos("bl").adds(0, 12).x(0));
-
 			middleColumn = add(showObjectCollisionBoxesCheckBox = new CheckBox("Show Object Collision Boxes"){
 				{a = (Utils.getprefb("showObjectCollisionBoxes", false));}
 				public void set(boolean val) {
@@ -2234,37 +2222,38 @@ public class OptWnd extends Window {
 				}
 			}, middleColumn.pos("bl").adds(0, 2));
 			showMoundBedsRadiiCheckBox.tooltip = showMoundBedsRadiiTooltip;
-			middleColumn = add(showBarrelContentsTextCheckBox = new CheckBox("Show Barrel Contents Text"){
-				{a = (Utils.getprefb("showBarrelContentsText", true));}
+			middleColumn = add(objectPermanentHighlightingCheckBox = new CheckBox(""){
+				{a = (Utils.getprefb("objectPermanentHighlighting", false));}
 				public void changed(boolean val) {
-					Utils.setprefb("showBarrelContentsText", val);
-					if (ui != null && ui.gui != null){
-						ui.gui.optionInfoMsg("Barrel Contents Text is now " + (val ? "SHOWN" : "HIDDEN") + "!", (val ? msgGreen : msgGray), Audio.resclip(val ? Toggle.sfxon : Toggle.sfxoff));
+					Utils.setprefb("objectPermanentHighlighting", val);
+					if (!val) {
+						if (ui != null && ui.gui != null)
+							ui.sess.glob.oc.gobAction(Gob::removePermanentHighlightOverlay);
+						Gob.permanentHighlightList.clear();
 					}
 				}
-			}, middleColumn.pos("bl").adds(0, 13));
-			showBarrelContentsTextCheckBox.tooltip = showBarrelContentsTextTooltip;
-
-			middleColumn = add(showIconSignTextCheckBox = new CheckBox("Show Icon Sign Text"){
-				{a = (Utils.getprefb("showIconSignText", true));}
-				public void changed(boolean val) {
-					Utils.setprefb("showIconSignText", val);
-					if (ui != null && ui.gui != null){
-						ui.gui.optionInfoMsg("Icon Sign Text is now " + (val ? "SHOWN" : "HIDDEN") + "!", (val ? msgGreen : msgGray), Audio.resclip(val ? Toggle.sfxon : Toggle.sfxoff));
+			}, middleColumn.pos("bl").adds(0, 20));
+			// ND: Doing funny workaround with 2 separate labels to split the checkbox on 2 rows haha
+			add(new Label("Permanently Highlight Objects with"){
+				@Override
+				public boolean mousedown(MouseDownEvent ev) {
+					if(ev.b == 1) {
+						objectPermanentHighlightingCheckBox.click();
+						return(true);
 					}
+					return(super.mousedown(ev));
 				}
-			}, middleColumn.pos("bl").adds(0, 2));
-			showIconSignTextCheckBox.tooltip = showIconSignTextTooltip;
-			middleColumn = add(showCheeseRacksTierTextCheckBox = new CheckBox("Show Cheese Racks Tier Text"){
-				{a = (Utils.getprefb("showCheeseRacksTierText", false));}
-				public void changed(boolean val) {
-					Utils.setprefb("showCheeseRacksTierText", val);
-					if (ui != null && ui.gui != null){
-						ui.gui.optionInfoMsg("Cheese Racks Tier Text is now " + (val ? "SHOWN" : "HIDDEN") + "!", (val ? msgGreen : msgGray), Audio.resclip(val ? Toggle.sfxon : Toggle.sfxoff));
+			}, middleColumn.pos("ur").adds(6, -10));
+			add(new Label("Alt + Middle Click (Mouse Scroll Click)"){
+				@Override
+				public boolean mousedown(MouseDownEvent ev) {
+					if(ev.b == 1) {
+						objectPermanentHighlightingCheckBox.click();
+						return(true);
 					}
+					return(super.mousedown(ev));
 				}
-			}, middleColumn.pos("bl").adds(0, 2));
-			showCheeseRacksTierTextCheckBox.tooltip = showCheeseRacksTierTextTooltip;
+			}, middleColumn.pos("bl").adds(21, -6));
 
 			rightColumn = add(new Label("Object Pinging Colors:"), UI.scale(480, 0));
 			rightColumn = add(areaChatPingColorOptionWidget = new ColorOptionWidget("Area Chat (Alt+LClick):", "areaChatPing", 115, Integer.parseInt(areaChatPingColorSetting[0]), Integer.parseInt(areaChatPingColorSetting[1]), Integer.parseInt(areaChatPingColorSetting[2]), Integer.parseInt(areaChatPingColorSetting[3]), (Color col) -> {
@@ -2349,6 +2338,38 @@ public class OptWnd extends Window {
 				}
 			}, rightColumn.pos("bl").adds(0, 2).x(UI.scale(480)));
 			showBeeSkepsHarvestIconsCheckBox.tooltip = showBeeSkepsHarvestIconsTooltip;
+
+			rightColumn = add(showBarrelContentsTextCheckBox = new CheckBox("Show Barrel Contents Text"){
+				{a = (Utils.getprefb("showBarrelContentsText", true));}
+				public void changed(boolean val) {
+					Utils.setprefb("showBarrelContentsText", val);
+					if (ui != null && ui.gui != null){
+						ui.gui.optionInfoMsg("Barrel Contents Text is now " + (val ? "SHOWN" : "HIDDEN") + "!", (val ? msgGreen : msgGray), Audio.resclip(val ? Toggle.sfxon : Toggle.sfxoff));
+					}
+				}
+			}, rightColumn.pos("bl").adds(0, 13));
+			showBarrelContentsTextCheckBox.tooltip = showBarrelContentsTextTooltip;
+
+			rightColumn = add(showIconSignTextCheckBox = new CheckBox("Show Icon Sign Text"){
+				{a = (Utils.getprefb("showIconSignText", true));}
+				public void changed(boolean val) {
+					Utils.setprefb("showIconSignText", val);
+					if (ui != null && ui.gui != null){
+						ui.gui.optionInfoMsg("Icon Sign Text is now " + (val ? "SHOWN" : "HIDDEN") + "!", (val ? msgGreen : msgGray), Audio.resclip(val ? Toggle.sfxon : Toggle.sfxoff));
+					}
+				}
+			}, rightColumn.pos("bl").adds(0, 2));
+			showIconSignTextCheckBox.tooltip = showIconSignTextTooltip;
+			rightColumn = add(showCheeseRacksTierTextCheckBox = new CheckBox("Show Cheese Racks Tier Text"){
+				{a = (Utils.getprefb("showCheeseRacksTierText", false));}
+				public void changed(boolean val) {
+					Utils.setprefb("showCheeseRacksTierText", val);
+					if (ui != null && ui.gui != null){
+						ui.gui.optionInfoMsg("Cheese Racks Tier Text is now " + (val ? "SHOWN" : "HIDDEN") + "!", (val ? msgGreen : msgGray), Audio.resclip(val ? Toggle.sfxon : Toggle.sfxoff));
+					}
+				}
+			}, rightColumn.pos("bl").adds(0, 2));
+			showCheeseRacksTierTextCheckBox.tooltip = showCheeseRacksTierTextTooltip;
 
 			Widget backButton;
 			add(backButton = new PButton(UI.scale(200), "Back", 27, back, "Advanced Settings"), leftColumn.pos("bl").adds(0, 18).x(0));
