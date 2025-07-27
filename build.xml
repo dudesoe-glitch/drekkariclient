@@ -235,10 +235,13 @@
   </target>
 
   <target name="Util: Upload to steam workshop" depends="bin">
-    <java classname="haven.SteamWorkshop" fork="true" failonerror="true" classpath="bin/hafen.jar">
-      <arg value="upload"/>
-      <arg value="bin"/>
-    </java>
+    <exec executable="cmd" spawn="true">
+      <arg value="/c" />
+      <arg value="start" />
+      <arg value="cmd" />
+      <arg value="/k" />
+      <arg value="java -cp bin/hafen.jar haven.SteamWorkshop upload bin" />
+    </exec>
   </target>
 
     <target name="clean">
