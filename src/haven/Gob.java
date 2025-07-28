@@ -114,7 +114,6 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	GobCheeseRackInfo cheeseRackInfo;
 	public boolean combatFoeHighlighted = false;
 	private GobSpeedInfo gobSpeedInfo;
-	Audio.CS playerAlarmClip = null;
 	public String currentWeapon = "";
 	GobCombatDataInfo combatDataInfo;
 
@@ -1422,11 +1421,9 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 				if (getres().name.equals("gfx/borka/body")) {
 					long plgobid = glob.sess.ui.gui.map.plgob;
 					if (plgobid != -1 && plgobid != id) {
-						if (isLoftar) {
+						if (isLoftar)
 							setattr(new Buddy(this, -1, "Loftar", Color.WHITE));
-							if (playerAlarmClip != null)
-								((Audio.Mixer) Audio.player.stream).stop(playerAlarmClip);
-						} else if ((getattr(Vilmate.class) != null))
+						else if ((getattr(Vilmate.class) != null))
 							setattr(new Buddy(this, -1, "Village/Realm Member", Color.WHITE));
 						else {
 							setattr(new Buddy(this, -1, "Unknown", Color.GRAY));
@@ -2260,6 +2257,8 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 
 	public void playPlayerAlarm() {
 		if (!alarmPlayed.contains(id)){
+			Composite c = getattr(Composite.class);
+			if (c == null || c.comp.cmod.isEmpty()) return;
 			if (getres() != null) {
 				if (isMannequin != null && !isMannequin && isSkeleton != null && !isSkeleton){
 					if (getres().name.equals("gfx/borka/body")) {
@@ -2306,8 +2305,8 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 					AudioInputStream in = AudioSystem.getAudioInputStream(file);
 					AudioFormat tgtFormat = new AudioFormat(AudioFormat.Encoding.PCM_SIGNED, 44100, 16, 2, 4, 44100, false);
 					AudioInputStream pcmStream = AudioSystem.getAudioInputStream(tgtFormat, in);
-					playerAlarmClip = new Audio.VolAdjust(new Audio.PCMClip(pcmStream, 2, 2), val / 50.0);
-					((Audio.Mixer) Audio.player.stream).add(playerAlarmClip);
+					Audio.CS klippi = new Audio.PCMClip(pcmStream, 2, 2);
+					((Audio.Mixer) Audio.player.stream).add(new Audio.VolAdjust(klippi, val / 50.0));
 					alarmPlayed.add(id);
 				}
 			} catch (Exception ignored) {
