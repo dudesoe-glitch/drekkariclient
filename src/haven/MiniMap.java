@@ -783,9 +783,6 @@ public class MiniMap extends Widget {
 	drawparty(g);
 	drawbiome(g);
 	drawsprites(g);
-	if (dloc.seg != sessloc.seg){ // ND: Attempts to fix the bug where the segments desync, idk why they desync and it's annoying me alot
-		sessloc.seg = dloc.seg;
-	}
     }
 
     public void draw(GOut g) {

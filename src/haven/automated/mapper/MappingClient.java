@@ -113,20 +113,28 @@ public class MappingClient {
 
 	@Override
 	public void run() {
-	    if(mapfile.lock.readLock().tryLock()) {
-		List<MarkerData> markers = mapfile.markers.stream().filter(uploadCheck).map(m -> {
-		    Coord mgc = new Coord(Math.floorDiv(m.tc.x, 100), Math.floorDiv(m.tc.y, 100));
-		    Indir<MapFile.Grid> indirGrid = mapfile.segments.get(m.seg).grid(mgc);
-		    return new MarkerData(m, indirGrid);
-		}).collect(Collectors.toList());
-		mapfile.lock.readLock().unlock();
-		scheduler.execute(new ProcessMapper(mapfile, markers));
-	    } else {
-		if(retries-- > 0) {
-		    scheduler.schedule(this, 5, TimeUnit.SECONDS);
+		if (mapfile.lock.readLock().tryLock()) {
+			try {
+				List<MarkerData> markers = mapfile.markers.stream()
+						.filter(uploadCheck)
+						.map(m -> {
+							Coord mgc = new Coord(Math.floorDiv(m.tc.x, 100), Math.floorDiv(m.tc.y, 100));
+							Indir<MapFile.Grid> indirGrid = mapfile.segments.get(m.seg).grid(mgc);
+							return new MarkerData(m, indirGrid);
+						})
+						.collect(Collectors.toList());
+
+				scheduler.execute(new ProcessMapper(mapfile, markers));
+			} finally {
+				mapfile.lock.readLock().unlock();
+			}
+		} else {
+			if (retries-- > 0) {
+				scheduler.schedule(this, 5, TimeUnit.SECONDS);
+			}
 		}
-	    }
 	}
+
     }
 
     private class MarkerData {
