@@ -56,12 +56,11 @@ public class Fightsess extends Widget {
     public int use = -1, useb = -1;
     public Coord pcc;
     public int pho;
-    private Fightview fv;
+    public Fightview fv;
 	public static final Text.Foundry ipFoundry = new Text.Foundry(Text.serif.deriveFont(Font.BOLD), 22);
 	public static final Text.Foundry ipAdditionalFont = new Text.Foundry(Text.dfont.deriveFont(Font.BOLD), 12);
 	public static final Text.Foundry openingAdditionalFont = new Text.Foundry(Text.dfont.deriveFont(Font.BOLD), 10);
 	public static final Text.Foundry cleaveAdditionalFont = new Text.Foundry(Text.dfont.deriveFont(Font.BOLD), 10);
-	public Map<Fightview.Relation, Coord> relations = new HashMap<>();
 	int combatMedColorShift = 0;
 	public static final Text.Foundry keybindsFoundry = new Text.Foundry(Text.sans.deriveFont(java.awt.Font.BOLD), 14);
 	public static final Text.Foundry damageFoundry = new Text.Foundry(Text.sans.deriveFont(java.awt.Font.BOLD), 11);
@@ -251,57 +250,7 @@ public class Fightsess extends Widget {
 	private Effect weaponRangeFx;
     public void draw(GOut g) {
 //	updatepos();
-	relations.clear();
-	MapView map = getparent(GameUI.class).map;
-	if (map != null){
-		for (Fightview.Relation rel : fv.lsrel) {
-			try {
-				Coord3f rawc = map.glob.oc.getgob(rel.gobid).placed.getc();
-				rawc.z = rawc.z + 15;
-				if (rawc == null)
-					continue;
-				relations.put(rel, map.screenxf(rawc).round2());
-			} catch (NullPointerException ignore) {}
-		}
-	}
-	int fps = GLPanel.Loop.fps > 0 ? GLPanel.Loop.fps : 1;
-	int alphaShiftSpeed = 2400/fps;
-	if (combatMedAlphaShiftUp) {
-		if (combatMedColorShift + alphaShiftSpeed <= 255) {
-			combatMedColorShift += alphaShiftSpeed;
-		} else {
-			combatMedAlphaShiftUp = false;
-			combatMedColorShift = 255;
-		}
-	} else {
-		if (combatMedColorShift - alphaShiftSpeed >= 0){
-			combatMedColorShift -= alphaShiftSpeed;
-		} else {
-			combatMedAlphaShiftUp = true;
-			combatMedColorShift = 0;
-		}
-	}
-	if (OptWnd.drawFloatingCombatDataCheckBox.a) {
-		if (OptWnd.drawFloatingCombatDataOnCurrentTargetCheckBox.a) {
-			try {
-				Coord sc = relations.get(fv.current);
-				if (sc != null)
-					drawCombatData(g, fv.current, sc, true, true);
-			} catch (NullPointerException ignored) {}
-		}
-		if (OptWnd.drawFloatingCombatDataOnOthersCheckBox.a) {
-			try {
-				for (Map.Entry<Fightview.Relation, Coord> entry : relations.entrySet()) {
-					Fightview.Relation otherRelation = entry.getKey();
-					Coord sc = entry.getValue();
-					if (sc == null || fv.current == otherRelation) {
-						continue;
-					}
-					drawCombatData(g, otherRelation, sc, !OptWnd.onlyShowOpeningsAbovePercentageCombatInfoCheckBox.a, !OptWnd.onlyShowCoinsAbove4CombatInfoCheckBox.a);
-				}
-			} catch (NullPointerException ignored) {}
-		}
-	}
+		combatMedAlphaShift();
 	if (OptWnd.drawFloatingCombatOpeningsAboveYourselfCheckBox.a) {
 		try {
 			drawSelfCombatOpenings(g);
@@ -429,7 +378,7 @@ public class Fightsess extends Widget {
 					}
 				} else {
 					if (name.equals("paginae/atk/combmed")){
-						if(meterValue > 75){
+						if(meterValue > 70){
 							g.chcolor(255, 255-combatMedColorShift, 255-combatMedColorShift, 255);
 						}
 					}
@@ -1041,162 +990,6 @@ public class Fightsess extends Widget {
 		return(currentWeaponRangeFx);
 	}
 
-	private void drawCombatData(GOut g, Fightview.Relation rels, Coord sc, boolean showAllOpenings, boolean alwaysShowCoins) {
-		int scaledY = sc.y - UI.scale(86);
-		Coord topLeft = new Coord(sc.x - UI.scale(32), scaledY);
-		boolean openings;
-		boolean cleaveUsed = false;
-		long cleaveDuration = 4300;
-		//Check if cleave indicator is needed
-		if (rels.lastActCleave != null) {
-			Gob gob = ui.sess.glob.oc.getgob(rels.gobid);
-			// ND: Figure out the *MINIMUM* cooldown someone can have after cleaving.
-			if (gob.currentWeapon.equals("b12axe"))
-				cleaveDuration = 5400;
-			else if (gob.currentWeapon.equals("cutblade"))
-				cleaveDuration = 5200;
-			cleaveUsed = System.currentTimeMillis() - rels.lastActCleave < cleaveDuration;
-		}
-		boolean defenseUsed = false;
-		if (rels.lastActDefence != null) {
-			defenseUsed = System.currentTimeMillis() - rels.lastActDefence < rels.lastDefenceDuration;
-		}
-
-		// ND: Check for openings depending if it's a player or not.
-		Gob gob = ui.sess.glob.oc.getgob(rels.gobid);
-		if (gob != null && gob.getres() != null) {
-			if (gob.getres().name.equals("gfx/borka/body")) { // ND: If it's a player, the first buff is the maneuver, always, so skip it.
-				openings = rels.buffs.children(Buff.class).size() > 1;
-			} else { // ND: Everything else doesn't have a maneuver.
-				openings = rels.buffs.children(Buff.class).size() > 0;
-			}
-		} else {
-			openings = rels.buffs.children(Buff.class).size() > 1;
-		}
-
-		topLeft.x -= UI.scale(2) * rels.buffs.children(Buff.class).size();
-
-		// IP / OIP Text
-		boolean showCoins = true;
-		if (!alwaysShowCoins)
-			if (rels.ip < 4 && rels.oip < 4)
-				showCoins = false;
-		if (showCoins) {
-			g.chcolor(0, 0, 0, 120);
-			g.frect(new Coord(topLeft.x + UI.scale(3), topLeft.y + UI.scale(9)), UI.scale(new Coord(39, 20)));
-			g.chcolor(255, 255, 255, 255);
-			int oipOffset = rels.oip < 10 ? 35 : 40;
-			g.aimage(Text.renderstroked(Integer.toString(rels.ip), OptWnd.myIPCombatColorOptionWidget.currentColor, Color.BLACK, ipAdditionalFont).tex(), new Coord(topLeft.x + UI.scale(20), topLeft.y + UI.scale(19)), 1, 0.5);
-			g.aimage(Text.renderstroked("-", Color.WHITE, Color.BLACK, ipAdditionalFont).tex(), new Coord(topLeft.x + UI.scale(26), topLeft.y + UI.scale(18)), 1, 0.5);
-			g.aimage(Text.renderstroked(Integer.toString(rels.oip), OptWnd.enemyIPCombatColorOptionWidget.currentColor, Color.BLACK, ipAdditionalFont).tex(), new Coord(topLeft.x + UI.scale(oipOffset), topLeft.y + UI.scale(19)), 1, 0.5);
-		}
-
-		// Maneuver
-		if (OptWnd.showCombatManeuverCombatInfoCheckBox.a) {
-			for (Buff buff : rels.buffs.children(Buff.class)) {
-				try {
-					if (buff.res != null && buff.res.get() != null) {
-						String name = buff.res.get().name;
-						if (Config.maneuvers.contains(name)) {
-							g.chcolor(0, 0, 0, 255);
-							g.frect(new Coord(topLeft.x + UI.scale(41), topLeft.y + UI.scale(9)), UI.scale(new Coord(20, 20)));
-							g.chcolor(255, 255, 255, 255);
-							int meterValue = getOpeningValue(buff);
-							Resource.Image img = buff.res.get().flayer(Resource.imgc);
-							Tex maneuverTexture = new TexI(PUtils.uiscale(img.scaled, UI.scale(new Coord(18, 18))));
-							if (name.equals("paginae/atk/combmed")) {
-								if (meterValue > 70) {
-									g.chcolor(255, 255 - combatMedColorShift, 255 - combatMedColorShift, 255);
-								}
-							}
-							g.image(maneuverTexture, new Coord(topLeft.x + UI.scale(42), topLeft.y + UI.scale(10)));
-
-							// Meter
-							if (meterValue > 1) {
-								g.chcolor(0, 0, 0, 255);
-								g.frect(new Coord(topLeft.x + UI.scale(61), topLeft.y + UI.scale(9)), UI.scale(new Coord(5, 20)));
-								if (meterValue < 30) {
-									g.chcolor(255, 255, 255, 255);
-								} else {
-									g.chcolor(255, (255 - (255 * meterValue) / 100), (255 - (255 * meterValue) / 100), 255);
-								}
-								g.frect(new Coord(topLeft.x + UI.scale(62), topLeft.y + UI.scale(28) - ((18 * meterValue) / 100)), UI.scale(new Coord(3, (18 * meterValue) / 100)));
-							}
-						}
-					}
-				} catch (Loading ignored) {
-				}
-			}
-		}
-
-
-		// openings, only if it has any
-		if (openings) {
-			List<TemporaryOpening> openingList = new ArrayList<>();
-			for (Buff buff : rels.buffs.children(Buff.class)) {
-				try {
-					if (buff.res != null && buff.res.get() != null) {
-						Tex img = buff.res.get().flayer(Resource.imgc).tex();
-						String name = buff.res.get().name;
-						if (OptWnd.improvedOpeningsImageColor.containsKey(name)) {
-							int meterValue = getOpeningValue(buff);
-							openingList.add(new TemporaryOpening(meterValue, name, OptWnd.improvedOpeningsImageColor.get(name), img));
-						}
-					}
-				} catch (Loading ignored) {
-				}
-			}
-			openingList.sort((o1, o2) -> Integer.compare(o2.value, o1.value));
-			boolean showOpenings = true;
-			if (!showAllOpenings){
-				if (!openingList.isEmpty() && !OptWnd.minimumOpeningTextEntry.text().isEmpty()){
-					if (openingList.get(0).value < Integer.parseInt(OptWnd.minimumOpeningTextEntry.text())){
-						showOpenings = false;
-					}
-				}
-			}
-			if (showOpenings) {
-				int openingOffsetX = 4;
-				for (TemporaryOpening opening : openingList) {
-					g.chcolor(0, 0, 0, 255);
-					g.frect(new Coord(topLeft.x + UI.scale(openingOffsetX) - UI.scale(1), topLeft.y + UI.scale(30) - UI.scale(1)), UI.scale(new Coord(20, 20)));
-					g.chcolor(opening.color);
-					if (OptWnd.showCombatOpeningsAsLettersCheckBox.a)
-						g.image(opening.img, new Coord(topLeft.x + UI.scale(openingOffsetX), topLeft.y + UI.scale(30)), UI.scale(new Coord(18, 18)));
-					else
-						g.frect(new Coord(topLeft.x + UI.scale(openingOffsetX), topLeft.y + UI.scale(30)), UI.scale(new Coord(18, 18)));
-					g.chcolor(255, 255, 255, 255);
-
-					int valueOffset = opening.value < 10 ? 15 : opening.value< 100 ? 18 : 20;
-					g.aimage(Text.renderstroked(String.valueOf(opening.value), openingAdditionalFont).tex(), new Coord(topLeft.x + UI.scale(openingOffsetX) + UI.scale(valueOffset) - UI.scale(1), topLeft.y + UI.scale(39)), 1, 0.5);
-					openingOffsetX += 19;
-				}
-			}
-		}
-
-		//add cleave cooldown indicator
-		if (cleaveUsed) {
-			long timer = ((cleaveDuration - (System.currentTimeMillis() - rels.lastActCleave)));
-			g.chcolor(new Color(0, 0, 0, 255));
-			g.frect(new Coord(topLeft.x + UI.scale(3), topLeft.y - UI.scale(4)), UI.scale(new Coord((int) ((76 * timer)/cleaveDuration)+2, 13)));
-			g.chcolor(new Color(213, 0, 0, 255));
-			g.frect(new Coord(topLeft.x + UI.scale(4), topLeft.y - UI.scale(3)), UI.scale(new Coord((int) ((76 * timer)/cleaveDuration), 11)));
-			g.chcolor(new Color(255, 255, 255, 255));
-			g.aimage(Text.renderstroked(getCooldownTime(timer), cleaveAdditionalFont).tex(), new Coord(topLeft.x + UI.scale(52), topLeft.y + UI.scale(2)), 1, 0.5);
-		}
-
-		//add defense cooldown indicator, just like cleave
-		if (defenseUsed) {
-			long timer = ((rels.lastDefenceDuration - (System.currentTimeMillis() - rels.lastActDefence)));
-			g.chcolor(new Color(0, 0, 0, 255));
-			g.frect(new Coord(topLeft.x + UI.scale(3), topLeft.y - UI.scale(4)), UI.scale(new Coord((int) ((76 * timer)/rels.lastDefenceDuration)+2, 13)));
-			g.chcolor(new Color(227, 136, 0, 255));
-			g.frect(new Coord(topLeft.x + UI.scale(4), topLeft.y - UI.scale(3)), UI.scale(new Coord((int) ((76 * timer)/rels.lastDefenceDuration), 11)));
-			g.chcolor(new Color(255, 255, 255, 255));
-			g.aimage(Text.renderstroked(getCooldownTime(timer), cleaveAdditionalFont).tex(), new Coord(topLeft.x + UI.scale(52), topLeft.y + UI.scale(2)), 1, 0.5);
-		}
-		g.chcolor(255, 255, 255, 255);
-	}
 
 	private void drawSelfCombatOpenings(GOut g) {
 		Coord3f rawc = ui.gui.map.player().placed.getc();
@@ -1266,11 +1059,11 @@ public class Fightsess extends Widget {
 		return 0;
 	}
 
-	private static class TemporaryOpening{
-		private int value;
-		private String name;
-		private Color color;
-		private Tex img;
+	public static class TemporaryOpening{
+		public int value;
+		public String name;
+		public Color color;
+		public Tex img;
 
 		public TemporaryOpening(int value, String name, Color color, Tex img) {
 			this.value = value;
@@ -1278,11 +1071,6 @@ public class Fightsess extends Widget {
 			this.color = color;
 			this.img = img;
 		}
-	}
-
-	public String getCooldownTime(long time) {
-		double convertedTime = time / 1000.0;
-		return String.format("%.1f", convertedTime);
 	}
 
 	public static String fmt1DecPlace(double value) {
@@ -1430,5 +1218,25 @@ public class Fightsess extends Widget {
 		//ui.gui.msg("ql: "+ql,Color.white);
 		basedmg = (int)(Math.ceil(wepdmg/Math.sqrt(ql/10)));
 		//ui.gui.msg("basedmg: "+basedmg,Color.white);
+	}
+
+	private void combatMedAlphaShift(){
+		int fps = GLPanel.Loop.fps > 0 ? GLPanel.Loop.fps : 1;
+		int alphaShiftSpeed = 2400/fps;
+		if (combatMedAlphaShiftUp) {
+			if (combatMedColorShift + alphaShiftSpeed <= 255) {
+				combatMedColorShift += alphaShiftSpeed;
+			} else {
+				combatMedAlphaShiftUp = false;
+				combatMedColorShift = 255;
+			}
+		} else {
+			if (combatMedColorShift - alphaShiftSpeed >= 0){
+				combatMedColorShift -= alphaShiftSpeed;
+			} else {
+				combatMedAlphaShiftUp = true;
+				combatMedColorShift = 0;
+			}
+		}
 	}
 }

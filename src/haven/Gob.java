@@ -116,6 +116,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	private GobSpeedInfo gobSpeedInfo;
 	Audio.CS playerAlarmClip = null;
 	public String currentWeapon = "";
+	GobCombatDataInfo combatDataInfo;
 
     public static class Overlay implements RenderTree.Node, Sprite.Owner {
 	public final int id;
@@ -2557,6 +2558,20 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 			currentWeapon = "";
 			if (isMe != null && isMe)
 				OptWnd.refreshMyWeaponRange = true;
+		}
+	}
+
+	public void addCombatDataInfo(Fightview.Relation rel) {
+		if (combatDataInfo == null) {
+			combatDataInfo = new GobCombatDataInfo(this, rel);
+			setattr(GobCombatDataInfo.class, combatDataInfo);
+		}
+	}
+
+	public void removeCombatDataInfo() {
+		if (combatDataInfo != null) {
+			delattr(GobCombatDataInfo.class);
+			combatDataInfo = null;
 		}
 	}
 

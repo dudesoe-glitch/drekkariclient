@@ -89,6 +89,7 @@ public class Fightview extends Widget {
 		if (g != null) {
 			g.removeCombatFoeCircleOverlay();
 			g.removeCombatFoeHighlight();
+			g.removeCombatDataInfo();
 		}
 	}
 
@@ -132,6 +133,7 @@ public class Fightview extends Widget {
 			if (rel != current)
 				g.setCombatFoeCircleOverlay();
 			g.setCombatFoeHighlightOverlay();
+			g.addCombatDataInfo(rel);
 		}
 	}
     }
