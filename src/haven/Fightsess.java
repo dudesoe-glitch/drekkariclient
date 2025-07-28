@@ -967,7 +967,7 @@ public class Fightsess extends Widget {
 		if (map == null)
 			return null;
 		Gob player = ui.gui.map.player();
-		if (player == null)
+		if (player == null || player.currentWeapon.equals("") || Config.WEAPON_NAMES_AND_RANGES.get(player.currentWeapon) == null)
 			return null;
 		Pipe.Op place;
 		try {
@@ -975,7 +975,7 @@ public class Fightsess extends Widget {
 		} catch(Loading l) {
 			return(null);
 		}
-		if((currentWeaponRangeFx == null) || (currentWeaponRangeFx.slot == null) && !player.currentWeapon.equals("")) {
+		if((currentWeaponRangeFx == null) || (currentWeaponRangeFx.slot == null)) {
 			try {
 				currentWeaponRangeFx = new Effect(new CombatRangeSprite(null, Config.WEAPON_NAMES_AND_RANGES.get(player.currentWeapon), OptWnd.weaponCombatRangeColorOptionWidget.currentColor));
 				currentWeaponRangeFx.slot = map.basic.add(currentWeaponRangeFx.spr, place);
