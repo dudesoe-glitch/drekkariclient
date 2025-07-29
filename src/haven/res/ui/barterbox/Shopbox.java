@@ -195,7 +195,7 @@ public class Shopbox extends Widget implements ItemInfo.SpriteOwner, GSprite.Own
     public Resource resource() {return(res.res.get());}
     public GSprite sprite() {
 	if(spr == null)
-	    throw(new Loading("Still waiting for sprite to be constructed"));
+		this.spr = GSprite.create(this, res.res.get(), res.sdt.clone());
 	return(spr);
     }
     public Resource getres() {return(res.res.get());}
