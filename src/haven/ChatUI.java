@@ -1773,9 +1773,6 @@ public class ChatUI extends Widget {
             } else if (resizing.equals("vertically")) {
                 resize(sz.x, Math.max(UI.scale(minh), Math.min(parent.sz.y - UI.scale(120), sz.y + UI.scale(5) - ev.c.y)));
             }
-            if (GameUI.questObjectivesPanel != null){ // ND: IF IT EXISTS.
-                GameUI.questObjectivesPanel.presize(); // ND: move the quest objectives panel as we resize the chat
-            }
         }
     }
 

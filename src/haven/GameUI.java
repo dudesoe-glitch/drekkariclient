@@ -68,7 +68,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
     public Inventory maininv;
     public CharWnd chrwdg;
     public MapWnd mapfile;
-    private Widget qqview;
+    public Widget qqview;
     public BuddyWnd buddies;
     private final Zergwnd zerg;
     public final Collection<Polity> polities = new ArrayList<Polity>();
@@ -85,7 +85,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 //    public Belt beltwdg;
     public final Map<Integer, String> polowners = new HashMap<Integer, String>();
     public Bufflist buffs;
-	public static AlignPanel questObjectivesPanel = null;
+	public Window questObjectivesWindow = null;
 	public TileHighlight.TileHighlightCFG tileHighlight;
 	public QuickSlotsWdg quickslots;
 	private double lastmsgsfx = 0;
@@ -495,6 +495,8 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 
 	makewnd = add(new CraftWindow(), Utils.getprefc("wndc-makewnd", new Coord(400, 200)));
 	makewnd.hide();
+
+	questObjectivesWindow = add(new QuestObjectivesWindow(), Utils.getprefc("wndc-questObjectivesWindow", UI.unscale(new Coord(400, 200))));
     }
 
     protected void attached() {
@@ -1021,6 +1023,8 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 		Utils.setprefc("wndc-makewnd", makewnd.c);
 	if (miniStudy != null)
 		Utils.setprefc("wndc-miniStudy", miniStudy.c);
+	if (questObjectivesWindow != null)
+		Utils.setprefc("wndc-questObjectivesWindow", questObjectivesWindow.c);
 	}
     }
 
@@ -1164,31 +1168,32 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 	    if(qqview != null)
 		qqview.reqdestroy();
 	    final Widget cref = qqview = child;
-		questObjectivesPanel = add(new AlignPanel() {
-		    {add(cref);}
-
-		    protected Coord getc() {
-			return(new Coord(10, GameUI.this.sz.y - chat.sz.y - this.sz.y - UI.scale( 26)));
-		    }
-
-		    public void cdestroy(Widget ch) {
-			qqview = null;
-			destroy();
-		    }
-
-			@Override
-			public void draw(GOut g) {
-				if (showUI)
-					super.draw(g);
-			}
-
-			@Override
-			public boolean mousedown(MouseDownEvent ev) {
-				if (!showUI)
-					return(false);
-				return super.mousedown(ev);
-			}
-		});
+//		add(new AlignPanel() {
+//		    {add(cref);}
+//
+//		    protected Coord getc() {
+//			return(new Coord(10, GameUI.this.sz.y - chat.sz.y - this.sz.y - UI.scale( 26)));
+//		    }
+//
+//		    public void cdestroy(Widget ch) {
+//			qqview = null;
+//			destroy();
+//		    }
+//
+//			@Override
+//			public void draw(GOut g) {
+//				if (showUI)
+//					super.draw(g);
+//			}
+//
+//			@Override
+//			public boolean mousedown(MouseDownEvent ev) {
+//				if (!showUI)
+//					return(false);
+//				return super.mousedown(ev);
+//			}
+//		});
+		questObjectivesWindow.add(child, Coord.z);
 	} else if(place == "misc") {
 	    Coord c;
 	    int a = 1;
