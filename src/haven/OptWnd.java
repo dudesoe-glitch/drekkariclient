@@ -640,6 +640,7 @@ public class OptWnd extends Window {
 	public static CheckBox soundAlertForFinishedCuriositiesCheckBox;
 	public static CheckBox alwaysShowCombatUIStaminaBarCheckBox;
 	public static CheckBox alwaysShowCombatUIHealthBarCheckBox;
+	public static CheckBox transparentQuestsObjectivesWindowCheckBox;
 	public static HSlider mapZoomSpeedSlider;
 	public static CheckBox alwaysOpenMiniStudyOnLoginCheckBox;
 	public static HSlider mapIconsSizeSlider;
@@ -770,6 +771,17 @@ public class OptWnd extends Window {
 			}
 		}, leftColumn.pos("bl").adds(0, 2));
 		alwaysShowCombatUIHealthBarCheckBox.tooltip = alwaysShowCombatUiBarTooltip;
+
+		leftColumn = add(transparentQuestsObjectivesWindowCheckBox = new CheckBox("Transparent Quests Objectives Window"){
+			{a = (Utils.getprefb("transparentQuestsObjectivesWindow", false));}
+			public void changed(boolean val) {
+				Utils.setprefb("transparentQuestsObjectivesWindow", val);
+				if (ui != null && ui.gui != null && ui.gui.questObjectivesWindow != null && ui.gui.questObjectivesWindow.visible()) {
+					ui.gui.questObjectivesWindow.resetDeco();
+				}
+			}
+		}, leftColumn.pos("bl").adds(0, 2));
+		transparentQuestsObjectivesWindowCheckBox.tooltip = transparentQuestsObjectivesWindowTooltip;
 
 		Widget rightColumn;
 		rightColumn = add(simplifiedUIThemeCheckBox = new CheckBox("Simplified UI Theme"){
@@ -4685,6 +4697,9 @@ public class OptWnd extends Window {
 			"\n" +
 			"\n$col[218,163,0]{Preview:}$col[185,185,185]{Enable this to hear the sound!", UI.scale(300));
 	private static final Object alwaysShowCombatUiBarTooltip = RichText.render("For more options for this bar, check the Combat Settings.", UI.scale(320));
+	private static final Object transparentQuestsObjectivesWindowTooltip = RichText.render("This makes the Quest Objectives window background transparent, like in the default client." +
+			"\n" +
+			"\n$col[185,185,185]{You can still drag the window around, regardless.", UI.scale(300));
 
 	// Combat Settings Tooltips
 	private static final Object singleRowCombatMovesTooltip = RichText.render("This makes the Bottom Panel show the combat moves in one row, rather than two.", UI.scale(300));

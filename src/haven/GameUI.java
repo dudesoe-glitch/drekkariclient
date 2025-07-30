@@ -85,7 +85,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 //    public Belt beltwdg;
     public final Map<Integer, String> polowners = new HashMap<Integer, String>();
     public Bufflist buffs;
-	public Window questObjectivesWindow = null;
+	public QuestObjectivesWindow questObjectivesWindow = null;
 	public TileHighlight.TileHighlightCFG tileHighlight;
 	public QuickSlotsWdg quickslots;
 	private double lastmsgsfx = 0;
@@ -1194,6 +1194,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 //			}
 //		});
 		questObjectivesWindow.add(child, Coord.z);
+		questObjectivesWindow.resetDeco();
 	} else if(place == "misc") {
 	    Coord c;
 	    int a = 1;
