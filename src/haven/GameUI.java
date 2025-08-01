@@ -1052,16 +1052,16 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 		MapFile file;
 		try {
 		    file = MapFile.load(mapstore, mapfilename());
-			if(OptWnd.uploadMapTilesCheckBox.a && MappingClient.getInstance() != null) {
-				MappingClient.getInstance().ProcessMap(file, (m) -> {
-					if(m instanceof MapFile.PMarker) {
-						Color markerColor = ((MapFile.PMarker)m).color;
-						Boolean isColorEnabled = OptWnd.colorCheckboxesMap.get(markerColor);
-						return isColorEnabled != null && isColorEnabled;
-					}
-					return true;
-				});
-			}
+//			if(OptWnd.uploadMapTilesCheckBox.a && MappingClient.getInstance() != null) {
+//				MappingClient.getInstance().ProcessMap(file, (m) -> {
+//					if(m instanceof MapFile.PMarker) {
+//						Color markerColor = ((MapFile.PMarker)m).color;
+//						Boolean isColorEnabled = OptWnd.colorCheckboxesMap.get(markerColor);
+//						return isColorEnabled != null && isColorEnabled;
+//					}
+//					return true;
+//				});
+//			}
 		} catch(java.io.IOException e) {
 		    /* XXX: Not quite sure what to do here. It's
 		     * certainly not obvious that overwriting the

@@ -113,26 +113,26 @@ public class MappingClient {
 
 	@Override
 	public void run() {
-		if (mapfile.lock.readLock().tryLock()) {
-			try {
-				List<MarkerData> markers = mapfile.markers.stream()
-						.filter(uploadCheck)
-						.map(m -> {
-							Coord mgc = new Coord(Math.floorDiv(m.tc.x, 100), Math.floorDiv(m.tc.y, 100));
-							Indir<MapFile.Grid> indirGrid = mapfile.segments.get(m.seg).grid(mgc);
-							return new MarkerData(m, indirGrid);
-						})
-						.collect(Collectors.toList());
-
-				scheduler.execute(new ProcessMapper(mapfile, markers));
-			} finally {
-				mapfile.lock.readLock().unlock();
-			}
-		} else {
-			if (retries-- > 0) {
-				scheduler.schedule(this, 5, TimeUnit.SECONDS);
-			}
-		}
+//		if (mapfile.lock.readLock().tryLock()) {
+//			try {
+//				List<MarkerData> markers = mapfile.markers.stream()
+//						.filter(uploadCheck)
+//						.map(m -> {
+//							Coord mgc = new Coord(Math.floorDiv(m.tc.x, 100), Math.floorDiv(m.tc.y, 100));
+//							Indir<MapFile.Grid> indirGrid = mapfile.segments.get(m.seg).grid(mgc);
+//							return new MarkerData(m, indirGrid);
+//						})
+//						.collect(Collectors.toList());
+//
+//				scheduler.execute(new ProcessMapper(mapfile, markers));
+//			} finally {
+//				mapfile.lock.readLock().unlock();
+//			}
+//		} else {
+//			if (retries-- > 0) {
+//				scheduler.schedule(this, 5, TimeUnit.SECONDS);
+//			}
+//		}
 	}
 
     }
@@ -482,4 +482,36 @@ public class MappingClient {
 	    return (gc.toString() + " in map space " + mapID);
 	}
     }
+
+	public void uploadSMarker(Gob gob, MapFile.SMarker marker) {
+		try {
+			MCache.Grid grid = glob.map.getgrid(toGridCoordinate(gob.rc));
+			Coord offset = gridOffset2(gob.rc);
+
+			JSONObject obj = new JSONObject();
+			obj.put("name", marker.nm);
+			obj.put("gridID", String.valueOf(grid.id));
+			obj.put("x", offset.x);
+			obj.put("y", offset.y);
+			obj.put("type", "shared");
+			obj.put("id", marker.oid);
+			obj.put("image", marker.res.name);
+
+			scheduler.execute(new MarkerUpdate(new JSONArray(List.of(obj))));
+		} catch (Loading ignored) {
+		}
+	}
+
+	/** the grid coordinate of a map grid, used for retrieving map grids in mcache
+	 * example: "glob.map.getgrid(toGridCoordinate(gob.rc)).id" will get the grid id for the coordinate the gob is on **/
+	public static Coord toGridCoordinate(Coord2d c) {
+		return new Coord(Math.floorDiv((int) c.x, 1100), Math.floorDiv((int) c.y, 1100));
+	}
+
+	/** a coordinate (0-100,0-100) within a 100x100 map grid **/
+	public static Coord gridOffset2(Coord2d c) {
+		Coord gridUnit = toGridUnit(c);
+		return new Coord((int) ((c.x - gridUnit.x)/11d), (int) ((c.y - gridUnit.y)/11d));
+	}
+
 }

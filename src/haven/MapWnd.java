@@ -39,6 +39,8 @@ import haven.MapFile.PMarker;
 import haven.MapFile.SMarker;
 import haven.MiniMap.*;
 import haven.BuddyWnd.GroupSelector;
+import haven.automated.mapper.MappingClient;
+
 import static haven.MCache.tilesz;
 import static haven.MCache.cmaps;
 import static haven.Utils.eq;
@@ -951,6 +953,9 @@ public class MapWnd extends Window implements Console.Directory {
 				    view.file.update(prev);
 				}
 			    }
+				if (MappingClient.getInstance() != null && OptWnd.uploadMapTilesCheckBox.a) {
+					MappingClient.getInstance().uploadSMarker(gob, mark);
+				}
 			} finally {
 			    view.file.lock.writeLock().unlock();
 			}

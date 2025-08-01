@@ -4214,12 +4214,12 @@ public class OptWnd extends Window {
 	public static CheckBox uploadMapTilesCheckBox;
 	public static CheckBox sendLiveLocationCheckBox;
 	public static TextEntry liveLocationNameTextEntry;
-	public static Map<Color, Boolean> colorCheckboxesMap = new HashMap<>();
-	static {
-		for (Color color : BuddyWnd.gc) {
-			colorCheckboxesMap.put(color, Utils.getprefb("enableMarkerUpload" + color.getRGB(), false));
-		}
-	}
+//	public static Map<Color, Boolean> colorCheckboxesMap = new HashMap<>();
+//	static {
+//		for (Color color : BuddyWnd.gc) {
+//			colorCheckboxesMap.put(color, Utils.getprefb("enableMarkerUpload" + color.getRGB(), false));
+//		}
+//	}
 
 	public class ServerIntegrationSettingsPanel extends Panel {
 
@@ -4259,31 +4259,31 @@ public class OptWnd extends Window {
 			}, prev.pos("ur").adds(6, 0));
 			liveLocationNameTextEntry.tooltip = liveLocationNameTooltip;
 
-			prev = add(new Label("Markers to upload:"), prev.pos("bl").adds(0, 20).x(0));
-
-			for (Map.Entry<Color, Boolean> entry : colorCheckboxesMap.entrySet()) {
-				Color color = entry.getKey();
-				boolean isChecked = entry.getValue();
-
-				CheckBox colorCheckbox = new CheckBox(""){
-					{a = isChecked;}
-					@Override
-					public void draw(GOut g) {
-						g.chcolor(color);
-						g.frect(Coord.z.add(0, (sz.y - box.sz().y) / 2), box.sz());
-						g.chcolor();
-						if(state())
-							g.image(mark, Coord.z.add(0, (sz.y - mark.sz().y) / 2));
-					}
-
-					public void set(boolean val) {
-						Utils.setprefb("enableMarkerUpload" + color.getRGB(), val);
-						colorCheckboxesMap.put(color, val);
-						a = val;
-					}
-				};
-				prev = add(colorCheckbox, prev.pos("ur").adds(10, 0));
-			}
+//			prev = add(new Label("Markers to upload:"), prev.pos("bl").adds(0, 20).x(0));
+//
+//			for (Map.Entry<Color, Boolean> entry : colorCheckboxesMap.entrySet()) {
+//				Color color = entry.getKey();
+//				boolean isChecked = entry.getValue();
+//
+//				CheckBox colorCheckbox = new CheckBox(""){
+//					{a = isChecked;}
+//					@Override
+//					public void draw(GOut g) {
+//						g.chcolor(color);
+//						g.frect(Coord.z.add(0, (sz.y - box.sz().y) / 2), box.sz());
+//						g.chcolor();
+//						if(state())
+//							g.image(mark, Coord.z.add(0, (sz.y - mark.sz().y) / 2));
+//					}
+//
+//					public void set(boolean val) {
+//						Utils.setprefb("enableMarkerUpload" + color.getRGB(), val);
+//						colorCheckboxesMap.put(color, val);
+//						a = val;
+//					}
+//				};
+//				prev = add(colorCheckbox, prev.pos("ur").adds(10, 0));
+//			}
 
 			Widget backButton;
 			add(backButton = new PButton(UI.scale(200), "Back", 27, back, "Advanced Settings"), prev.pos("bl").adds(0, 18).x(0));
