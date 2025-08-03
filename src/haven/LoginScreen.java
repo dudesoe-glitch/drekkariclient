@@ -63,6 +63,9 @@ public class LoginScreen extends Widget {
 		add(Resource.local().loadwait("customclient/sfx/vikingTheme"));
 		add(Resource.local().loadwait("customclient/sfx/sorceressTheme"));
 		add(Resource.local().loadwait("customclient/sfx/huntressTheme"));
+		add(Resource.local().loadwait("customclient/sfx/alchemistTheme"));
+		add(Resource.local().loadwait("customclient/sfx/valkyrieTheme"));
+		add(Resource.local().loadwait("customclient/sfx/berserkerTheme"));
 	}};
 	private static List<String> backgrounds = new ArrayList<>() {{
 		add(haven.MainFrame.gameDir + "res/customclient/rogueScreen.png");
@@ -70,6 +73,9 @@ public class LoginScreen extends Widget {
 		add(haven.MainFrame.gameDir + "res/customclient/vikingScreen.png");
 		add(haven.MainFrame.gameDir + "res/customclient/sorceressScreen.png");
 		add(haven.MainFrame.gameDir + "res/customclient/huntressScreen.png");
+		add(haven.MainFrame.gameDir + "res/customclient/alchemistScreen.png");
+		add(haven.MainFrame.gameDir + "res/customclient/valkyrieScreen.png");
+		add(haven.MainFrame.gameDir + "res/customclient/berserkerScreen.png");
 	}};
 	final List<String> keys = new ArrayList<>(){{
 		add("Random!");
@@ -78,6 +84,9 @@ public class LoginScreen extends Widget {
 		add("Viking");
 		add("Sorceress");
 		add("Huntress");
+		add("Alchemist");
+		add("Valkyrie");
+		add("Berserker");
 	}};
 	private OldDropBox backgroundDropBox;
 	static public int bgIndex = 1;
