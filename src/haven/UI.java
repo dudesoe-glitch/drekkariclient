@@ -66,7 +66,7 @@ public class UI {
     public final ActAudio.Root audio = new ActAudio.Root();
     public final Loader loader;
     public final CommandQueue queue = new CommandQueue();
-    private static final double scalef;
+    public static final double scalef;
 	public GameUI gui = null;
 	private final Object guiLock = new Object();
 	public int lastWidgetID = 0;

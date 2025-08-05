@@ -134,7 +134,7 @@ public class TextEntry extends Widget implements ReadLine.Owner {
 	    if(cx > sx + (sz.x - wmarg)) {sx = cx - (sz.x - wmarg);}
 	    int lx = cx - sx;
 	    if(((Utils.rtime() - Math.max(focusstart, buf.mtime())) % 1.0) < 0.5)
-		g.image(caret, coff.add(toffx + lx, (sz.y - tcache.img.getHeight()) / 2));
+		g.image(caret, coff.add(toffx + lx, ((sz.y - tcache.img.getHeight()) / 2) + (UI.scalef == 1 ? 1 : 0)));
 	}
     }
 
