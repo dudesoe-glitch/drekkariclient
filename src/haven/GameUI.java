@@ -497,6 +497,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 	makewnd.hide();
 
 	questObjectivesWindow = add(new QuestObjectivesWindow(), Utils.getprefc("wndc-questObjectivesWindow", UI.unscale(new Coord(400, 200))));
+	questObjectivesWindow.hide();
     }
 
     protected void attached() {
@@ -1195,6 +1196,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 //		});
 		questObjectivesWindow.add(child, Coord.z);
 		questObjectivesWindow.resetDeco();
+		questObjectivesWindow.show();
 	} else if(place == "misc") {
 	    Coord c;
 	    int a = 1;
