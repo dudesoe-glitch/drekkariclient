@@ -1100,7 +1100,7 @@ public class OptWnd extends Window {
 			Widget leftColumn, rightColumn;
 
 			leftColumn = add(new Label("Top panel height:"), 0, 0);
-			leftColumn = add(combatUITopPanelHeightSlider = new HSlider(UI.scale(200), 36, 480, Utils.getprefi("combatTopPanelHeight", 400)) {
+			leftColumn = add(combatUITopPanelHeightSlider = new HSlider(UI.scale(200), 36, 440, Utils.getprefi("combatTopPanelHeight", 400)) {
 				public void changed() {
 					Utils.setprefi("combatTopPanelHeight", val);
 				}
@@ -1110,7 +1110,7 @@ public class OptWnd extends Window {
 				Utils.setprefi("combatTopPanelHeight", 400);
 			}), leftColumn.pos("bl").adds(210, -20)).tooltip = resetButtonTooltip;
 			leftColumn = add(new Label("Bottom panel height:"), leftColumn.pos("bl").adds(0, 10));
-			leftColumn = add(combatUIBottomPanelHeightSlider = new HSlider(UI.scale(200), 10, 480, Utils.getprefi("combatBottomPanelHeight", 100)) {
+			leftColumn = add(combatUIBottomPanelHeightSlider = new HSlider(UI.scale(200), 10, 440, Utils.getprefi("combatBottomPanelHeight", 100)) {
 				public void changed() {
 					Utils.setprefi("combatBottomPanelHeight", val);
 				}
