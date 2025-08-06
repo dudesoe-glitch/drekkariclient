@@ -939,7 +939,7 @@ public class Fightsess extends Widget {
 		if (map == null)
 			return null;
 		Gob player = ui.gui.map.player();
-		if (player == null)
+		if (player == null || player.occupiedGobID != null)
 			return null;
 		Pipe.Op place;
 		try {
@@ -967,7 +967,7 @@ public class Fightsess extends Widget {
 		if (map == null)
 			return null;
 		Gob player = ui.gui.map.player();
-		if (player == null || player.currentWeapon.equals("") || Config.WEAPON_NAMES_AND_RANGES.get(player.currentWeapon) == null)
+		if (player == null || player.occupiedGobID != null || player.currentWeapon.equals("") || Config.WEAPON_NAMES_AND_RANGES.get(player.currentWeapon) == null)
 			return null;
 		Pipe.Op place;
 		try {

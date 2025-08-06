@@ -4739,7 +4739,9 @@ public class OptWnd extends Window {
 	private static final Object drawYourCurrentPathTooltip = RichText.render("When this is enabled, a straight line will be drawn between your character and wherever you clicked" +
 			"\n" +
 			"\n$col[185,185,185]{You can use this to make sure you won't run into a tree or something, I guess.}", UI.scale(300));
-	private static final Object showYourCombatRangeCirclesTooltip = RichText.render("This will display two circles under your character, that show your unarmed range, and currently equipped weapon range (if you have a weapon equipped).", UI.scale(300));
+	private static final Object showYourCombatRangeCirclesTooltip = RichText.render("This will display two circles under your character, that show your unarmed range, and currently equipped weapon range (if you have a weapon equipped)." +
+			"\n" +
+			"\n$col[185,185,185]{The circles only show up when you're on foot.}", UI.scale(300));
 
 	// Display Settings Tooltips
 	private static final Object granularityPositionTooltip = RichText.render("This works like the :placegrid console command. " +
