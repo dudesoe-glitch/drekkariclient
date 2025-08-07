@@ -634,7 +634,9 @@ public class OptWnd extends Window {
 	public static CheckBox snapWindowsBackInsideCheckBox;
 	public static CheckBox dragWindowsInWhenResizingCheckBox;
 	public static CheckBox showHoverInventoriesWhenHoldingShiftCheckBox;
-	private CheckBox showQuickSlotsCheckBox;
+	public static CheckBox showQuickSlotsCheckBox;
+	public static CheckBox leftHandQuickSlotCheckBox, rightHandQuickSlotCheckBox, leftPouchQuickSlotCheckBox, rightPouchQuickSlotCheckBox,
+			beltQuickSlotCheckBox, backpackQuickSlotCheckBox, capeQuickSlotCheckBox;
 	public static CheckBox showStudyReportHistoryCheckBox;
 	public static CheckBox lockStudyReportCheckBox;
 	public static CheckBox soundAlertForFinishedCuriositiesCheckBox;
@@ -699,7 +701,7 @@ public class OptWnd extends Window {
 				Utils.setprefb("showHoverInventoriesWhenHoldingShift", val);
 			}
 		}, leftColumn.pos("bl").adds(0, 12));
-		leftColumn = add(showQuickSlotsCheckBox = new CheckBox("Enable Quick Slots Widget"){
+		leftColumn = add(showQuickSlotsCheckBox = new CheckBox("Enable Quick Slots Widget:"){
 			{a = (Utils.getprefb("showQuickSlotsBar", true));}
 			public void changed(boolean val) {
 				Utils.setprefb("showQuickSlotsBar", val);
@@ -709,6 +711,60 @@ public class OptWnd extends Window {
 			}
 		}, leftColumn.pos("bl").adds(0, 2));
 		showQuickSlotsCheckBox.tooltip = showQuickSlotsTooltip;
+		leftColumn = add(new Label("> Show:"), leftColumn.pos("bl").adds(0, 1).xs(0));
+		leftColumn = add(leftHandQuickSlotCheckBox = new CheckBox("Left Hand"){
+			{a = Utils.getprefb("leftHandQuickSlot", true);}
+			public void changed(boolean val) {
+				ui.gui.quickslots.reloadSlots();
+				Utils.setprefb("leftHandQuickSlot", val);
+			}
+		}, leftColumn.pos("ur").adds(4, 0));
+		add(rightHandQuickSlotCheckBox = new CheckBox("Right Hand"){
+			{a = Utils.getprefb("rightHandQuickSlot", true);}
+			public void changed(boolean val) {
+				ui.gui.quickslots.reloadSlots();
+				Utils.setprefb("rightHandQuickSlot", val);
+			}
+		}, leftColumn.pos("ur").adds(4, 0));
+
+		leftColumn = add(leftPouchQuickSlotCheckBox = new CheckBox("Left Pouch"){
+			{a = Utils.getprefb("leftPouchQuickSlot", false);}
+			public void changed(boolean val) {
+				ui.gui.quickslots.reloadSlots();
+				Utils.setprefb("leftPouchQuickSlot", val);
+			}
+		}, leftColumn.pos("bl").adds(0, 2));
+		add(rightPouchQuickSlotCheckBox = new CheckBox("Right Pouch"){
+			{a = Utils.getprefb("rightPouchQuickSlot", false);}
+			public void changed(boolean val) {
+				ui.gui.quickslots.reloadSlots();
+				Utils.setprefb("rightPouchQuickSlot", val);
+			}
+		}, leftColumn.pos("ur").adds(4, 0));
+
+		leftColumn = add(beltQuickSlotCheckBox = new CheckBox("Belt"){
+			{a = Utils.getprefb("beltQuickSlot", true);}
+			public void changed(boolean val) {
+				ui.gui.quickslots.reloadSlots();
+				Utils.setprefb("beltQuickSlot", val);
+			}
+		}, leftColumn.pos("bl").adds(0, 2));
+		leftColumn = add(backpackQuickSlotCheckBox = new CheckBox("Backpack"){
+			{a = Utils.getprefb("backpackQuickSlot", true);}
+			public void changed(boolean val) {
+				ui.gui.quickslots.reloadSlots();
+				Utils.setprefb("backpackQuickSlot", val);
+			}
+		}, leftColumn.pos("ur").adds(4, 0));
+		add(capeQuickSlotCheckBox = new CheckBox("Cape"){
+			{a = Utils.getprefb("capeQuickSlot", true);}
+			public void changed(boolean val) {
+				ui.gui.quickslots.reloadSlots();
+				Utils.setprefb("capeQuickSlot", val);
+			}
+		}, leftColumn.pos("ur").adds(4, 0));
+
+
 		leftColumn = add(showStudyReportHistoryCheckBox = new CheckBox("Show Study Report History"){
 			{a = (Utils.getprefb("showStudyReportHistory", true));}
 			public void set(boolean val) {
@@ -716,7 +772,7 @@ public class OptWnd extends Window {
 				Utils.setprefb("showStudyReportHistory", val);
 				a = val;
 			}
-		}, leftColumn.pos("bl").adds(0, 12));
+		}, leftColumn.pos("bl").adds(0, 12).xs(0));
 		showStudyReportHistoryCheckBox.tooltip = showStudyReportHistoryTooltip;
 		leftColumn = add(lockStudyReportCheckBox = new CheckBox("Lock Study Report"){
 			{a = (Utils.getprefb("lockStudyReport", false));}
