@@ -111,7 +111,7 @@ public class SkyBoxSprite extends Sprite {
 	}
 
 	public void added(final RenderTree.Slot slot) {
-		slot.ostate(Pipe.Op.compose(new States.Facecull(States.Facecull.Mode.FRONT), Location.goback("gobx"), new SkyboxShader()));
+		slot.ostate(Pipe.Op.compose(new States.Facecull(States.Facecull.Mode.FRONT), Location.goback("gobx"), new SkyboxShader(), Clickable.notClickable));
 		slot.add(this.smod, smat);
 	}
 
