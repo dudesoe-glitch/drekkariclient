@@ -1,6 +1,7 @@
 package haven;
 
 import static haven.Equipory.etts;
+import static haven.Inventory.sqsz;
 
 public class QuickSlotsWdg extends Widget implements DTarget {
     private static final Tex sbg = Resource.loadtex("gfx/hud/quickslots");
@@ -138,6 +139,54 @@ public class QuickSlotsWdg extends Widget implements DTarget {
             }
         }
         return super.tooltip(c, prev);
+    }
+
+    @Override
+    public boolean mousehover(MouseHoverEvent ev, boolean on) {
+        Coord c = ev.c;
+        Equipory e = ui.gui.getequipory();
+        if(e != null) {
+            WItem w = null;
+            Coord hoverCoord = null;
+            if (leftHandSlotCoord != null && c.x > leftHandSlotCoord.x && c.x <= leftHandSlotCoord.x + slotSquareBg.sz().x){
+                hoverCoord = new Coord(leftHandSlotCoord.x + slotSquareBg.sz().x, leftHandSlotCoord.y + slotSquareBg.sz().y);
+                w = e.slots[6];
+            }
+            if (rightHandSlotCoord != null && c.x > rightHandSlotCoord.x && c.x <= rightHandSlotCoord.x + slotSquareBg.sz().x){
+                hoverCoord = new Coord(rightHandSlotCoord.x + slotSquareBg.sz().x, rightHandSlotCoord.y + slotSquareBg.sz().y);
+                w = e.slots[7];
+            }
+            if (leftPouchSlotCoord != null && c.x > leftPouchSlotCoord.x && c.x <= leftPouchSlotCoord.x + slotSquareBg.sz().x){
+                hoverCoord = new Coord(leftPouchSlotCoord.x + slotSquareBg.sz().x, leftPouchSlotCoord.y + slotSquareBg.sz().y);
+                w = e.slots[19];
+            }
+            if (rightPouchSlotCoord != null && c.x > rightPouchSlotCoord.x && c.x <= rightPouchSlotCoord.x + slotSquareBg.sz().x){
+                hoverCoord = new Coord(rightPouchSlotCoord.x + slotSquareBg.sz().x, rightPouchSlotCoord.y + slotSquareBg.sz().y);
+                w = e.slots[20];
+            }
+            if (beltSlotCoord != null && c.x > beltSlotCoord.x && c.x <= beltSlotCoord.x + slotSquareBg.sz().x){
+                hoverCoord = new Coord(beltSlotCoord.x + slotSquareBg.sz().x, beltSlotCoord.y + slotSquareBg.sz().y);
+                w = e.slots[5];
+            }
+            if (backpackSlotCoord != null && c.x > backpackSlotCoord.x && c.x <= backpackSlotCoord.x + slotSquareBg.sz().x){
+                hoverCoord = new Coord(backpackSlotCoord.x + slotSquareBg.sz().x, backpackSlotCoord.y + slotSquareBg.sz().y);
+                w = e.slots[11];
+            }
+            if (capeSlotCoord != null && c.x > capeSlotCoord.x && c.x <= capeSlotCoord.x + slotSquareBg.sz().x){
+                hoverCoord = new Coord(capeSlotCoord.x + slotSquareBg.sz().x, capeSlotCoord.y + slotSquareBg.sz().y);
+                w = e.slots[14];
+            }
+            if(w != null) {
+                if(on && (w.item.contents != null && (!OptWnd.showHoverInventoriesWhenHoldingShiftCheckBox.a || ui.modshift))) {
+                    Widget hover = new Widget();
+                    QuickSlotsWdg.this.add(hover, hoverCoord);
+                    w.item.hovering(hover);
+                    return(true);
+                }
+                return w.mousehover(ev, on);
+            }
+        }
+        return(false);
     }
 
     @Override
