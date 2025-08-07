@@ -120,6 +120,27 @@ public class QuickSlotsWdg extends Widget implements DTarget {
     }
 
     @Override
+    public Object tooltip(Coord c, Widget prev) {
+        Equipory e = ui.gui.getequipory();
+        if(e != null) {
+            WItem w = null;
+            if (leftHandSlotCoord != null && c.x > leftHandSlotCoord.x && c.x <= leftHandSlotCoord.x + slotSquareBg.sz().x) w = e.slots[6];
+            if (rightHandSlotCoord != null && c.x > rightHandSlotCoord.x && c.x <= rightHandSlotCoord.x + slotSquareBg.sz().x) w = e.slots[7];
+            if (leftPouchSlotCoord != null && c.x > leftPouchSlotCoord.x && c.x <= leftPouchSlotCoord.x + slotSquareBg.sz().x) w = e.slots[19];
+            if (rightPouchSlotCoord != null && c.x > rightPouchSlotCoord.x && c.x <= rightPouchSlotCoord.x + slotSquareBg.sz().x) w = e.slots[20];
+            if (beltSlotCoord != null && c.x > beltSlotCoord.x && c.x <= beltSlotCoord.x + slotSquareBg.sz().x) w = e.slots[5];
+            if (backpackSlotCoord != null && c.x > backpackSlotCoord.x && c.x <= backpackSlotCoord.x + slotSquareBg.sz().x) w = e.slots[11];
+            if (capeSlotCoord != null && c.x > capeSlotCoord.x && c.x <= capeSlotCoord.x + slotSquareBg.sz().x) w = e.slots[14];
+            if(w != null) {
+                return w.tooltip(c, (prev == this) ? w : prev);
+            } else {
+                return null;
+            }
+        }
+        return super.tooltip(c, prev);
+    }
+
+    @Override
     public boolean mousedown(MouseDownEvent ev) {
         if (!GameUI.showUI)
             return false;
