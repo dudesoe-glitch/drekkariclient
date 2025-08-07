@@ -481,7 +481,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 	questhelper.hide();
 	add(questhelper, Utils.getprefc("wndc-autoDropManagerWindow", UI.unscale(new Coord(187, 50))));
 	quickslots = add(new QuickSlotsWdg(), Utils.getprefc("wndc-quickslots", UI.scale(new Coord(426, 10))));
-	if (!Utils.getprefb("showQuickSlotsBar", true)) {
+	if (!OptWnd.showQuickSlotsCheckBox.a) {
 		quickslots.hide();
 	}
 	actionBar1.c = Utils.getprefc("wndc-actionBar1", UI.unscale(new Coord(0, 500)));
@@ -1903,12 +1903,22 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 		}
 
 	} else if(kb_rightQuickSlotButton.key().match(ev)) {
-		quickslots.drop(QuickSlotsWdg.righthandslotc, Coord.z);
-		quickslots.simulateclick(QuickSlotsWdg.righthandslotc);
+		Equipory e = getequipory();
+		if (e != null) {
+			e.wdgmsg("drop", 6);
+			WItem wItem = e.slots[6];
+			if (wItem != null)
+				wItem.item.wdgmsg("take", new Coord(wItem.sz.x / 2, wItem.sz.y / 2));
+		}
 		return(true);
 	} else if(kb_leftQuickSlotButton.key().match(ev)) {
-		quickslots.drop(QuickSlotsWdg.lefthandslotc, Coord.z);
-		quickslots.simulateclick(QuickSlotsWdg.lefthandslotc);
+		Equipory e = getequipory();
+		if (e != null) {
+			e.wdgmsg("drop", 7);
+			WItem wItem = e.slots[7];
+			if (wItem != null)
+				wItem.item.wdgmsg("take", new Coord(wItem.sz.x / 2, wItem.sz.y / 2));
+		}
 		return(true);
 	} else if (kb_nightVision.key().match(ev)) {
 		if (OptWnd.nightVisionSlider.max - OptWnd.nightVisionSlider.val >= OptWnd.nightVisionSlider.val - OptWnd.nightVisionSlider.min) {
