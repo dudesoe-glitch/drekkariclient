@@ -4740,8 +4740,10 @@ public class OptWnd extends Window {
 	private static final Object dragWindowsInWhenResizingTooltip = RichText.render("This will force ALL windows to be dragged back inside the game window, whenever you resize it." +
 			"\n" +
 			"\n$col[185,185,185]{Without this setting, windows remain in the same spot when you resize your game window, even if they end up outside of it. They will only come back if closed and reopened (for example, via keybinds)", UI.scale(300));
-	private static final Object showQuickSlotsTooltip = RichText.render("Just a small interactable widget that shows your hands, belt, backpack and cape slots, so you don't have to open your equipment window." +
-			"\nTo drag this widget to a new position: hold down Shift, click and drag." +
+	private static final Object showQuickSlotsTooltip = RichText.render("Just a small interactable widget that can show your hands, pouches, belt, backpack and cape slots, depending on what you select." +
+			"\nYou can use this so you don't have to open your equipment window all the time." +
+			"\n" +
+			"\nThis window can be dragged using the middle mouse button (Scroll Click)." +
 			"\n" +
 			"\n$col[185,185,185]{Your quick-switch keybinds ('Right Hand' and 'Left Hand') are NOT affected by this setting.}", UI.scale(300));
 	public static final Object showStudyReportHistoryTooltip = RichText.render("Shows what curiosity was formerly placed in each slot. " +
