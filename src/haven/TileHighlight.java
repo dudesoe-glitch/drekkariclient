@@ -87,6 +87,7 @@ public class TileHighlight {
 			add("gfx/tiles/swamp");
 			add("gfx/tiles/swampwater");
 			add("gfx/tiles/timberland");
+			add("gfx/tiles/thicket");
 			add("gfx/tiles/wald");
 			add("gfx/tiles/warmdepth");
 			add("gfx/tiles/water");
