@@ -78,6 +78,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 	private Collection<DraggedItem> handSave = new LinkedList<>();
     public WItem vhand;
     public ChatUI chat;
+	public ChatWnd chatWnd;
     public ChatUI.Channel syslog;
     public Progress prog = null;
     private boolean afk = false;
@@ -367,8 +368,12 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 	this.genus = genus;
 	setcanfocus(true);
 	setfocusctl(true);
-	chat = add(new ChatUI());
+	chat = new ChatUI();
 	chat.show();
+	chatWnd = new ChatWnd(Utils.getprefc("wndsz-chat", new Coord(UI.scale(410), 150)), "Chat", this);
+	chatWnd.add(chat, - UI.scale(13), - UI.scale(20));
+	add(chatWnd, Utils.getprefc("wndc-chat", UI.scale(new Coord(-100, 99999))));
+
 //	beltwdg.raise();
 //	blpanel = add(new Hidepanel("gui-bl", null, new Coord(-1,  1)) {
 //		public void move(double a) {
@@ -1026,6 +1031,8 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 		Utils.setprefc("wndc-miniStudy", miniStudy.c);
 	if (questObjectivesWindow != null)
 		Utils.setprefc("wndc-questObjectivesWindow", questObjectivesWindow.c);
+	if (chatWnd != null)
+		Utils.setprefc("wndc-chat", chatWnd.c);
 	}
     }
 
@@ -1371,13 +1378,13 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 //	beltwdg.c = new Coord(chat.c.x, Math.min(chat.c.y - beltwdg.sz.y, sz.y - beltwdg.sz.y));
 	super.draw(g);
 	int by = sz.y;
-	if(chat.visible())
-		by = Math.min(by, chat.c.y);
+	if(chatWnd.visible())
+		by = Math.min(by, chatWnd.c.y - UI.scale(20));
 //	if(beltwdg.visible())
 //	    by = Math.min(by, beltwdg.c.y);
 	if(cmdline != null) {
-		drawcmd(g, new Coord(UI.scale(200), by -= UI.scale(40)));
-	} else if(msgDeque.size() > 0) {
+		drawcmd(g, new Coord(chatWnd.c.x + UI.scale(20), by + UI.scale(6)));
+	} if(msgDeque.size() > 0) {
 		Iterator<SysTimedMessage> iter = msgDeque.descendingIterator();
 		int cur_limit = 0;
 		while(iter.hasNext()) {
@@ -1386,15 +1393,15 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 				iter.remove();
 			}else{
 				g.chcolor(0, 0, 0, 192);
-				g.frect(new Coord(UI.scale(18), by - UI.scale(22)), msg.text.sz().add(UI.scale(4), UI.scale(4)));
+				g.frect(new Coord(chatWnd.c.x + UI.scale(18), by - UI.scale(22)), msg.text.sz().add(UI.scale(4), UI.scale(4)));
 				g.chcolor();
-				g.image(msg.text.tex(), new Coord(UI.scale(20), by -= UI.scale(20)));
+				g.image(msg.text.tex(), new Coord(chatWnd.c.x + UI.scale(20), by -= UI.scale(20)));
 				by -= UI.scale(4);
 			}
 		}
 	}
-	if(!chat.visible()) {
-	    chat.drawsmall(g, new Coord(UI.scale(10), by), UI.scale(100));
+	if(!chatWnd.visible()) {
+	    chat.drawsmall(g, new Coord(chatWnd.c.x + UI.scale(10), by), UI.scale(100));
 	}
 
 	int x = (int)(ui.gui.sz.x / 2.0);
@@ -2064,7 +2071,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
     }
 
     public void toggleui() {
-		chat.show(!showUI);
+		chatWnd.show(!showUI);
 		mapfile.show(!showUI);
 		Hidepanel[] panels = {brpanel, ulpanel, umpanel, urpanel, menupanel};
 		for(Hidepanel p : panels)
@@ -2075,7 +2082,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
     public void resize(Coord sz) {
 	super.resize(sz);
 //	chat.resize(sz.x - blpw - brpw);
-	chat.move(new Coord(0, sz.y));
+//	chat.move(new Coord(0, sz.y));
 	if(map != null)
 	    map.resize(sz);
 	if(prog != null)

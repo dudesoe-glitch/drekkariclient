@@ -62,20 +62,20 @@ public class ChatUI extends Widget {
     public Channel sel = null;
     public int urgency = 0;
     private final Selector chansel;
-    private Coord base = Coord.z;
+//    private Coord base = Coord.z;
     private QuickLine qline = null;
     private final LinkedList<Notification> notifs = new LinkedList<Notification>();
     private UI.Grab qgrab;
 
     public ChatUI() {
-	super(Utils.getprefc("chatsize", new Coord(UI.scale(410), 150)));
+	super(Coord.z);
 	chansel = add(new Selector(new Coord(selw, sz.y - marg.y)), marg);
 	setfocusctl(true);
 	setcanfocus(true);
     }
 
     protected void added() {
-	base = this.c;
+//	base = new Coord(0, parent.sz.y);
 	resize(this.sz);
     }
 
@@ -1603,11 +1603,11 @@ public class ChatUI extends Widget {
     public void draw(GOut g) {
 	g.rimage(Window.bg, marg, sz.sub(marg.x * 2, marg.y));
 	super.draw(g);
-	g.image(bulc, new Coord(0, 0));
-	g.image(burc, new Coord(sz.x - burc.sz().x, 0));
-	g.rimagev(bvlb, new Coord(0, bulc.sz().y), sz.y - bulc.sz().y);
-	g.rimagev(bvrb, new Coord(sz.x - bvrb.sz().x, burc.sz().y), sz.y - burc.sz().y);
-	g.rimageh(bhb, new Coord(bulc.sz().x, 0), sz.x - bulc.sz().x - burc.sz().x);
+//	g.image(bulc, new Coord(0, 0));
+//	g.image(burc, new Coord(sz.x - burc.sz().x, 0));
+//	g.rimagev(bvlb, new Coord(0, bulc.sz().y), sz.y - bulc.sz().y);
+//	g.rimagev(bvrb, new Coord(sz.x - bvrb.sz().x, burc.sz().y), sz.y - burc.sz().y);
+//	g.rimageh(bhb, new Coord(bulc.sz().x, 0), sz.x - bulc.sz().x - burc.sz().x);
 //	g.aimage(bmf, new Coord(sz.x / 2, 0), 0.5, 0);
 	if((sel == null) || (sel.cb == null))
 	    g.aimage(bcbd, new Coord(sz.x, 0), 1, 0);
@@ -1643,7 +1643,7 @@ public class ChatUI extends Widget {
     }
 
     private class Spring extends NormAnim {
-	final int oy = base.y - c.y, ny;
+	final int oy = c.y, ny;
 	Spring(int ny) {
 	    super(0.15);
 	    this.ny = ny;
@@ -1652,7 +1652,7 @@ public class ChatUI extends Widget {
 
 	public void ntick(double a) {
 	    double b = Math.cos(Math.PI * 2.5 * a) * Math.exp(-5 * a);
-	    c = Coord.of(c.x, base.y + ny + (int)((ny - oy) * b));
+	    c = Coord.of(c.x, ny + (int)((ny - oy) * b));
 	    if((a == 1.0) && (ny >= 0)) {
 		hide();
 	    }
@@ -1661,17 +1661,15 @@ public class ChatUI extends Widget {
 
     public void resize(Coord sz) {
 	super.resize(sz);
-	if(visible)
-	    this.c = base.add(0, -this.sz.y);
 	chansel.resize(new Coord(selw, this.sz.y - marg.y));
 	if(sel != null)
 	    sel.resize(new Coord(this.sz.x - marg.x - sel.c.x, this.sz.y - sel.c.y));
     }
 
-    public void presize() {
-	if(sz.y > parent.sz.y - UI.scale(100))
-	    hresize(Math.max(UI.scale(minh), parent.sz.y - UI.scale(100)));
-    }
+//    public void presize() {
+//	if(sz.y > parent.sz.y - UI.scale(100))
+//	    hresize(Math.max(UI.scale(minh), parent.sz.y - UI.scale(100)));
+//    }
 
     public boolean targetshow = false;
     public void sshow(boolean show) {
@@ -1685,12 +1683,11 @@ public class ChatUI extends Widget {
 	resize(sz.x, h);
     }
 
-    public void resize(int w) {
-	resize(new Coord(Math.max(w, selw + marg.x + UI.scale(10) + marg.x), sz.y));
-    }
+//    public void resize(int w) {
+//	resize(new Coord(Math.max(w, selw + marg.x + UI.scale(10) + marg.x), sz.y));
+//    }
 
     public void move(Coord base) {
-	this.c = (this.base = base).add(0, visible ? -sz.y : 0);
     }
 
     public void expand() {
@@ -1743,49 +1740,49 @@ public class ChatUI extends Widget {
     private static final int minh = 96;
 	private String resizing = "none";
     public boolean mousedown(MouseDownEvent ev) {
-	if ((ev.b == 1) && (ev.c.x + UI.scale(4) > sz.x - bvlb.sz().x) && (ev.c.y - UI.scale(4) < bhb.sz().y)) {
-		dm = ui.grabmouse(this);
-		doff = ev.c;
-		resizing = "both";
-		return (true);
-	} else if ((ev.b == 1) && (ev.c.x + UI.scale(4) > sz.x - bvlb.sz().x)) {
-		dm = ui.grabmouse(this);
-		doff = ev.c;
-		resizing = "horizontally";
-		return (true);
-	} else if ((ev.b == 1) && (ev.c.y - UI.scale(4) < bhb.sz().y)) {
-	    dm = ui.grabmouse(this);
-	    doff = ev.c;
-		resizing = "vertically";
-	    return(true);
-	} else {
+//	if ((ev.b == 1) && (ev.c.x + UI.scale(4) > sz.x - bvlb.sz().x) && (ev.c.y - UI.scale(4) < bhb.sz().y)) {
+//		dm = ui.grabmouse(this);
+//		doff = ev.c;
+//		resizing = "both";
+//		return (true);
+//	} else if ((ev.b == 1) && (ev.c.x + UI.scale(4) > sz.x - bvlb.sz().x)) {
+//		dm = ui.grabmouse(this);
+//		doff = ev.c;
+//		resizing = "horizontally";
+//		return (true);
+//	} else if ((ev.b == 1) && (ev.c.y - UI.scale(4) < bhb.sz().y)) {
+//	    dm = ui.grabmouse(this);
+//	    doff = ev.c;
+//		resizing = "vertically";
+//	    return(true);
+//	} else {
 	    return(super.mousedown(ev));
-	}
+//	}
     }
 
     public void mousemove(MouseMoveEvent ev) {
 	super.mousemove(ev);
-        if(dm != null) {
-            if (resizing.equals("both")) {
-                resize(Math.max(UI.scale(410), Math.min(parent.sz.x - UI.scale(226), ev.c.x + UI.scale(5))), Math.max(UI.scale(minh), Math.min(parent.sz.y - UI.scale(120), sz.y + UI.scale(5) - ev.c.y)));
-            } else if (resizing.equals("horizontally")) {
-                resize(Math.max(UI.scale(410), Math.min(parent.sz.x - UI.scale(226), ev.c.x + UI.scale(5))), sz.y);
-            } else if (resizing.equals("vertically")) {
-                resize(sz.x, Math.max(UI.scale(minh), Math.min(parent.sz.y - UI.scale(120), sz.y + UI.scale(5) - ev.c.y)));
-            }
-        }
+//        if(dm != null) {
+//            if (resizing.equals("both")) {
+//                resize(Math.max(UI.scale(410), Math.min(parent.sz.x - UI.scale(226), ev.c.x + UI.scale(5))), Math.max(UI.scale(minh), Math.min(parent.sz.y - UI.scale(120), sz.y + UI.scale(5) - ev.c.y)));
+//            } else if (resizing.equals("horizontally")) {
+//                resize(Math.max(UI.scale(410), Math.min(parent.sz.x - UI.scale(226), ev.c.x + UI.scale(5))), sz.y);
+//            } else if (resizing.equals("vertically")) {
+//                resize(sz.x, Math.max(UI.scale(minh), Math.min(parent.sz.y - UI.scale(120), sz.y + UI.scale(5) - ev.c.y)));
+//            }
+//        }
     }
 
     public boolean mouseup(MouseUpEvent ev) {
-	if(dm != null) {
-	    dm.remove();
-	    dm = null;
-		Utils.setprefc("chatsize", sz);
-		resizing = "none";
-	    return(true);
-	} else {
+//	if(dm != null) {
+//	    dm.remove();
+//	    dm = null;
+//		Utils.setprefc("chatsize", sz);
+//		resizing = "none";
+//	    return(true);
+//	} else {
 	    return(super.mouseup(ev));
-	}
+//	}
     }
 
     public boolean keydown(KeyDownEvent ev) {
