@@ -2072,6 +2072,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 
     public void toggleui() {
 		chatWnd.show(!showUI);
+		questObjectivesWindow.show(!showUI);
 		mapfile.show(!showUI);
 		Hidepanel[] panels = {brpanel, ulpanel, umpanel, urpanel, menupanel};
 		for(Hidepanel p : panels)
