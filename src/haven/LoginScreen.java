@@ -154,7 +154,7 @@ public class LoginScreen extends Widget {
 		}
 	};
 	add(new CircleFadein(0.5));
-	optbtn = adda(new Button(UI.scale(100), "Options"), pos("cbl").add(10, -10), 0, 1);
+	optbtn = adda(new Button(UI.scale(100), "Options"), pos("cbl").add(10, -26), 0, 1);
 	optbtn.setgkey(GameUI.kb_opt);
 //	if(HttpStatus.mond.get() != null)
 //	    adda(new StatusLabel(HttpStatus.mond.get(), 1.0), sz.x - UI.scale(10), UI.scale(10), 1.0, 0.0);
@@ -188,10 +188,10 @@ public class LoginScreen extends Widget {
 			OptWnd.themeSongVolumeSlider.val = val;
 			OptWnd.themeSongVolumeSlider.changed();
 		}
-	}, bg.sz().x - UI.scale(230) , bg.sz().y - UI.scale(20));
-	add(new Label("Background Music Volume"), bg.sz().x - UI.scale(180) , bg.sz().y - UI.scale(36));
-	add(new Label("Login Screen Style:"), bg.sz().x - UI.scale(200) , bg.sz().y - UI.scale(52));
-	add(backgroundDropBox, bg.sz().x - UI.scale(100) , bg.sz().y - UI.scale(52));
+	}, bg.sz().x - UI.scale(230) , bg.sz().y - UI.scale(28));
+	add(new Label("Background Music Volume"), bg.sz().x - UI.scale(180) , bg.sz().y - UI.scale(44));
+	add(new Label("Login Screen Style:"), bg.sz().x - UI.scale(200) , bg.sz().y - UI.scale(60));
+	add(backgroundDropBox, bg.sz().x - UI.scale(100) , bg.sz().y - UI.scale(60));
 	GameUI.swimmingToggled = false;
 	GameUI.trackingToggled = false;
 	GameUI.crimesToggled = false;
@@ -252,7 +252,7 @@ public class LoginScreen extends Widget {
 			}
 
         }
-	}, new Coord(this.sz.x + UI.scale(-60), 0));
+	}, new Coord(this.sz.x + UI.scale(-60), 10));
     }
 
 //    public static final KeyBinding kb_savtoken = KeyBinding.get("login/savtoken", KeyMatch.forchar('R', KeyMatch.M)); // ND: Why the fuck are there keybinds for these? Someone might press one of those by mistake
