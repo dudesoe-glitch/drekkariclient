@@ -66,6 +66,7 @@ public class LoginScreen extends Widget {
 		add(Resource.local().loadwait("customclient/sfx/alchemistTheme"));
 		add(Resource.local().loadwait("customclient/sfx/valkyrieTheme"));
 		add(Resource.local().loadwait("customclient/sfx/berserkerTheme"));
+		add(Resource.local().loadwait("customclient/sfx/beastmasterTheme"));
 	}};
 	private static List<String> backgrounds = new ArrayList<>() {{
 		add(haven.MainFrame.gameDir + "res/customclient/rogueScreen.png");
@@ -76,6 +77,7 @@ public class LoginScreen extends Widget {
 		add(haven.MainFrame.gameDir + "res/customclient/alchemistScreen.png");
 		add(haven.MainFrame.gameDir + "res/customclient/valkyrieScreen.png");
 		add(haven.MainFrame.gameDir + "res/customclient/berserkerScreen.png");
+		add(haven.MainFrame.gameDir + "res/customclient/beastmasterScreen.png");
 	}};
 	final List<String> keys = new ArrayList<>(){{
 		add("Random!");
@@ -87,6 +89,7 @@ public class LoginScreen extends Widget {
 		add("Alchemist");
 		add("Valkyrie");
 		add("Berserker");
+		add("Beastmaster");
 	}};
 	private OldDropBox backgroundDropBox;
 	static public int bgIndex = 1;
@@ -119,7 +122,7 @@ public class LoginScreen extends Widget {
 	Tex bg = bg(backgrounds.get(bgIndex-1));
 	setfocustab(true);
 	add(backgroundImg = new Img(bg), Coord.z);
-	backgroundDropBox = new OldDropBox<String>(UI.scale(66), 4, UI.scale(17)) {
+	backgroundDropBox = new OldDropBox<String>(UI.scale(76), 4, UI.scale(17)) {
 		{
 			super.change(Utils.getprefi("loginBgIndex", 0));
 		}
