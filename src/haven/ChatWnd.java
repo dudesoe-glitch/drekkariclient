@@ -48,8 +48,8 @@ public class ChatWnd extends Window {
 
     @Override
     public void resize(Coord sz) {
-        sz.x = Math.max(sz.x, UI.scale(410));
-        sz.y = Math.max(sz.y, UI.scale(150));
+        sz.x = Math.max(sz.x, UI.scale(280));
+        sz.y = Math.max(sz.y, UI.scale(58));
         super.resize(sz);
         Utils.setprefc("wndsz-chat", sz);
     }
