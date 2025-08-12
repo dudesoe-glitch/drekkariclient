@@ -50,19 +50,6 @@ public class QuestObjectivesWindow extends Window {
                 }
 
                 @Override
-                public void iresize(Coord isz) {
-                    Coord mrgn = lg ? dlmrgn : dsmrgn;
-                    Coord asz = isz;
-                    Coord csz = asz.add(mrgn.mul(2));
-                    wsz = csz.add(tlm).add(brm);
-                    resize(wsz);
-                    ca = Area.sized(tlm, csz);
-                    aa = Area.sized(ca.ul.add(mrgn), asz);
-                    cbtn.c = Coord.of(UI.scale(12), +UI.scale(28));
-                    cpsz = Coord.of((int) (wsz.x * 0.95), cm.sz().y).sub(cptl);
-                }
-
-                @Override
                 public boolean mousedown(MouseDownEvent ev) {
                     if(ev.propagate(this))
                         return(true);
@@ -97,4 +84,17 @@ public class QuestObjectivesWindow extends Window {
         }
     }
 
+    @Override
+    protected void added() {
+        super.added();
+        if (deco instanceof DefaultDeco)
+            ((DefaultDeco)deco).cbtn.hide();
+    }
+
+    @Override
+    public void chdeco(Deco deco) {
+        super.chdeco(deco);
+        if (deco instanceof DefaultDeco)
+            ((DefaultDeco)deco).cbtn.hide();
+    }
 }
