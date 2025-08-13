@@ -123,7 +123,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	public final Sprite.Mill<?> sm;
 	public Sprite spr;
 	public boolean delign = false, old = false;
-	private Collection<RenderTree.Slot> slots = null;
+	public Collection<RenderTree.Slot> slots = null;
 	private boolean added = false;
 
 	public Overlay(Gob gob, int id, Sprite.Mill<?> sm) {

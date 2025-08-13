@@ -2,9 +2,11 @@ package haven.automated;
 
 import haven.*;
 import haven.Composite;
+import haven.Window;
 
 import java.awt.*;
 import java.util.*;
+import java.util.List;
 
 import static haven.MCache.cmaps;
 import static haven.MCache.tilesz;
@@ -426,6 +428,82 @@ public class AUtils {
             }
             gui.msg(message.toString(), Color.WHITE);
         } catch (Loading ignored) {}
+    }
+
+    public static List<WItem> getAllItemsFromAllInventoriesAndStacksExcludeBeltAndKeyring(GameUI gui){
+        List<WItem> items = new ArrayList<>();
+        List<Inventory> allInventories = gui.getAllInventories();
+
+        for (Inventory inventory : allInventories) {
+            if (!isBeltOrKeyring(inventory)) {
+                for (WItem item : inventory.getAllItems()) {
+                    if (!item.item.getname().contains("stack of")) {
+                        items.add(item);
+                    }
+                }
+            }
+        }
+
+        items.addAll(gui.getAllContentsWindows());
+        return items;
+    }
+
+    public static boolean isBeltOrKeyring(Inventory inventory) {
+        if (inventory.parent instanceof Window) {
+            String cap = ((Window) inventory.parent).cap;
+            return cap.contains("Belt") || cap.contains("Keyring");
+        }
+        return false;
+    }
+
+    public static boolean rightClickGobOverlayWithItem(GameUI gui, Gob gob, String overlayResName) {
+        if (gob != null && !gob.ols.isEmpty()) {
+            Optional<Gob.Overlay> foundOverlay = gob.ols.stream()
+                    .filter(ol -> ol != null && ol.spr != null && ol.spr.res != null && overlayResName.equals(ol.spr.res.name))
+                    .map(ol -> (Gob.Overlay) ol)
+                    .findFirst();
+
+            if (foundOverlay.isPresent()) {
+                Gob.Overlay gobOverlay = foundOverlay.get();
+                gui.map.wdgmsg("itemact", Coord.z, gob.rc.floor(posres), 0, 1, (int) gob.id, gob.rc.floor(posres), gobOverlay.id, -1);
+                return true;
+            } else {
+                return false;
+            }
+        }
+        return false;
+    }
+
+    public static boolean rightClickGobOverlayAndSelectOption(GameUI gui, Gob gob, int index, String overlayResName) {
+        if (gob != null && !gob.ols.isEmpty()) {
+            Optional<Gob.Overlay> foundOverlay = gob.ols.stream()
+                    .filter(ol -> ol != null && ol.spr != null && ol.spr.res != null && overlayResName.equals(ol.spr.res.name))
+                    .map(ol -> (Gob.Overlay) ol)
+                    .findFirst();
+
+            if (foundOverlay.isPresent()) {
+                Gob.Overlay gobOverlay = foundOverlay.get();
+                gui.map.wdgmsg("click", Coord.z, gob.rc.floor(posres), 3, 0, 1, (int) gob.id, gob.rc.floor(posres), gobOverlay.id, -1);;
+                gui.ui.rcvr.rcvmsg(gui.ui.lastWidgetID+1, "cl", index, gui.ui.modflags());
+                return true;
+            } else {
+                return false;
+            }
+        }
+        return false;
+    }
+
+    public static boolean gobHasOverlay (Gob gob, String overlayResName){
+        if (gob != null && !gob.ols.isEmpty()) {
+            Optional<Gob.Overlay> foundOverlay = gob.ols.stream()
+                    .filter(ol -> ol != null && ol.spr != null && ol.spr.res != null && overlayResName.equals(ol.spr.res.name))
+                    .map(ol -> (Gob.Overlay) ol)
+                    .findFirst();
+            if (foundOverlay.isPresent()) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }

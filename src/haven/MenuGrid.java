@@ -769,6 +769,7 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 		makeLocal("customclient/menugrid/Bots/TarKilnEmptierBot");
 		makeLocal("customclient/menugrid/Bots/TurnipBot");
 		makeLocal("customclient/menugrid/Bots/CleanupBot");
+		makeLocal("customclient/menugrid/Bots/RoastingSpitBot");
 
 		// Category: Other Scripts & Tools
 		makeLocal("customclient/menugrid/OtherScriptsAndTools/Add9CoalScript");
@@ -921,6 +922,20 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 						gui.cleanupBot.reqdestroy();
 						gui.cleanupBot = null;
 						gui.cleanupThread = null;
+					}
+				}
+			} else if (ad[2].equals("RoastingSpitBot")) {
+				if (gui.roastingSpitBot == null && gui.roastingSpitThread == null) {
+					gui.roastingSpitBot = new RoastingSpitBot(gui);
+					gui.add(gui.roastingSpitBot, new Coord(gui.sz.x/2 - gui.roastingSpitBot.sz.x/2, gui.sz.y/2 - gui.roastingSpitBot.sz.y/2 - 200));
+					gui.roastingSpitThread = new Thread(gui.roastingSpitBot, "roastingSpitBot");
+					gui.roastingSpitThread.start();
+				} else {
+					if (gui.roastingSpitBot != null) {
+						gui.roastingSpitBot.stop();
+						gui.roastingSpitBot.reqdestroy();
+						gui.roastingSpitBot = null;
+						gui.roastingSpitThread = null;
 					}
 				}
 			}

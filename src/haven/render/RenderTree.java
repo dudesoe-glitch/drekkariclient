@@ -405,7 +405,7 @@ public class RenderTree implements RenderList.Adapter, Disposable {
 	}
     }
 
-    static class TreeSlot implements Slot {
+    public static class TreeSlot implements Slot {
 	final TreeSlot parent;
 	final RenderTree tree;
 	final Node node;
@@ -414,7 +414,7 @@ public class RenderTree implements RenderList.Adapter, Disposable {
 	private TreeSlot[] deps = null;
 	private Pipe.Op cstate, ostate;
 	private boolean stlock = false;
-	private TreeSlot[] children = null;
+	public TreeSlot[] children = null;
 	private int nchildren = 0;
 	private int pidx = -1;
 

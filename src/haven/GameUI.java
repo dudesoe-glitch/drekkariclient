@@ -41,7 +41,6 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import haven.automated.*;
-import haven.automated.mapper.MappingClient;
 import haven.render.Location;
 import haven.res.ui.stackinv.ItemStack;
 
@@ -173,6 +172,8 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 	public Thread turnipThread;
 	public CleanupBot cleanupBot;
 	public Thread cleanupThread;
+	public RoastingSpitBot roastingSpitBot;
+	public Thread roastingSpitThread;
 
 
     public static abstract class BeltSlot {
