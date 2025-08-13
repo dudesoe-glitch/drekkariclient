@@ -2229,6 +2229,12 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
 				}
 			}
 		}
+		synchronized (Pathfinder.class) {
+			if (pf != null) {
+				pf.terminate = true;
+				pfthread.interrupt();
+			}
+		}
 		if(checkpointManager != null && checkpointManagerThread != null && clickb == 1){
 			checkpointManager.pauseIt();
 		}

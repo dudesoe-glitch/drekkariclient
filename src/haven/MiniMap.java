@@ -26,6 +26,7 @@
 
 package haven;
 
+import haven.automated.pathfinder.Pathfinder;
 import haven.render.*;
 
 import java.awt.image.BufferedImage;
@@ -1041,6 +1042,12 @@ public class MiniMap extends Widget {
 			}
 			if (OptWnd.autoEquipBunnySlippersPlateBootsCheckBox.a) {
 				ui.gui.map.switchToPlateBoots();
+			}
+			synchronized (Pathfinder.class) {
+				if (ui.gui.map.pf != null) {
+					ui.gui.map.pf.terminate = true;
+					ui.gui.map.pfthread.interrupt();
+				}
 			}
 			if(mv.checkpointManager != null && mv.checkpointManagerThread != null && button == 1){
 				if (!ui.modmeta)
