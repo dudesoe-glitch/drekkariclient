@@ -36,6 +36,7 @@ import java.util.concurrent.Future;
 import java.util.function.*;
 import java.util.stream.Collectors;
 
+import haven.automated.helpers.HitBoxes;
 import haven.automated.mapper.MappingClient;
 import haven.render.*;
 import haven.render.gl.GLObject;
@@ -1278,6 +1279,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 		updateMineLadderRadius();
 		updateSupportOverlays();
 		initPermanentHighlightOverlay();
+		HitBoxes.addHitBox(this);
 	}
 
 	public void updPose(HashSet<String> poses) {
