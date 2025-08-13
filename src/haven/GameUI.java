@@ -1843,6 +1843,9 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 	public static KeyBinding kb_toggleCollisionBoxes  = KeyBinding.get("toggleCollisionBoxesKB",  KeyMatch.forchar('B', KeyMatch.S));
 	public static KeyBinding kb_toggleGrowthInfo  = KeyBinding.get("toggleGrowthInfoKB",  KeyMatch.forchar('I',  KeyMatch.C | KeyMatch.S));
 	public static KeyBinding kb_toggleHarvestIcons  = KeyBinding.get("toggleHarvestIconsKB",  KeyMatch.forchar('P',  KeyMatch.C | KeyMatch.S));
+	public static KeyBinding kb_toggleBarrelContentsText = KeyBinding.get("toggleBarrelContentsTextKB",  KeyMatch.forchar('K',  KeyMatch.C | KeyMatch.S));
+	public static KeyBinding kb_toggleIconSignText = KeyBinding.get("toggleIconSignTextKB",  KeyMatch.forchar('J',  KeyMatch.C | KeyMatch.S));
+	public static KeyBinding kb_toggleCheeseRacksTierText = KeyBinding.get("toggleCheeseRacksTierTextKB",  KeyMatch.forchar('U',  KeyMatch.C | KeyMatch.S));
 	public static KeyBinding kb_toggleLowFoodWaterIcons  = KeyBinding.get("toggleLowFoodWaterIconsKB",  KeyMatch.forchar('O',  KeyMatch.C | KeyMatch.S));
 	public static KeyBinding kb_toggleBeeSkepIcons  = KeyBinding.get("toggleBeeSkepIconsKB",  KeyMatch.forchar('L',  KeyMatch.C | KeyMatch.S));
 	public static KeyBinding kb_toggleSpeedInfo  = KeyBinding.get("toggleSpeedInfoKB",  KeyMatch.forchar('S',  KeyMatch.C | KeyMatch.S));
@@ -1994,6 +1997,15 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 		return(true);
 	} else if(kb_toggleHarvestIcons.key().match(ev)) {
 		OptWnd.showTreesBushesHarvestIconsCheckBox.set(!OptWnd.showTreesBushesHarvestIconsCheckBox.a);
+		return(true);
+	} else if(kb_toggleBarrelContentsText.key().match(ev)) {
+		OptWnd.showBarrelContentsTextCheckBox.set(!OptWnd.showBarrelContentsTextCheckBox.a);
+		return(true);
+	} else if(kb_toggleIconSignText.key().match(ev)) {
+		OptWnd.showIconSignTextCheckBox.set(!OptWnd.showIconSignTextCheckBox.a);
+		return(true);
+	} else if(kb_toggleCheeseRacksTierText.key().match(ev)) {
+		OptWnd.showCheeseRacksTierTextCheckBox.set(!OptWnd.showCheeseRacksTierTextCheckBox.a);
 		return(true);
 	} else if(kb_toggleLowFoodWaterIcons.key().match(ev)) {
 		OptWnd.showLowFoodWaterIconsCheckBox.set(!OptWnd.showLowFoodWaterIconsCheckBox.a);
@@ -2681,6 +2693,32 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 			isHorizontal = horizontal;
 			Utils.setprefb(horizontalSettingName, horizontal);
 			checkIfOutsideOfUI();
+		}
+
+		private MenuGrid.PagButton curttp = null;
+		private Tex curtt = null;
+		@Override
+		public Object tooltip(Coord c, Widget prev) {
+			if (!showUI)
+				return(false);
+			try {
+				int slot = beltslot(c);
+				if (slot != -1) {
+					if (belt[slot] instanceof PagBeltSlot) {
+						MenuGrid.PagButton pag = ((PagBeltSlot)belt[slot]).pag.button();
+						if(pag != null) {
+							if((pag != curttp)) {
+								BufferedImage ti = pag.rendertt(true);
+								curtt = (ti == null) ? null : new TexI(ti);
+								curttp = pag;
+							}
+							return(curtt);
+						}
+					}
+				}
+			} catch (Exception ignored){
+			}
+			return super.tooltip(c, prev);
 		}
 	}
 

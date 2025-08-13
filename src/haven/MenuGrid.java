@@ -177,8 +177,15 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 	    }
 	    if(pag.id instanceof Indir)
 		pag.scm.wdgmsg("act", Utils.extend(Utils.extend(new Object[0], act().ad), eact));
-	    else
-		pag.scm.wdgmsg("use", Utils.extend(new Object[] {pag.id}, eact));
+		else {
+			if (OptWnd.preventUsingRawHideWhenRidingCheckBox.a && pag.button() != null && pag.button().name() != null && pag.button().name().equals("Raw Hide!")) { // ND: I can't figure out a better reliable way to check the button
+				if (pag.scm.ui != null && pag.scm.ui.gui != null && pag.scm.ui.gui.map != null && pag.scm.ui.gui.map.player() != null && pag.scm.ui.gui.map.player().imOnHorseback){ // ND: Might be overkill, better safe than sorry.
+					pag.scm.ui.gui.error("Prevent Raw Hide when Riding a Horse is ENABLED! Dismount first before using Raw Hide!");
+					return;
+				}
+			}
+			pag.scm.wdgmsg("use", Utils.extend(new Object[]{pag.id}, eact));
+		}
 	}
 	public void tick(double dt) {
 	    if(spr != null)
@@ -761,7 +768,6 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 		makeLocal("customclient/menugrid/Toggles/TileCentering");
 		makeLocal("customclient/menugrid/Toggles/QueuedMovementWindow");
 		makeLocal("customclient/menugrid/Toggles/AutoDrop");
-		makeLocal("customclient/menugrid/Toggles/BarrelContentsText");
 		makeLocal("customclient/menugrid/Toggles/FlowerMenuAutoSelect");
 
 		// Category: Bots
@@ -862,8 +868,6 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 				OptWnd.enableQueuedMovementCheckBox.set(!OptWnd.enableQueuedMovementCheckBox.a);
 			} else if (ad[2].equals("AutoDrop")) {
 				AutoDropManagerWindow.autoDropItemsCheckBox.set(!AutoDropManagerWindow.autoDropItemsCheckBox.a);
-			} else if (ad[2].equals("BarrelContentsText")) {
-				OptWnd.showBarrelContentsTextCheckBox.set(!OptWnd.showBarrelContentsTextCheckBox.a);
 			} else if (ad[2].equals("FlowerMenuAutoSelect")) {
 				FlowerMenuAutoSelectManagerWindow.flowerMenuAutoSelectCheckBox.set(!FlowerMenuAutoSelectManagerWindow.flowerMenuAutoSelectCheckBox.a);
 			}
