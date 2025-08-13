@@ -141,7 +141,7 @@ public class Map {
         }
 
         if (HitBoxes.collisionBoxMap.get(gob.getres().name) != null) {
-            HitBoxes.CollisionBox[] collisionBoxes = HitBoxes.collisionBoxMap.get(gob.getres().name);
+            HitBoxes.CollisionBoxSecondary[] collisionBoxSecondaries = HitBoxes.collisionBoxMap.get(gob.getres().name);
             if (gob.getres().name.contains("/pow")) {
                 Resource res = gob.getres();
                 ResDrawable rd = gob.getattr(ResDrawable.class);
@@ -163,7 +163,7 @@ public class Map {
                     }
                 }
             } else {
-                for (HitBoxes.CollisionBox collisionBox : collisionBoxes) {
+                for (HitBoxes.CollisionBoxSecondary collisionBox : collisionBoxSecondaries) {
                     if (!collisionBox.hitAble) {
                         return;
                     } else {

@@ -8,8 +8,8 @@ import java.sql.*;
 import java.util.*;
 
 public class HitBoxes {
-    private static final String DATABASE = "jdbc:sqlite:static_data.db";
-    public static Map<String, CollisionBox[]> collisionBoxMap = new HashMap<>();
+    private static final String DATABASE = "jdbc:sqlite:hitboxes.db";
+    public static Map<String, CollisionBoxSecondary[]> collisionBoxMap = new HashMap<>();
 
     private static Set<String> passableGobs = new HashSet<>(Arrays.asList(
             "gfx/terobjs/herbs", "gfx/terobjs/items", "gfx/terobjs/plants", "gfx/terobjs/clue", "gfx/terobjs/boostspeed",
@@ -18,33 +18,33 @@ public class HitBoxes {
 
     static {
         //Add missing animals...
-        collisionBoxMap.put("gfx/kritter/horse", new CollisionBox[]{new CollisionBox(
+        collisionBoxMap.put("gfx/kritter/horse", new CollisionBoxSecondary[]{new CollisionBoxSecondary(
                 new Coord(-8, -4), new Coord(8, 4), new Coord(8, -4), new Coord(-8, 4))});
-        collisionBoxMap.put("gfx/kritter/horse/mare", new CollisionBox[]{new CollisionBox(
+        collisionBoxMap.put("gfx/kritter/horse/mare", new CollisionBoxSecondary[]{new CollisionBoxSecondary(
                 new Coord(-8, -4), new Coord(8, 4), new Coord(8, -4), new Coord(-8, 4))});
-        collisionBoxMap.put("gfx/kritter/horse/stallion", new CollisionBox[]{new CollisionBox(
+        collisionBoxMap.put("gfx/kritter/horse/stallion", new CollisionBoxSecondary[]{new CollisionBoxSecondary(
                 new Coord(-8, -4), new Coord(8, 4), new Coord(8, -4), new Coord(-8, 4))});
-        collisionBoxMap.put("gfx/kritter/horse/foal", new CollisionBox[]{new CollisionBox(
+        collisionBoxMap.put("gfx/kritter/horse/foal", new CollisionBoxSecondary[]{new CollisionBoxSecondary(
                 new Coord(-8, -4), new Coord(8, 4), new Coord(8, -4), new Coord(-8, 4))});
-        collisionBoxMap.put("gfx/kritter/cattle/calf", new CollisionBox[]{new CollisionBox(
+        collisionBoxMap.put("gfx/kritter/cattle/calf", new CollisionBoxSecondary[]{new CollisionBoxSecondary(
                 new Coord(-9, -3), new Coord(9, 3), new Coord(9, -3), new Coord(-9, 3))});
-        collisionBoxMap.put("gfx/kritter/cattle/cattle", new CollisionBox[]{new CollisionBox(
+        collisionBoxMap.put("gfx/kritter/cattle/cattle", new CollisionBoxSecondary[]{new CollisionBoxSecondary(
                 new Coord(-9, -3), new Coord(9, 3), new Coord(9, -3), new Coord(-9, 3))});
-        collisionBoxMap.put("gfx/kritter/pig/piglet", new CollisionBox[]{new CollisionBox(
+        collisionBoxMap.put("gfx/kritter/pig/piglet", new CollisionBoxSecondary[]{new CollisionBoxSecondary(
                 new Coord(-6, -3), new Coord(6, 3), new Coord(6, -3), new Coord(-6, 3))});
-        collisionBoxMap.put("gfx/kritter/pig/sow", new CollisionBox[]{new CollisionBox(
+        collisionBoxMap.put("gfx/kritter/pig/sow", new CollisionBoxSecondary[]{new CollisionBoxSecondary(
                 new Coord(-6, -3), new Coord(6, 3), new Coord(6, -3), new Coord(-6, 3))});
-        collisionBoxMap.put("gfx/kritter/pig/hog", new CollisionBox[]{new CollisionBox(
+        collisionBoxMap.put("gfx/kritter/pig/hog", new CollisionBoxSecondary[]{new CollisionBoxSecondary(
                 new Coord(-6, -3), new Coord(6, 3), new Coord(6, -3), new Coord(-6, 3))});
-        collisionBoxMap.put("gfx/kritter/goat/nanny", new CollisionBox[]{new CollisionBox(
+        collisionBoxMap.put("gfx/kritter/goat/nanny", new CollisionBoxSecondary[]{new CollisionBoxSecondary(
                 new Coord(-3, -2), new Coord(4, 2), new Coord(4, -2), new Coord(-3, 2))});
-        collisionBoxMap.put("gfx/kritter/goat/billy", new CollisionBox[]{new CollisionBox(
+        collisionBoxMap.put("gfx/kritter/goat/billy", new CollisionBoxSecondary[]{new CollisionBoxSecondary(
                 new Coord(-3, -2), new Coord(4, 2), new Coord(4, -2), new Coord(-3, 2))});
-        collisionBoxMap.put("gfx/kritter/goat/kid", new CollisionBox[]{new CollisionBox(
+        collisionBoxMap.put("gfx/kritter/goat/kid", new CollisionBoxSecondary[]{new CollisionBoxSecondary(
                 new Coord(-3, -2), new Coord(4, 2), new Coord(4, -2), new Coord(-3, 2))});
-        collisionBoxMap.put("gfx/kritter/sheep/lamb", new CollisionBox[]{new CollisionBox(
+        collisionBoxMap.put("gfx/kritter/sheep/lamb", new CollisionBoxSecondary[]{new CollisionBoxSecondary(
                 new Coord(-4, -2), new Coord(5, 2), new Coord(5, -2), new Coord(-4, 2))});
-        collisionBoxMap.put("gfx/kritter/sheep/sheep", new CollisionBox[]{new CollisionBox(
+        collisionBoxMap.put("gfx/kritter/sheep/sheep", new CollisionBoxSecondary[]{new CollisionBoxSecondary(
                 new Coord(-4, -2), new Coord(5, 2), new Coord(5, -2), new Coord(-4, 2))});
     }
 
@@ -55,7 +55,7 @@ public class HitBoxes {
         if(collisionBoxMap.get(res.name) == null){
             for (String gobResName : passableGobs) {
                 if (res.name.contains(gobResName) && !res.name.contains("trellis")) {
-                    collisionBoxMap.put(res.name, new CollisionBox[]{new CollisionBox(false)});
+                    collisionBoxMap.put(res.name, new CollisionBoxSecondary[]{new CollisionBoxSecondary(false)});
                     return;
                 }
             }
@@ -65,13 +65,13 @@ public class HitBoxes {
         }
     }
 
-    private static CollisionBox[] extractCollisionBoxesFromResource(Gob gob) {
+    private static CollisionBoxSecondary[] extractCollisionBoxesFromResource(Gob gob) {
         Resource res = gob.getres();
         if (res.name.endsWith("/consobj")) {
             ResDrawable rd = gob.getattr(ResDrawable.class);
             if (rd != null && rd.sdt.rbuf.length >= 4) {
                 MessageBuf buf = rd.sdt.clone();
-                return (new CollisionBox[]{new CollisionBox(new Coord(buf.rbuf[0], buf.rbuf[1]), new Coord(buf.rbuf[2], buf.rbuf[3]))});
+                return (new CollisionBoxSecondary[]{new CollisionBoxSecondary(new Coord(buf.rbuf[0], buf.rbuf[1]), new Coord(buf.rbuf[2], buf.rbuf[3]))});
             }
         }
         try {
@@ -101,26 +101,26 @@ public class HitBoxes {
                 }
             }
 
-            final List<CollisionBox> collisionBoxesList = new ArrayList<>();
+            final List<CollisionBoxSecondary> collisionBoxesListSecondary = new ArrayList<>();
             for (Resource.Obstacle o : obstacles) {
                 for (int i = 0; i < o.p.length; i++) {
                     boolean hitAble = checkHitAble(gob, o);
-                    CollisionBox collisionBox = new CollisionBox(o.p[i], hitAble);
-                    collisionBoxesList.add(collisionBox);
+                    CollisionBoxSecondary collisionBox = new CollisionBoxSecondary(o.p[i], hitAble);
+                    collisionBoxesListSecondary.add(collisionBox);
                 }
             }
             for (Resource.Neg o : negs) {
                 boolean hitAble = checkHitAble(gob);
-                CollisionBox collisionBox = new CollisionBox(o.bc, o.ac, hitAble, false);
-                collisionBoxesList.add(collisionBox);
+                CollisionBoxSecondary collisionBox = new CollisionBoxSecondary(o.bc, o.ac, hitAble, false);
+                collisionBoxesListSecondary.add(collisionBox);
             }
 
-            CollisionBox[] collisionBoxes = collisionBoxesList.toArray(new CollisionBox[0]);
+            CollisionBoxSecondary[] collisionBoxSecondaries = collisionBoxesListSecondary.toArray(new CollisionBoxSecondary[0]);
 
-            collisionBoxMap.put(res.name, collisionBoxes);
-            saveCollisionBoxMapEntry(res.name, collisionBoxes);
+            collisionBoxMap.put(res.name, collisionBoxSecondaries);
+            saveCollisionBoxMapEntry(res.name, collisionBoxSecondaries);
 
-            return (collisionBoxes);
+            return (collisionBoxSecondaries);
         } catch (Exception ignore) {
         }
         return null;
@@ -180,9 +180,9 @@ public class HitBoxes {
                     while (rs.next()) {
                         String key = rs.getString("key");
                         String serialized = rs.getString("value");
-                        CollisionBox[] collisionBoxes = deserialize(serialized);
-                        if (collisionBoxes != null) {
-                            collisionBoxMap.put(key, collisionBoxes);
+                        CollisionBoxSecondary[] collisionBoxSecondaries = deserialize(serialized);
+                        if (collisionBoxSecondaries != null) {
+                            collisionBoxMap.put(key, collisionBoxSecondaries);
                         }
                     }
                 } catch (SQLException e) {
@@ -194,18 +194,18 @@ public class HitBoxes {
         }
     }
 
-    public static CollisionBox[] deserialize(String s) {
+    public static CollisionBoxSecondary[] deserialize(String s) {
         try (ByteArrayInputStream bais = new ByteArrayInputStream(Base64.getDecoder().decode(s));
              ObjectInputStream ois = new ObjectInputStream(bais)) {
-            return (CollisionBox[]) ois.readObject();
+            return (CollisionBoxSecondary[]) ois.readObject();
         } catch (IOException | ClassNotFoundException e) {
             System.err.println("Error while deserializing CollisionBox[]: " + e.getMessage());
             return null;
         }
     }
 
-    public static void saveCollisionBoxMapEntry(String key, CollisionBox[] collisionBoxes) {
-        String serialized = serialize(collisionBoxes);
+    public static void saveCollisionBoxMapEntry(String key, CollisionBoxSecondary[] collisionBoxSecondaries) {
+        String serialized = serialize(collisionBoxSecondaries);
         if (serialized != null) {
             try (Connection conn = DriverManager.getConnection(DATABASE)) {
                 if (conn != null) {
@@ -224,10 +224,10 @@ public class HitBoxes {
         }
     }
 
-    public static String serialize(CollisionBox[] collisionBoxes) {
+    public static String serialize(CollisionBoxSecondary[] collisionBoxSecondaries) {
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
              ObjectOutputStream oos = new ObjectOutputStream(baos)) {
-            oos.writeObject(collisionBoxes);
+            oos.writeObject(collisionBoxSecondaries);
             return Base64.getEncoder().encodeToString(baos.toByteArray());
         } catch (IOException e) {
             System.err.println("Error while serializing CollisionBox[]: " + e.getMessage());
@@ -264,12 +264,12 @@ public class HitBoxes {
         }
     }
 
-    public static class CollisionBox implements Serializable {
+    public static class CollisionBoxSecondary implements Serializable {
         private static final long serialVersionUID = 2554246893705809471L;
         public Coord2d[] coords;
         public boolean hitAble;
 
-        public CollisionBox(Coord a, Coord b) {
+        public CollisionBoxSecondary(Coord a, Coord b) {
             this.coords = new Coord2d[] {
                     new Coord2d(a.x, a.y),
                     new Coord2d(b.x, b.y)
@@ -277,7 +277,7 @@ public class HitBoxes {
             this.hitAble = true;
         }
 
-        public CollisionBox(Coord a, Coord b, Coord c, Coord d) {
+        public CollisionBoxSecondary(Coord a, Coord b, Coord c, Coord d) {
             this.coords = new Coord2d[] {
                     new Coord2d(a.x, a.y),
                     new Coord2d(b.x, b.y),
@@ -287,17 +287,17 @@ public class HitBoxes {
             this.hitAble = true;
         }
 
-        public CollisionBox(boolean hitAble) {
+        public CollisionBoxSecondary(boolean hitAble) {
             this.coords = new Coord2d[0];
             this.hitAble = hitAble;
         }
 
-        public CollisionBox(Coord2d[] coords, boolean hitAble) {
+        public CollisionBoxSecondary(Coord2d[] coords, boolean hitAble) {
             this.coords = coords;
             this.hitAble = hitAble;
         }
 
-        public CollisionBox(final Coord off, final Coord br, boolean hitAble, boolean buffer) {
+        public CollisionBoxSecondary(final Coord off, final Coord br, boolean hitAble, boolean buffer) {
             Coord ac = !buffer ? off : off.add(2, 2);
             Coord bc = !buffer ? br : br.add(4, 4);
             this.coords = new Coord2d[]{

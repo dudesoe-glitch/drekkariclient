@@ -86,8 +86,8 @@ public class Pathfinder implements Runnable {
                 }
                 if (gob.getres() != null && isInsideBoundBox(gob.rc.floor(), gob.a, gob.getres().name, player.rc.floor())) {
                     if (HitBoxes.collisionBoxMap.get(gob.getres().name) != null) {
-                        HitBoxes.CollisionBox[] collisionBoxes = HitBoxes.collisionBoxMap.get(gob.getres().name);
-                        for (HitBoxes.CollisionBox collisionBox : collisionBoxes) {
+                        HitBoxes.CollisionBoxSecondary[] collisionBoxes = HitBoxes.collisionBoxMap.get(gob.getres().name);
+                        for (HitBoxes.CollisionBoxSecondary collisionBox : collisionBoxes) {
                             if (collisionBox.hitAble) {
                                 if (collisionBox.coords.length > 2) {
                                     double minX = Double.MAX_VALUE;
@@ -143,8 +143,8 @@ public class Pathfinder implements Runnable {
         // exclude any bounding boxes overlapping the destination gob
         if (this.gob != null)
             if (HitBoxes.collisionBoxMap.get(this.gob.getres().name) != null) {
-                HitBoxes.CollisionBox[] collisionBoxes = HitBoxes.collisionBoxMap.get(this.gob.getres().name);
-                for (HitBoxes.CollisionBox collisionBox : collisionBoxes) {
+                HitBoxes.CollisionBoxSecondary[] collisionBoxes = HitBoxes.collisionBoxMap.get(this.gob.getres().name);
+                for (HitBoxes.CollisionBoxSecondary collisionBox : collisionBoxes) {
                     if (collisionBox.hitAble) {
                         if (collisionBox.coords.length > 2) {
                             double minX = Double.MAX_VALUE;
@@ -245,8 +245,8 @@ public class Pathfinder implements Runnable {
 
     public static boolean isInsideBoundBox(Coord gobRc, double gobA, String resName, Coord point) {
         if (HitBoxes.collisionBoxMap.get(resName) != null) {
-            HitBoxes.CollisionBox[] collisionBoxes = HitBoxes.collisionBoxMap.get(resName);
-            for (HitBoxes.CollisionBox collisionBox : collisionBoxes) {
+            HitBoxes.CollisionBoxSecondary[] collisionBoxes = HitBoxes.collisionBoxMap.get(resName);
+            for (HitBoxes.CollisionBoxSecondary collisionBox : collisionBoxes) {
                 if (collisionBox.hitAble) {
                     if (collisionBox.coords.length > 3) {
                         double minX = Double.MAX_VALUE;
