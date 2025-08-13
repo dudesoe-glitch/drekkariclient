@@ -177,8 +177,15 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 	    }
 	    if(pag.id instanceof Indir)
 		pag.scm.wdgmsg("act", Utils.extend(Utils.extend(new Object[0], act().ad), eact));
-	    else
-		pag.scm.wdgmsg("use", Utils.extend(new Object[] {pag.id}, eact));
+		else {
+			if (OptWnd.preventUsingRawHideWhenRidingCheckBox.a && pag.button() != null && pag.button().name() != null && pag.button().name().equals("Raw Hide!")) { // ND: I can't figure out a better reliable way to check the button
+				if (pag.scm.ui != null && pag.scm.ui.gui != null && pag.scm.ui.gui.map != null && pag.scm.ui.gui.map.player() != null && pag.scm.ui.gui.map.player().imOnHorseback){ // ND: Might be overkill, better safe than sorry.
+					pag.scm.ui.gui.error("Prevent Raw Hide when Riding a Horse is ENABLED! Dismount first before using Raw Hide!");
+					return;
+				}
+			}
+			pag.scm.wdgmsg("use", Utils.extend(new Object[]{pag.id}, eact));
+		}
 	}
 	public void tick(double dt) {
 	    if(spr != null)

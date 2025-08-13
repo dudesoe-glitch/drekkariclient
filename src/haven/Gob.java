@@ -107,6 +107,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	public Boolean imDrinking = false;
 	public Boolean imInCoracle = false;
 	public Boolean imOnSkis = false;
+	public Boolean imOnHorseback = false;
 	List<String> onWaterAnimations = List.of("coracleidle", "coraclerowan", "dugout", "rowboat", "rowing", "snekkja", "knarr");
 	private Overlay archeryVector;
 	private Overlay archeryRadius;
@@ -1312,6 +1313,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 			imDrinking = (poses.contains("drinkan"));
 			imInCoracle = (poses.contains("coracleidle") || poses.contains("coraclerowan"));
 			imOnSkis = (poses.contains("skian-idle") || poses.contains("skian-walk") || poses.contains("skian-run"));
+			imOnHorseback = (poses.contains("riding-idle"));
 			boolean imOnWater = onWaterAnimations.stream().anyMatch(target -> poses.stream().anyMatch(s -> s.contains(target)));
 			if (poses.contains("spear-ready")) {
 				archeryIndicator(155, !imOnWater);
