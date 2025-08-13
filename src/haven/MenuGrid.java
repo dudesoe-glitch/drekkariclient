@@ -768,7 +768,6 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 		makeLocal("customclient/menugrid/Toggles/TileCentering");
 		makeLocal("customclient/menugrid/Toggles/QueuedMovementWindow");
 		makeLocal("customclient/menugrid/Toggles/AutoDrop");
-		makeLocal("customclient/menugrid/Toggles/BarrelContentsText");
 		makeLocal("customclient/menugrid/Toggles/FlowerMenuAutoSelect");
 
 		// Category: Bots
@@ -868,8 +867,6 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 				OptWnd.enableQueuedMovementCheckBox.set(!OptWnd.enableQueuedMovementCheckBox.a);
 			} else if (ad[2].equals("AutoDrop")) {
 				AutoDropManagerWindow.autoDropItemsCheckBox.set(!AutoDropManagerWindow.autoDropItemsCheckBox.a);
-			} else if (ad[2].equals("BarrelContentsText")) {
-				OptWnd.showBarrelContentsTextCheckBox.set(!OptWnd.showBarrelContentsTextCheckBox.a);
 			} else if (ad[2].equals("FlowerMenuAutoSelect")) {
 				FlowerMenuAutoSelectManagerWindow.flowerMenuAutoSelectCheckBox.set(!FlowerMenuAutoSelectManagerWindow.flowerMenuAutoSelectCheckBox.a);
 			}
