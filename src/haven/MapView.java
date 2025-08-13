@@ -2915,18 +2915,6 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
 			System.out.println("-= PF DONE =-");
 	}
 
-	public void pfLeftClickPrecise(Coord mc, String action){
-		haven.automated.pathfinder.Map.plbbox = 2;
-		pfLeftClick(mc, action);
-		haven.automated.pathfinder.Map.plbbox = 3;
-	}
-
-	public void pfRightClickPrecise(Gob gob, int meshid, int clickb, int modflags, String action){
-		haven.automated.pathfinder.Map.plbbox = 2;
-		pfRightClick(gob, meshid, clickb, modflags, action);
-		haven.automated.pathfinder.Map.plbbox = 3;
-	}
-
 	public void pfLeftClick(Coord mc, String action) {
 		try{
 			Gob player = player();
@@ -2959,6 +2947,34 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
 			}
 		} catch (Exception e){
 			e.getMessage();
+		}
+	}
+
+	public void pfLeftClickGob(Gob gob, String action) {
+		Gob player = player();
+		if (player == null || gob == null)
+			return;
+
+		synchronized (Pathfinder.class) {
+			if (pf != null) {
+				pf.terminate = true;
+				pfthread.interrupt();
+				if (player.getattr(Moving.class) != null)
+					wdgmsg("gk", 27);
+			}
+
+			Coord dest = gob.rc.floor();
+
+			Coord src = player.rc.floor();
+			int gcx = haven.automated.pathfinder.Map.origin - (src.x - dest.x);
+			int gcy = haven.automated.pathfinder.Map.origin - (src.y - dest.y);
+			if (gcx < 0 || gcx >= haven.automated.pathfinder.Map.sz || gcy < 0 || gcy >= haven.automated.pathfinder.Map.sz)
+				return;
+
+			pf = new Pathfinder(this, new Coord(gcx, gcy), gob, -1, 1, 0, action);
+			pf.addListener(this);
+			pfthread = new Thread(pf, "Pathfinder");
+			pfthread.start();
 		}
 	}
 
