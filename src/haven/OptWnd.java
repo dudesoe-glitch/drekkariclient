@@ -2818,6 +2818,7 @@ public class OptWnd extends Window {
 		y = addbtn(cont, "Show Low Food/Water Icons", GameUI.kb_toggleLowFoodWaterIcons, y);
 		y = addbtn(cont, "Show Bee Skep Harvest Icons", GameUI.kb_toggleBeeSkepIcons, y);
 		y = addbtn(cont, "Show Barrel Contents Text", GameUI.kb_toggleBarrelContentsText, y);
+		y = addbtn(cont, "Show Icon Sign Text", GameUI.kb_toggleIconSignText, y);
 		y = addbtn(cont, "Show Objects Speed", GameUI.kb_toggleSpeedInfo, y);
 		y = addbtn(cont, "Hide/Show Cursor Item", GameUI.kb_toggleCursorItem, y);
 		y+=UI.scale(20);
@@ -4859,9 +4860,9 @@ public class OptWnd extends Window {
 	private static final Object showBarrelContentsTextTooltip = RichText.render("This adds text on top of barrels, to make it easier to determine what’s inside of them. Empty barrels won't show any text." +
 			"\n" +
 			"\n$col[218,163,0]{Keybind:} $col[185,185,185]{This can also be toggled using a keybind.}", UI.scale(300));
-	private static final Object showIconSignTextTooltip = RichText.render("This adds text on top of icon signs, that shows the name of the currently displayed icon." +
+	private static final Object showIconSignTextTooltip = RichText.render("This adds text on top of icon signs, that shows the name of the currently displayed icon. Empty signs won't show any text." +
 			"\n" +
-			"\n$col[185,185,185]{Icon signs that don't have any icon set won't show any text.}", UI.scale(300));
+			"\n$col[218,163,0]{Keybind:} $col[185,185,185]{This can also be toggled using a keybind.}", UI.scale(300));
 	private static final Object showCheeseRacksTierTextTooltip = RichText.render("This adds text on top of each cheese tray inside cheese racks, that shows the current tier of the cheese present in the tray." +
 			"\n" +
 			"\n$col[185,185,185]{Unfortunately, the server only sends the tier info, so the client can't tell which exact cheese is in the trays.}", UI.scale(300));
