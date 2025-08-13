@@ -2692,6 +2692,32 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 			Utils.setprefb(horizontalSettingName, horizontal);
 			checkIfOutsideOfUI();
 		}
+
+		private MenuGrid.PagButton curttp = null;
+		private Tex curtt = null;
+		@Override
+		public Object tooltip(Coord c, Widget prev) {
+			if (!showUI)
+				return(false);
+			try {
+				int slot = beltslot(c);
+				if (slot != -1) {
+					if (belt[slot] instanceof PagBeltSlot) {
+						MenuGrid.PagButton pag = ((PagBeltSlot)belt[slot]).pag.button();
+						if(pag != null) {
+							if((pag != curttp)) {
+								BufferedImage ti = pag.rendertt(true);
+								curtt = (ti == null) ? null : new TexI(ti);
+								curttp = pag;
+							}
+							return(curtt);
+						}
+					}
+				}
+			} catch (Exception ignored){
+			}
+			return super.tooltip(c, prev);
+		}
 	}
 
 	public static final KeyBinding[] kb_actbar1 = {
