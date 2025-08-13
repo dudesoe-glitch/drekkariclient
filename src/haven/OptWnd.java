@@ -2817,6 +2817,7 @@ public class OptWnd extends Window {
 		y = addbtn(cont, "Show Tree/Bush Harvest Icons", GameUI.kb_toggleHarvestIcons, y);
 		y = addbtn(cont, "Show Low Food/Water Icons", GameUI.kb_toggleLowFoodWaterIcons, y);
 		y = addbtn(cont, "Show Bee Skep Harvest Icons", GameUI.kb_toggleBeeSkepIcons, y);
+		y = addbtn(cont, "Show Barrel Contents Text", GameUI.kb_toggleBarrelContentsText, y);
 		y = addbtn(cont, "Show Objects Speed", GameUI.kb_toggleSpeedInfo, y);
 		y = addbtn(cont, "Hide/Show Cursor Item", GameUI.kb_toggleCursorItem, y);
 		y+=UI.scale(20);
@@ -4855,9 +4856,9 @@ public class OptWnd extends Window {
 			"\n$col[185,185,185]{For example, you can use this to keep track of which cows you milked already, or whatever.}" +
 			"\n" +
 			"\n$col[218,163,0]{Note:} $col[185,185,185]{Disabling this setting will also reset the current list of highlighted objects.}", UI.scale(300));
-	private static final Object showBarrelContentsTextTooltip = RichText.render("This adds text on top of barrels, to make it easier to determine what’s inside of them." +
+	private static final Object showBarrelContentsTextTooltip = RichText.render("This adds text on top of barrels, to make it easier to determine what’s inside of them. Empty barrels won't show any text." +
 			"\n" +
-			"\n$col[185,185,185]{Empty barrels won't show any text.}", UI.scale(300));
+			"\n$col[218,163,0]{Keybind:} $col[185,185,185]{This can also be toggled using a keybind.}", UI.scale(300));
 	private static final Object showIconSignTextTooltip = RichText.render("This adds text on top of icon signs, that shows the name of the currently displayed icon." +
 			"\n" +
 			"\n$col[185,185,185]{Icon signs that don't have any icon set won't show any text.}", UI.scale(300));

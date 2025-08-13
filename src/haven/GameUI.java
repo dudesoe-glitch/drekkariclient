@@ -1841,6 +1841,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 	public static KeyBinding kb_toggleCollisionBoxes  = KeyBinding.get("toggleCollisionBoxesKB",  KeyMatch.forchar('B', KeyMatch.S));
 	public static KeyBinding kb_toggleGrowthInfo  = KeyBinding.get("toggleGrowthInfoKB",  KeyMatch.forchar('I',  KeyMatch.C | KeyMatch.S));
 	public static KeyBinding kb_toggleHarvestIcons  = KeyBinding.get("toggleHarvestIconsKB",  KeyMatch.forchar('P',  KeyMatch.C | KeyMatch.S));
+	public static KeyBinding kb_toggleBarrelContentsText = KeyBinding.get("toggleBarrelContentsTextKB",  KeyMatch.forchar('K',  KeyMatch.C | KeyMatch.S));
 	public static KeyBinding kb_toggleLowFoodWaterIcons  = KeyBinding.get("toggleLowFoodWaterIconsKB",  KeyMatch.forchar('O',  KeyMatch.C | KeyMatch.S));
 	public static KeyBinding kb_toggleBeeSkepIcons  = KeyBinding.get("toggleBeeSkepIconsKB",  KeyMatch.forchar('L',  KeyMatch.C | KeyMatch.S));
 	public static KeyBinding kb_toggleSpeedInfo  = KeyBinding.get("toggleSpeedInfoKB",  KeyMatch.forchar('S',  KeyMatch.C | KeyMatch.S));
@@ -1992,6 +1993,9 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 		return(true);
 	} else if(kb_toggleHarvestIcons.key().match(ev)) {
 		OptWnd.showTreesBushesHarvestIconsCheckBox.set(!OptWnd.showTreesBushesHarvestIconsCheckBox.a);
+		return(true);
+	} else if(kb_toggleBarrelContentsText.key().match(ev)) {
+		OptWnd.showBarrelContentsTextCheckBox.set(!OptWnd.showBarrelContentsTextCheckBox.a);
 		return(true);
 	} else if(kb_toggleLowFoodWaterIcons.key().match(ev)) {
 		OptWnd.showLowFoodWaterIconsCheckBox.set(!OptWnd.showLowFoodWaterIconsCheckBox.a);
