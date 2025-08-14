@@ -3,9 +3,7 @@ package haven.automated;
 
 import haven.*;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 import static haven.OCache.posres;
 
@@ -99,17 +97,84 @@ public class InteractWithCursorNearest implements Runnable {
                         }
                     }
                 }
-                if (theObject == null)
-                    return;
-                if (OptWnd.autoEquipBunnySlippersPlateBootsCheckBox.a) {
-                    gui.map.switchBunnySlippersAndPlateBoots(theObject);
+                InteractWithNearestObject.Target best = null;
+                if (Utils.getprefb("clickNearestObject_Doors", true)) {
+                    InteractWithNearestObject.Target fromTable = nearestFromBuildings(maxDistance, mc);
+                    Gob suffixGob = nearestBySuffix(maxDistance, mc);
+                    InteractWithNearestObject.Target fromSuffix = (suffixGob == null) ? null : new InteractWithNearestObject.Target(suffixGob.rc, Coord.z, suffixGob.id, -1);
+
+                    best = InteractWithNearestObject.minByDist(mc, fromTable, fromSuffix);
                 }
-                gui.map.wdgmsg("click", Coord.z, theObject.rc.floor(posres), 3, 0, 0, (int) theObject.id, theObject.rc.floor(posres), 0, -1);
-                if (gui.interactWithNearestObjectThread != null) {
-                    gui.interactWithNearestObjectThread.interrupt();
-                    gui.interactWithNearestObjectThread = null;
+                boolean aDoorIsClosest = false;
+                if (theObject != null && best != null) {
+                    if (best.c.dist(mc) < theObject.rc.dist(mc))
+                        aDoorIsClosest = true;
+                } else if (theObject == null && best != null) {
+                    aDoorIsClosest = true;
+                } else if (theObject != null && best == null) {
+                    aDoorIsClosest = false;
+                } else if (theObject == null && best == null) {
+                    return;
+                }
+                if (aDoorIsClosest) {
+                    try {
+                        gui.map.wdgmsg("click", best.s, best.c.floor(posres), 3, 0, 0,
+                                (int) best.g, best.c.floor(posres), 0, best.m);
+                        if (gui.interactWithNearestObjectThread != null) {
+                            gui.interactWithNearestObjectThread.interrupt();
+                            gui.interactWithNearestObjectThread = null;
+                        }
+                    } catch (Exception ignored) {}
+                } else {
+                    if (OptWnd.autoEquipBunnySlippersPlateBootsCheckBox.a) {
+                        gui.map.switchBunnySlippersAndPlateBoots(theObject);
+                    }
+                    gui.map.wdgmsg("click", Coord.z, theObject.rc.floor(posres), 3, 0, 0, (int) theObject.id, theObject.rc.floor(posres), 0, -1);
+                    if (gui.interactWithNearestObjectThread != null) {
+                        gui.interactWithNearestObjectThread.interrupt();
+                        gui.interactWithNearestObjectThread = null;
+                    }
                 }
             }
         }.run();
+    }
+
+    public InteractWithNearestObject.Target nearestFromBuildings(double r, Coord2d mc) {
+        if (r <= 0) r = 1024.0;
+        InteractWithNearestObject.Target best = null;
+        for (Gob gob : Utils.getAllGobs(gui)) {
+            try {
+                Resource res = gob.getres();
+                if (res == null) continue;
+                List<InteractWithNearestObject.Door> doors = InteractWithNearestObject.BUILDINGS.get(res.name);
+                if (doors == null) continue;
+                for (InteractWithNearestObject.Door d : doors) {
+                    Coord2d c = gob.rc.add(d.rc.rotate(gob.a));
+                    if (c.dist(mc) < r && (best == null || c.dist(mc) < best.c.dist(mc)))
+                        best = new InteractWithNearestObject.Target(c, Coord.z, gob.id, d.id);
+                }
+            } catch (Loading ignored) {}
+        }
+        return best;
+    }
+
+    public Gob nearestBySuffix(double r, Coord2d mc) {
+        if (r <= 0) r = 1024.0;
+        Gob best = null;
+        double bestd = Double.MAX_VALUE;
+
+        for (Gob gob : Utils.getAllGobs(gui)) {
+            try {
+                Resource res = gob.getres();
+                if (res == null) continue;
+                if ("gfx/terobjs/arch/greathall-door".equals(res.name)) continue;
+                boolean match = false;
+                for (String s : InteractWithNearestObject.SUFFIXES) { if (res.name.endsWith(s)) { match = true; break; } }
+                if (!match) continue;
+                double d = gob.rc.dist(mc);
+                if (d < r && d < bestd) { best = gob; bestd = d; }
+            } catch (Loading ignored) {}
+        }
+        return best;
     }
 }

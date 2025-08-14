@@ -793,7 +793,6 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 		makeLocal("customclient/menugrid/OtherScriptsAndTools/QuestgiverTriangulation");
 		makeLocal("customclient/menugrid/OtherScriptsAndTools/OreAndStoneCounter");
 		makeLocal("customclient/menugrid/OtherScriptsAndTools/GridHeightCalculator");
-		makeLocal("customclient/menugrid/OtherScriptsAndTools/EnterNearestDoor");
 		makeLocal("customclient/menugrid/OtherScriptsAndTools/CustomAlarmManager");
 		makeLocal("customclient/menugrid/OtherScriptsAndTools/AutoDropManager");
 		makeLocal("customclient/menugrid/OtherScriptsAndTools/FlowerMenuAutoSelectManager");
@@ -1076,9 +1075,6 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 				}
 			} else if (ad[2].equals("GridHeightCalculator")) {
 				AUtils.getGridHeightAvg(gui);
-			} else if (ad[2].equals("EnterNearestDoor")) {
-				Thread t = new Thread(new EnterNearestDoor(gui), "Transition");
-				t.start();
 			} else if (ad[2].equals("CustomAlarmManager")) {
 				if(gui.opts != null) {
 					if(gui.opts.alarmWindow == null) {
