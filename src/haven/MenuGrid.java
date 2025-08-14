@@ -946,7 +946,7 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 			} else if (ad[2].equals("RoastingSpitBot")) {
 				if (gui.roastingSpitBot == null && gui.roastingSpitThread == null) {
 					gui.roastingSpitBot = new RoastingSpitBot(gui);
-					gui.add(gui.roastingSpitBot, new Coord(gui.sz.x/2 - gui.roastingSpitBot.sz.x/2, gui.sz.y/2 - gui.roastingSpitBot.sz.y/2 - 200));
+					gui.add(gui.roastingSpitBot, Utils.getprefc("wndc-roastingSpitBotWindow", new Coord(gui.sz.x/2 - gui.roastingSpitBot.sz.x/2, gui.sz.y/2 - gui.roastingSpitBot.sz.y/2 - 200)));
 					gui.roastingSpitThread = new Thread(gui.roastingSpitBot, "roastingSpitBot");
 					gui.roastingSpitThread.start();
 				} else {

@@ -37,7 +37,7 @@ public class RoastingSpitBot extends Window implements Runnable {
         super(UI.scale(160, 50), "Roasting Spit Bot", true);
         this.gui = gui;
 
-        startbutton = add(new Button(UI.scale(100), "Start") {
+        startbutton = add(new Button(UI.scale(150), "Start") {
             @Override
             public void click() {
                 active = !active;
@@ -256,5 +256,11 @@ public class RoastingSpitBot extends Window implements Runnable {
             maxProg = gui.prog.prog;
             Thread.sleep(40);
         }
+    }
+
+    @Override
+    public void reqdestroy() {
+        Utils.setprefc("wndc-roastingSpitBotWindow", this.c);
+        super.reqdestroy();
     }
 }
