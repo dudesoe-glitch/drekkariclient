@@ -172,8 +172,8 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 	public Thread turnipThread;
 	public CleanupBot cleanupBot;
 	public Thread cleanupThread;
-	public CellarBot cellarBot;
-	public Thread cellarThread;
+	public CellarDiggingBot cellarDiggingBot;
+	public Thread cellarDiggingThread;
 	public RoastingSpitBot roastingSpitBot;
 	public Thread roastingSpitThread;
 

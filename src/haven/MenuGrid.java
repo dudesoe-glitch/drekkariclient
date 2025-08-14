@@ -774,7 +774,7 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 		makeLocal("customclient/menugrid/Bots/OceanScoutBot");
 		makeLocal("customclient/menugrid/Bots/TarKilnEmptierBot");
 		makeLocal("customclient/menugrid/Bots/TurnipBot");
-		makeLocal("customclient/menugrid/Bots/CellarBot");
+		makeLocal("customclient/menugrid/Bots/CellarDiggingBot");
 		makeLocal("customclient/menugrid/Bots/CleanupBot");
 		makeLocal("customclient/menugrid/Bots/RoastingSpitBot");
 
@@ -929,18 +929,18 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 						gui.cleanupThread = null;
 					}
 				}
-			} else if (ad[2].equals("CellarBot")) {
-				if (gui.cellarBot == null && gui.cellarThread == null) {
-					gui.cellarBot = new CellarBot(gui);
-					gui.add(gui.cellarBot, Utils.getprefc("wndc-cellarBotWindow", new Coord(gui.sz.x/2 - gui.cellarBot.sz.x/2, gui.sz.y/2 - gui.cellarBot.sz.y/2 - 200)));
-					gui.cellarThread = new Thread(gui.cellarBot, "CellarBot");
-					gui.cellarThread.start();
+			} else if (ad[2].equals("CellarDiggingBot")) {
+				if (gui.cellarDiggingBot == null && gui.cellarDiggingThread == null) {
+					gui.cellarDiggingBot = new CellarDiggingBot(gui);
+					gui.add(gui.cellarDiggingBot, Utils.getprefc("wndc-cellarDiggingBotWindow", new Coord(gui.sz.x/2 - gui.cellarDiggingBot.sz.x/2, gui.sz.y/2 - gui.cellarDiggingBot.sz.y/2 - 200)));
+					gui.cellarDiggingThread = new Thread(gui.cellarDiggingBot, "CellarDiggingBot");
+					gui.cellarDiggingThread.start();
 				} else {
-					if (gui.cellarBot != null) {
-						gui.cellarBot.stop();
-						gui.cellarBot.reqdestroy();
-						gui.cellarBot = null;
-						gui.cellarThread = null;
+					if (gui.cellarDiggingBot != null) {
+						gui.cellarDiggingBot.stop();
+						gui.cellarDiggingBot.reqdestroy();
+						gui.cellarDiggingBot = null;
+						gui.cellarDiggingThread = null;
 					}
 				}
 			} else if (ad[2].equals("RoastingSpitBot")) {

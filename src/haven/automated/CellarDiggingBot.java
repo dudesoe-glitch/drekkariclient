@@ -9,19 +9,19 @@ import java.util.Objects;
 import static haven.OCache.posres;
 import static java.lang.Thread.sleep;
 
-public class CellarBot extends Window implements Runnable {
+public class CellarDiggingBot extends Window implements Runnable {
     private final GameUI gui;
     private boolean stop;
     private boolean active;
     private final Button activeButton;
 
-    public CellarBot(GameUI gui) {
-        super(UI.scale(150, 70), "Cellar Bot");
+    public CellarDiggingBot(GameUI gui) {
+        super(UI.scale(150, 70), "Cellar Digging Bot");
         this.gui = gui;
         this.stop = false;
         this.active = false;
 
-        activeButton = new Button(UI.scale(50), "Start") {
+        activeButton = new Button(UI.scale(150), "Start") {
             @Override
             public void click() {
                 active = !active;
@@ -33,7 +33,8 @@ public class CellarBot extends Window implements Runnable {
                 }
             }
         };
-        add(activeButton, UI.scale(50, 35));
+        add(activeButton, UI.scale(0, 10));
+        pack();
     }
 
     @Override
@@ -50,7 +51,7 @@ public class CellarBot extends Window implements Runnable {
 
                     Gob cellar = findCellarGob();
                     if (cellar == null) {
-                        gui.error("No cellar door present, ending script");
+                        gui.error("Cellar Digging Bot: No cellar door present! Stopping.");
                         active = false;
                         activeButton.change("Start");
                         continue;
@@ -68,7 +69,6 @@ public class CellarBot extends Window implements Runnable {
                 sleep(200);
             }
         } catch (InterruptedException e) {
-            System.out.println("CellarBot interrupted");
         }
     }
 
@@ -85,7 +85,7 @@ public class CellarBot extends Window implements Runnable {
             }
             double nrj = ui.gui.getmeter("nrj", 0).a;
             if (nrj < 0.25) {
-                gui.error("Need food");
+                gui.error("Cellar Digging Bot: Low on energy! Stopping.");
                 active = false;
                 activeButton.change("Start");
                 return false;
@@ -209,8 +209,8 @@ public class CellarBot extends Window implements Runnable {
             stop = true;
             stop();
             reqdestroy();
-            gui.cellarBot = null;
-            gui.cellarThread = null;
+            gui.cellarDiggingBot = null;
+            gui.cellarDiggingThread = null;
         } else {
             super.wdgmsg(sender, msg, args);
         }
@@ -228,7 +228,7 @@ public class CellarBot extends Window implements Runnable {
 
     @Override
     public void reqdestroy() {
-        Utils.setprefc("wndc-cellarBotWindow", this.c);
+        Utils.setprefc("wndc-cellarDiggingBotWindow", this.c);
         super.reqdestroy();
     }
 }
