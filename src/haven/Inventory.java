@@ -32,7 +32,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class Inventory extends Widget implements DTarget {
-    public static final Coord sqsz = UI.scale(new Coord(32, 32)).add(1, 1);
+    public static final Coord sqsz = UI.scale(new Coord(33, 33));
     public static final Tex invsq = Resource.loadtex("gfx/hud/invsq");
     public boolean dropul = true;
     public Coord isz;
