@@ -550,6 +550,14 @@ public class Utils {
 	return(ArgumentFormatException.check(arg, String.class));
     }
 
+    public static List<?> olv(Object arg) {
+	if(arg instanceof Object[])
+	    return(Arrays.asList((Object[])arg));
+	if(arg instanceof List)
+	    return((List<?>)arg);
+	throw(new ArgumentFormatException("object-list", arg));
+    }
+
     public static int iv(Object arg) {
 	return(ArgumentFormatException.check(arg, Number.class, "int").intValue());
     }
@@ -574,8 +582,15 @@ public class Utils {
 
     public static Indir<Resource> irv(Object arg) {
 	Indir s = ArgumentFormatException.check(arg, Indir.class);
+	return(() -> (Resource)s.get());
+    }
+
+    public static Resource resv(Object arg) {
+	if(arg instanceof Resource)
+	    return((Resource)arg);
+	Indir s = ArgumentFormatException.check(arg, Indir.class);
 	Resource ret = ArgumentFormatException.check(s.get(), Resource.class);
-	return(() -> ret);
+	return(ret);
     }
 
     /* Nested format: [[KEY, VALUE], [KEY, VALUE], ...] */
@@ -1778,6 +1793,12 @@ public class Utils {
 	return(ret);
     }
 
+    public static <K, V> V pop(Map<K, V> map, K key, V def) {
+	if(!map.containsKey(key))
+	    return(def);
+	return(map.remove(key));
+    }
+
     public static <T> List<T> reversed(List<T> ls) {
 	return(new AbstractList<T>() {
 		public int size() {
@@ -1995,6 +2016,17 @@ public class Utils {
 	}
     }
 
+    public static <K, V> MapBuilder<K, V> map() {
+	return(new MapBuilder<K, V>(new HashMap<K, V>()));
+    }
+
+    public static <K, V> Map<K, V> index(Collection<? extends V> values, Function<? super V, ? extends K> key) {
+	Map<K, V> ret = new HashMap<>();
+	for(V val : values)
+	    ret.put(key.apply(val), val);
+	return(ret);
+    }
+
     public static class Range extends AbstractList<Integer> {
 	public final int min, max, step;
 
@@ -2050,10 +2082,6 @@ public class Utils {
 		    return(res);
 		}
 	    });
-    }
-
-    public static <K, V> MapBuilder<K, V> map() {
-	return(new MapBuilder<K, V>(new HashMap<K, V>()));
     }
 
     public static <F, T> Iterator<T> map(Iterator<F> from, Function<? super F, ? extends T> fn) {
