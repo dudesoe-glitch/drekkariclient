@@ -645,6 +645,7 @@ public class OptWnd extends Window {
 	public static HSlider mapZoomSpeedSlider;
 	public static CheckBox alwaysOpenMiniStudyOnLoginCheckBox;
 	public static HSlider mapIconsSizeSlider;
+	public static CheckBox improvedInstrumentMusicWindowCheckBox;
 
     public class InterfaceSettingsPanel extends Panel {
 	public InterfaceSettingsPanel(Panel back) {
@@ -970,6 +971,13 @@ public class OptWnd extends Window {
 			buf = PUtils.convolve(buf, tsz, GobIcon.filter);
 			MiniMap.plp = new TexI(buf);
 		}), rightColumn.pos("ur").adds(6, -4)).tooltip = resetButtonTooltip;
+		rightColumn = add(improvedInstrumentMusicWindowCheckBox = new CheckBox("Improved Instrument Music Window"){
+			{a = (Utils.getprefb("improvedInstrumentMusicWindow", true));}
+			public void changed(boolean val) {
+				Utils.setprefb("improvedInstrumentMusicWindow", val);
+			}
+		}, rightColumn.pos("bl").adds(0, 15));
+		improvedInstrumentMusicWindowCheckBox.tooltip = improvedInstrumentMusicWindowTooltip;
 
 		Widget backButton;
 		add(backButton = new PButton(UI.scale(200), "Back", 27, back, "Advanced Settings"), leftColumn.pos("bl").adds(0, 30).x(0));
@@ -4812,6 +4820,10 @@ public class OptWnd extends Window {
 	private static final Object showYourCombatRangeCirclesTooltip = RichText.render("This will display two circles under your character, that show your unarmed range, and currently equipped weapon range (if you have a weapon equipped)." +
 			"\n" +
 			"\n$col[185,185,185]{The circles only show up when you're on foot.}", UI.scale(300));
+	private static final Object improvedInstrumentMusicWindowTooltip = RichText.render("The improved window changes the layout of the keys, and adds an automatic player you can use to play notes from midi files." +
+			"\nYou have to re-open the instrument music window after changing this setting." +
+			"\n" +
+			"\n$col[185,185,185]{If you want to use Midi2Haven to play notes with a midi controller, you must disable this improvement and use the default window layout.}", UI.scale(300));
 
 	// Display Settings Tooltips
 	private static final Object granularityPositionTooltip = RichText.render("This works like the :placegrid console command. " +
