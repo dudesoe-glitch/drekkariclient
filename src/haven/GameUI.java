@@ -532,7 +532,15 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 		    if(menu == null)
 			return;
 		    if(srchwnd == null) {
-			srchwnd = new MenuSearch(menu);
+			srchwnd = new MenuSearch(menu){
+				@Override
+				public void wdgmsg(String msg, Object... args) {
+					super.wdgmsg(msg, args);
+					if (msg.equals("close")) { // ND: When closing the window using the close button, rather than the hotkey
+						Utils.setprefc("wndc-srch", this.c); // ND: Add this to save the search window location
+					}
+				}
+			};
 			fitwdg(GameUI.this.add(srchwnd, Utils.getprefc("wndc-srch", new Coord(200, 200))));
 			} else {
 				Utils.setprefc("wndc-srch",srchwnd.c); // ND: Add this to save the search window location
