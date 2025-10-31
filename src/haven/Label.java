@@ -71,8 +71,8 @@ public class Label extends Widget {
     }
 
     public void settext(String text) {
-	if(text.equals(this.text.text))
-	    return;
+//	if(text.equals(this.text.text)) // ND: This causes bugs with the Study window to not properly update the info labels (and probably bugs out some other labels too)
+//	    return;
 	this.text.dispose();
 	this.text = Text.create(texts, PUtils.strokeImg(f.render(texts = text, col)));
 	resize(this.text.sz());
