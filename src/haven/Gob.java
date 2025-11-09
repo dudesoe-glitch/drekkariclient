@@ -2082,10 +2082,13 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 								for (Composited.MD item : c.comp.cmod) {
 									if (item.mod.get().basename().equals("male")) {
 										playerGender = "male";
+										break;
 									} else if (item.mod.get().basename().equals("female")) {
 										playerGender = "female";
-									} else {
+										break;
+									} else if (item.mod.get().basename().equals("mannequin-w1") || item.mod.get().basename().equals("mannequin-w2")){
 										isMannequin = true;
+										break;
 									}
 								}
 							}
