@@ -1,9 +1,11 @@
 /* Preprocessed source code */
+package haven.res.ui.hondead;
+
 import haven.*;
 import java.util.*;
 
 /* >wdg: DeadWnd */
-@haven.FromResource(name = "ui/hondead", version = 6)
+@haven.FromResource(name = "ui/hondead", version = 7)
 public class DeadWnd extends Window {
     CList ls;
     
@@ -11,7 +13,7 @@ public class DeadWnd extends Window {
 	super(Coord.z, "Characters", true);
 	add(new Label("Choose a character:"), Coord.z);
 	ls = add(new CList(UI.scale(200, 200)), UI.scale(0, 20));
-	add(new Button(UI.scale(200), "To Valhalla!", () -> {
+	add(new Button(UI.scale(200), "Ride the Rainbow!", () -> {
 		    if(ls.sel != null)
 			DeadWnd.this.wdgmsg("ch", ls.sel.text);
 	}), UI.scale(0, 230));
@@ -41,7 +43,7 @@ public class DeadWnd extends Window {
 		for(int i = 0, y = 0; (y < sz.y) && (i + sb.val < chrs.size()); i++, y += itemh) {
 		    Text c = chrs.get(i + sb.val);
 		    if(c == sel) {
-			g.chcolor(100, 100, 100, 128);
+			g.chcolor(255, 255, 0, 128);
 			g.frect(new Coord(0, y), new Coord(sz.x, itemh));
 			g.chcolor();
 		    }
@@ -51,18 +53,18 @@ public class DeadWnd extends Window {
 	    super.draw(g);
 	}
 	
-	public boolean mousedown(Coord c, int button) {
-	    if(super.mousedown(c, button))
+	public boolean mousedown(MouseDownEvent ev) {
+	    if(ev.propagate(this) || super.mousedown(ev))
 		return(true);
-	    int sel = (c.y / itemh) + sb.val;
+	    int sel = (ev.c.y / itemh) + sb.val;
 	    synchronized(chrs) {
-		this.sel = (sel >= chrs.size())?null:chrs.get(sel);
+		this.sel = (sel >= chrs.size()) ? null : chrs.get(sel);
 	    }
 	    return(true);
 	}
 	
-	public boolean mousewheel(Coord c, int amount) {
-	    sb.ch(amount);
+	public boolean mousewheel(MouseWheelEvent ev) {
+	    sb.ch(ev.a);
 	    return(true);
 	}
 	
