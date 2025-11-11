@@ -49,6 +49,7 @@ public class RealmChannel extends ChatUI.MultiChat {
 	public final Sender from;
 	public final String text;
 	private Text r = null;
+	private final String timestamp = Utils.timestamp();
 
 	public PNamedMessage(Sender from, String text) {
 	    this.from = from;
@@ -65,17 +66,20 @@ public class RealmChannel extends ChatUI.MultiChat {
 	    }
 
 	    public Text get() {
-		return(ChatUI.fnd.render(RichText.Parser.quote(String.format("%s: %s", nm, text)), w, TextAttribute.FOREGROUND, from.color));
+		return(ChatUI.fnd.render(RichText.Parser.quote(String.format("%s: %s", "[" + timestamp + "] " + nm, text)), w, TextAttribute.FOREGROUND, from.color));
 	    }
 	}
 
 	private String nm() {
 	    BuddyWnd.Buddy b = getparent(GameUI.class).buddies.find(from.bid);
-	    if(b != null)
-		return(b.name);
+		if(b != null) {
+			if (from.name != null){
+				return (from.name + " [Memo: " + b.name + "]");
+			}
+		}
 	    if(from.name != null)
 		return(from.name);
-	    return("???");
+		return("??? (Not Memorised)");
 	}
 
 	public Indir<Text> render(int w) {
