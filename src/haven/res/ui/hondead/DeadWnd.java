@@ -13,7 +13,7 @@ public class DeadWnd extends Window {
 	super(Coord.z, "Characters", true);
 	add(new Label("Choose a character:"), Coord.z);
 	ls = add(new CList(UI.scale(200, 200)), UI.scale(0, 20));
-	add(new Button(UI.scale(200), "Ride the Rainbow!", () -> {
+	add(new Button(UI.scale(200), "To Valhalla!", () -> {
 		    if(ls.sel != null)
 			DeadWnd.this.wdgmsg("ch", ls.sel.text);
 	}), UI.scale(0, 230));
@@ -43,7 +43,7 @@ public class DeadWnd extends Window {
 		for(int i = 0, y = 0; (y < sz.y) && (i + sb.val < chrs.size()); i++, y += itemh) {
 		    Text c = chrs.get(i + sb.val);
 		    if(c == sel) {
-			g.chcolor(255, 255, 0, 128);
+				g.chcolor(100, 100, 100, 128);
 			g.frect(new Coord(0, y), new Coord(sz.x, itemh));
 			g.chcolor();
 		    }
