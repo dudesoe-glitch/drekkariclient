@@ -13,6 +13,16 @@ public class AttrMats extends VarMats {
 
     public AttrMats(Gob gob, Map<Integer, Material> mats) {
 	super(gob);
+	Resource res = gob.getres();
+	if ((OptWnd.disableHerbalistTablesVarMatsCheckBox.a && res.name.equals("gfx/terobjs/htable"))
+			|| (OptWnd.disableCupboardsVarMatsCheckBox.a && res.name.equals("gfx/terobjs/cupboard"))
+			|| (OptWnd.disableChestsVarMatsCheckBox.a && (res.name.equals("gfx/terobjs/chest") || res.name.equals("gfx/terobjs/stonecasket")))
+			|| (OptWnd.disableMetalCabinetsVarMatsCheckBox.a && res.name.equals("gfx/terobjs/metalcabinet"))
+			|| (OptWnd.disableTrellisesVarMatsCheckBox.a && res.name.equals("gfx/terobjs/plants/trellis"))
+			|| (OptWnd.disableSmokeShedsVarMatsCheckBox.a && res.name.equals("gfx/terobjs/smokeshed"))
+			|| (OptWnd.disableAllObjectsVarMatsCheckBox.a)){
+	this.mats = new IntMap<Material>();
+	} else
 	this.mats = mats;
     }
 

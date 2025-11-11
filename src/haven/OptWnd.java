@@ -3647,44 +3647,44 @@ public class OptWnd extends Window {
 
 			// TODO: ND: Would be nice if this was a scrollable list with selectable items, rather than individual checkboxes
 			leftColumn = add(new Label("Disable Variable Materials for Objects:"), leftColumn.pos("bl").adds(0, 10).x(UI.scale(0)));
-			leftColumn = add(disableHerbalistTablesVarMatsCheckBox = new CheckBox("Herbalist Tables Variable Materials"){
+			leftColumn = add(disableHerbalistTablesVarMatsCheckBox = new CheckBox("Herbalist Tables Variable Materials (Requires Reload)"){
 				{a = (Utils.getprefb("disableHerbalistTablesVarMats", false));}
 				public void changed(boolean val) {
 					Utils.setprefb("disableHerbalistTablesVarMats", val);
 				}
 			}, leftColumn.pos("bl").adds(12, 8));
-			leftColumn = add(disableCupboardsVarMatsCheckBox = new CheckBox("Cupboards Variable Materials"){
+			leftColumn = add(disableCupboardsVarMatsCheckBox = new CheckBox("Cupboards Variable Materials (Requires Reload)"){
 				{a = (Utils.getprefb("disableCupboardsVarMats", false));}
 				public void changed(boolean val) {
 					Utils.setprefb("disableCupboardsVarMats", val);
 				}
 			}, leftColumn.pos("bl").adds(0, 2));
-			leftColumn = add(disableChestsVarMatsCheckBox = new CheckBox("Chests Variable Materials"){
+			leftColumn = add(disableChestsVarMatsCheckBox = new CheckBox("Chests Variable Materials (Requires Reload)"){
 				{a = (Utils.getprefb("disableChestsVarMats", false));}
 				public void changed(boolean val) {
 					Utils.setprefb("disableChestsVarMats", val);
 				}
 			}, leftColumn.pos("bl").adds(0, 2));
-			leftColumn = add(disableMetalCabinetsVarMatsCheckBox = new CheckBox("Metal Cabinets Variable Materials"){
+			leftColumn = add(disableMetalCabinetsVarMatsCheckBox = new CheckBox("Metal Cabinets Variable Materials (Requires Reload)"){
 				{a = (Utils.getprefb("disableMetalCabinetsVarMats", false));}
 				public void changed(boolean val) {
 					Utils.setprefb("disableMetalCabinetsVarMats", val);
 				}
 			}, leftColumn.pos("bl").adds(0, 2));
-			leftColumn = add(disableTrellisesVarMatsCheckBox = new CheckBox("Trellises Variable Materials"){
+			leftColumn = add(disableTrellisesVarMatsCheckBox = new CheckBox("Trellises Variable Materials (Requires Reload)"){
 				{a = (Utils.getprefb("disableTrellisesVarMats", false));}
 				public void changed(boolean val) {
 					Utils.setprefb("disableTrellisesVarMats", val);
 				}
 			}, leftColumn.pos("bl").adds(0, 2));
-			leftColumn = add(disableSmokeShedsVarMatsCheckBox = new CheckBox("Smoke Sheds Variable Materials"){
+			leftColumn = add(disableSmokeShedsVarMatsCheckBox = new CheckBox("Smoke Sheds Variable Materials (Requires Reload)"){
 				{a = (Utils.getprefb("disableSmokeShedsVarMats", false));}
 				public void changed(boolean val) {
 					Utils.setprefb("disableSmokeShedsVarMats", val);
 				}
 			}, leftColumn.pos("bl").adds(0, 2));
 
-			leftColumn = add(disableAllObjectsVarMatsCheckBox = new CheckBox("ALL OBJECTS Variable Materials (YES, ALL!)"){
+			leftColumn = add(disableAllObjectsVarMatsCheckBox = new CheckBox("ALL OBJECTS Variable Materials (Requires Reload)"){
 				{a = (Utils.getprefb("disableAllObjectsVarMats", false));}
 				public void changed(boolean val) {
 					Utils.setprefb("disableAllObjectsVarMats", val);
