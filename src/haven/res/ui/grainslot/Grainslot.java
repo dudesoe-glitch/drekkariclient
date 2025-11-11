@@ -1,17 +1,15 @@
-package haven;/* Preprocessed source code */
+/* Preprocessed source code */
+package haven.res.ui.grainslot;
 
-import haven.automated.helpers.FarmingStatic;
-
-import java.util.Collections;
-import java.util.List;
-
+import haven.*;
+import java.util.*;
 import static haven.Inventory.invsq;
 
-@FromResource(name = "ui/grainslot", version = 20)
+/* >wdg: Grainslot */
+@haven.FromResource(name = "ui/grainslot", version = 21)
 public class Grainslot extends Widget implements DTarget, ItemInfo.Owner {
-	public final Label lbl;
-	public boolean autoTake = false;
-    public final Button tbtn, pbtn, ebtn, ybtn;
+    public final Label lbl;
+    public final Button tbtn, pbtn, ebtn;
     public Indir<Resource> icon;
     private ItemInfo.Raw rawinfo = null;
     private Tex iconc;
@@ -19,51 +17,16 @@ public class Grainslot extends Widget implements DTarget, ItemInfo.Owner {
     public Grainslot() {
 	super(UI.scale(390, 40));
 	lbl = adda(new Label(""), sz.y, sz.y / 2, 0, 0.5);
-	int w = UI.scale(45), m = UI.scale(5);
-	ebtn = adda(new Button(w, "Empty", () -> wdgmsg("empty")), sz.x-5, sz.y / 2, 1, 0.5);
-	tbtn = adda(new Button(w, "Take", () -> wdgmsg("take")), ebtn.c.x - m, sz.y / 2, 1, 0.5);
-	pbtn = adda(new Button(w, "Put", this::putUpgraded), tbtn.c.x - m, sz.y / 2, 1, 0.5);
-	ybtn = adda(new Button(w, "Auto", this::takeFromHere), pbtn.c.x - m, sz.y / 2, 1, 0.5);
-	ebtn.hide(); tbtn.hide(); pbtn.hide(); ybtn.hide();
+	int w = UI.scale(60), m = UI.scale(5);
+	ebtn = adda(new Button(w, "Empty", () -> wdgmsg("empty")), sz.x, sz.y / 2, 1.0, 0.5);
+	tbtn = adda(new Button(w, "Take", () -> wdgmsg("take")), ebtn.c.x - m, sz.y / 2, 1.0, 0.5);
+	pbtn = adda(new Button(w, "Put", () -> wdgmsg("put")), tbtn.c.x - m, sz.y / 2, 1.0, 0.5);
+	ebtn.hide(); tbtn.hide(); pbtn.hide();
     }
 
-	public ItemInfo.Raw getRawinfo() {
-		return rawinfo;
-	}
-
-	public void takeFromHere(){
-		if(rawinfo != null) {
-			autoTake = !autoTake;
-			if (autoTake) {
-				ybtn.change("Stop");
-			} else {
-				ybtn.change("Auto");
-			}
-		}
-	}
-
-	public void disableTake(){
-		autoTake = false;
-		ybtn.change("Auto");
-	}
-
-	public void putUpgraded(){
-		for(Grainslot grainslot : FarmingStatic.grainSlots){
-			if(grainslot.autoTake){
-				grainslot.wdgmsg("take");
-				break;
-			}
-		}
-		wdgmsg("put");
-	}
-
-	public static class GrainSlotFactory implements Factory {
-		public Widget create(UI ui, Object[] args) {
-			Grainslot grainslot = new Grainslot();
-			FarmingStatic.grainSlots.add(grainslot);
-			return(grainslot);
-		}
-	}
+    public static Widget mkwidget(UI ui, Object... args) {
+	return(new Grainslot());
+    }
 
     public void draw(GOut g) {
 	int ic = (sz.y - invsq.sz().y) / 2;
@@ -73,13 +36,13 @@ public class Grainslot extends Widget implements DTarget, ItemInfo.Owner {
 		if(iconc == null)
 		    iconc = icon.get().layer(Resource.imgc).tex();
 		g.image(iconc, new Coord(ic + 1, ic + 1));
-	    } catch(Loading e) {
+	    } catch(Loading l) {
 	    }
 	}
 	super.draw(g);
     }
 
-    private static final ClassResolver<Widget> ctxr = new ClassResolver<Widget>()
+    private static final OwnerContext.ClassResolver<Widget> ctxr = new OwnerContext.ClassResolver<Widget>()
 	.add(Glob.class, wdg -> wdg.ui.sess.glob)
 	.add(Session.class, wdg -> wdg.ui.sess);
     public <T> T context(Class<T> cl) {return(ctxr.context(cl, this));}
@@ -100,15 +63,15 @@ public class Grainslot extends Widget implements DTarget, ItemInfo.Owner {
 	    if(prev != this)
 		hoverstart = now;
 	    try {
-//		if(now - hoverstart < 1.0) {
-//		    if(shorttip == null)
-//			shorttip = new TexI(ItemInfo.shorttip(info()));
-//		    return(shorttip);
-//		} else {
+		if(now - hoverstart < 1.0) {
+		    if(shorttip == null)
+			shorttip = new TexI(ItemInfo.shorttip(info()));
+		    return(shorttip);
+		} else {
 		    if(longtip == null)
 			longtip = new TexI(ItemInfo.longtip(info()));
 		    return(longtip);
-//		}
+		}
 	    } catch(Loading l) {
 		return("...");
 	    }
@@ -142,11 +105,7 @@ public class Grainslot extends Widget implements DTarget, ItemInfo.Owner {
 	    iconc = null;
 	    int bfl = (Integer)args[2];
 	    tbtn.show((bfl & 1) != 0);
-		if((bfl & 1) == 0){
-			disableTake();
-		}
 	    pbtn.show((bfl & 2) != 0);
-		ybtn.show((bfl & 2) != 0);
 	    ebtn.show((bfl & 4) != 0);
 	    rawinfo = (args.length > 3) ? new ItemInfo.Raw((Object[])args[3]) : null;
 	    info = null;
@@ -155,10 +114,4 @@ public class Grainslot extends Widget implements DTarget, ItemInfo.Owner {
 	    super.uimsg(msg, args);
 	}
     }
-
-	@Override
-	public void remove() {
-		FarmingStatic.grainSlots.remove(this);
-		super.remove();
-	}
 }
