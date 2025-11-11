@@ -52,7 +52,7 @@ public abstract class Sprite implements RenderTree.Node, PView.Render2D {
 
     public interface Owner extends OwnerContext {
 	public Random mkrandoom();
-	@Deprecated public Resource getres();
+	/*@Deprecated */public Resource getres();
     }
 
     public class RecOwner implements Owner {

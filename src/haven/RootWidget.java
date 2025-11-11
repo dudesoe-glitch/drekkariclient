@@ -35,6 +35,7 @@ public class RootWidget extends ConsoleHost implements UI.Notice.Handler, Widget
     Profile guprof, grprof, ggprof;
     private Text lastmsg;
     private double msgtime;
+	public static final Resource defaultCursor = Resource.local().loadwait("gfx/hud/curs/arw");
 	
     public RootWidget(UI ui, Coord sz) {
 	super(ui, new Coord(0, 0), sz);

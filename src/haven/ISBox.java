@@ -43,7 +43,7 @@ public class ISBox extends Widget implements DTarget {
 		g.chcolor();
 	    }
 	};
-    public static final IBox boxinvisible = new IBox("gfx/hud/bosq", "tl", "tr", "bl", "br", "el", "er", "et", "eb") {
+    public static final IBox boxinvisible = new IBox.Scaled("gfx/hud/bosq", "tl", "tr", "bl", "br", "el", "er", "et", "eb") {
         public void draw(GOut g, Coord tl, Coord sz) {
             g.chcolor(bgcolinvisible);
             super.draw(g, tl, sz);
