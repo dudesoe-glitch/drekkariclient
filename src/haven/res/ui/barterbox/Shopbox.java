@@ -2,6 +2,8 @@
 package haven.res.ui.barterbox;
 
 import haven.*;
+import haven.res.ui.tt.q.qbuff.QBuff;
+
 import static haven.Inventory.invsq;
 import static haven.Inventory.sqsz;
 import java.awt.image.BufferedImage;
@@ -19,7 +21,8 @@ public class Shopbox extends Widget implements ItemInfo.SpriteOwner, GSprite.Own
 	pricec = UI.scale(200, 5),
 	qualc = UI.scale(220 + 40, 5).add(invsq.sz()),
 	cbtnc = UI.scale(220, 66),
-	spipec = UI.scale(85, 66),
+	spipec = UI.scale(85, 40),
+	bulkTextEntryc = UI.scale(87, 68),
 	bpipec = UI.scale(300, 66);
     public ResData res;
     public ItemSpec price;
@@ -29,8 +32,9 @@ public class Shopbox extends Widget implements ItemInfo.SpriteOwner, GSprite.Own
     private GSprite spr;
     private Object[] info = {};
     private Button spipe, bpipe, bbtn, cbtn;
-    private TextEntry pnume, pqe;
+    private TextEntry pnume, pqe, bulkTextEntry;
     public final boolean admin;
+	private Text quality;
 
     public static Widget mkwidget(UI ui, Object... args) {
 	boolean adm = (Integer)args[0] != 0;
@@ -75,7 +79,7 @@ public class Shopbox extends Widget implements ItemInfo.SpriteOwner, GSprite.Own
 	protected Tex find(List<ItemInfo> info) {
 	    GItem.NumberInfo ninf = ItemInfo.find(GItem.NumberInfo.class, info);
 	    if(ninf == null) return(null);
-	    return(new TexI(Utils.outline2(Text.render(Integer.toString(ninf.itemnum()), Color.WHITE).img, Utils.contrast(Color.WHITE))));
+	    return(PUtils.strokeTex(WItem.quantityFoundry.renderstroked2(Integer.toString(ninf.itemnum()), Color.WHITE, Color.BLACK)));
 	}
     };
 
@@ -97,9 +101,12 @@ public class Shopbox extends Widget implements ItemInfo.SpriteOwner, GSprite.Own
 		}
 		spr.draw(sg);
 		if(itemnum.get() != null)
-		    sg.aimage(itemnum.get(), sqsz, 1, 1);
+		    sg.aimage(itemnum.get(), sqsz, 0.9, 0.8);
 		if(num != null)
-		    g.aimage(num.tex(), itemc.add(invsq.sz()).add(UI.scale(5, 0)), 0.0, 1.0);
+		    g.aimage(PUtils.strokeTex(num), itemc.add(invsq.sz()).add(UI.scale(5, 0)), 0.0, 1.0);
+		if (quality != null) {
+			g.aimage(PUtils.strokeTex(quality), itemc.add(invsq.sz()).add(UI.scale(4, -18)), 0.0, 1.0);
+		}
 	    }
 	}
 
@@ -113,11 +120,11 @@ public class Shopbox extends Widget implements ItemInfo.SpriteOwner, GSprite.Own
 		sg.image(WItem.missing.layer(Resource.imgc).tex(), Coord.z, sqsz);
 	    }
 	    if(!admin && (pnumt != null))
-		g.aimage(pnumt.tex(), pricec.add(invsq.sz()), 0.0, 1.0);
+		g.aimage(PUtils.strokeTex(pnumt), pricec.add(invsq.sz()), 0.0, 1.0);
 	    if(!admin) {
 		if(pqt != null) {
-		    g.aimage(qlbl.tex(), qualc, 0, 1);
-		    g.aimage(pqt.tex(), qualc.add(UI.scale(40, 0)), 0, 1);
+		    g.aimage(PUtils.strokeTex(qlbl), qualc, 0, 1);
+		    g.aimage(PUtils.strokeTex(pqt), qualc.add(UI.scale(40, 0)), 0, 1);
 		}
 	    }
 	}
@@ -126,8 +133,12 @@ public class Shopbox extends Widget implements ItemInfo.SpriteOwner, GSprite.Own
 
     private List<ItemInfo> cinfo;
     public List<ItemInfo> info() {
-	if(cinfo == null)
-	    cinfo = ItemInfo.buildinfo(this, info);
+	if(cinfo == null) {
+		cinfo = ItemInfo.buildinfo(this, info);
+		QBuff qb = quality();
+		if (qb != null)
+			quality = Text.render("Quality: " + (int) qb.q);
+	}
 	return(cinfo);
     }
 
@@ -184,7 +195,7 @@ public class Shopbox extends Widget implements ItemInfo.SpriteOwner, GSprite.Own
     public Resource resource() {return(res.res.get());}
     public GSprite sprite() {
 	if(spr == null)
-	    throw(new Loading("Still waiting for sprite to be constructed"));
+		this.spr = GSprite.create(this, res.res.get(), res.sdt.clone());
 	return(spr);
     }
     public Resource getres() {return(res.res.get());}
@@ -216,7 +227,14 @@ public class Shopbox extends Widget implements ItemInfo.SpriteOwner, GSprite.Own
     public void wdgmsg(Widget sender, String msg, Object... args) {
 	Integer n;
 	if(sender == bbtn) {
-	    wdgmsg("buy");
+		if (!bulkTextEntry.text().isEmpty()) {
+			int count = Integer.parseInt(bulkTextEntry.text());
+			for (int i = 0; i < count; ++i) {
+				this.wdgmsg("buy");
+			}
+		} else {
+			this.wdgmsg("buy");
+		}
 	} else if(sender == spipe) {
 	    wdgmsg("spipe");
 	} else if(sender == bpipe) {
@@ -233,7 +251,14 @@ public class Shopbox extends Widget implements ItemInfo.SpriteOwner, GSprite.Own
     private void updbtn() {
 	boolean canbuy = (res != null) && (price != null) && (pnum > 0);
 	if(canbuy && (bbtn == null)) {
-	    bbtn = add(new Button(UI.scale(75), "Buy"), buyc);
+	    bbtn = add(new Button(UI.scale(75), "Buy:"), buyc);
+		bulkTextEntry = add(new TextEntry(UI.scale(71), ""){
+			protected void changed() {
+				this.settext(this.text().replaceAll("[^\\d]", "")); // Only numbers
+				this.settext(this.text().replaceAll("(?<=^.{2}).*", "")); // No more than 2 digits
+				super.changed();
+			}
+		}, bulkTextEntryc);
 	} else if(!canbuy && (bbtn != null)) {
 	    bbtn.reqdestroy();
 	    bbtn = null;
@@ -297,4 +322,24 @@ public class Shopbox extends Widget implements ItemInfo.SpriteOwner, GSprite.Own
 	    super.uimsg(name, args);
 	}
     }
+
+	private QBuff quality() {
+		try {
+			for (ItemInfo info : info()) {
+				if (info instanceof ItemInfo.Contents)
+					return getQBuff(((ItemInfo.Contents) info).sub);
+			}
+			return getQBuff(info());
+		} catch (Exception ignored) {
+		}
+		return null;
+	}
+
+	private QBuff getQBuff(List<ItemInfo> infolist) {
+		for (ItemInfo info : infolist) {
+			if (info instanceof QBuff)
+				return (QBuff) info;
+		}
+		return null;
+	}
 }
