@@ -199,7 +199,6 @@ public class LoginScreen extends Widget {
 	GameUI.trackingToggled = false;
 	GameUI.crimesToggled = false;
 	MenuGrid.loginTogglesNeedUpdate = true;
-	OptWnd.flowerMenuAutoSelectManagerWindow = null;
 	Gob.batWingCapeEquipped = false;
 	Gob.nightQueenDefeated = false;
 	Gob.alarmPlayed.clear();
