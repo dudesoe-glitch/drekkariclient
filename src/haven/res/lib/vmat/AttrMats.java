@@ -13,6 +13,7 @@ public class AttrMats extends VarMats {
 
     public AttrMats(Gob gob, Map<Integer, Material> mats) {
 	super(gob);
+	if (gob != null && gob.getres() != null) {
 	Resource res = gob.getres();
 	if ((OptWnd.disableHerbalistTablesVarMatsCheckBox.a && res.name.equals("gfx/terobjs/htable"))
 			|| (OptWnd.disableCupboardsVarMatsCheckBox.a && res.name.equals("gfx/terobjs/cupboard"))
@@ -20,8 +21,10 @@ public class AttrMats extends VarMats {
 			|| (OptWnd.disableMetalCabinetsVarMatsCheckBox.a && res.name.equals("gfx/terobjs/metalcabinet"))
 			|| (OptWnd.disableTrellisesVarMatsCheckBox.a && res.name.equals("gfx/terobjs/plants/trellis"))
 			|| (OptWnd.disableSmokeShedsVarMatsCheckBox.a && res.name.equals("gfx/terobjs/smokeshed"))
-			|| (OptWnd.disableAllObjectsVarMatsCheckBox.a)){
-	this.mats = new IntMap<Material>();
+			|| (OptWnd.disableAllObjectsVarMatsCheckBox.a)) {
+		this.mats = new IntMap<Material>();
+	} else
+		this.mats = mats;
 	} else
 	this.mats = mats;
     }
