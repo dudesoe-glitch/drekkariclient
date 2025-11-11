@@ -185,7 +185,7 @@ public class Config {
 	    return(prop(name, Double::parseDouble, () -> defval));
 	}
 	public static Variable<byte[]> propb(String name, byte[] defval) {
-	    return(prop(name, Utils::hex2byte, () -> defval));
+	    return(prop(name, Utils.hex::dec, () -> defval));
 	}
 	public static Variable<URI> propu(String name, URI defval) {
 	    return(prop(name, Config::parseuri, () -> defval));
@@ -317,7 +317,7 @@ public class Config {
 		Bootstrap.authuser.set(opt.arg);
 		break;
 	    case 'C':
-		Bootstrap.authck.set(Utils.hex2byte(opt.arg));
+		Bootstrap.authck.set(Utils.hex.dec(opt.arg));
 		break;
 	    case 'p':
 		Utils.prefspec.set(opt.arg);

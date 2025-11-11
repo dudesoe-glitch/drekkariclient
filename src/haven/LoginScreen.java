@@ -426,7 +426,7 @@ public class LoginScreen extends Widget {
 		parse: if(pw.length() == 64) {
 		    byte[] ptok;
 		    try {
-			ptok = Utils.hex2byte(pw);
+			ptok = Utils.hex.dec(pw);
 		    } catch(IllegalArgumentException e) {
 			break parse;
 		    }
