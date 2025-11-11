@@ -2,6 +2,7 @@
 package haven.res.ui.locptr;
 
 import haven.*;
+import haven.automated.PointerTriangulation;
 import haven.render.*;
 import java.awt.Color;
 import static java.lang.Math.*;
@@ -15,6 +16,8 @@ public class Pointer extends Widget {
     public Coord lc;
     public long gobid = -1;
     private Tex licon;
+	private Text.Line tt = null;
+	private int dist;
 
     public Pointer(Indir<Resource> icon) {
 	super(Coord.z);
@@ -61,7 +64,7 @@ public class Pointer extends Widget {
 	sc = sc.add(hsz);
 
 	// gl.glEnable(GL2.GL_POLYGON_SMOOTH); XXXRENDER
-	g.usestate(col);
+//	g.usestate(col);
 	g.drawp(Model.Mode.TRIANGLES, new float[] {
 		sc.x, sc.y,
 		sc.x + ad.x - (ad.y / 3), sc.y + ad.y + (ad.x / 3),
@@ -73,6 +76,7 @@ public class Pointer extends Widget {
 		if(licon == null)
 		    licon = icon.get().layer(Resource.imgc).tex();
 		g.aimage(licon, sc.add(ad), 0.5, 0.5);
+		g.aimage(Text.renderstroked(dist + "", Color.WHITE, Color.BLACK, Text.num12boldFnd).tex(), sc.add(ad), 0.5, 0.5);
 	    } catch(Loading l) {
 	    }
 	}
@@ -98,6 +102,12 @@ public class Pointer extends Widget {
 	    } catch(Loading l) {
 		return;
 	    }
+	}
+	Gob me = getparent(GameUI.class).map.player();
+	if (me != null) {
+		int cdist = (int) (Math.ceil(me.rc.dist(tc) / 11.0));
+		if (cdist != dist)
+			dist = cdist;
 	}
 	drawarrow(g, new Coord(sl.toview(Area.sized(mv.sz))));
     }
@@ -132,8 +142,29 @@ public class Pointer extends Widget {
     }
 
     public Object tooltip(Coord c, Widget prev) {
-	if((lc != null) && (lc.dist(c) < 20))
-	    return(tooltip);
+	if ((lc != null) && (lc.dist(c) < 20) && this.ui.gui.map.player() != null) {
+		if (tooltip instanceof Widget.KeyboundTip) {
+			try {
+				try {
+					Coord2d playerCoord = ui.gui.map.player().rc;
+					Coord2d targetCoord = tc;
+					double dx = targetCoord.x - playerCoord.x;
+					double dy = playerCoord.y - targetCoord.y;
+					PointerTriangulation.pointerAngle = Math.atan2(dy, dx);
+					PointerTriangulation.pointerChecked = true;
+				} catch (Exception ignored){}
+				if (tt != null && tt.tex() != null)
+					tt.tex().dispose();
+				if (dist > 990) {
+					return tt = Text.render("> " + ((Widget.KeyboundTip) tooltip).base + " <" + " | Distance: Over " + 1000 + " tiles");
+				} else {
+					return tt = Text.render("> " + ((Widget.KeyboundTip) tooltip).base + " <" + " | Distance: " + dist + " tiles");
+				}
+			} catch (NullPointerException ignored) {
+			}
+		}
+		return (tooltip);
+	}
 	return(null);
     }
 }
