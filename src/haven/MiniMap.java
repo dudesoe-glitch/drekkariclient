@@ -940,6 +940,9 @@ public class MiniMap extends Widget {
     public boolean mousedown(MouseDownEvent ev) {
 	dsloc = xlate(ev.c);
 	if(dsloc != null) {
+		if (ui.modmeta && ev.b == 1){
+			ui.gui.map.addCheckpoint(dsloc.tc.sub(sessloc.tc).mul(tilesz).add(tilesz.div(2)));
+		}
 	    dsicon = iconat(ev.c);
 	    dsmark = markerat(dsloc.tc);
 	    if((dsicon != null) && clickicon(dsicon, dsloc, ev.b, true))
@@ -1039,8 +1042,6 @@ public class MiniMap extends Widget {
 						chat.send("LOC@" + (int)(clickloc.x-player.rc.x) + "x" + (int)(clickloc.y-player.rc.y));
 					}
 				}
-			} else if (ui.modmeta && button == 1){
-				mv.addCheckpoint(loc.tc.sub(sessloc.tc).mul(tilesz).add(tilesz.div(2)));
 			}
 			if (OptWnd.autoEquipBunnySlippersPlateBootsCheckBox.a) {
 				ui.gui.map.switchToPlateBoots();
