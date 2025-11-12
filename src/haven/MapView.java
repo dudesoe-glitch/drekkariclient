@@ -2209,6 +2209,9 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
 					if (OptWnd.autoEquipBunnySlippersPlateBootsCheckBox.a) {
 						switchBunnySlippersAndPlateBoots(gob);
 					}
+					if(checkpointManager != null && checkpointManagerThread != null){
+						checkpointManager.pauseIt();
+					}
 					wdgmsg("click", args);
 					if (OptWnd.autoSelect1stFlowerMenuCheckBox.a) {
 						if (ui.modctrl) {
