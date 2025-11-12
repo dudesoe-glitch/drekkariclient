@@ -954,6 +954,8 @@ public class MiniMap extends Widget {
 	    dsmark = null;
 	}
 	if(dragp(ev.b)) {
+		if (OptWnd.enableQueuedMovementCheckBox.a && ui.modmeta) // ND: Prevent dragging the map by mistake when we're trying to add a checkpoint for queued movement
+			return false;
 	    Location loc = curloc;
 	    if((drag == null) && (loc != null)) {
 		drag = ui.grabmouse(this);
