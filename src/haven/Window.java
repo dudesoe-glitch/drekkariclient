@@ -494,10 +494,10 @@ public class Window extends Widget {
     public boolean keydown(KeyDownEvent ev) {
 	if(ev.propagate(this))
 	    return(true);
-//	if(key_esc.match(ev)) {
-//	    reqclose();
-//	    return(true);
-//	}
+	if(key_esc.match(ev) && !OptWnd.preventEscKeyFromClosingWindowsCheckBox.a) {
+	    reqclose();
+	    return(true);
+	}
 	return(super.keydown(ev));
     }
 

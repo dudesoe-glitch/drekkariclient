@@ -646,6 +646,7 @@ public class OptWnd extends Window {
 	public static CheckBox alwaysOpenMiniStudyOnLoginCheckBox;
 	public static HSlider mapIconsSizeSlider;
 	public static CheckBox improvedInstrumentMusicWindowCheckBox;
+    public static CheckBox preventEscKeyFromClosingWindowsCheckBox;
 
     public class InterfaceSettingsPanel extends Panel {
 	public InterfaceSettingsPanel(Panel back) {
@@ -978,6 +979,12 @@ public class OptWnd extends Window {
 			}
 		}, rightColumn.pos("bl").adds(0, 15));
 		improvedInstrumentMusicWindowCheckBox.tooltip = improvedInstrumentMusicWindowTooltip;
+        rightColumn = add(preventEscKeyFromClosingWindowsCheckBox = new CheckBox("Prevent ESC from closing Windows"){
+            {a = (Utils.getprefb("preventEscKeyFromClosingWindows", false));}
+            public void changed(boolean val) {
+                Utils.setprefb("preventEscKeyFromClosingWindows", val);
+            }
+        }, rightColumn.pos("bl").adds(0, 2));
 
 		Widget backButton;
 		add(backButton = new PButton(UI.scale(200), "Back", 27, back, "Advanced Settings"), leftColumn.pos("bl").adds(0, 30).x(0));
