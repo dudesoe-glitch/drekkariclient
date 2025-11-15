@@ -47,6 +47,7 @@ public class StudydeskInfo extends Widget {
             public void changed() {
                 Utils.setprefi("curiotimetarget", val);
                 currentSliderValue = val;
+                curioCounter.clear();
                 updateLabel();
             }
 
@@ -56,6 +57,7 @@ public class StudydeskInfo extends Widget {
                 studyhours.settext(String.format(days == 1 ? (hours == 1 ? "%d Day and %d Hour" : "%d Day and %d Hours") : (hours == 1 ? "%d Days and %d Hour" : "%d Days and %d Hours"), days, hours));
             }
         }, UI.scale(new Coord(0, 75)));
+        curioslider.settip("You might lag a bit when you change this, that's normal");
     }
 
     private static final Coord totalLPCoord = UI.scale(new Coord(0, 15));
