@@ -2990,14 +2990,14 @@ public class OptWnd extends Window {
 			}, prev.pos("bl").adds(0, 6));
 			autoSelect1stFlowerMenuCheckBox.tooltip = autoSelect1stFlowerMenuTooltip;
 			prev = add(autoRepeatFlowerMenuCheckBox = new CheckBox("Auto-Repeat Flower-Menu (hold Ctrl+Shift)"){
-				{a = Utils.getprefb("autoRepeatFlowerMenu", false);}
+				{a = Utils.getprefb("autoRepeatFlowerMenu", true);}
 				public void changed(boolean val) {
 					Utils.setprefb("autoRepeatFlowerMenu", val);
 				}
 			}, prev.pos("bl").adds(0, 2));
 			autoRepeatFlowerMenuCheckBox.tooltip = autoRepeatFlowerMenuTooltip;
 			prev = add(alsoUseContainersWithRepeaterCheckBox = new CheckBox("Also use containers with Auto-Repeat"){
-				{a = Utils.getprefb("alsoUseContainersWithRepeater", false);}
+				{a = Utils.getprefb("alsoUseContainersWithRepeater", true);}
 				public void changed(boolean val) {
 					Utils.setprefb("alsoUseContainersWithRepeater", val);
 				}
