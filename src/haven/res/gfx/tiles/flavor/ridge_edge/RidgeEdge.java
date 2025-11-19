@@ -9,10 +9,10 @@ import haven.resutil.*;
 import haven.resutil.Ridges.*;
 
 /* >flavor: RidgeEdge$Fac */
-@haven.FromResource(name = "gfx/tiles/flavor/ridge-edge", version = 1)
+@haven.FromResource(name = "gfx/tiles/flavor/ridge-edge", version = 2)
 public class RidgeEdge implements Tileset.Flavor {
     public NodeWrap mat;
-    public float r = 1.25f, zoff = -0.12f, xoff = -0.12f;
+    public float r = 0.5f, zoff = -0.0f, xoff = 0.0f;
 
     public RidgeEdge(Resource sres, Object[][] argsv) {
 	for(Object[] args : argsv) {
@@ -115,7 +115,7 @@ public class RidgeEdge implements Tileset.Flavor {
 				if(!mbuf.emptyp()) {
 				    FastMesh mesh = mbuf.mkmesh();
 				    Gob ob = new Tileset.Flavor.GridObj(buf);
-				    ob.setattr(new SprDrawable(ob, new StaticSprite(ob, Resource.classres(RidgeEdge.class), mat.apply(mesh))));
+				    ob.setattr(new SprDrawable(ob, owner -> new StaticSprite(owner, Resource.classres(RidgeEdge.class), mat.apply(mesh))));
 				    buf.add(ob);
 				}
 			    }
@@ -127,7 +127,7 @@ public class RidgeEdge implements Tileset.Flavor {
     }
 
     public void flavor2(Buffer buf, Terrain trn, Random seed) {
-	float oz = OptWnd.flatWorldCheckBox.a ? 0 : (float)trn.map.getfz(trn.area.ul);
+	float oz = (float)trn.map.getfz(trn.area.ul);
 	Map<Coord3f, Point> points = new IdentityHashMap<>();
 	for(Coord tc : trn.tiles()) {
 	    RPart desc = getdesc(trn, tc);
