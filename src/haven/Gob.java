@@ -2576,7 +2576,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 
 	public void removeCombatDataInfo() {
 		if (combatDataInfo != null) {
-			delattr(GobCombatDataInfo.class);
+            setattr(GobCombatDataInfo.class, null);
 			combatDataInfo = null;
 		}
 	}
