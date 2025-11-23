@@ -1122,10 +1122,12 @@ public class Config {
 		if (MappingClient.initialized()) {
 			MappingClient.destroy();
 		}
-		MappingClient.init(ui.sess.glob);
-		MappingClient automapper = MappingClient.getInstance();
-		if (automapper != null)
-			automapper.SetPlayerName(OptWnd.liveLocationNameTextEntry.buf.line() + " (" + playername + ")");
+        if (!OptWnd.webmapEndpointTextEntry.text().isEmpty()) {
+            MappingClient.init(ui.sess.glob);
+            MappingClient automapper = MappingClient.getInstance();
+            if (automapper != null)
+                automapper.SetPlayerName(OptWnd.liveLocationNameTextEntry.buf.line() + " (" + playername + ")");
+        }
 	}
 
 	public static final Map<String, String> ORE_FULL_NAMES = new HashMap<>();
