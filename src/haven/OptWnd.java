@@ -26,6 +26,7 @@
 
 package haven;
 
+import haven.automated.mapper.MappingClient;
 import haven.render.*;
 import haven.res.gfx.fx.msrad.MSRad;
 import haven.res.ui.pag.toggle.Toggle;
@@ -4314,6 +4315,7 @@ public class OptWnd extends Window {
 			prev = add(webmapEndpointTextEntry = new TextEntry(UI.scale(220), Utils.getpref("webMapEndpoint", "")){
 				protected void changed() {
 					Utils.setpref("webMapEndpoint", this.buf.line());
+                    MappingClient.destroy();
 					super.changed();
 				}
 			}, prev.pos("ur").adds(6, 0));
