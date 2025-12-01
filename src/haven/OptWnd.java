@@ -4358,14 +4358,7 @@ public class OptWnd extends Window {
 			}, prev.pos("ur").adds(6, 0));
 			liveLocationNameTextEntry.tooltip = liveLocationNameTooltip;
 
-//			prev = add(new Label("Webmap Token:"), prev.pos("bl").adds(0, 16).x(0));
-//			prev = add(webmapTokenTextEntry = new TextEntry(UI.scale(235), Utils.getpref("webmapToken", "")){
-//				protected void changed() {
-//					Utils.setpref("webmapToken", this.buf.line());
-//					super.changed();
-//				}
-//			}, prev.pos("ur").adds(6, 0));
-
+            prev = add(new Label("Cookbook Integration"), prev.pos("bl").adds(0, 26).x(110));
 			prev = add(new Label("Cookbook Endpoint:"), prev.pos("bl").adds(0, 16).x(0));
 			prev = add(cookBookEndpointTextEntry = new TextEntry(UI.scale(220), Utils.getpref("cookBookEndpoint", "")){
 				protected void changed() {
@@ -4373,16 +4366,16 @@ public class OptWnd extends Window {
 					super.changed();
 				}
 			}, prev.pos("ur").adds(6, 0));
-			prev = add(new Label("Cookbook Token:"), prev.pos("bl").adds(0, 16).x(0));
-			prev = add(cookBookTokenTextEntry = new TextEntry(UI.scale(235), Utils.getpref("cookBookToken", "")){
+			prev = add(new Label("Cookbook Token:"), prev.pos("bl").adds(0, 8).x(0));
+			prev = add(cookBookTokenTextEntry = new TextEntry(UI.scale(220), Utils.getpref("cookBookToken", "")){
 				protected void changed() {
 					Utils.setpref("cookBookToken", this.buf.line());
 					super.changed();
 				}
-			}, prev.pos("ur").adds(6, 0));
+			}, prev.pos("ur").adds(20, 0));
 
 			Widget backButton;
-			add(backButton = new PButton(UI.scale(200), "Back", 27, back, "Advanced Settings"), prev.pos("bl").adds(0, 18).x(0));
+			add(backButton = new PButton(UI.scale(200), "Back", 27, back, "Advanced Settings"), prev.pos("bl").adds(0, 26).x(0));
 			pack();
 			centerBackButton(backButton, this);
 		}
