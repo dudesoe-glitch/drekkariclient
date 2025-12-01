@@ -289,7 +289,7 @@ public class Fightsess extends Widget {
 			Tex img = buff.res.get().flayer(Resource.imgc).tex();
 			Coord isz = img.sz();
 			g.chcolor(255, 255, 255, 255);
-			Double ameter = (buff.ameter >= 0) ? Double.valueOf(buff.ameter / 100.0) : buff.ameteri.get();
+			Double ameter = buff.ameteri.get();
 			int ameteri = 0; // Added
 			if(ameter != null) {
 				ameteri = (int) (100*ameter); // Added
@@ -308,15 +308,11 @@ public class Fightsess extends Widget {
 				else
 					g.frect(new Coord(x + myLocation, y - UI.scale(20)), isz);
 				g.chcolor(Color.WHITE);
-				if(ameteri != buff.nmeter) {
-					buff.ntext = null;
-					buff.nmeter = ameteri;
-				}
 			} else {
 				g.image(img, new Coord(x + myLocation, y - UI.scale(20)));
 			}
-			if(buff.nmeter >= 0)
-				g.aimage(buff.nmeter(), new Coord(x + myLocation, y - UI.scale(20)).add(isz).sub(1, 1), 1, 1);
+            if (ameteri > 0)
+                g.aimage(Text.renderstroked(String.valueOf(ameteri), openingAdditionalFont).tex(), new Coord(x + myLocation, y - UI.scale(20)).add(isz).sub(1, 1), 1, 1);
 			myLocation -= UI.scale(40);
 		} catch (Loading ignored) {
 		}
@@ -352,7 +348,7 @@ public class Fightsess extends Widget {
 				Tex img = buff.res.get().flayer(Resource.imgc).tex();
 				Coord isz = img.sz();
 				g.chcolor(255, 255, 255, 255);
-				Double ameter = (buff.ameter >= 0) ? Double.valueOf(buff.ameter / 100.0) : buff.ameteri.get();
+				Double ameter = buff.ameteri.get();
 				int ameteri = 0; // Added
 				if(ameter != null) {
 					ameteri = (int) (100*ameter); // Added
@@ -371,10 +367,6 @@ public class Fightsess extends Widget {
 					else
 						g.frect(new Coord(x + location, y - UI.scale(20)), isz);
 					g.chcolor(Color.WHITE);
-					if(ameteri != buff.nmeter) {
-						buff.ntext = null;
-						buff.nmeter = ameteri;
-					}
 				} else {
 					if (name.equals("paginae/atk/combmed")){
 						if(meterValue > 70){
@@ -384,8 +376,8 @@ public class Fightsess extends Widget {
 					g.image(img, new Coord(x + location, y - UI.scale(20)));
 					g.chcolor(255, 255, 255, 255);
 				}
-				if(buff.nmeter >= 0)
-					g.aimage(buff.nmeter(), new Coord(x + location, y - UI.scale(20)).add(isz).sub(1, 1), 1, 1);
+                if (ameteri > 0)
+                    g.aimage(Text.renderstroked(String.valueOf(ameteri), openingAdditionalFont).tex(), new Coord(x + location, y - UI.scale(20)).add(isz).sub(1, 1), 1, 1);
 				location += UI.scale(40);
 			} catch (Loading ignored) {
 			}
@@ -1051,7 +1043,7 @@ public class Fightsess extends Widget {
 	}
 
 	private int getOpeningValue(Buff buff) {
-		Double meterDouble = (buff.ameter >= 0) ? Double.valueOf(buff.ameter / 100.0) : buff.ameteri.get();
+		Double meterDouble = buff.ameteri.get();
 		if (meterDouble != null) {
 			return (int) (100 * meterDouble);
 		}

@@ -104,7 +104,7 @@ public class Fightview extends Widget {
 						if (Config.maneuvers.contains(name)) {
 							if (name.equals("paginae/atk/combmed")) {
 								int meterValue = 0;
-								Double meterDouble = (buff.ameter >= 0) ? Double.valueOf(buff.ameter / 100.0) : buff.ameteri.get();
+								Double meterDouble = buff.ameteri.get();
 								if (meterDouble != null) {
 									meterValue = (int) (100 * meterDouble);
 								}

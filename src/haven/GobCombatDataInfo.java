@@ -219,7 +219,7 @@ public class GobCombatDataInfo extends GobInfo {
     }
 
     private int getOpeningValue(Buff buff) {
-        Double meterDouble = (buff.ameter >= 0) ? Double.valueOf(buff.ameter / 100.0) : buff.ameteri.get();
+        Double meterDouble = buff.ameteri.get();
         if (meterDouble != null) {
             return (int) (100 * meterDouble);
         }
