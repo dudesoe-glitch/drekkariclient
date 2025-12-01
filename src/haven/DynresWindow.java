@@ -629,6 +629,7 @@ public class DynresWindow extends Window {
 		}
 
 		public Random mkrandoom() {return(bk.mkrandoom());}
+        public Resource getres() {return(bk.getres());}
 	    }
 
 	    public Sprite create(Sprite.Owner owner, Indir<Resource> vres) {

@@ -253,6 +253,10 @@ public class Composited implements RenderTree.Node, EquipTarget {
 	    return(OwnerContext.orparent(cl, eqctxr.context(cl, this, false), eqowner));
 	}
 
+    public Resource getres() {
+        return(spr.res);
+    }
+
 	public Random mkrandoom() {
 	    if(eqowner != null) {
 		RandomSource rnd = eqowner.fcontext(RandomSource.class, false);

@@ -496,6 +496,9 @@ public class ModSprite extends Sprite implements Sprite.CUpd, EquipTarget {
 	public Random mkrandoom() {
 	    return(main.owner.mkrandoom());
 	}
+    public Resource getres() {
+        return(main.res);
+    }
 
 	public int order() {return(2000);}
 
