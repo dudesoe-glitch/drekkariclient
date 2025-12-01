@@ -228,7 +228,6 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	    .add(Overlay.class, o -> o);
 	public <T> T context(Class<T> cl) {return(OwnerContext.orparent(cl, ctxr.context(cl, this, false), gob));}
 	public Random mkrandoom() {return(gob.mkrandoom());}
-//	@Deprecated
 	public Resource getres() {return(gob.getres());}
 
 	public String getSprResName() {
@@ -1036,7 +1035,6 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	return(Utils.mkrandoom(id));
     }
 
-//    @Deprecated
     public Resource getres() {
 	Drawable d = getattr(Drawable.class);
 	if(d != null)
