@@ -939,17 +939,14 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 			} else if (ad[2].equals("GrubGrubBot")) {
 				if (gui.grubGrubBot == null && gui.grubGrubThread == null) {
 					gui.grubGrubBot = new GrubGrubBot(gui);
-					gui.grubGrubThread = new Thread(gui.grubGrubBot, "GrubGrubBot");
+                    gui.add(gui.grubGrubBot, Utils.getprefc("wndc-grubGrubBotWindow", new Coord(gui.sz.x / 2 - gui.grubGrubBot.sz.x / 2, gui.sz.y / 2 - gui.grubGrubBot.sz.y / 2 - 200)));
+                    gui.grubGrubThread = new Thread(gui.grubGrubBot, "GrubGrubBot");
 					gui.grubGrubThread.start();
-					GrubGrubBot.transferTicksInstead = true;
-					gui.msg("GrubGrub Bot started.", Color.WHITE);
 				} else {
 					if (gui.grubGrubBot != null) {
-						GrubGrubBot.transferTicksInstead = false;
-						gui.msg("No more GrubGrub.", Color.WHITE);
 						gui.grubGrubBot.stop();
+                        gui.grubGrubBot.reqdestroy();
 						gui.grubGrubBot = null;
-						gui.grubGrubThread = null;
 					}
 				}
 			} else if (ad[2].equals("CellarDiggingBot")) {
