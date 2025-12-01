@@ -1,16 +1,16 @@
 package haven.widgets;
 
-import haven.Coord;
-import haven.GOut;
+import haven.*;
 import haven.Scrollbar;
-import haven.UI;
-import haven.Widget;
 
+import java.awt.*;
 import java.util.*;
+import java.util.List;
 import java.util.function.Function;
 
 public class SingleSelectList<T> extends Widget {
     private final List<T> items = new ArrayList<>();
+    private final List<Tex> itemsTex = new ArrayList<Tex>();
     private int selectedIndex = -1;
 
     private final int rowHeight;
@@ -18,19 +18,19 @@ public class SingleSelectList<T> extends Widget {
     private final int separatorThickness;
     private int scrollOffsetY = 0;
     private final Scrollbar verticalScrollbar;
-    private final Function<T, String> textRenderer;
 
     private int hoverIndex = -1;
 
-    public SingleSelectList(Coord size, int rowHeight, Collection<T> data, Function<T, String> renderer) {
+    public SingleSelectList(Coord size, int rowHeight, Collection<T> data) {
         this.sz = size;
         this.rowHeight = UI.scale(rowHeight);
         this.textPaddingX = UI.scale(8);
         this.separatorThickness = Math.max(1, UI.scale(1));
-        this.textRenderer = (renderer != null) ? renderer : String::valueOf;
 
         if (data != null) items.addAll(data);
-
+        for (T string : items){
+            itemsTex.add(PUtils.strokeTex(Text.std.render((String) string)));
+        }
         this.verticalScrollbar = add(new Scrollbar(this.sz.y, 0,
                 Math.max(0, items.size() * this.rowHeight - this.sz.y)) {
             public void changed() { scrollOffsetY = this.val; }
@@ -50,7 +50,7 @@ public class SingleSelectList<T> extends Widget {
     public String getSelected() {
         if (selectedIndex < 0 || selectedIndex >= items.size())
             return null;
-        return textRenderer.apply(items.get(selectedIndex));
+        return (String) items.get(selectedIndex);
     }
 
     @Override
@@ -141,8 +141,7 @@ public class SingleSelectList<T> extends Widget {
                 g.chcolor();
             }
 
-            String text = textRenderer.apply(items.get(i));
-            g.atext(text, Coord.of(textPaddingX, y + (rowHeight / 2)), 0, 0.5);
+            g.aimage(itemsTex.get(i), Coord.of(textPaddingX, y + (rowHeight / 2)), 0, 0.5);
 
             g.chcolor(255, 255, 255, 40);
             g.frect(Coord.of(0, y + rowHeight - separatorThickness),

@@ -1,29 +1,27 @@
 package haven.widgets;
 
-import haven.Coord;
-import haven.GOut;
-import haven.UI;
-import haven.Widget;
+import haven.*;
 
+import java.awt.*;
 import java.util.*;
+import java.util.List;
 import java.util.function.Function;
 
 public class TwoOptionSwitch<T> extends Widget {
     private final List<T> items = new ArrayList<>(2);
+    private final List<Tex> itemsTex = new ArrayList<Tex>();
     private int selectedIndex = 0;
 
     private final int rowHeight;
     private final int textPaddingX;
     private final int separatorThickness;
-    private final Function<T, String> textRenderer;
 
     private int hoverIndex = -1;
 
-    public TwoOptionSwitch(Coord size, int rowHeight, Collection<T> data, Function<T, String> renderer) {
+    public TwoOptionSwitch(Coord size, int rowHeight, Collection<T> data) {
         this.rowHeight = UI.scale(rowHeight);
         this.textPaddingX = UI.scale(8);
         this.separatorThickness = Math.max(1, UI.scale(1));
-        this.textRenderer = (renderer != null) ? renderer : String::valueOf;
 
         setItemsInternal(data);
         int h = Math.max(size.y, this.rowHeight * 2);
@@ -35,6 +33,9 @@ public class TwoOptionSwitch<T> extends Widget {
         if (data != null) items.addAll(data);
         if (items.size() != 2)
             throw new IllegalArgumentException("TwoOptionSwitch requires exactly two items");
+        for (T string : items){
+            itemsTex.add(PUtils.strokeTex(Text.std.render((String) string)));
+        }
         selectedIndex = Math.min(Math.max(selectedIndex, 0), 1);
     }
 
@@ -45,7 +46,7 @@ public class TwoOptionSwitch<T> extends Widget {
         changed(getSelected(), selectedIndex);
     }
 
-    public String getSelected() { return textRenderer.apply(items.get(selectedIndex)); }
+    public String getSelected() { return (String) items.get(selectedIndex); }
 
     @Override
     public void resize(Coord newSize) {
@@ -102,8 +103,7 @@ public class TwoOptionSwitch<T> extends Widget {
                 g.chcolor();
             }
 
-            String text = textRenderer.apply(items.get(i));
-            g.atext(text, Coord.of(textPaddingX, y + (rowHeight / 2)), 0, 0.5);
+            g.aimage(itemsTex.get(i), Coord.of(textPaddingX, y + (rowHeight / 2)), 0, 0.5);
 
             g.chcolor(255, 255, 255, 40);
             g.frect(Coord.of(0, y + rowHeight - separatorThickness),

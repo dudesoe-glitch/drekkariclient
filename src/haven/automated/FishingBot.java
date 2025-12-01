@@ -68,7 +68,7 @@ public class FishingBot extends Window implements Runnable {
         add(baitLabel, UI.scale(295, 0));
 
 
-        fishingPoleChoice = add(new TwoOptionSwitch<String>(UI.scale(120, 36), 18, FishingAtlas.fishingPoles, s -> s) {
+        fishingPoleChoice = add(new TwoOptionSwitch<String>(UI.scale(120, 36), 18, FishingAtlas.fishingPoles) {
             @Override
             protected void changed(String sel, int idx) {
                 if (idx == 0) {
@@ -88,22 +88,22 @@ public class FishingBot extends Window implements Runnable {
         }, UI.scale(10, 20));
 
         hookChoice = add(
-                new MultiSelectList<>(UI.scale(130, 72), 18, FishingAtlas.fishingHooks, s -> s),
+                new MultiSelectList<>(UI.scale(130, 72), 18, FishingAtlas.fishingHooks),
                 UI.scale(10, 92)
         );
 
         fishLineChoice = add(
-                new MultiSelectList<>(UI.scale(130, 144), 18, FishingAtlas.fishingLines, s -> s),
+                new MultiSelectList<>(UI.scale(130, 144), 18, FishingAtlas.fishingLines),
                 UI.scale(135, 20)
         );
 
         baitChoice = add(
-                new MultiSelectList<>(UI.scale(140, 144), 18, FishingAtlas.fishingBaits, s -> s),
+                new MultiSelectList<>(UI.scale(140, 144), 18, FishingAtlas.fishingBaits),
                 UI.scale(260, 20)
         );
 
         lureChoice = add(
-                new MultiSelectList<>(UI.scale(140, 144), 18, FishingAtlas.fishingLures, s -> s),
+                new MultiSelectList<>(UI.scale(140, 144), 18, FishingAtlas.fishingLures),
                 UI.scale(260, 20)
         );
         lureChoice.hide();
