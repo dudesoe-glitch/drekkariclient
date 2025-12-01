@@ -78,7 +78,6 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
 	public boolean areaSelect = false;
 	public Coord currentCursorLocation;
 	public Coord3f gobPathLastClick;
-	public boolean moveWithPf = false;
 
     public interface Delayed {
 	public void run(GOut g);
@@ -2219,6 +2218,12 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
 					if(checkpointManager != null && checkpointManagerThread != null){
 						checkpointManager.pauseIt();
 					}
+                    synchronized (Pathfinder.class) {
+                        if (pf != null) {
+                            pf.terminate = true;
+                            pfthread.interrupt();
+                        }
+                    }
 					wdgmsg("click", args);
 					if (OptWnd.autoSelect1stFlowerMenuCheckBox.a) {
 						if (ui.modctrl) {
@@ -2238,17 +2243,17 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
 					switchToPlateBoots();
 				}
 			}
-		}
-		synchronized (Pathfinder.class) {
-			if (pf != null) {
-				pf.terminate = true;
-				pfthread.interrupt();
-			}
+            synchronized (Pathfinder.class) {
+                if (pf != null && clickb == 1) {
+                    pf.terminate = true;
+                    pfthread.interrupt();
+                }
+            }
 		}
 		if(checkpointManager != null && checkpointManagerThread != null && clickb == 1){
 			checkpointManager.pauseIt();
 		}
-		if (moveWithPf && clickb == 1 && ui.modctrl && !ui.modshift && !ui.modmeta && !ui.modsuper) {
+		if (OptWnd.walkWithPathfinderCheckBox.a && clickb == 1 && ui.modctrl && ui.modshift && !ui.modmeta && !ui.modsuper) {
 			pfLeftClick(mc.floor(), null);
 		} else {
 			wdgmsg("click", args);

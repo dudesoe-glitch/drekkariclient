@@ -1046,20 +1046,26 @@ public class MiniMap extends Widget {
 			if (OptWnd.autoEquipBunnySlippersPlateBootsCheckBox.a) {
 				ui.gui.map.switchToPlateBoots();
 			}
-			synchronized (Pathfinder.class) {
-				if (ui.gui.map.pf != null) {
-					ui.gui.map.pf.terminate = true;
-					ui.gui.map.pfthread.interrupt();
-				}
-			}
 			if(mv.checkpointManager != null && mv.checkpointManagerThread != null && button == 1){
 				if (!ui.modmeta)
 					mv.checkpointManager.pauseIt();
 			}
+            synchronized (Pathfinder.class) {
+                if (ui.gui.map.pf != null && button == 1) {
+                    ui.gui.map.pf.terminate = true;
+                    ui.gui.map.pfthread.interrupt();
+                }
+            }
 		mv.wdgmsg("click", mc, loc.tc.sub(sessloc.tc).mul(tilesz).add(tilesz.div(2)).floor(posres),	button, ui.modflags());
 		} else {
             if(mv.checkpointManager != null && mv.checkpointManagerThread != null && button == 3){
                 mv.checkpointManager.pauseIt();
+            }
+            synchronized (Pathfinder.class) {
+                if (ui.gui.map.pf != null && button == 3) {
+                    ui.gui.map.pf.terminate = true;
+                    ui.gui.map.pfthread.interrupt();
+                }
             }
 			if (OptWnd.autoEquipBunnySlippersPlateBootsCheckBox.a) {
 				if (button == 3)
