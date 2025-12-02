@@ -1805,9 +1805,9 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
 					Coord playerScreen = screenxf(player.getc()).round2();
 					Coord targetScreen = screenxf(new Coord3f((float)nextCheckpoint.x, (float)nextCheckpoint.y, glob.map.getzp(nextCheckpoint).z)).round2();
 					g.chcolor(Color.BLUE);
-					g.line(playerScreen, targetScreen, 2);
+					g.line(playerScreen, targetScreen, 3);
 					g.chcolor(Color.CYAN);
-					g.line(playerScreen, targetScreen, 1);
+					g.line(playerScreen, targetScreen, 2);
 
 					for (int i = 1; i < pf.pathWaypoints.size() - 1; i++) {
 						Coord2d start = pf.pathWaypoints.get(i);
@@ -1815,9 +1815,9 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
 						Coord startScreen = screenxf(new Coord3f((float)start.x, (float)start.y, glob.map.getzp(start).z)).round2();
 						Coord endScreen = screenxf(new Coord3f((float)end.x, (float)end.y, glob.map.getzp(end).z)).round2();
 						g.chcolor(Color.BLUE);
-						g.line(startScreen, endScreen, 2);
+						g.line(startScreen, endScreen, 3);
 						g.chcolor(Color.CYAN);
-						g.line(startScreen, endScreen, 1);
+						g.line(startScreen, endScreen, 2);
 					}
 				}
 			} catch (Exception ignored) {
