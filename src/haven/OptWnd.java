@@ -1158,6 +1158,7 @@ public class OptWnd extends Window {
 	public static HSlider targetSpriteSizeSlider;
 	public static CheckBox drawChaseVectorsCheckBox;
 	public static CheckBox drawYourCurrentPathCheckBox;
+	public static CheckBox drawPathfinderRouteCheckBox;
 	public static CheckBox showYourCombatRangeCirclesCheckBox;
 	public static boolean refreshMyUnarmedRange = false;
 	public static boolean refreshMyWeaponRange = false;
@@ -1532,6 +1533,12 @@ public class OptWnd extends Window {
 				}
 			}, rightColumn.pos("bl").adds(0, 2));
 			drawYourCurrentPathCheckBox.tooltip = drawYourCurrentPathTooltip;
+			rightColumn = add(drawPathfinderRouteCheckBox = new CheckBox("Draw Pathfinder Route"){
+				{a = Utils.getprefb("drawPathfinderRoute", false);}
+				public void changed(boolean val) {
+					Utils.setprefb("drawPathfinderRoute", val);
+				}
+			}, rightColumn.pos("bl").adds(0, 2));
 			rightColumn = add(showYourCombatRangeCirclesCheckBox = new CheckBox("Show Your Combat Range Circles"){
 				{a = Utils.getprefb("showYourCombatRangeCircles", false);}
 				public void changed(boolean val) {
@@ -1558,7 +1565,7 @@ public class OptWnd extends Window {
 			
 
 			Widget backButton;
-			add(backButton = new PButton(UI.scale(200), "Back", 27, back, "Advanced Settings"), leftColumn.pos("bl").adds(0, 18).x(0));
+			add(backButton = new PButton(UI.scale(200), "Back", 27, back, "Advanced Settings"), leftColumn.pos("bl").adds(0, 33).x(0));
 			pack();
 			centerBackButton(backButton, this);
 		}
@@ -2908,7 +2915,7 @@ public class OptWnd extends Window {
 	public static CheckBox autoDrinkingCheckBox;
 	public static TextEntry autoDrinkingThresholdTextEntry;
 	public static CheckBox enableQueuedMovementCheckBox;
-    public static CheckBox walkWithPathfinderCheckBox;
+    public static CheckBox walkWithPathFinderCheckBox;
 
 	public class GameplayAutomationSettingsPanel extends Panel {
 
@@ -3134,7 +3141,7 @@ public class OptWnd extends Window {
 			}, prev.pos("bl").adds(0, 12));
 			enableQueuedMovementCheckBox.tooltip = enableQueuedMovementTooltip;
 
-            prev = add(walkWithPathfinderCheckBox = new CheckBox("Walk with Pathfinder (Ctrl+Shift+Click)"){
+            prev = add(walkWithPathFinderCheckBox = new CheckBox("Walk with Pathfinder (Ctrl+Shift+Click)"){
                 {a = Utils.getprefb("walkWithPathfinder", false);}
                 public void set(boolean val) {
                     Utils.setprefb("walkWithPathfinder", val);
@@ -3144,7 +3151,7 @@ public class OptWnd extends Window {
                     }
                 }
             }, prev.pos("bl").adds(0, 12));
-            walkWithPathfinderCheckBox.tooltip = walkWithPathfinderTooltip;
+            walkWithPathFinderCheckBox.tooltip = walkWithPathfinderTooltip;
 
 			Widget backButton;
 			add(backButton = new PButton(UI.scale(200), "Back", 27, back, "Advanced Settings"), prev.pos("bl").adds(0, 18));

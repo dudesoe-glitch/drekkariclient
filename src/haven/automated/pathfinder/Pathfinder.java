@@ -4,7 +4,9 @@ package haven.automated.pathfinder;
 import haven.*;
 import haven.automated.helpers.HitBoxes;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
@@ -26,6 +28,7 @@ public class Pathfinder implements Runnable {
     private int interruptedRetries = 5;
     private static final int RESPONSE_TIMEOUT = 800;
     private long avgOverrun = 0;
+    public List<Coord2d> pathWaypoints = new ArrayList<>();
 
     public Pathfinder(MapView mv, Coord dest, String action) {
         this.dest = dest;
@@ -155,6 +158,13 @@ public class Pathfinder implements Runnable {
 
         m.dbgdump();
 
+        pathWaypoints.clear();
+        pathWaypoints.add(player.rc);
+        for (Edge e : path) {
+            Coord2d waypoint = new Coord2d(src.x + e.dest.x - Map.origin, src.y + e.dest.y - Map.origin);
+            pathWaypoints.add(waypoint);
+        }
+
         Iterator<Edge> it = path.iterator();
         while (it.hasNext() && !moveinterupted && !terminate) {
             Edge e = it.next();
@@ -208,6 +218,11 @@ public class Pathfinder implements Runnable {
             long actual = System.currentTimeMillis() - segmentStart;
             long overrun = actual - estimate;
             avgOverrun = (avgOverrun + overrun) / 2;
+
+            if (pathWaypoints.size() > 1) {
+                pathWaypoints.remove(1);
+                pathWaypoints.set(0, player.rc);
+            }
 
             if (moveinterupted) {
                 interruptedRetries--;
