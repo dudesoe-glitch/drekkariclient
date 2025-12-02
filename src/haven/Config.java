@@ -361,10 +361,8 @@ public class Config {
 		// ND: Map Icons that should ALWAYS be enabled. Players should be forced to see these at all times.
 		// The key is the icon name, the value is the error message sent when they try to disable the icon.
 		put("Player", "You should ALWAYS see players on the map. I don't care what you have to say.");
-		put("Cave Passage", "Let's keep Caves visible, yeah?");
 		put("Swirling Vortex", "Vortexes can be dangerous. You don't want to miss them, right?");
 		put("Boost Speed", "You need to see Speed Boosts at all times. Keep them enabled.");
-		put("Burrow", "Burrows can hide things, like someone trying to ambush you. Keep them enabled.");
 	}};
 
 	public static final List<String> statsAndAttributesOrder = new ArrayList<String>(){{
