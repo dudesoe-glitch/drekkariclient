@@ -877,7 +877,7 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 			} else if (ad[2].equals("FlowerMenuAutoSelect")) {
 				FlowerMenuAutoSelectManagerWindow.flowerMenuAutoSelectCheckBox.set(!FlowerMenuAutoSelectManagerWindow.flowerMenuAutoSelectCheckBox.a);
 			} else if (ad[2].equals("PathfinderWalking")) {
-                OptWnd.walkWithPathfinderCheckBox.set(!OptWnd.walkWithPathfinderCheckBox.a);
+                OptWnd.walkWithPathFinderCheckBox.set(!OptWnd.walkWithPathFinderCheckBox.a);
 			}
 		} else if (ad[1].equals("Bots")) { // Category: Toggles
 			if (ad[2].equals("OceanScoutBot")) {

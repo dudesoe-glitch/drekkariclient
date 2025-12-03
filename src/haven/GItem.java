@@ -28,7 +28,7 @@ package haven;
 
 import java.util.*;
 
-import haven.automated.foodRecipes.FoodService;
+import haven.automated.cookbook.FoodService;
 import haven.render.*;
 import haven.res.ui.tt.q.qbuff.QBuff;
 import haven.res.ui.tt.q.quality.Quality;
