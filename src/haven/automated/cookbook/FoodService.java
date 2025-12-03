@@ -212,6 +212,14 @@ public class FoodService {
             this.name = name;
             this.percentage = percentage;
         }
+
+        public String getName() {
+            return name;
+        }
+
+        public Integer getPercentage() {
+            return percentage;
+        }
     }
 
     public static class FoodFEP {
@@ -221,6 +229,14 @@ public class FoodService {
         public FoodFEP(String name, Double value) {
             this.name = name;
             this.value = value;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public Double getValue() {
+            return value;
         }
     }
 
@@ -237,6 +253,30 @@ public class FoodService {
             this.resourceName = "";
             this.ingredients = new ArrayList<>();
             this.feps = new ArrayList<>();
+        }
+
+        public String getItemName() {
+            return itemName;
+        }
+
+        public String getResourceName() {
+            return resourceName;
+        }
+
+        public Integer getEnergy() {
+            return energy;
+        }
+
+        public double getHunger() {
+            return hunger;
+        }
+
+        public ArrayList<FoodIngredient> getIngredients() {
+            return ingredients;
+        }
+
+        public ArrayList<FoodFEP> getFeps() {
+            return feps;
         }
 
         @Override
