@@ -394,6 +394,12 @@ public class ModSprite extends Sprite implements Sprite.CUpd, EquipTarget {
     }
 
     public void added(RenderTree.Slot slot) {
+    if (!(owner instanceof ResDrawable)) {
+        HatTransformEntry transform = HAT_TRANSFORMS.get(this.res.name);
+        if (transform != null) {
+            slot.cstate(Pipe.Op.compose(transform.transforms));
+        }
+    }
 	parts(slot);
 	slots.add(slot);
     }
@@ -728,4 +734,65 @@ public class ModSprite extends Sprite implements Sprite.CUpd, EquipTarget {
 	    }
 	}
     }
+
+
+    public static class HatTransformEntry {
+        public final Location[] transforms;
+
+        public HatTransformEntry(Location[] transforms) {
+            this.transforms = transforms;
+        }
+    }
+
+    private static final Map<String, HatTransformEntry> HAT_TRANSFORMS = Map.ofEntries(
+            Map.entry("gfx/terobjs/items/hats/magahat", new HatTransformEntry(new Location[]{
+                    Location.rot(new Coord3f(0, 0, 1), 3.15f)
+            })),
+            Map.entry("gfx/terobjs/items/hats/darkmagahat", new HatTransformEntry(new Location[]{
+                    Location.rot(new Coord3f(0, 0, 1), 3.15f)
+            })),
+            Map.entry("gfx/terobjs/items/hats/caimancap", new HatTransformEntry(new Location[]{
+                    Location.rot(new Coord3f(0, 0, 1), 3.15f),
+                    Location.scale(1f, 1f, 1.05f),
+                    Location.rot(new Coord3f(0, 1, 0), 0.2f)
+            })),
+            Map.entry("gfx/terobjs/items/hats/tricorne", new HatTransformEntry(new Location[]{
+                    Location.xlate(new Coord3f(0.2f, 0, 0)),
+                    Location.scale(1.17f, 1f, 1.2f)
+            })),
+            Map.entry("gfx/terobjs/items/hats/propellercap", new HatTransformEntry(new Location[]{
+                    Location.rot(new Coord3f(0, 0, 1), 3.15f),
+                    Location.rot(new Coord3f(0, 1, 0), -0.2f),
+                    Location.scale(1.05f, 1.05f, 1.2f),
+                    Location.xlate(new Coord3f(0, 0, -0.5f))
+            })),
+            Map.entry("gfx/terobjs/items/hats/hbicap", new HatTransformEntry(new Location[]{
+                    Location.rot(new Coord3f(0, 0, 1), 3.15f),
+                    Location.rot(new Coord3f(0, 1, 0), 0.2f),
+                    Location.scale(1f, 0.9f, 0.8f),
+                    Location.xlate(new Coord3f(0.1f, 0, 0.1f))
+            })),
+            Map.entry("gfx/terobjs/items/hats/truckercap", new HatTransformEntry(new Location[]{
+                    Location.rot(new Coord3f(0, 0, 1), 3.15f),
+                    Location.scale(1f, 1f, 1.05f),
+                    Location.xlate(new Coord3f(0.2f, 0, 0.2f))
+            })),
+            Map.entry("gfx/terobjs/items/hats/whiteduckcap", new HatTransformEntry(new Location[]{
+                    Location.rot(new Coord3f(0, 0, 1), 3.15f)
+            })),
+            Map.entry("gfx/terobjs/items/hats/hipstersskullcap", new HatTransformEntry(new Location[]{
+                    Location.rot(new Coord3f(0, 0, 1), 3.15f),
+                    Location.rot(new Coord3f(0, 1, 0), 0.2f),
+                    Location.scale(1.2f, 1.1f, 1.1f),
+                    Location.xlate(new Coord3f(0, 0, -0.1f))
+            })),
+            Map.entry("gfx/terobjs/items/hats/giftwrapcap", new HatTransformEntry(new Location[]{
+                    Location.rot(new Coord3f(0, 0, 1), 3.15f)
+            })),
+            Map.entry("gfx/terobjs/items/hats/goblincap", new HatTransformEntry(new Location[]{
+                    Location.rot(new Coord3f(0, 0, 1), 3.15f),
+                    Location.rot(new Coord3f(0, 1, 0), -0.2f)
+            }))
+    );
+
 }
