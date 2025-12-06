@@ -69,6 +69,7 @@ public class Charlist extends Widget {
 	Gob.nightQueenDefeated = false;
 	Gob.alarmPlayed.clear();
 	GameUI.stopAllThemes();
+    Config.setPlayerName(null);
     }
 
     public static class Char {

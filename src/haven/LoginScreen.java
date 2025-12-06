@@ -255,6 +255,7 @@ public class LoginScreen extends Widget {
 
         }
 	}, new Coord(this.sz.x + UI.scale(-60), 10));
+    Config.setPlayerName(null);
     }
 
 //    public static final KeyBinding kb_savtoken = KeyBinding.get("login/savtoken", KeyMatch.forchar('R', KeyMatch.M)); // ND: Why the fuck are there keybinds for these? Someone might press one of those by mistake
