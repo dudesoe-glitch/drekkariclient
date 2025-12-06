@@ -519,6 +519,9 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 	iconconf = loadiconconf();
 	TileHighlight.toggle(this);
 	tileHighlight.hide();
+    if (Config.playername != null && ui != null && ui.sess != null && ui.sess.glob != null) {
+        Config.initAutomapper(ui);
+    }
 	super.attached();
     }
 

@@ -1110,7 +1110,7 @@ public class Config {
 		MapAttInfo.put("uppercut", new AttackInfo(new Color[]{Color.GREEN,Color.BLUE},30));
 	}
 
-	private static String playername;
+	public static String playername;
 
 	public static void setPlayerName(String playername) {
 		Config.playername = playername;
@@ -1120,7 +1120,7 @@ public class Config {
 		if (MappingClient.initialized()) {
 			MappingClient.destroy();
 		}
-        if (!OptWnd.webmapEndpointTextEntry.text().isEmpty()) {
+        if (!OptWnd.webmapEndpointTextEntry.text().isEmpty() && ui.sess != null && ui.sess.glob != null) {
             MappingClient.init(ui.sess.glob);
             MappingClient automapper = MappingClient.getInstance();
             if (automapper != null)
