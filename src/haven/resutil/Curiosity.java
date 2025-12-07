@@ -28,7 +28,6 @@ package haven.resutil;
 
 import haven.*;
 import java.awt.Color;
-import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
 public class Curiosity extends ItemInfo.Tip implements GItem.ColorInfo {
@@ -43,7 +42,7 @@ public class Curiosity extends ItemInfo.Tip implements GItem.ColorInfo {
 	this.mw = mw;
 	this.enc = enc;
 	this.time = time;
-	this.lph = (exp > 0 && time > 0) ? (int)((3600 * exp / time)*3.29f) : 0;
+	this.lph = (exp > 0 && time > 0) ? (int)((3600 * exp / time)* GameUI.gameTimeSpeedMultiplier) : 0;
 	UI ui = null;
 	if(owner instanceof Widget) {
 	    Widget wdg = (Widget)owner;
@@ -51,7 +50,7 @@ public class Curiosity extends ItemInfo.Tip implements GItem.ColorInfo {
 		ui = wdg.ui;
 	}
 	if (owner instanceof GItem) {
-		((GItem) owner).studytime = this.time / 3.29f / 60;
+		((GItem) owner).studytime = this.time / GameUI.gameTimeSpeedMultiplier / 60;
 	}
 	this.ui = ui;
     }
@@ -59,7 +58,7 @@ public class Curiosity extends ItemInfo.Tip implements GItem.ColorInfo {
     static String[] units = {"s", "m", "h", "d"};
     static int[] div = {60, 60, 24};
     static String timefmt(int time) {
-	time =	(int) (time/3.29f);
+	time =	(int) (time/ GameUI.gameTimeSpeedMultiplier);
 	int[] vals = new int[units.length];
 	vals[0] = time;
 	for(int i = 0; i < div.length; i++) {
@@ -133,7 +132,7 @@ public class Curiosity extends ItemInfo.Tip implements GItem.ColorInfo {
 		}
 
 		// Convert seconds into "real time"
-		time = (int) (time / 3.29f);
+		time = (int) (time / GameUI.gameTimeSpeedMultiplier);
 
 		// If time is greater than or equal to 10 hours
 		if (time >= 36000) {
@@ -164,7 +163,7 @@ public class Curiosity extends ItemInfo.Tip implements GItem.ColorInfo {
 			if(meter > 0) {
 				long now = System.currentTimeMillis();
 				long remStudy = (long) ((1.0 - meter) * time);
-				long elapsed = (long) (3.29f * (now - item.meterUpdated) / 1000);
+				long elapsed = (long) (GameUI.gameTimeSpeedMultiplier * (now - item.meterUpdated) / 1000);
 				return (int) (remStudy - elapsed);
 			}
 		}
