@@ -58,6 +58,7 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 	public double studytime = 0.0;
 	private boolean checkedAutodrop = false;
 	private QBuff qBuff;
+    public boolean attemptedAutoloot = false;
 
     @RName("item")
     public static class $_ implements Factory {

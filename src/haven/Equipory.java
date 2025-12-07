@@ -432,7 +432,7 @@ public class Equipory extends Widget implements DTarget {
 				for (int slot = 0; slot < slots.length; slot++) {
 					if (slots[slot] != null) {
 						GItem child = slots[slot].item;
-						if (child != null) {
+						if (child != null && !child.attemptedAutoloot) {
 							if ((OptWnd.autoLootRingsCheckBox.a && (slot == 8 || slot == 9))
 									|| (OptWnd.autoLootNecklaceCheckBox.a && slot == 1)
 									|| (OptWnd.autoLootHelmetCheckBox.a && slot == 0)
@@ -447,6 +447,7 @@ public class Equipory extends Widget implements DTarget {
 									|| (OptWnd.autoLootMouthCheckBox.a && slot == 18)
 									|| (OptWnd.autoLootCapeCheckBox.a && slot == 14)){
 								child.wdgmsg("transfer", Coord.z);
+                                child.attemptedAutoloot = true;
 							} else if (OptWnd.autoLootWeaponCheckBox.a && (slot == 6 || slot == 7)) { // ND: Weapon special case
 								if (!child.getres().name.equals("gfx/invobjs/small/roundshield") // ND: Don't need shields, waste of inventory/belt space
 									// ND: These other things will probably bug out the autolooter, each with their own specific case, so let's not try to auto-loot them.
@@ -463,6 +464,7 @@ public class Equipory extends Widget implements DTarget {
 									}
 									// ND: If failed, try to transfer to inventory
 									child.wdgmsg("transfer", Coord.z);
+                                    child.attemptedAutoloot = true;
 								}
 							}
 						}
