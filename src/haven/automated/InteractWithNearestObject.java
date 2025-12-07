@@ -49,6 +49,7 @@ public class InteractWithNearestObject implements Runnable {
 
     public final static HashSet<String> caves = new HashSet<String>(Arrays.asList(
             "gfx/tiles/ridges/cavein",
+            "gfx/tiles/ridges/cavein2",
             "gfx/tiles/ridges/caveout"
     ));
 
