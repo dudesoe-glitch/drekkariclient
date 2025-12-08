@@ -101,8 +101,8 @@ public class Charlist extends Widget {
 	    this.chr = chr;
 	    Widget avaf = adda(Frame.with(this.ava = new Avaview(Avaview.dasz, -1, "avacam"), false), Coord.of(sz.y / 2), 0.5, 0.5);
 	    name = add(new ILabel(chr.name, nf), avaf.pos("ur").adds(5, 0));
-	    disc = add(new ILabel("", df), name.pos("bl"));
-        add(new Button(UI.scale(60), "Play"), pos("cbl").adds(100, -46)).action(() -> {
+	    disc = add(new ILabel("", df), name.pos("bl").adds(2, -6));
+        add(new Button(UI.scale(60), "Play"), pos("cbl").adds(100, -36)).action(() -> {
             Charlist.this.wdgmsg("play", chr.name);
             Config.setPlayerName(chr.name);
             Config.initAutomapper(ui);
