@@ -570,6 +570,8 @@ public abstract class ItemInfo {
 	public static Map<Entry, String> getBonuses(List<ItemInfo> infos) {
 		List<ItemInfo> slotInfos = ItemInfo.findall("haven.res.ui.tt.slots.ISlots", infos);
 		List<ItemInfo> gilding = ItemInfo.findall("haven.res.ui.tt.slot.Slotted", infos);
+        List<ItemInfo> slotInfos_alt = ItemInfo.findall("haven.res.ui.tt.slots_alt.ISlots", infos);
+        List<ItemInfo> gilding_alt = ItemInfo.findall("haven.res.ui.tt.slot_alt.Slotted", infos);
 		Map<Entry, String> bonuses = new HashMap<>();
 		try {
 			for (ItemInfo islots : slotInfos) {
@@ -582,6 +584,17 @@ public abstract class ItemInfo {
 				List<Object> slots = (List<Object>) Reflect.getFieldValue(info, "sub");
 				parseAttrMods(bonuses, slots);
 			}
+            // ND: World 16.1 gildings use a different fetched resource, but since both can't coexist in the same world, just search for both and add whichever ones apply
+            for (ItemInfo islots_alt : slotInfos_alt) {
+                List<Object> slots_alt = (List<Object>) Reflect.getFieldValue(islots_alt, "s");
+                for (Object slot_alt : slots_alt) {
+                    parseAttrMods(bonuses, (List) Reflect.getFieldValue(slot_alt, "info"));
+                }
+            }
+            for (ItemInfo info_alt : gilding_alt) {
+                List<Object> slots_alt = (List<Object>) Reflect.getFieldValue(info_alt, "sub");
+                parseAttrMods(bonuses, slots_alt);
+            }
 			parseAttrMods(bonuses, ItemInfo.findall(AttrMod.class, infos));
 		} catch (Exception e) {
 		}
