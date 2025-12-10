@@ -29,6 +29,7 @@ public class InteractWithNearestObject implements Runnable {
             "adder",
             "arrow",
             "bat",
+            "goshawk",
             "precioussnowflake",
             "truffle-black0",
             "truffle-black1",
