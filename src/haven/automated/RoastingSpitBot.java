@@ -27,6 +27,7 @@ public class RoastingSpitBot extends Window implements Runnable {
             "gfx/invobjs/rockdove-cleaned",
             "gfx/invobjs/mallard-cleaned",
             "gfx/invobjs/squirrel-clean",
+            "gfx/invobjs/kebabraw",
     };
     double maxDistance = 2 * 11;
     public String roastingSpitOverlayName = "gfx/terobjs/roastspit";
