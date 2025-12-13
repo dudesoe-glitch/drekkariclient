@@ -268,6 +268,8 @@ public class MapWnd extends Window implements Console.Directory {
 	private UI.Grab drag;
 	private Coord dragc;
 	public boolean mousedown(MouseDownEvent ev) {
+        if (OptWnd.walkWithPathFinderCheckBox.a && ui.modctrl && ui.modshift && !ui.modmeta && !ui.modsuper)
+            return false;
 	    Coord c = ev.c, cc = c.sub(sc);
 	    if((ev.b == 1) && compact() && (cc.x < sizer.sz().x) && (cc.y < sizer.sz().y) && (cc.y >= sizer.sz().y - UI.scale(25) + (sizer.sz().x - cc.x))) {
 		if(drag == null) {
