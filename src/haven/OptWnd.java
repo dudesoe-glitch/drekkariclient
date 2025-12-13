@@ -1158,7 +1158,6 @@ public class OptWnd extends Window {
 	public static HSlider targetSpriteSizeSlider;
 	public static CheckBox drawChaseVectorsCheckBox;
 	public static CheckBox drawYourCurrentPathCheckBox;
-	public static CheckBox drawPathfinderRouteCheckBox;
 	public static CheckBox showYourCombatRangeCirclesCheckBox;
 	public static boolean refreshMyUnarmedRange = false;
 	public static boolean refreshMyWeaponRange = false;
@@ -1533,12 +1532,6 @@ public class OptWnd extends Window {
 				}
 			}, rightColumn.pos("bl").adds(0, 2));
 			drawYourCurrentPathCheckBox.tooltip = drawYourCurrentPathTooltip;
-			rightColumn = add(drawPathfinderRouteCheckBox = new CheckBox("Draw Pathfinder Route"){
-				{a = Utils.getprefb("drawPathfinderRoute", false);}
-				public void changed(boolean val) {
-					Utils.setprefb("drawPathfinderRoute", val);
-				}
-			}, rightColumn.pos("bl").adds(0, 2));
 			rightColumn = add(showYourCombatRangeCirclesCheckBox = new CheckBox("Show Your Combat Range Circles"){
 				{a = Utils.getprefb("showYourCombatRangeCircles", false);}
 				public void changed(boolean val) {
@@ -2916,6 +2909,7 @@ public class OptWnd extends Window {
 	public static TextEntry autoDrinkingThresholdTextEntry;
 	public static CheckBox enableQueuedMovementCheckBox;
     public static CheckBox walkWithPathFinderCheckBox;
+    public static CheckBox drawPathfinderRouteCheckBox;
 
 	public class GameplayAutomationSettingsPanel extends Panel {
 
@@ -3152,6 +3146,12 @@ public class OptWnd extends Window {
                 }
             }, prev.pos("bl").adds(0, 12));
             walkWithPathFinderCheckBox.tooltip = walkWithPathfinderTooltip;
+            prev = add(drawPathfinderRouteCheckBox = new CheckBox("Draw Pathfinder Route on the ground"){
+                {a = Utils.getprefb("drawPathfinderRoute", false);}
+                public void changed(boolean val) {
+                    Utils.setprefb("drawPathfinderRoute", val);
+                }
+            }, prev.pos("bl").adds(12, 2));
 
 			Widget backButton;
 			add(backButton = new PButton(UI.scale(200), "Back", 27, back, "Advanced Settings"), prev.pos("bl").adds(0, 18));
