@@ -34,17 +34,23 @@ public class InteractWithCursorNearest implements Runnable {
                         }
                         if (res != null) {
                             // Open nearby gates, but not visitor gates
-                            boolean isGate = InteractWithNearestObject.gates.contains(res.basename());
+                            boolean isSmallGate = InteractWithNearestObject.smallGates.contains(res.basename());
+                            boolean isReinforcedGate = InteractWithNearestObject.reinforcedGates.contains(res.basename());
                             try {
-                                if (isGate) {
-                                    for (Gob.Overlay ol : clickedGob.ols) {
-                                        String oname = ol.spr.res.name;
-                                        if (oname.equals("gfx/fx/eq"))
-                                            isGate = false;
+                                if (isReinforcedGate) {
+                                    if (gui.genus.equals("b7c199a4557503a8")) {
+                                        isReinforcedGate = false;
+                                    } else {
+                                        for (Gob.Overlay ol : clickedGob.ols) {
+                                            String oname = ol.spr.res.name;
+                                            if (oname.equals("gfx/fx/eq"))
+                                                isReinforcedGate = false;
+                                        }
                                     }
                                 }
                             } catch (NullPointerException ignored) {}
-                            if ((isGate && Utils.getprefb("clickNearestObject_NonVisitorGates", true))
+                            boolean isNonVisitorGate = isSmallGate || isReinforcedGate;
+                            if ((isNonVisitorGate && Utils.getprefb("clickNearestObject_NonVisitorGates", true))
                             || ((res.name.startsWith("gfx/terobjs/herbs") || InteractWithNearestObject.otherPickableObjects.contains(res.basename())) && Utils.getprefb("clickNearestObject_Forageables", true))
                             || (Arrays.stream(Config.critterResPaths).anyMatch(res.name::matches) || res.name.matches(".*(rabbit|bunny)$")) && Utils.getprefb("clickNearestObject_Critters", true)
                             || (InteractWithNearestObject.caves.contains(res.name) && Utils.getprefb("clickNearestObject_Caves", false))
@@ -75,7 +81,7 @@ public class InteractWithCursorNearest implements Runnable {
                     }
                     if (res != null) {
                         // Open nearby gates, but not visitor gates
-                        boolean isGate = InteractWithNearestObject.gates.contains(res.basename());
+                        boolean isGate = InteractWithNearestObject.smallGates.contains(res.basename());
                         try {
                             if (isGate) {
                                 for (Gob.Overlay ol : gob.ols) {

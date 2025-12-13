@@ -14,15 +14,18 @@ public class InteractWithNearestObject implements Runnable {
         this.gui = gui;
     }
 
-    public final static HashSet<String> gates = new HashSet<String>(Arrays.asList(
-            "brickwallgate",
-            "brickbiggate",
+    public final static HashSet<String> smallGates = new HashSet<String>(Arrays.asList(
             "drystonewallgate",
             "drystonewallbiggate",
-            "palisadegate",
-            "palisadebiggate",
             "polegate",
             "polebiggate"
+    ));
+
+    public final static HashSet<String> reinforcedGates = new HashSet<String>(Arrays.asList(
+            "brickwallgate",
+            "brickbiggate",
+            "palisadegate",
+            "palisadebiggate"
     ));
 
     public final static Set<String> otherPickableObjects = new HashSet<String>(Arrays.asList( // ND: Pretty much any ground item can be added here
@@ -73,17 +76,23 @@ public class InteractWithNearestObject implements Runnable {
             }
             if (res != null) {
                 // Open nearby gates, but not visitor gates
-                boolean isGate = gates.contains(res.basename());
+                boolean isSmallGate = smallGates.contains(res.basename());
+                boolean isReinforcedGate = InteractWithNearestObject.reinforcedGates.contains(res.basename());
                 try {
-                    if (isGate) {
+                    if (isReinforcedGate) {
+                        if (gui.genus.equals("b7c199a4557503a8")) {
+                            isReinforcedGate = false;
+                        } else {
                         for (Gob.Overlay ol : gob.ols) {
                             String oname = ol.spr.res.name;
                             if (oname.equals("gfx/fx/eq"))
-                                isGate = false;
+                                isReinforcedGate = false;
+                        }
                         }
                     }
                 } catch (NullPointerException ignored) {}
-                if ((isGate && Utils.getprefb("clickNearestObject_NonVisitorGates", true))
+                boolean isNonVisitorGate = isSmallGate || isReinforcedGate;
+                if ((isNonVisitorGate && Utils.getprefb("clickNearestObject_NonVisitorGates", true))
                 || ((res.name.startsWith("gfx/terobjs/herbs") || otherPickableObjects.contains(res.basename())) && Utils.getprefb("clickNearestObject_Forageables", true))
                 || (Arrays.stream(Config.critterResPaths).anyMatch(res.name::matches) || res.name.matches(".*(rabbit|bunny)$")) && Utils.getprefb("clickNearestObject_Critters", true)
                 || (caves.contains(res.name) && Utils.getprefb("clickNearestObject_Caves", false))
