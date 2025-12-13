@@ -472,7 +472,8 @@ public class Config {
 			"gfx/kritter/adder/adder",
 			"gfx/kritter/rat/caverat",
 			"gfx/kritter/goat/wildgoat",
-			"gfx/kritter/cavelouse/cavelouse"
+			"gfx/kritter/cavelouse/cavelouse",
+            "gfx/kritter/goshawk/goshawk"
 	};
 
 	public static final String[] housesResPaths = {
