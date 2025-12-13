@@ -520,7 +520,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 	questObjectivesWindow.hide();
 
     Float timeSpeed = GAMETIME_SPEEDS.get(genus);
-    gameTimeSpeedMultiplier = timeSpeed != null ? timeSpeed : 1f;
+    gameTimeSpeedMultiplier = timeSpeed != null ? timeSpeed : 3.29f;
     }
 
     protected void attached() {
