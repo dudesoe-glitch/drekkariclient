@@ -636,7 +636,7 @@ public class OptWnd extends Window {
 	public static CheckBox showHoverInventoriesWhenHoldingShiftCheckBox;
 	public static CheckBox showQuickSlotsCheckBox;
 	public static CheckBox leftHandQuickSlotCheckBox, rightHandQuickSlotCheckBox, leftPouchQuickSlotCheckBox, rightPouchQuickSlotCheckBox,
-			beltQuickSlotCheckBox, backpackQuickSlotCheckBox, capeQuickSlotCheckBox;
+			beltQuickSlotCheckBox, backpackQuickSlotCheckBox, shouldersQuickSlotCheckBox, capeQuickSlotCheckBox;
 	public static CheckBox showStudyReportHistoryCheckBox;
 	public static CheckBox lockStudyReportCheckBox;
 	public static CheckBox soundAlertForFinishedCuriositiesCheckBox;
@@ -727,7 +727,7 @@ public class OptWnd extends Window {
 				ui.gui.quickslots.reloadSlots();
 				Utils.setprefb("rightHandQuickSlot", val);
 			}
-		}, leftColumn.pos("ur").adds(4, 0));
+		}, leftColumn.pos("ur").adds(10, 0));
 
 		leftColumn = add(leftPouchQuickSlotCheckBox = new CheckBox("Left Pouch"){
 			{a = Utils.getprefb("leftPouchQuickSlot", false);}
@@ -735,7 +735,7 @@ public class OptWnd extends Window {
 				ui.gui.quickslots.reloadSlots();
 				Utils.setprefb("leftPouchQuickSlot", val);
 			}
-		}, leftColumn.pos("bl").adds(0, 2));
+		}, leftColumn.pos("bl").adds(0, 1));
 		add(rightPouchQuickSlotCheckBox = new CheckBox("Right Pouch"){
 			{a = Utils.getprefb("rightPouchQuickSlot", false);}
 			public void changed(boolean val) {
@@ -750,21 +750,28 @@ public class OptWnd extends Window {
 				ui.gui.quickslots.reloadSlots();
 				Utils.setprefb("beltQuickSlot", val);
 			}
-		}, leftColumn.pos("bl").adds(0, 2));
-		leftColumn = add(backpackQuickSlotCheckBox = new CheckBox("Backpack"){
+		}, leftColumn.pos("bl").adds(0, 1));
+		add(backpackQuickSlotCheckBox = new CheckBox("Backpack"){
 			{a = Utils.getprefb("backpackQuickSlot", true);}
 			public void changed(boolean val) {
 				ui.gui.quickslots.reloadSlots();
 				Utils.setprefb("backpackQuickSlot", val);
 			}
-		}, leftColumn.pos("ur").adds(4, 0));
-		add(capeQuickSlotCheckBox = new CheckBox("Cape"){
+		}, leftColumn.pos("ur").adds(37, 0));
+        leftColumn = add(shouldersQuickSlotCheckBox = new CheckBox("Shoulders"){
+            {a = Utils.getprefb("shouldersQuickSlot", true);}
+            public void changed(boolean val) {
+                ui.gui.quickslots.reloadSlots();
+                Utils.setprefb("shouldersQuickSlot", val);
+            }
+        }, leftColumn.pos("bl").adds(0, 1));
+        leftColumn = add(capeQuickSlotCheckBox = new CheckBox("Cape"){
 			{a = Utils.getprefb("capeQuickSlot", true);}
 			public void changed(boolean val) {
 				ui.gui.quickslots.reloadSlots();
 				Utils.setprefb("capeQuickSlot", val);
 			}
-		}, leftColumn.pos("ur").adds(4, 0));
+		}, leftColumn.pos("ur").adds(9, 0));
 
 
 		leftColumn = add(showStudyReportHistoryCheckBox = new CheckBox("Show Study Report History"){
