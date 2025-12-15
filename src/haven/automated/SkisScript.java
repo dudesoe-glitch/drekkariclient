@@ -49,7 +49,7 @@ public class SkisScript implements Runnable {
                     FlowerMenu.setNextSelection("Pick up");
                     gui.map.wdgmsg("click", Coord.z, gobSkis.rc.floor(posres), 3, 0, 0, (int) gobSkis.id, gobSkis.rc.floor(posres), 0, -1);
             }
-            if (eq.slots[14] == null) { // ND: Don't need to do anything here, cause "Pick up" already puts it on your cape slot
+            if (eq.slots[21] == null) { // ND: Don't need to do anything here, cause "Pick up" already puts it on your cape slot
                 return;
             } else {
                 int timeout = 0;

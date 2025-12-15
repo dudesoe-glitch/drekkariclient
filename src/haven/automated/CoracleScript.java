@@ -96,7 +96,7 @@ public class CoracleScript implements Runnable {
                 }
             }
 
-            if (eq.slots[14] == null) { // ND: Don't need to do anything here, cause "Pick up" already puts it on your cape slot
+            if (eq.slots[21] == null) { // ND: Don't need to do anything here, cause "Pick up" already puts it on your cape slot
                 return;
             } else {
                 int timeout = 0;
