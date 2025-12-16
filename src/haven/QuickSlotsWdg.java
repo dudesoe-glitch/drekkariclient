@@ -102,7 +102,7 @@ public class QuickSlotsWdg extends Widget implements DTarget {
             if (rightPouchSlotCoord != null && cc.x > rightPouchSlotCoord.x && cc.x <= rightPouchSlotCoord.x + slotSquareBg.sz().x) e.wdgmsg("drop", 20);
             if (beltSlotCoord != null && cc.x > beltSlotCoord.x && cc.x <= beltSlotCoord.x + slotSquareBg.sz().x) e.wdgmsg("drop", 5);
             if (backpackSlotCoord != null && cc.x > backpackSlotCoord.x && cc.x <= backpackSlotCoord.x + slotSquareBg.sz().x) e.wdgmsg("drop", 11);
-            if (shouldersSlotCoord != null && cc.x > shouldersSlotCoord.x && cc.x <= shouldersSlotCoord.x + slotSquareBg.sz().x) e.wdgmsg("drop", 21);
+            if (shouldersSlotCoord != null && cc.x > shouldersSlotCoord.x && cc.x <= shouldersSlotCoord.x + slotSquareBg.sz().x) e.wdgmsg("drop", 22);
             if (capeSlotCoord != null && cc.x > capeSlotCoord.x && cc.x <= capeSlotCoord.x + slotSquareBg.sz().x) e.wdgmsg("drop", 14);
             return true;
         }
@@ -120,7 +120,7 @@ public class QuickSlotsWdg extends Widget implements DTarget {
             if (rightPouchSlotCoord != null && cc.x > rightPouchSlotCoord.x && cc.x <= rightPouchSlotCoord.x + slotSquareBg.sz().x) w = e.slots[20];
             if (beltSlotCoord != null && cc.x > beltSlotCoord.x && cc.x <= beltSlotCoord.x + slotSquareBg.sz().x) w = e.slots[5];
             if (backpackSlotCoord != null && cc.x > backpackSlotCoord.x && cc.x <= backpackSlotCoord.x + slotSquareBg.sz().x) w = e.slots[11];
-            if (shouldersSlotCoord != null && cc.x > shouldersSlotCoord.x && cc.x <= shouldersSlotCoord.x + slotSquareBg.sz().x) w = e.slots[21];
+            if (shouldersSlotCoord != null && cc.x > shouldersSlotCoord.x && cc.x <= shouldersSlotCoord.x + slotSquareBg.sz().x) w = e.slots[22];
             if (capeSlotCoord != null && cc.x > capeSlotCoord.x && cc.x <= capeSlotCoord.x + slotSquareBg.sz().x) w = e.slots[14];
             if (w != null) {
                 return w.iteminteract(cc, ul);
@@ -140,7 +140,7 @@ public class QuickSlotsWdg extends Widget implements DTarget {
             if (rightPouchSlotCoord != null && c.x > rightPouchSlotCoord.x && c.x <= rightPouchSlotCoord.x + slotSquareBg.sz().x) w = e.slots[20];
             if (beltSlotCoord != null && c.x > beltSlotCoord.x && c.x <= beltSlotCoord.x + slotSquareBg.sz().x) w = e.slots[5];
             if (backpackSlotCoord != null && c.x > backpackSlotCoord.x && c.x <= backpackSlotCoord.x + slotSquareBg.sz().x) w = e.slots[11];
-            if (shouldersSlotCoord != null && c.x > shouldersSlotCoord.x && c.x <= shouldersSlotCoord.x + slotSquareBg.sz().x) w = e.slots[21];
+            if (shouldersSlotCoord != null && c.x > shouldersSlotCoord.x && c.x <= shouldersSlotCoord.x + slotSquareBg.sz().x) w = e.slots[22];
             if (capeSlotCoord != null && c.x > capeSlotCoord.x && c.x <= capeSlotCoord.x + slotSquareBg.sz().x) w = e.slots[14];
             if(w != null) {
                 return w.tooltip(c, (prev == this) ? w : prev);
@@ -184,7 +184,7 @@ public class QuickSlotsWdg extends Widget implements DTarget {
             }
             if (shouldersSlotCoord != null && c.x > shouldersSlotCoord.x && c.x <= shouldersSlotCoord.x + slotSquareBg.sz().x){
                 hoverCoord = new Coord(shouldersSlotCoord.x + slotSquareBg.sz().x, shouldersSlotCoord.y + slotSquareBg.sz().y);
-                w = e.slots[21];
+                w = e.slots[22];
             }
             if (capeSlotCoord != null && c.x > capeSlotCoord.x && c.x <= capeSlotCoord.x + slotSquareBg.sz().x){
                 hoverCoord = new Coord(capeSlotCoord.x + slotSquareBg.sz().x, capeSlotCoord.y + slotSquareBg.sz().y);
@@ -227,7 +227,7 @@ public class QuickSlotsWdg extends Widget implements DTarget {
             if (rightPouchSlotCoord != null && ev.c.x > rightPouchSlotCoord.x && ev.c.x <= rightPouchSlotCoord.x + slotSquareBg.sz().x) w = e.slots[20];
             if (beltSlotCoord != null && ev.c.x > beltSlotCoord.x && ev.c.x <= beltSlotCoord.x + slotSquareBg.sz().x) w = e.slots[5];
             if (backpackSlotCoord != null && ev.c.x > backpackSlotCoord.x && ev.c.x <= backpackSlotCoord.x + slotSquareBg.sz().x) w = e.slots[11];
-            if (shouldersSlotCoord != null && ev.c.x > shouldersSlotCoord.x && ev.c.x <= shouldersSlotCoord.x + slotSquareBg.sz().x) w = e.slots[21];
+            if (shouldersSlotCoord != null && ev.c.x > shouldersSlotCoord.x && ev.c.x <= shouldersSlotCoord.x + slotSquareBg.sz().x) w = e.slots[22];
             if (capeSlotCoord != null && ev.c.x > capeSlotCoord.x && ev.c.x <= capeSlotCoord.x + slotSquareBg.sz().x) w = e.slots[14];
             if (w != null) {
                 w.mousedown(new MouseDownEvent(new Coord(w.sz.x / 2, w.sz.y / 2), ev.b));
