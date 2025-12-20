@@ -41,6 +41,8 @@ public class Flash extends Sprite implements PView.Render2D {
     }
 
     public void draw(GOut g, Pipe state) {
+    if (OptWnd.disableLibertyCapsHighCheckBox.a)
+        return;
 	if(ul == null) {
 	    Coord2d csz = new Coord2d(g.sz());
 	    csz = csz.mul(1000.0 / Math.max(csz.x, csz.y));
@@ -66,6 +68,8 @@ public class Flash extends Sprite implements PView.Render2D {
     }
 
     @Override public void added(RenderTree.Slot slot) {
+    if (OptWnd.disableLibertyCapsHighCheckBox.a)
+        return;
 	slot.add(Sprite.create(owner, sfx, Message.nil));
     }
 }
