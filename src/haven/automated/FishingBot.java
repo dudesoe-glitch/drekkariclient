@@ -19,6 +19,7 @@ public class FishingBot extends Window implements Runnable {
 
     private boolean stop;
     private boolean active;
+    private Integer fishActionId = null;
 
     private final Button startButton;
     private final CheckBox startCheckBox;
@@ -125,6 +126,8 @@ public class FishingBot extends Window implements Runnable {
                 }
             }
         }, UI.scale(210, 175));
+
+        findFishActionId();
     }
 
     private int contentAnalysis(WItem item) {
@@ -325,6 +328,7 @@ public class FishingBot extends Window implements Runnable {
 
     @Override
     public void run() {
+
         while (!stop) {
             if (!checkVitals()) {
                 sleep(1000);
@@ -337,6 +341,30 @@ public class FishingBot extends Window implements Runnable {
                 prepareFishingPole();
             }
             sleep(500);
+        }
+    }
+
+    private void findFishActionId() {
+        try {
+            if (gui.menu != null && gui.menu.paginae != null) {
+                for (MenuGrid.Pagina pag : gui.menu.paginae) {
+                    try {
+                        if (pag.res != null && pag.res.get() != null) {
+                            String resName = pag.res.get().name;
+                            if ("paginae/act/fish".equals(resName)) {
+                                if (pag.id instanceof Integer) {
+                                    fishActionId = (Integer) pag.id;
+                                    return;
+                                }
+                            }
+                        }
+                    } catch (Loading e) {
+                        // Resource not loaded yet, skip
+                    } catch (Exception ignored) {}
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Fishing Bot: Error finding fish action ID: " + e.getMessage());
         }
     }
 
@@ -377,14 +405,30 @@ public class FishingBot extends Window implements Runnable {
             return;
         }
         Set<String> poses = player.getPoses();
-        if (poses.contains("fishidle")) {
+        if (poses.contains("fishidle") || poses.contains("napp1")) {
+            return;
+        }
+
+        if (!startCheckBox.a) {
+            return;
+        }
+
+        if (fishActionId == null) {
+            deactivate("Fishing Bot: Fish action ID not found! Uncheck 'Fishing' checkbox to only prepare pole.");
             return;
         }
 
         Coord2d fishCoord = getFishingCoord();
         if (fishCoord != null) {
-            gui.menu.wdgmsg("use", 7,0);
-            sleep(500);
+            gui.menu.wdgmsg("use", fishActionId, 0);
+
+            String poleSel = fishingPoleChoice.getSelected();
+            if ("Primitive Casting-Rod".equals(poleSel)) {
+                sleep(1500);
+            } else {
+                sleep(500);
+            }
+
             gui.map.wdgmsg("click", Coord.z, fishCoord.floor(posres), 1, 0);
             sleep(500);
             gui.map.wdgmsg("click", Coord.z, fishCoord.floor(posres), 3, 0);
