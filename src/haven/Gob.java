@@ -209,14 +209,14 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 
 	public void added(RenderTree.Slot slot) {
 	    slot.add(spr);
+        if (this.spr != null && this.spr.res != null && this.spr.res.name.contains("decal")){
+            if (OptWnd.flatCupboardsCheckBox.a && this.spr.owner.getres().name.equals("gfx/terobjs/cupboard"))
+                slot.cstate(Pipe.Op.compose(Location.scale(1, 1, 1.6f), Location.xlate(new Coord3f(0, 0, -5.4f))));
+            slot.ostate(new MixColor(new Color(255, 255, 255, 0)));
+        }
 	    if(slots == null)
 		slots = new ArrayList<>(1);
 	    slots.add(slot);
-		if (this.spr != null && this.spr.res != null && this.spr.res.name.contains("decal")){
-			if (OptWnd.flatCupboardsCheckBox.a && this.spr.owner.getres().name.equals("gfx/terobjs/cupboard"))
-				slot.cstate(Pipe.Op.compose(Location.scale(1, 1, 1.6f), Location.xlate(new Coord3f(0, 0, -5.4f))));
-			slot.ostate(new MixColor(new Color(255, 255, 255, 0)));
-		}
 	}
 
 	public void removed(RenderTree.Slot slot) {
