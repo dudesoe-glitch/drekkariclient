@@ -70,7 +70,7 @@ public class Charlist extends Widget {
 	Gob.alarmPlayed.clear();
 	GameUI.stopAllThemes();
     Config.setPlayerName(null);
-    GameUI.gameTimeSpeedMultiplier = 1f;
+    GameUI.gameTimeSpeedMultiplier = 3.29f;
     }
 
     public static class Char {

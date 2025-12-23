@@ -144,7 +144,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 	private String myLastStaminaBarText = "";
     private static final Tex mapperWarning = PUtils.strokeTex(Text.renderstroked("You need to relog for the Webmap Integration to send data!", Color.RED, Color.BLACK, Text.num12boldFnd));
     private static final Tex mapperWarning2 = PUtils.strokeTex(Text.renderstroked("(This happens on newly created characters, or if you changed your endpoint)", Color.RED, Color.BLACK, Text.num12boldFnd));
-    public static float gameTimeSpeedMultiplier = 1f;
+    public static float gameTimeSpeedMultiplier = 3.29f;
     private static final Map<String, Float> GAMETIME_SPEEDS = new HashMap<>() {{ // ND: Game speeds differ. Default worlds were always 3.29, but W16.1 is faster
         put("b7c199a4557503a8", 4.93f); // W16.1
         put("c646473983afec09", 3.29f); // W16
