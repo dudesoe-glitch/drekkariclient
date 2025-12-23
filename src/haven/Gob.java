@@ -656,9 +656,18 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
     public void addol(Overlay ol, boolean async) {
 	if (getres() != null) {
 		if(OptWnd.disableIndustrialSmokeCheckBox.a && !getres().name.equals("gfx/terobjs/clue")) {
-				if (ol.spr != null && ol.spr.res != null && ol.spr.res.name.contains("ismoke")) {
+			try {
+				Resource res = null;
+				if(ol.sm instanceof OCache.OlSprite) {
+					res = ((OCache.OlSprite)ol.sm).res.get();
+				} else if(ol.sm instanceof Sprite.Mill.FromRes) {
+					res = ((Sprite.Mill.FromRes)ol.sm).res.get();
+				} else if(ol.spr != null) {
+					res = ol.spr.res;
+				}
+				if(res != null && res.name.contains("ismoke"))
 					return;
-			}
+			} catch(Loading ignored) {}
 		}
 		if(OptWnd.disableScentSmokeCheckBox.a && getres().name.equals("gfx/terobjs/clue")) {
 			return;
