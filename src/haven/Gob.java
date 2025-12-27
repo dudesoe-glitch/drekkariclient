@@ -2630,4 +2630,15 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
         }
     }
 
+    public void refreshForageables() {
+        if (Utils.isSpriteKind(this, "GaussianPlant")) {
+            Drawable drawable = getattr(Drawable.class);
+            ResDrawable resDrawable = (drawable instanceof ResDrawable) ? (ResDrawable) drawable : null;
+            if (resDrawable != null) {
+                setattr(new ResDrawable(this, resDrawable.res, resDrawable.sdt, true));
+            }
+        }
+    }
+
+
 }

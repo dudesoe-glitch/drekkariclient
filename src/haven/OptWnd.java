@@ -3638,10 +3638,12 @@ public class OptWnd extends Window {
 				}
 			}, leftColumn.pos("bl").adds(0, 2));
 			simplifiedCropsCheckBox.tooltip = simplifiedCropsTooltip;
-			leftColumn = add(simplifiedForageablesCheckBox = new CheckBox("Simplified Forageables (Requires Reload)"){
+			leftColumn = add(simplifiedForageablesCheckBox = new CheckBox("Simplified Forageables"){
 				{a = Utils.getprefb("simplifiedForageables", false);}
 				public void changed(boolean val) {
 					Utils.setprefb("simplifiedForageables", val);
+                    if (ui != null && ui.gui != null)
+                        ui.sess.glob.oc.gobAction(Gob::refreshForageables);
 				}
 			}, leftColumn.pos("bl").adds(0, 2));
 			simplifiedForageablesCheckBox.tooltip = simplifiedForageablesTooltip;
