@@ -3517,6 +3517,7 @@ public class OptWnd extends Window {
 	public static CheckBox hideFlavorObjectsCheckBox;
 	public static CheckBox flatWorldCheckBox;
 	public static CheckBox disableTileSmoothingCheckBox;
+    public static CheckBox disableTileBlendingCheckBox;
 	public static CheckBox disableTileTransitionsCheckBox;
 	public static CheckBox flatCaveWallsCheckBox;
 	public static CheckBox straightCliffEdgesCheckBox;
@@ -3605,6 +3606,18 @@ public class OptWnd extends Window {
 				}
 			}, leftColumn.pos("bl").adds(0, 2));
 			disableTileSmoothingCheckBox.tooltip = disableTileSmoothingTooltip;
+            leftColumn = add(disableTileBlendingCheckBox = new CheckBox("Disable Tile Blending"){
+                {a = Utils.getprefb("disableTileBlending", false);}
+                public void changed(boolean val) {
+                    Utils.setprefb("disableTileBlending", val);
+                    if (ui.sess != null)
+                        ui.sess.glob.map.invalidateAll();
+                    if (ui != null && ui.gui != null) {
+                        ui.gui.optionInfoMsg("Tile Blending is now " + (val ? "DISABLED" : "ENABLED") + "!", (val ? msgRed : msgGreen), Audio.resclip(val ? Toggle.sfxoff : Toggle.sfxon));
+                    }
+                }
+            }, leftColumn.pos("bl").adds(0, 2));
+            disableTileBlendingCheckBox.tooltip = disableTileBlendingTooltip;
 			leftColumn = add(disableTileTransitionsCheckBox = new CheckBox("Disable Tile Transitions"){
 				{a = Utils.getprefb("disableTileTransitions", false);}
 				public void changed(boolean val) {
@@ -5060,7 +5073,13 @@ public class OptWnd extends Window {
 			"\n$col[185,185,185]{I guess some people think this makes it easier to differentiate between terrain types, or maybe it's just preference.}" +
 			"\n" +
 			"\n$col[218,163,0]{Action Button:} $col[185,185,185]{This setting can also be turned on/off using an action button from the menu grid (Custom Client Extras → Toggles).}", UI.scale(320));
-	private static final Object disableTileTransitionsTooltip = RichText.render("This will turn all tiles into squares, so you can determine where one biome ends and another one starts, or where the shoreline meets the water." +
+    private static final Object disableTileBlendingTooltip = RichText.render("This will remove the blending of the random texture patches that are being applied to biome tiles." +
+            "\n" +
+            "\n$col[185,185,185]{It might make it a bit more confusing, because some patches of land might look like completely different biomes, but they're not...}" +
+            "\n" +
+            "\n$col[218,163,0]{Action Button:} $col[185,185,185]{This setting can also be turned on/off using an action button from the menu grid (Custom Client Extras → Toggles).}", UI.scale(320));
+
+    private static final Object disableTileTransitionsTooltip = RichText.render("This will turn all tiles into squares, so you can determine where one biome ends and another one starts, or where the shoreline meets the water." +
 			"\n" +
 			"\n$col[185,185,185]{It can be useful in some niche cases I won't bother listing, but it's preference.}" +
 			"\n" +

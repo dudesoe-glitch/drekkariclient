@@ -65,7 +65,7 @@ public class TerrainTile extends Tiler implements Tiler.MCons, Tiler.CTrans {
 	    vs = new Scan(Coord.z.sub(sr, sr), m.sz.add(sr * 2 + 1, sr * 2 + 1));
 	    float[][] buf1 = new float[var.length + 1][vs.l];
 	    float[][] lwc = new float[var.length + 1][vs.l];
-		if (!OptWnd.disableTileSmoothingCheckBox.a) {
+		if (!OptWnd.disableTileBlendingCheckBox.a) {
 	    for(int i = 0; i < var.length + 1; i++) {
 		for(int y = vs.ul.y; y < vs.br.y; y++) {
 		    for(int x = vs.ul.x; x < vs.br.x; x++) {

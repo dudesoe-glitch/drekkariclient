@@ -752,6 +752,7 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 		makeLocal("customclient/menugrid/Toggles/FlavorObjects");
 		makeLocal("customclient/menugrid/Toggles/FlatWorld");
 		makeLocal("customclient/menugrid/Toggles/TileSmoothing");
+        makeLocal("customclient/menugrid/Toggles/TileBlending");
 		makeLocal("customclient/menugrid/Toggles/TileTransitions");
 		makeLocal("customclient/menugrid/Toggles/ItemDroppingAnywhere");
 		makeLocal("customclient/menugrid/Toggles/ItemDroppingInWater");
@@ -842,7 +843,9 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 				OptWnd.flatWorldCheckBox.set(!OptWnd.flatWorldCheckBox.a);
 			} else if (ad[2].equals("TileSmoothing")) {
 				OptWnd.disableTileSmoothingCheckBox.set(!OptWnd.disableTileSmoothingCheckBox.a);
-			} else if (ad[2].equals("TileTransitions")) {
+            } else if (ad[2].equals("TileBlending")) {
+                OptWnd.disableTileBlendingCheckBox.set(!OptWnd.disableTileBlendingCheckBox.a);
+            } else if (ad[2].equals("TileTransitions")) {
 				OptWnd.disableTileTransitionsCheckBox.set(!OptWnd.disableTileTransitionsCheckBox.a);
 			} else if (ad[2].equals("ItemDroppingAnywhere")) {
 				OptWnd.noCursorItemDroppingAnywhereCheckBox.set(!OptWnd.noCursorItemDroppingAnywhereCheckBox.a);
