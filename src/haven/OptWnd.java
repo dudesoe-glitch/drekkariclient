@@ -2837,6 +2837,8 @@ public class OptWnd extends Window {
 			public void changed(boolean val) {Utils.setprefb("wagonNearestLiftable_log", val);}}, objectsLiftActionLeft.pos("bl").adds(0, 4)).settip("Lift nearest log into Wagon/Cart.");
 
 		y+=UI.scale(40);
+        y = addbtnImproved(cont, "Combat Cheese Auto-Distance", "", new Color(0, 255, 34,255), GameUI.kb_autoCombatDistance, y);
+        y+=UI.scale(20);
 		y = addbtn(cont, "Toggle Collision Boxes", GameUI.kb_toggleCollisionBoxes, y);
 		y = addbtn(cont, "Toggle Object Hiding", GameUI.kb_toggleHidingBoxes, y);
 		y = addbtn(cont, "Display Growth Info on Plants", GameUI.kb_toggleGrowthInfo, y);

@@ -14,39 +14,37 @@ import java.util.Objects;
 import static haven.OCache.posres;
 
 public class CombatDistanceTool extends Window implements Runnable {
-    private static Map<String, Double> animalDistances = new HashMap<>();
-    private static Map<String, Double> vehicleDistance = new HashMap<>();
-
-    static {
-        animalDistances.put("gfx/kritter/adder/adder", 17.1);
-        animalDistances.put("gfx/kritter/ant/ant", 15.2);
-        animalDistances.put("gfx/kritter/cattle/cattle", 27.0);
-        animalDistances.put("gfx/kritter/badger/badger", 19.9);
-        animalDistances.put("gfx/kritter/bear/bear", 24.7);
-        animalDistances.put("gfx/kritter/boar/boar", 25.1);
-        animalDistances.put("gfx/kritter/caveangler/caveangler", 27.2);
-        animalDistances.put("gfx/kritter/cavelouse/cavelouse", 22.0);
-        animalDistances.put("gfx/kritter/fox/fox", 18.1);
-        animalDistances.put("gfx/kritter/horse/horse", 23.0);
-        animalDistances.put("gfx/kritter/lynx/lynx", 20.0);
-        animalDistances.put("gfx/kritter/mammoth/mammoth", 30.3);
-        animalDistances.put("gfx/kritter/moose/moose", 25.0);
-        animalDistances.put("gfx/kritter/orca/orca", 49.25);
-        animalDistances.put("gfx/kritter/reddeer/reddeer", 25.0);
-        animalDistances.put("gfx/kritter/roedeer/roedeer", 22.0);
-        animalDistances.put("gfx/kritter/spermwhale/spermwhale", 112.2);
-        animalDistances.put("gfx/kritter/goat/wildgoat", 18.9);
-        animalDistances.put("gfx/kritter/wolf/wolf", 25.0);
-        animalDistances.put("gfx/kritter/wolverine/wolverine", 21.0);
-        animalDistances.put("gfx/borka/body", 55.0);
-
-        vehicleDistance.put("gfx/terobjs/vehicle/rowboat", 13.3);
-        vehicleDistance.put("gfx/terobjs/vehicle/dugout", 7.4);
-        vehicleDistance.put("gfx/terobjs/vehicle/snekkja", 29.35);
-        vehicleDistance.put("gfx/terobjs/vehicle/knarr", 54.5);
-        vehicleDistance.put("gfx/kritter/horse/stallion", 5.4);
-        vehicleDistance.put("gfx/kritter/horse/mare", 5.4);
-    }
+    public static final Map<String, Double> animalDistances = Map.ofEntries(
+            Map.entry("gfx/kritter/adder/adder", 17.1),
+            Map.entry("gfx/kritter/ant/ant", 15.2),
+            Map.entry("gfx/kritter/cattle/cattle", 27.0),
+            Map.entry("gfx/kritter/badger/badger", 19.9),
+            Map.entry("gfx/kritter/bear/bear", 24.7),
+            Map.entry("gfx/kritter/boar/boar", 25.1),
+            Map.entry("gfx/kritter/caveangler/caveangler", 27.2),
+            Map.entry("gfx/kritter/cavelouse/cavelouse", 22.0),
+            Map.entry("gfx/kritter/fox/fox", 18.1),
+            Map.entry("gfx/kritter/horse/horse", 23.0),
+            Map.entry("gfx/kritter/lynx/lynx", 20.0),
+            Map.entry("gfx/kritter/mammoth/mammoth", 30.3),
+            Map.entry("gfx/kritter/moose/moose", 25.0),
+            Map.entry("gfx/kritter/orca/orca", 49.25),
+            Map.entry("gfx/kritter/reddeer/reddeer", 25.0),
+            Map.entry("gfx/kritter/roedeer/roedeer", 22.0),
+            Map.entry("gfx/kritter/spermwhale/spermwhale", 112.2),
+            Map.entry("gfx/kritter/goat/wildgoat", 18.9),
+            Map.entry("gfx/kritter/wolf/wolf", 25.0),
+            Map.entry("gfx/kritter/wolverine/wolverine", 21.0),
+            Map.entry("gfx/borka/body", 55.0)
+    );
+    public static final Map<String, Double> vehicleDistance = Map.ofEntries(
+            Map.entry("gfx/terobjs/vehicle/rowboat", 13.3),
+            Map.entry("gfx/terobjs/vehicle/dugout", 7.4),
+            Map.entry("gfx/terobjs/vehicle/snekkja", 29.35),
+            Map.entry("gfx/terobjs/vehicle/knarr", 54.5),
+            Map.entry("gfx/kritter/horse/stallion", 5.4),
+            Map.entry("gfx/kritter/horse/mare", 5.4)
+    );
 
     private final GameUI gui;
     public boolean stop;
