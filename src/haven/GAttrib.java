@@ -32,7 +32,6 @@ import haven.render.*;
 
 public abstract class GAttrib {
     public final Gob gob;
-	public boolean skipRender = false;
 	
     public GAttrib(Gob gob) {
 	this.gob = gob;
