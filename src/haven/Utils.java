@@ -2698,4 +2698,27 @@ public class Utils {
 		return owner.ocontext(Gob.class);
 	}
 
+    public static boolean isSpriteKind(Gob gob, String... kind) {
+        if (gob.getres() == null)
+            return false;
+        List<String> kinds = Arrays.asList(kind);
+        boolean result = false;
+        Class spc;
+        Drawable d = gob.getattr(Drawable.class);
+        Resource.CodeEntry ce = gob.getres().layer(Resource.CodeEntry.class);
+        if(ce != null) {
+            spc = ce.get("spr");
+            result = spc != null && (kinds.contains(spc.getSimpleName()) || kinds.contains(spc.getSuperclass().getSimpleName()));
+        }
+        if(!result) {
+            if(d instanceof ResDrawable) {
+                Sprite spr = ((ResDrawable) d).spr;
+                if(spr == null) {throw new Loading();}
+                spc = spr.getClass();
+                result = kinds.contains(spc.getSimpleName()) || kinds.contains(spc.getSuperclass().getSimpleName());
+            }
+        }
+        return result;
+    }
+
 }

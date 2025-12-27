@@ -65,7 +65,7 @@ public class GobGrowthInfo extends GobInfo {
     private Tex growth() {
 	Text.Line line = null;
 	Resource res = gob.getres();
-	if(isSpriteKind(gob, "GrowingPlant", "TrellisPlant") && !(OptWnd.toggleGobHidingCheckBox.a && OptWnd.hideCropsCheckbox.a)) {
+	if(Utils.isSpriteKind(gob, "GrowingPlant", "TrellisPlant") && !(OptWnd.toggleGobHidingCheckBox.a && OptWnd.hideCropsCheckbox.a)) {
 	    int maxStage = 0;
 	    for (FastMesh.MeshRes layer : gob.getres().layers(FastMesh.MeshRes.class)) {
 		if(layer.id / 10 > maxStage) {
@@ -101,7 +101,7 @@ public class GobGrowthInfo extends GobInfo {
 
 		}
 		}
-	} else if(isSpriteKind(gob, "Tree")) {
+	} else if(Utils.isSpriteKind(gob, "Tree")) {
 		boolean isHidden = true;
 	    Message data = getDrawableData(gob);
 	    if(data != null && !data.eom()) {
@@ -160,27 +160,7 @@ public class GobGrowthInfo extends GobInfo {
 	else
 	    return null;
     }
-    
-    private static boolean isSpriteKind(Gob gob, String... kind) {
-	List<String> kinds = Arrays.asList(kind);
-	boolean result = false;
-	Class spc;
-	Drawable d = gob.getattr(Drawable.class);
-	Resource.CodeEntry ce = gob.getres().layer(Resource.CodeEntry.class);
-	if(ce != null) {
-	    spc = ce.get("spr");
-	    result = spc != null && (kinds.contains(spc.getSimpleName()) || kinds.contains(spc.getSuperclass().getSimpleName()));
-	}
-	if(!result) {
-	    if(d instanceof ResDrawable) {
-		Sprite spr = ((ResDrawable) d).spr;
-		if(spr == null) {throw new Loading();}
-		spc = spr.getClass();
-		result = kinds.contains(spc.getSimpleName()) || kinds.contains(spc.getSuperclass().getSimpleName());
-	    }
-	}
-	return result;
-    }
+
 
     @Override
     public String toString() {
