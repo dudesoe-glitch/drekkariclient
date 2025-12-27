@@ -2621,7 +2621,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
     }
 
     public void refreshCrops() {
-        if (Utils.isSpriteKind(this, "GrowingPlant") || Utils.isSpriteKind(this, "GaussianPlant")) {
+        if (Utils.isSpriteKind(this, "GrowingPlant") || Utils.isSpriteKind(this, "TrellisPlant")) {
             Drawable drawable = getattr(Drawable.class);
             ResDrawable resDrawable = (drawable instanceof ResDrawable) ? (ResDrawable) drawable : null;
             if (resDrawable != null) {
