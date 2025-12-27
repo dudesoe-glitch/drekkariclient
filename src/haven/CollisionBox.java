@@ -16,8 +16,7 @@ public class CollisionBox extends SlottedNode implements Rendered {
 	private static final float Z = 0.2f;
 	public static final float WIDTH = 2f;
 
-	public static final Pipe.Op TOP = Pipe.Op.compose(Rendered.last, States.Depthtest.none, States.maskdepth);
-	public static Pipe.Op SOLID_HOLLOW = Pipe.Op.compose(new ColorMask(OptWnd.collisionBoxColorOptionWidget.currentColor), new States.LineWidth(WIDTH), TOP);
+	public static Pipe.Op SOLID_HOLLOW = Pipe.Op.compose(new ColorMask(OptWnd.collisionBoxColorOptionWidget.currentColor), new States.LineWidth(WIDTH), Rendered.last, States.Depthtest.none);
 
     private Pipe.Op state = null;
 

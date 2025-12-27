@@ -2195,7 +2195,7 @@ public class OptWnd extends Window {
 			}, UI.scale(240, 0));
 			showObjectCollisionBoxesCheckBox.tooltip = showObjectCollisionBoxesTooltip;
 			middleColumn = add(collisionBoxColorOptionWidget = new ColorOptionWidget("Collision Box Color:", "collisionBox", 115, Integer.parseInt(collisionBoxColorSetting[0]), Integer.parseInt(collisionBoxColorSetting[1]), Integer.parseInt(collisionBoxColorSetting[2]), Integer.parseInt(collisionBoxColorSetting[3]), (Color col) -> {
-				CollisionBox.SOLID_HOLLOW = Pipe.Op.compose(new ColorMask(col), new States.LineWidth(CollisionBox.WIDTH), CollisionBox.TOP);
+				CollisionBox.SOLID_HOLLOW = Pipe.Op.compose(new ColorMask(col), new States.LineWidth(CollisionBox.WIDTH), Rendered.last, States.Depthtest.none);
 				if (ui != null && ui.gui != null) {
 					ui.sess.glob.oc.gobAction(Gob::updateCollisionBoxes);
 					ui.gui.map.updatePlobCollisionBox();
@@ -2204,7 +2204,7 @@ public class OptWnd extends Window {
 			add(new Button(UI.scale(70), "Reset", false).action(() -> {
 				Utils.setprefsa("collisionBox" + "_colorSetting", new String[]{"255", "255", "255", "210"});
 				collisionBoxColorOptionWidget.cb.colorChooser.setColor(collisionBoxColorOptionWidget.currentColor = new Color(255, 255, 255, 210));
-				CollisionBox.SOLID_HOLLOW = Pipe.Op.compose(new ColorMask(OptWnd.collisionBoxColorOptionWidget.currentColor), new States.LineWidth(CollisionBox.WIDTH), CollisionBox.TOP);
+				CollisionBox.SOLID_HOLLOW = Pipe.Op.compose(new ColorMask(OptWnd.collisionBoxColorOptionWidget.currentColor), new States.LineWidth(CollisionBox.WIDTH), Rendered.last, States.Depthtest.none);
 				if (ui != null && ui.gui != null) {
 					ui.sess.glob.oc.gobAction(Gob::updateCollisionBoxes);
 					ui.gui.map.updatePlobCollisionBox();
@@ -4041,7 +4041,7 @@ public class OptWnd extends Window {
 
 			prev = add(hiddenObjectsColorOptionWidget = new ColorOptionWidget("Hidden Objects Box Color:", "hidingBox", 170, Integer.parseInt(hiddenObjectsColorSetting[0]), Integer.parseInt(hiddenObjectsColorSetting[1]), Integer.parseInt(hiddenObjectsColorSetting[2]), Integer.parseInt(hiddenObjectsColorSetting[3]), (Color col) -> {
 				HidingBox.SOLID_FILLED = Pipe.Op.compose(new BaseColor(col), new States.Facecull(States.Facecull.Mode.NONE), Rendered.last);
-				HidingBox.SOLID_HOLLOW = Pipe.Op.compose(new BaseColor(new Color(col.getRed(), col.getGreen(), col.getBlue(), 153)), new States.LineWidth(HidingBox.WIDTH), HidingBox.TOP);
+				HidingBox.SOLID_HOLLOW = Pipe.Op.compose(new BaseColor(new Color(col.getRed(), col.getGreen(), col.getBlue(), 153)), new States.LineWidth(HidingBox.WIDTH), Rendered.last, States.Depthtest.none);
 				if (ui != null && ui.gui != null) {
 					ui.sess.glob.oc.gobAction(Gob::updateHidingBoxes);
 					ui.gui.map.updatePlobHidingBox();
@@ -4052,7 +4052,7 @@ public class OptWnd extends Window {
 				Utils.setprefsa("hidingBox" + "_colorSetting", new String[]{"0", "225", "255", "170"});
 				hiddenObjectsColorOptionWidget.cb.colorChooser.setColor(hiddenObjectsColorOptionWidget.currentColor = new Color(0, 225, 255, 170));
 				HidingBox.SOLID_FILLED = Pipe.Op.compose(new BaseColor(hiddenObjectsColorOptionWidget.currentColor), new States.Facecull(States.Facecull.Mode.NONE), Rendered.last);
-				HidingBox.SOLID_HOLLOW = Pipe.Op.compose(new BaseColor(new Color(hiddenObjectsColorOptionWidget.currentColor.getRed(), hiddenObjectsColorOptionWidget.currentColor.getGreen(), hiddenObjectsColorOptionWidget.currentColor.getBlue(), 153)), new States.LineWidth(HidingBox.WIDTH), HidingBox.TOP);
+				HidingBox.SOLID_HOLLOW = Pipe.Op.compose(new BaseColor(hiddenObjectsColorOptionWidget.currentColor), new States.LineWidth(HidingBox.WIDTH), Rendered.last, States.Depthtest.none);
 				if (ui != null && ui.gui != null) {
 					ui.sess.glob.oc.gobAction(Gob::updateHidingBoxes);
 					ui.gui.map.updatePlobHidingBox();
