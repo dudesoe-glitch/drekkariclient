@@ -3629,10 +3629,12 @@ public class OptWnd extends Window {
 				}
 			}, leftColumn.pos("bl").adds(0, 12));
 			hideFlavorObjectsCheckBox.tooltip = hideFlavorObjectsTooltip;
-			leftColumn = add(simplifiedCropsCheckBox = new CheckBox("Simplified Crops (Requires Reload)"){
+			leftColumn = add(simplifiedCropsCheckBox = new CheckBox("Simplified Crops"){
 				{a = Utils.getprefb("simplifiedCrops", false);}
 				public void changed(boolean val) {
 					Utils.setprefb("simplifiedCrops", val);
+                    if (ui != null && ui.gui != null)
+                        ui.sess.glob.oc.gobAction(Gob::refreshCrops);
 				}
 			}, leftColumn.pos("bl").adds(0, 2));
 			simplifiedCropsCheckBox.tooltip = simplifiedCropsTooltip;
