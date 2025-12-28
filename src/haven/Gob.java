@@ -1535,8 +1535,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 				doHide = OptWnd.toggleGobHidingCheckBox.a;
 				doShowHidingBox = true;
 			} else if (OptWnd.hideCropsCheckbox.a && resName.startsWith("gfx/terobjs/plants") && !resName.endsWith("trellis")) {
-				doHide = OptWnd.toggleGobHidingCheckBox.a;
-				doShowHidingBox = false; // ND: You can walk through them anyway, so it doesn't matter. Their resource doesn't have an actual hitbox layer and we'll have an endless lag loop of trying to draw one.
+                // ND: Crops work differently, and I only managed to make this work by handling it in their specific classes
 			} else if (OptWnd.hideTrellisCheckbox.a && resName.endsWith("trellis")) {
 				doHide = OptWnd.toggleGobHidingCheckBox.a;
 				doShowHidingBox = true;

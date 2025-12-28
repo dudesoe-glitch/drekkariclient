@@ -46,6 +46,8 @@ public class TrellisPlant implements Sprite.Factory {
 	CSprite spr = new CSprite(owner, res);
 	float d = 11f / num;
 	float c = -5.5f + (d / 2);
+    if (OptWnd.toggleGobHidingCheckBox.a && OptWnd.hideCropsCheckbox.a)
+        return(spr);
 	if (OptWnd.simplifiedCropsCheckBox.a)
 		spr.addpart(0, 0, Pipe.Op.nil, var.get(0));
 	else
