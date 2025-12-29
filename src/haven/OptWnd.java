@@ -3995,7 +3995,6 @@ public class OptWnd extends Window {
 					a = val;
 					if (ui != null && ui.gui != null) {
 						ui.sess.glob.oc.gobAction(Gob::updateHidingBoxes);
-                        ui.sess.glob.oc.gobAction(Gob::refreshCrops);
 						ui.gui.map.updatePlobHidingBox();
 					}
 				}
@@ -4135,7 +4134,6 @@ public class OptWnd extends Window {
 					Utils.setprefb("hideCrops", val);
 					if (ui != null && ui.gui != null) {
 						ui.sess.glob.oc.gobAction(Gob::updateHidingBoxes);
-                        ui.sess.glob.oc.gobAction(Gob::refreshCrops);
 						ui.gui.map.updatePlobHidingBox();
 					}
 				}

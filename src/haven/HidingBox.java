@@ -76,13 +76,13 @@ public class HidingBox extends SlottedNode implements Rendered {
 		Resource res = getResource(gob);
         String resName = res.name;
 		TreeScale treeScale = null;
-		float boxScale = 1000.0f;
+		float boxScale = 1.0f;
 		boolean growingTreeOrBush = false;
 		if ((resName.startsWith("gfx/terobjs/trees") && !resName.endsWith("log") && !resName.endsWith("oldtrunk")) || resName.startsWith("gfx/terobjs/bushes")) {
 			treeScale = gob.getattr(TreeScale.class);
 			if (treeScale != null) {
 				if (treeScale.scale < 1.0f || treeScale.scale > 1.0f) { // ND: Don't care about the original scale, cause the collision always assumes it's a fully grown tree
-					boxScale = 1000.0f / treeScale.scale;
+					boxScale = 1.0f / treeScale.scale;
 					growingTreeOrBush = true;
 				}
 			}
