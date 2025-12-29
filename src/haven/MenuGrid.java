@@ -765,7 +765,6 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 		makeLocal("customclient/menugrid/Toggles/MineSweeper");
 		makeLocal("customclient/menugrid/Toggles/PathfinderWalking");
 		makeLocal("customclient/menugrid/Toggles/ClearAllCombatDamage");
-		makeLocal("customclient/menugrid/Toggles/AnimalAutoPeace");
 		makeLocal("customclient/menugrid/Toggles/AutoDrinking");
 		makeLocal("customclient/menugrid/Toggles/TileCentering");
 		makeLocal("customclient/menugrid/Toggles/QueuedMovementWindow");
@@ -867,8 +866,6 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 				OptWnd.enableMineSweeperCheckBox.set(!OptWnd.enableMineSweeperCheckBox.a);
 			} else if (ad[2].equals("ClearAllCombatDamage")) {
 				OptWnd.damageInfoClearButton.click();
-			} else if (ad[2].equals("AnimalAutoPeace")) {
-				OptWnd.autoPeaceAnimalsWhenCombatStartsCheckBox.set(!OptWnd.autoPeaceAnimalsWhenCombatStartsCheckBox.a);
 			} else if (ad[2].equals("AutoDrinking")) {
 				OptWnd.autoDrinkingCheckBox.set(!OptWnd.autoDrinkingCheckBox.a);
 			} else if (ad[2].equals("TileCentering")) {

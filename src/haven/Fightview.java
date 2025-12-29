@@ -57,6 +57,7 @@ public class Fightview extends Widget {
 	public boolean currentChanged = false;
 	public double lastMoveCooldown, lastMoveCooldownSeconds;
 	public Boolean lastMoveUpdated = false;
+    private long autogivegobid = -1;
 
     public class Relation {
         public final long gobid;
@@ -71,7 +72,8 @@ public class Fightview extends Widget {
 	public Long lastDefenceDuration = null;
 	public double minAgi = 0D;
 	public double maxAgi = 2D;
-	public boolean autopeaced = false;
+    public GiveButton give;
+    public AutoGiveButton autogive;
 
         public Relation(long gobid) {
             this.gobid = gobid;
@@ -136,6 +138,13 @@ public class Fightview extends Widget {
 			g.addCombatDataInfo(rel);
 		}
 	}
+
+    public void peace() {
+        if (give.state != 1) {
+            give.wdgmsg("click", 1);
+        }
+    }
+
     }
 
     public class Relbox extends Widget {
@@ -151,6 +160,7 @@ public class Fightview extends Widget {
 	    ava.canactivate = true;
 	    add(give = new GiveButton(0, UI.scale(15, 15)), UI.scale(5, 4));
 	    adda(purs = new Button(UI.scale(70), "Pursue"), avaf.c.x + avaf.sz.x + UI.scale(5), avaf.c.y + (avaf.sz.y / 2), 0.0, 0.5);
+        rel.give = give;
 	}
 
 	public void draw(GOut g) {
@@ -211,6 +221,8 @@ public class Fightview extends Widget {
 	    ava.canactivate = true;
 	    adda(give = new GiveButton(0), avaf.pos("ul").subs(5, 0), 1.0, 0.0);
 	    adda(purs = new Button(UI.scale(70), "Pursue"), give.pos("br").adds(0, 5), 1.0, 0.0);
+        rel.give = give;
+        adda(rel.autogive = new AutoGiveButton(rel, autogivegobid), give.pos("ul").subs(5, 0), 1.0, 0.0);
 	    lpack();
 	}
 
@@ -354,17 +366,6 @@ public class Fightview extends Widget {
 	    Widget inf = obinfo(rel.gobid, false);
 	    if(inf != null)
 		inf.tick(dt);
-		try {
-			if (OptWnd.autoPeaceAnimalsWhenCombatStartsCheckBox.a && !rel.autopeaced && curdisp != null && curdisp.give != null && curdisp.give.state != 1) {
-				synchronized (ui.sess.glob) {
-					Gob curgob = ui.sess.glob.oc.getgob(rel.gobid);
-					if (curgob != null && !curgob.getres().name.contains("gfx/borka")) {
-						wdgmsg("give", (int)rel.gobid, 1);
-					}
-					rel.autopeaced = true;
-				}
-			}
-		} catch (Exception ignored) {}
 	}
     }
 
@@ -398,8 +399,15 @@ public class Fightview extends Widget {
             Relation rel = getrel(Utils.uiv(args[0]));
 	    rel.remove();
             lsrel.remove(rel);
-	    if(rel == current)
-		setcur(null);
+	    if(rel == current) {
+            setcur(null);
+            if (rel.autogive != null && rel.autogive.state == 1 && ui != null && ui.gui != null) {
+                autogivegobid = rel.gobid;
+                if (!Utils.aggro(ui.gui, rel.gobid)) {
+                    autogivegobid = -1;
+                }
+            }
+        }
 	    updrel();
             return;
         } else if(msg == "upd") {

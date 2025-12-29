@@ -1885,7 +1885,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 	public static KeyBinding kb_aggroOrTargetNearestCursor = KeyBinding.get("AggroOrTargetNearestCursorButtonKB",  KeyMatch.nil);
 	public static KeyBinding kb_aggroNearestPlayerButton = KeyBinding.get("AggroNearestPlayerButtonKB",  KeyMatch.nil);
 	public static KeyBinding kb_aggroAllNonFriendlyPlayers = KeyBinding.get("AggroAllNonFriendlyPlayers",   KeyMatch.nil);
-	public static KeyBinding kb_aggroLastTarget = KeyBinding.get("aggroLastTarget",  KeyMatch.forchar('T', KeyMatch.S));
+	public static KeyBinding kb_autoReaggroTarget = KeyBinding.get("autoReaggroTarget",  KeyMatch.forchar('P', 0));
 	public static KeyBinding kb_peaceCurrentTarget  = KeyBinding.get("peaceCurrentTargetKB",  KeyMatch.forchar('P', KeyMatch.M));
 	public static KeyBinding kb_miniStudy = KeyBinding.get("miniStudyKB",  KeyMatch.forchar('S', KeyMatch.M));
     public static KeyBinding kb_autoCombatDistance  = KeyBinding.get("AutoCombatDistanceKB",  KeyMatch.forchar('K', 0));
@@ -2097,8 +2097,8 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 	} else if(kb_aggroAllNonFriendlyPlayers.key().match(ev)) {
 		this.runActionThread(new Thread(new AggroEveryoneInRange(this), "AggroEverythingInRange"));
 		return (true);
-	} else if (kb_aggroLastTarget.key().match(ev)) {
-		this.runActionThread(new Thread(new AttackOpponent(this, this.lastopponent), "Reaggro"));
+	} else if (kb_autoReaggroTarget.key().match(ev) && fv.current != null && fv.current.autogive != null) {
+        fv.current.autogive.remoteTrigger();
 		return(true);
 	} else if(kb_peaceCurrentTarget.key().match(ev)) {
 		peaceCurrentTarget();

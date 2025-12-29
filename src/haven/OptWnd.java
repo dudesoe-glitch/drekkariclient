@@ -2785,8 +2785,6 @@ public class OptWnd extends Window {
 				"\n\n$col[185,185,185]{Party members will never be attacked by this button. You can exclude other specific player groups from being attacked in the Aggro Exclusion Settings.}", new Color(255, 0, 0,255), GameUI.kb_aggroNearestPlayerButton, y);
 		y = addbtnImproved(cont, "Aggro all Non-Friendly Players", "Tries to attack everyone in range. " +
 				"\n\n$col[185,185,185]{Party members will never be attacked by this button. You can exclude other specific player groups from being attacked in the Aggro Exclusion Settings.}", new Color(255, 0, 0,255), GameUI.kb_aggroAllNonFriendlyPlayers, y);
-		y = addbtnImproved(cont, "Re-Aggro Animal (Cheese)", "Use this to cheese animals and re-aggro them quickly when they flee." +
-				"\n$col[185,185,185]{This is useful when you use animal auto-peace. Also, it only works when you're fighting one single animal.}", new Color(255, 68, 0,255), GameUI.kb_aggroLastTarget, y);
 		y = addbtnImproved(cont, "Peace Current Target", "", new Color(0, 255, 34,255), GameUI.kb_peaceCurrentTarget, y);
 
 		y = cont.adda(new Label("Other Custom features"), cont.sz.x / 2, y + UI.scale(10), 0.5, 0.0).pos("bl").adds(0, 5).y;
@@ -2838,6 +2836,7 @@ public class OptWnd extends Window {
 
 		y+=UI.scale(40);
         y = addbtnImproved(cont, "Combat Cheese Auto-Distance", "", new Color(0, 255, 34,255), GameUI.kb_autoCombatDistance, y);
+        y = addbtnImproved(cont, "Toggle Auto-Reaggro Target", "Use this to cheese animals and instantly re-aggro them when they flee.", new Color(0, 255, 34,255), GameUI.kb_autoReaggroTarget, y);
         y+=UI.scale(20);
 		y = addbtn(cont, "Toggle Collision Boxes", GameUI.kb_toggleCollisionBoxes, y);
 		y = addbtn(cont, "Toggle Object Hiding", GameUI.kb_toggleHidingBoxes, y);
@@ -2912,7 +2911,6 @@ public class OptWnd extends Window {
 	public static CheckBox autoDropLeechesCheckBox;
 	public static CheckBox autoEquipBunnySlippersPlateBootsCheckBox;
 	public static CheckBox autoDropTicksCheckBox;
-	public static CheckBox autoPeaceAnimalsWhenCombatStartsCheckBox;
 	public static CheckBox preventUsingRawHideWhenRidingCheckBox;
 	public static CheckBox autoDrinkingCheckBox;
 	public static TextEntry autoDrinkingThresholdTextEntry;
@@ -3090,17 +3088,6 @@ public class OptWnd extends Window {
 				}
 			}),prev.pos("bl").adds(0, 12).x(0));
 
-			prev = add(autoPeaceAnimalsWhenCombatStartsCheckBox = new CheckBox("Auto-Peace Animals when Combat Starts"){
-				{a = Utils.getprefb("autoPeaceAnimalsWhenCombatStarts", false);}
-				public void set(boolean val) {
-					Utils.setprefb("autoPeaceAnimalsWhenCombatStarts", val);
-					a = val;
-					if (ui != null && ui.gui != null) {
-						ui.gui.optionInfoMsg("Autopeace Animals when Combat Starts is now " + (val ? "ENABLED" : "DISABLED") + ".", (val ? msgGreen : msgRed), Audio.resclip(val ? Toggle.sfxon : Toggle.sfxoff));
-					}
-				}
-			}, prev.pos("bl").adds(0, 12));
-			autoPeaceAnimalsWhenCombatStartsCheckBox.tooltip = autoPeaceAnimalsWhenCombatStartsTooltip;
 			prev = add(preventUsingRawHideWhenRidingCheckBox = new CheckBox("Prevent using Raw Hide when Riding a Horse"){
 				{a = Utils.getprefb("preventUsingRawHideWhenRiding", false);}
 				public void changed(boolean val) {
@@ -4995,9 +4982,6 @@ public class OptWnd extends Window {
 	private static final Object autoEquipBunnySlippersPlateBootsTooltip = RichText.render("Switches your currently equipped shoes to Bunny Slippers when you right click to chase a rabbit, or Plate Boots if you click on anything else." +
 			"\n" +
 			"\n$col[185,185,185]{I suggest always using this setting in PVP.}", UI.scale(300));
-	private static final Object autoPeaceAnimalsWhenCombatStartsTooltip = RichText.render("This will automatically set your status to 'Peace' when combat is initiated with a new target (animals only). " +
-			"\nToggling this on, while in combat, will also autopeace all animals you are currently fighting." +
-			"\n\n$col[218,163,0]{Action Button:} $col[185,185,185]{This setting can also be turned on/off using an action button from the menu grid (Custom Client Extras → Toggles).}", UI.scale(320));
 	private static final Object preventUsingRawHideWhenRidingTooltip = RichText.render("This will prevent you from using Raw Hide while riding a Horse, and only allow using it when you're not mounted.", UI.scale(300));
 	private static final Object autoDrinkingTooltip = RichText.render("When your Stamina Bar goes below the set threshold, try to drink Water. If the threshold box is empty, it defaults to 75%." +
 			"\n" +
