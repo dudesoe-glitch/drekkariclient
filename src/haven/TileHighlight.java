@@ -29,8 +29,10 @@ public class TileHighlight {
 	public static final Map<String, List<String>> tileHighlightNames = new HashMap<String, List<String>>(){{
 		put("Ground Tiles", new ArrayList<String>(){{
 			add("gfx/tiles/ashland");
+            add("gfx/tiles/badlands");
 			add("gfx/tiles/beach");
 			add("gfx/tiles/beechgrove");
+            add("gfx/tiles/blackwood");
 			add("gfx/tiles/bluesod");
 			add("gfx/tiles/boards");
 			add("gfx/tiles/bog");
@@ -51,6 +53,7 @@ public class TileHighlight {
 			add("gfx/tiles/grass");
 			add("gfx/tiles/greenbrake");
 			add("gfx/tiles/greensward");
+            add("gfx/tiles/grove");
 			add("gfx/tiles/hardsteppe");
 			add("gfx/tiles/heath");
 			add("gfx/tiles/highground");
@@ -71,13 +74,16 @@ public class TileHighlight {
 			add("gfx/tiles/odeeper");
 			add("gfx/tiles/owater");
 			add("gfx/tiles/oxpasture");
+            add("gfx/tiles/peatmoss");
 			add("gfx/tiles/pinebarren");
 			add("gfx/tiles/redplain");
+            add("gfx/tiles/riverbed");
 			add("gfx/tiles/rockbeach");
 			add("gfx/tiles/rootbosk");
 			add("gfx/tiles/sandcliff");
 			add("gfx/tiles/scrubveld");
 			add("gfx/tiles/seabed");
+            add("gfx/tiles/seabirdrookery");
 			add("gfx/tiles/shadehollow");
 			add("gfx/tiles/shadycopse");
 			add("gfx/tiles/skargard");
