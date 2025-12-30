@@ -74,7 +74,8 @@ public class AutoGiveButton extends Widget {
         if (this.state == 1)
             rel.peace();
         else{
-            rel.give.wdgmsg("click", 1);
+            if (!OptWnd.autoPeaceAnimalsWhenCombatStartsCheckBox.a)
+                rel.give.wdgmsg("click", 1);
         }
         return(true);
     }
@@ -84,7 +85,8 @@ public class AutoGiveButton extends Widget {
         if (this.state == 1)
             rel.peace();
         else{
-            rel.give.wdgmsg("click", 1);
+            if (!OptWnd.autoPeaceAnimalsWhenCombatStartsCheckBox.a)
+                rel.give.wdgmsg("click", 1);
         }
     }
 }
