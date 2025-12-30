@@ -1,5 +1,6 @@
 package haven;
 
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -8,8 +9,8 @@ import java.util.Map;
 
 public class GobFoodWaterInfo extends GobInfo {
 
-	public static BufferedImage lowFoodImage = PUtils.convolvedown(Resource.local().loadwait("customclient/lowFood").layer(Resource.imgc).img, UI.scale(34, 34), CharWnd.iconfilter);
-	public static BufferedImage lowWaterImage = PUtils.convolvedown(Resource.local().loadwait("customclient/lowWater").layer(Resource.imgc).img, UI.scale(34, 34), CharWnd.iconfilter);
+    private static final BufferedImage lowFoodImage = PUtils.convolvedown(PUtils.rasterimg(PUtils.blurmask2(Resource.local().loadwait("customclient/lowFood").layer(Resource.imgc).img.getRaster(), 4, 1, Color.BLACK)), UI.scale(34, 34), CharWnd.iconfilter);
+    private static final BufferedImage lowWaterImage = PUtils.convolvedown(PUtils.rasterimg(PUtils.blurmask2(Resource.local().loadwait("customclient/lowWater").layer(Resource.imgc).img.getRaster(), 4, 1, Color.BLACK)), UI.scale(34, 34), CharWnd.iconfilter);
 	private static final Map<String, Tex> contentTexCache = new HashMap<>();
 
     protected GobFoodWaterInfo(Gob owner) {
