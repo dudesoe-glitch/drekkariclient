@@ -7,8 +7,8 @@ import java.util.Map;
 
 public class GobBeeskepHarvestInfo extends GobInfo {
 
-	private static final BufferedImage waxImage = PUtils.convolvedown(Resource.local().loadwait("customclient/wax").layer(Resource.imgc).img, UI.scale(26, 26), CharWnd.iconfilter);
-	private static final BufferedImage honeyImage = PUtils.convolvedown(Resource.local().loadwait("customclient/honey").layer(Resource.imgc).img, UI.scale(26, 26), CharWnd.iconfilter);
+    private static final BufferedImage waxImage = PUtils.convolvedown(PUtils.rasterimg(PUtils.blurmask2(Resource.local().loadwait("customclient/wax").layer(Resource.imgc).img.getRaster(), 4, 1, Color.BLACK)), UI.scale(26, 26), CharWnd.iconfilter);
+    private static final BufferedImage honeyImage = PUtils.convolvedown(PUtils.rasterimg(PUtils.blurmask2(Resource.local().loadwait("customclient/honey").layer(Resource.imgc).img.getRaster(), 4, 1, Color.BLACK)), UI.scale(26, 26), CharWnd.iconfilter);
 	private static final Map<String, Tex> contentTexCache = new HashMap<>();
 
     protected GobBeeskepHarvestInfo(Gob owner) {
