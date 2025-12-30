@@ -106,6 +106,35 @@ public class Equipory extends Widget implements DTarget {
 	public static CheckBox autoEquipBunnySlippersPlateBootsCheckBox;
 	boolean checkForLeeches = false;
 	boolean checkForTicks = false;
+    private static final CheckBox[] AUTOLOOT_SLOTS = new CheckBox[23];
+    static {
+        AUTOLOOT_SLOTS[8]  = OptWnd.autoLootRingsCheckBox;
+        AUTOLOOT_SLOTS[9]  = OptWnd.autoLootRingsCheckBox;
+        AUTOLOOT_SLOTS[1]  = OptWnd.autoLootNecklaceCheckBox;
+        AUTOLOOT_SLOTS[0]  = OptWnd.autoLootHeadgearCheckBox;
+        AUTOLOOT_SLOTS[3]  = OptWnd.autoLootChestArmorCheckBox;
+        AUTOLOOT_SLOTS[13] = OptWnd.autoLootLegArmorCheckBox;
+        AUTOLOOT_SLOTS[10] = OptWnd.autoLootCloakRobeCheckBox;
+        AUTOLOOT_SLOTS[2]  = OptWnd.autoLootShirtCheckBox;
+        AUTOLOOT_SLOTS[12] = OptWnd.autoLootPantsCheckBox;
+        AUTOLOOT_SLOTS[4]  = OptWnd.autoLootGlovesCheckBox;
+        AUTOLOOT_SLOTS[15] = OptWnd.autoLootShoesCheckBox;
+        AUTOLOOT_SLOTS[17] = OptWnd.autoLootEyewearCheckBox;
+        AUTOLOOT_SLOTS[18] = OptWnd.autoLootMouthwearCheckBox;
+        AUTOLOOT_SLOTS[14] = OptWnd.autoLootCapeCheckBox;
+        AUTOLOOT_SLOTS[22] = OptWnd.autoLootShouldersCheckBox;
+        AUTOLOOT_SLOTS[21] = OptWnd.autoLootMaskCheckBox;
+        AUTOLOOT_SLOTS[11] = OptWnd.autoLootBackpackCheckBox;
+        AUTOLOOT_SLOTS[19] = OptWnd.autoLootPouchesCheckBox;
+        AUTOLOOT_SLOTS[20] = OptWnd.autoLootPouchesCheckBox;
+    }
+
+    private static final Set<String> AUTOLOOT_WEAPON_BLACKLIST = Set.of(
+            "gfx/invobjs/small/roundshield",
+            "gfx/invobjs/small/travellerssack",
+            "gfx/invobjs/small/wanderersbindle",
+            "gfx/invobjs/small/pickingbasket"
+    );
 
 	@RName("epry")
     public static class $_ implements Factory {
@@ -431,51 +460,62 @@ public class Equipory extends Widget implements DTarget {
 		}
 		if (!myOwnEquipory && !isWardrobe && !isMannequin){
 			if ((now - autoLootDelayTime) > 300){
-				for (int slot = 0; slot < slots.length; slot++) {
-					if (slots[slot] != null) {
-						GItem child = slots[slot].item;
-						if (child != null && !child.attemptedAutoloot) {
-							if ((OptWnd.autoLootRingsCheckBox.a && (slot == 8 || slot == 9))
-									|| (OptWnd.autoLootNecklaceCheckBox.a && slot == 1)
-									|| (OptWnd.autoLootHelmetCheckBox.a && slot == 0)
-									|| (OptWnd.autoLootChestArmorCheckBox.a && slot == 3)
-									|| (OptWnd.autoLootLegArmorCheckBox.a && slot == 13)
-									|| (OptWnd.autoLootCloakRobeCheckBox.a && slot == 10)
-									|| (OptWnd.autoLootShirtCheckBox.a && slot == 2)
-									|| (OptWnd.autoLootPantsCheckBox.a && slot == 12)
-									|| (OptWnd.autoLootGlovesCheckBox.a && slot == 4)
-									|| (OptWnd.autoLootBootsCheckBox.a && slot == 15)
-									|| (OptWnd.autoLootEyewearCheckBox.a && slot == 17)
-									|| (OptWnd.autoLootMouthCheckBox.a && slot == 18)
-									|| (OptWnd.autoLootCapeCheckBox.a && slot == 14)){
-								child.wdgmsg("transfer", Coord.z);
-                                child.attemptedAutoloot = true;
-							} else if (OptWnd.autoLootWeaponCheckBox.a && (slot == 6 || slot == 7)) { // ND: Weapon special case
-								if (!child.getres().name.equals("gfx/invobjs/small/roundshield") // ND: Don't need shields, waste of inventory/belt space
-									// ND: These other things will probably bug out the autolooter, each with their own specific case, so let's not try to auto-loot them.
-									&& !child.getres().name.startsWith("gfx/invobjs/small/bucket")
-									&& !child.getres().name.equals("gfx/invobjs/small/travellerssack")
-									&& !child.getres().name.equals("gfx/invobjs/small/wanderersbindle")
-									&& !child.getres().name.equals("gfx/invobjs/small/pickingbasket")){
-									Inventory belt = returnBelt();
-									if (belt != null) {
-										if (belt.getFreeSpace() > 0) {
-											child.wdgmsg("take", Coord.z);
-											belt.wdgmsg("drop", belt.isRoom(1, 1));
-										}
-									}
-									// ND: If failed, try to transfer to inventory
-									child.wdgmsg("transfer", Coord.z);
-                                    child.attemptedAutoloot = true;
-								}
-							}
-						}
-					}
-				}
+                for (int slot = 0; slot < slots.length; slot++) {
+                    if (slots[slot] == null) continue;
+
+                    GItem child = slots[slot].item;
+                    if (child == null || child.attemptedAutoloot) continue;
+
+                    CheckBox box = AUTOLOOT_SLOTS[slot];
+                    if (box != null && box.a) {
+                        child.wdgmsg("transfer", Coord.z);
+                        child.attemptedAutoloot = true;
+                        continue;
+                    }
+
+                    // Weapon slots (special case)
+                    if ((slot == 6 || slot == 7) && OptWnd.autoLootWeaponCheckBox.a) {
+                        handleWeaponAutoloot(child);
+                    }
+                }
 			}
 		}
 		
 	}
+
+    private void handleWeaponAutoloot(GItem child) {
+        String res = child.getres().name;
+
+        if (isBlacklistedWeapon(res)) {
+            return;
+        }
+
+        Inventory belt = returnBelt();
+        if (belt != null && belt.getFreeSpace() > 0) {
+            child.wdgmsg("take", Coord.z);
+            belt.wdgmsg("drop", belt.isRoom(1, 1));
+        }
+
+        // Fallback: move to inventory
+        child.wdgmsg("transfer", Coord.z);
+        child.attemptedAutoloot = true;
+    }
+
+
+    private boolean isBlacklistedWeapon(String res) {
+        if (res.startsWith("gfx/invobjs/small/bucket")) return true;
+
+        switch (res) {
+            case "gfx/invobjs/small/roundshield":
+//            case "gfx/invobjs/small/travellerssack": // ND: We should try loot tsacks now, since they can actually be unequipped even with a full inventory
+            case "gfx/invobjs/small/wanderersbindle": // ND: But this one is worthless lol
+            case "gfx/invobjs/small/pickingbasket":
+                return true;
+            default:
+                return false;
+        }
+    }
+
 	public GItem getWeapon() {
 		GItem lweap = null;
 		GItem rweap = null;
