@@ -1012,7 +1012,8 @@ public class OptWnd extends Window {
 
 		public ActionBarsSettingsPanel(Panel back) {
 			Widget prev;
-			prev = add(new Label("Enabled Action Bars:"), 0, 0);
+            prev = add(new Label("You can move the bars with Middle Mouse Button (scroll click)."), 0, 4);
+			prev = add(new Label("Enabled Action Bars:"), prev.pos("bl").adds(0, 12));
 			add(new Label("Action Bar Orientation:"), prev.pos("ur").adds(42, 0));
 			prev = add(new CheckBox("Action Bar 1"){
 				{a = Utils.getprefb("showActionBar1", true);}
