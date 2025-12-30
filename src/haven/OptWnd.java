@@ -1025,6 +1025,7 @@ public class OptWnd extends Window {
 				}
 			}, prev.pos("bl").adds(12, 6));
 			addOrientationRadio(prev, "actionBar1Horizontal", 1);
+
 			prev = add(new CheckBox("Action Bar 2"){
 				{a = Utils.getprefb("showActionBar2", false);}
 				public void changed(boolean val) {
@@ -1035,6 +1036,7 @@ public class OptWnd extends Window {
 				}
 			}, prev.pos("bl").adds(0, 2));
 			addOrientationRadio(prev, "actionBar2Horizontal", 2);
+
 			prev = add(new CheckBox("Action Bar 3"){
 				{a = Utils.getprefb("showActionBar3", false);}
 				public void changed(boolean val) {
@@ -1045,6 +1047,7 @@ public class OptWnd extends Window {
 				}
 			}, prev.pos("bl").adds(0, 2));
 			addOrientationRadio(prev, "actionBar3Horizontal", 3);
+
 			prev = add(new CheckBox("Action Bar 4"){
 				{a = Utils.getprefb("showActionBar4", false);}
 				public void changed(boolean val) {
@@ -1055,6 +1058,28 @@ public class OptWnd extends Window {
 				}
 			}, prev.pos("bl").adds(0, 2));
 			addOrientationRadio(prev, "actionBar4Horizontal", 4);
+
+            prev = add(new CheckBox("Action Bar 5"){
+                {a = Utils.getprefb("showActionBar5", false);}
+                public void changed(boolean val) {
+                    Utils.setprefb("showActionBar5", val);
+                    if (ui != null && ui.gui != null && ui.gui.actionBar5 != null){
+                        ui.gui.actionBar5.show(val);
+                    }
+                }
+            }, prev.pos("bl").adds(0, 2));
+            addOrientationRadio(prev, "actionBar5Horizontal", 5);
+
+            prev = add(new CheckBox("Action Bar 6"){
+                {a = Utils.getprefb("showActionBar6", false);}
+                public void changed(boolean val) {
+                    Utils.setprefb("showActionBar6", val);
+                    if (ui != null && ui.gui != null && ui.gui.actionBar6 != null){
+                        ui.gui.actionBar6.show(val);
+                    }
+                }
+            }, prev.pos("bl").adds(0, 2));
+            addOrientationRadio(prev, "actionBar6Horizontal", 6);
 
 			prev = add(holdCTRLtoRemoveActionButtonsCheckBox = new CheckBox("Hold CTRL when right-clicking to remove action buttons"){
 				{a = (Utils.getprefb("holdCTRLtoRemoveActionButtons", false));}
@@ -1078,6 +1103,12 @@ public class OptWnd extends Window {
 			y = cont.adda(new Label("Action Bar 4 Keybinds"), cont.sz.x / 2, y + UI.scale(10), 0.5, 0.0).pos("bl").adds(0, 5).y;
 			for (int i = 0; i < GameUI.kb_actbar4.length; i++)
 				y = addbtn(cont, String.format("Button - %d", i + 1), GameUI.kb_actbar4[i], y);
+            y = cont.adda(new Label("Action Bar 5 Keybinds"), cont.sz.x / 2, y + UI.scale(10), 0.5, 0.0).pos("bl").adds(0, 5).y;
+            for (int i = 0; i < GameUI.kb_actbar5.length; i++)
+                y = addbtn(cont, String.format("Button - %d", i + 1), GameUI.kb_actbar5[i], y);
+            y = cont.adda(new Label("Action Bar 6 Keybinds"), cont.sz.x / 2, y + UI.scale(10), 0.5, 0.0).pos("bl").adds(0, 5).y;
+            for (int i = 0; i < GameUI.kb_actbar6.length; i++)
+                y = addbtn(cont, String.format("Button - %d", i + 1), GameUI.kb_actbar6[i], y);
 			adda(new PButton(UI.scale(200), "Back", 27, back, "Advanced Settings"), scroll.pos("bl").adds(0, 10).x(scroll.sz.x / 2), 0.5, 0.0);
 			pack();
 		}

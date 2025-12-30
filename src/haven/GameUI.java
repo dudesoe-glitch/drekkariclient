@@ -92,7 +92,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 	public QuickSlotsWdg quickslots;
 	private double lastmsgsfx = 0;
 	public static final Text.Foundry actBarKeybindsFoundry = new Text.Foundry(Text.sans.deriveFont(java.awt.Font.BOLD), 12);
-	public ActionBar actionBar1 = null, actionBar2 = null, actionBar3 = null, actionBar4 = null, currentActionBar = null;
+	public ActionBar actionBar1 = null, actionBar2 = null, actionBar3 = null, actionBar4 = null, actionBar5 = null, actionBar6 = null, currentActionBar = null;
 	public boolean localActionBarsLoaded = false;
 	public boolean changeCustomSlot = false;
 	public MenuGrid.Pagina customActionPag = null;
@@ -512,6 +512,10 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 	actionBar3.raise();
 	actionBar4.c = Utils.getprefc("wndc-actionBar4", UI.unscale(new Coord(0, 620)));
 	actionBar4.raise();
+    actionBar5.c = Utils.getprefc("wndc-actionBar5", UI.unscale(new Coord(0, 660)));
+    actionBar5.raise();
+    actionBar6.c = Utils.getprefc("wndc-actionBar6", UI.unscale(new Coord(0, 700)));
+    actionBar6.raise();
 
 	makewnd = add(new CraftWindow(), Utils.getprefc("wndc-makewnd", new Coord(400, 200)));
 	makewnd.hide();
@@ -1127,6 +1131,8 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 			actionBar2.loadLocal();
 			actionBar3.loadLocal();
 			actionBar4.loadLocal();
+            actionBar5.loadLocal();
+            actionBar6.loadLocal();
 			localActionBarsLoaded = true;
 		}
 	} else if(place == "fight") {
@@ -2827,9 +2833,33 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 			KeyBinding.get("actbar4/9", KeyMatch.nil),
 			KeyBinding.get("actbar4/0", KeyMatch.nil),
 	};
+    public static final KeyBinding[] kb_actbar5 = {
+            KeyBinding.get("actbar5/1", KeyMatch.nil),
+            KeyBinding.get("actbar5/2", KeyMatch.nil),
+            KeyBinding.get("actbar5/3", KeyMatch.nil),
+            KeyBinding.get("actbar5/4", KeyMatch.nil),
+            KeyBinding.get("actbar5/5", KeyMatch.nil),
+            KeyBinding.get("actbar5/6", KeyMatch.nil),
+            KeyBinding.get("actbar5/7", KeyMatch.nil),
+            KeyBinding.get("actbar5/8", KeyMatch.nil),
+            KeyBinding.get("actbar5/9", KeyMatch.nil),
+            KeyBinding.get("actbar5/0", KeyMatch.nil),
+    };
+    public static final KeyBinding[] kb_actbar6 = {
+            KeyBinding.get("actbar6/1", KeyMatch.nil),
+            KeyBinding.get("actbar6/2", KeyMatch.nil),
+            KeyBinding.get("actbar6/3", KeyMatch.nil),
+            KeyBinding.get("actbar6/4", KeyMatch.nil),
+            KeyBinding.get("actbar6/5", KeyMatch.nil),
+            KeyBinding.get("actbar6/6", KeyMatch.nil),
+            KeyBinding.get("actbar6/7", KeyMatch.nil),
+            KeyBinding.get("actbar6/8", KeyMatch.nil),
+            KeyBinding.get("actbar6/9", KeyMatch.nil),
+            KeyBinding.get("actbar6/0", KeyMatch.nil),
+    };
 
 	public ActionBar getActionBar(int number) {
-		ActionBar[] actionBars = {actionBar1, actionBar2, actionBar3, actionBar4};
+		ActionBar[] actionBars = {actionBar1, actionBar2, actionBar3, actionBar4, actionBar5, actionBar6};
 		return actionBars[number - 1];
 	}
 
@@ -2838,6 +2868,8 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 		actionBar2 = add(new ActionBar(kb_actbar2, 2, "actionBar2Horizontal"));
 		actionBar3 = add(new ActionBar(kb_actbar3, 3, "actionBar3Horizontal"));
 		actionBar4 = add(new ActionBar(kb_actbar4, 4, "actionBar4Horizontal"));
+        actionBar5 = add(new ActionBar(kb_actbar5, 5, "actionBar5Horizontal"));
+        actionBar6 = add(new ActionBar(kb_actbar6, 6, "actionBar6Horizontal"));
 		if (!Utils.getprefb("showActionBar1", true))
 			actionBar1.hide();
 		if (!Utils.getprefb("showActionBar2", false))
@@ -2846,6 +2878,10 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 			actionBar3.hide();
 		if (!Utils.getprefb("showActionBar4", false))
 			actionBar4.hide();
+        if (!Utils.getprefb("showActionBar5", false))
+            actionBar5.hide();
+        if (!Utils.getprefb("showActionBar6", false))
+            actionBar6.hide();
 	}
 
 	public List<WItem> getAllContentsWindows() {
