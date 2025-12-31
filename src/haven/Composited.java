@@ -42,6 +42,7 @@ public class Composited implements RenderTree.Node, EquipTarget {
     public List<MD> cmod = new LinkedList<MD>();
     public List<ED> cequ = new LinkedList<ED>();
     private final Collection<RenderTree.Slot> slots = new ArrayList<>(1);
+    private final Gob gobOwner;
 
     public class Poses {
 	public final PoseMod[] mods;
@@ -121,6 +122,7 @@ public class Composited implements RenderTree.Node, EquipTarget {
 	this.skel = skel;
 	this.pose = skel.new Pose(skel.bindpose);
 	this.eqowner = eqowner;
+    this.gobOwner = eqowner.fcontext(Gob.class, false);
     }
 
     public Composited(Skeleton skel) {
@@ -556,6 +558,8 @@ public class Composited implements RenderTree.Node, EquipTarget {
 	this.mod = nmod(mod);
 	RUtils.readd(slots, this::parts, () -> {this.mod = pmod;});
 	cmod = new ArrayList<MD>(mod);
+    if (gobOwner != null)
+        gobOwner.checkIfPlayerOrMannequin();
     }
     
     public void chequ(List<ED> equ) {

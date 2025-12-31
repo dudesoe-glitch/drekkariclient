@@ -2089,7 +2089,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 		}
 	}
 
-	private void checkIfPlayerOrMannequin(){
+	public void checkIfPlayerOrMannequin(){
 		try {
 			if (getres() != null) {
 				for (GAttrib g : attr.values()) {
@@ -2106,6 +2106,8 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 										break;
 									} else if (item.mod.get().basename().equals("mannequin-w1") || item.mod.get().basename().equals("mannequin-w2")){
 										isMannequin = true;
+                                        if (getattr(Buddy.class) != null)
+                                            delattr(Buddy.class);
 										break;
 									}
 								}
