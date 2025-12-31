@@ -2106,8 +2106,6 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 										break;
 									} else if (item.mod.get().basename().equals("mannequin-w1") || item.mod.get().basename().equals("mannequin-w2")){
 										isMannequin = true;
-                                        if (getattr(Buddy.class) != null)
-                                            delattr(Buddy.class);
 										break;
 									}
 								}
