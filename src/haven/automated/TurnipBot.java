@@ -362,7 +362,7 @@ public class TurnipBot extends Window implements Runnable, AreaSelectCallback {
     private void getHighestQualitySeeds() {
         try {
             Thread.sleep(300);
-            if (FarmingStatic.grainSlots.size() == 0) {
+            if (FarmingStatic.grainSlots.isEmpty()) {
                 gui.map.pfRightClick(granary, -1, 3, 0, null);
                 AUtils.waitPf(gui);
                 Thread.sleep(1000);
