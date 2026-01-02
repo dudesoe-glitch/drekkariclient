@@ -479,15 +479,25 @@ public class Glob {
 		String dayOfMonth = "";
 		String phaseOfMoon = " ";
 		if (ast != null) {
-			int nextseason = (int) Math.ceil((1 - ast.sp) * (ast.is == 1 ? 35 : ast.is == 3 ? 5 : 10));
-
 			int sdt = (ast.is == 1 ? 105 : ast.is == 3 ? 15 : 30); //days of season total
 			int sdp = (int) (ast.sp * (sdt)); //days of season passed
-			int sdl = (int) Math.floor((1 - ast.sp) * (sdt));
-			if (sdl >= 1)
-				dayOfMonth = seasonNames[ast.is] + String.format(" %d (%d ", (sdp + 1), sdl) + "left" + String.format(" (%d RL))", nextseason);
-			else
-				dayOfMonth = String.format("Last day of %s", seasonNames[ast.is]);
+
+            double daysLeftInSeason = (1.0 - ast.sp) * sdt;
+            double rlDaysLeft = daysLeftInSeason / GameUI.gameTimeSpeedMultiplier;
+            rlDaysLeft = Math.max(rlDaysLeft, 0.1); // ND: To avoid outputs like 0.0 RL
+
+            if (daysLeftInSeason >= 1) {
+                dayOfMonth = String.format(
+                        "%s %d (%.1f left (%.1f RL))",
+                        seasonNames[ast.is],
+                        sdp + 1,
+                        daysLeftInSeason,
+                        rlDaysLeft
+                );
+            } else {
+                dayOfMonth = String.format("Last day of %s", seasonNames[ast.is]);
+            }
+
 			int mp = (int) Math.round(ast.mp * mPhaseNames.length) % mPhaseNames.length;
 			phaseOfMoon = mPhaseNames[mp] + " Moon";
 		}
