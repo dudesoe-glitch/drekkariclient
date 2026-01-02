@@ -11,6 +11,7 @@ public class GobIconsCustom {
 		put("gfx/terobjs/vehicle/dugout", "customclient/mapicons/dugout");
         put("gfx/terobjs/vehicle/coracle", "customclient/mapicons/coracle");
 		put("gfx/terobjs/vehicle/spark", "customclient/mapicons/kicksled");
+        put("gfx/terobjs/vehicle/primsled", "customclient/mapicons/primitivesled");
 		put("gfx/terobjs/vehicle/skis-wilderness", "customclient/mapicons/skis");
 		put("gfx/terobjs/vehicle/wagon", "customclient/mapicons/wagon");
 		put("gfx/terobjs/vehicle/sleigh", "customclient/mapicons/sleigh");

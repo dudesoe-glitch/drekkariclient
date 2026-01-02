@@ -240,6 +240,7 @@ public class GobIconCategoryList extends OldListBox<GobIconCategoryList.GobCateg
                 "customclient/mapicons/skis",
                 "customclient/mapicons/wagon",
                 "customclient/mapicons/sleigh",
+                "customclient/mapicons/primitivesled",
         };
         private static final String[] TOOLS_PATH = {
                 "customclient/mapicons/wheelbarrow",
