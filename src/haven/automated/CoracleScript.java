@@ -140,17 +140,39 @@ public class CoracleScript implements Runnable {
 
 
             if (coracle != null) { // ND: If I have any coracle in my inventory at all, do the following
-                // ND: Check for about 4 seconds if I'm on a water tile
-                MCache mcache = gui.ui.sess.glob.map;
-                Tiler tl = mcache.tiler(mcache.gettile(gui.map.player().rc.floor(MCache.tilesz)));
-                int id = mcache.gettile(gui.map.player().rc.floor(MCache.tilesz));
-                int timeout = 0;
-                Resource tileRes = mcache.tilesetr(id);
-                while (tl != null && !(tl instanceof WaterTile || bogtype.contains(tileRes.name))) {
-                    tl = mcache.tiler(mcache.gettile(gui.map.player().rc.floor(MCache.tilesz)));
-                    timeout++;
-                    // ND: I copied this from Cediner. I wonder if this is less stressful for the CPU compared to just doing something like (System.currentTimeMillis() - start > 4000)
-                    if (tl instanceof WaterTile){
+                try {
+                    // ND: Check for about 4 seconds if I'm on a water tile
+                    MCache mcache = gui.ui.sess.glob.map;
+                    Tiler tl = mcache.tiler(mcache.gettile(gui.map.player().rc.floor(MCache.tilesz)));
+                    int id = mcache.gettile(gui.map.player().rc.floor(MCache.tilesz));
+                    int timeout = 0;
+                    Resource tileRes = mcache.tilesetr(id);
+                    while (tl != null && !(tl instanceof WaterTile || bogtype.contains(tileRes.name))) {
+                        tl = mcache.tiler(mcache.gettile(gui.map.player().rc.floor(MCache.tilesz)));
+                        timeout++;
+                        // ND: I copied this from Cediner. I wonder if this is less stressful for the CPU compared to just doing something like (System.currentTimeMillis() - start > 4000)
+                        if (tl instanceof WaterTile){
+                            int t = mcache.gettile(gui.map.player().rc.floor(MCache.tilesz));
+                            Resource res = mcache.tilesetr(t);
+                            if (res != null) {
+                                if (res.name.contains("deep")){
+                                    gui.error("Coracle Script: You can't drop a Coracle while swimming in Deep Water! You must be in Shallow Water!");
+                                    return;
+                                }
+                            }
+                        }
+                        if (timeout > 300) {
+                            gui.error("Coracle Script: Timed out waiting for Water Tile to drop Coracle on.");
+                            return;
+                        }
+                        try {
+                            Thread.sleep(10);
+                        } catch (InterruptedException e) {
+    //                        e.printStackTrace();
+                            return;
+                        }
+                    }
+                    if (tl != null && tl instanceof WaterTile){
                         int t = mcache.gettile(gui.map.player().rc.floor(MCache.tilesz));
                         Resource res = mcache.tilesetr(t);
                         if (res != null) {
@@ -160,30 +182,13 @@ public class CoracleScript implements Runnable {
                             }
                         }
                     }
-                    if (timeout > 300) {
-                        gui.error("Coracle Script: Timed out waiting for Water Tile to drop Coracle on.");
-                        return;
-                    }
-                    try {
-                        Thread.sleep(10);
-                    } catch (InterruptedException e) {
-//                        e.printStackTrace();
-                        return;
-                    }
+                    //Get gui item and drop coracle
+                    GItem coracleItem = coracle.item;
+                    coracleItem.wdgmsg("drop", new Coord(coracleItem.sz.x / 2, coracleItem.sz.y / 2));
+                } catch(Exception e) {
+                    gui.error("Coracle Script: Some error occured, stopping script.");
+                    return;
                 }
-                if (tl != null && tl instanceof WaterTile){
-                    int t = mcache.gettile(gui.map.player().rc.floor(MCache.tilesz));
-                    Resource res = mcache.tilesetr(t);
-                    if (res != null) {
-                        if (res.name.contains("deep")){
-                            gui.error("Coracle Script: You can't drop a Coracle while swimming in Deep Water! You must be in Shallow Water!");
-                            return;
-                        }
-                    }
-                }
-                //Get gui item and drop coracle
-                GItem coracleItem = coracle.item;
-                coracleItem.wdgmsg("drop", new Coord(coracleItem.sz.x / 2, coracleItem.sz.y / 2));
             }
 
             Gob gobCoracle = null;
