@@ -53,8 +53,10 @@ public class ItemDrag extends WItem {
 	    return(false);
 	if(OptWnd.overrideCursorItemWhenHoldingAltCheckBox.a && ui.modmeta) {
 		if(ev.b == 1) {
-			if(ui.dispatchq(parent, new Interact(ev.c.add(this.c), this)).handled)
-				return(ev.derive(ui.gui.map.rootxlate(ev.c.add(rootpos()))).dispatch(ui.gui.map));
+            if (dropOnWidget(parent, ev.c.add(this.c))) {
+                return(true);
+            } else
+                return(ev.derive(ui.gui.map.rootxlate(ev.c.add(rootpos()))).dispatch(ui.gui.map));
 		} else if(ev.b == 3) {
 			if(ui.dispatchq(parent, new Interact(ev.c.add(this.c), this)).handled)
 				return(ev.derive(ui.gui.map.rootxlate(ev.c.add(rootpos()))).dispatch(ui.gui.map));
@@ -126,7 +128,7 @@ public class ItemDrag extends WItem {
 			if((wdg == this) || !wdg.visible())
 				continue;
 			Coord cc = w.xlate(wdg.c, true);
-			if (wdg instanceof Window || wdg instanceof QuickSlotsWdg) {
+			if (wdg instanceof Window || wdg instanceof QuickSlotsWdg || wdg instanceof GameUI.ActionBar) {
 				if (c.isect(cc, wdg.sz)) {
 					if (dropon(wdg, c.add(cc.inv())))
 						return (true);
