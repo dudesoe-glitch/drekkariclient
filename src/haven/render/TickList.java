@@ -128,6 +128,7 @@ public class TickList implements RenderList<TickList.TickNode> {
 	    copy = new ArrayList<>(cur.values());
 	}
 	Consumer<Entry> task = ent -> {
+        try {
 	    if(ent.mon == null) {
 		ent.tick.autotick(dt);
 	    } else {
@@ -135,6 +136,9 @@ public class TickList implements RenderList<TickList.TickNode> {
 		    ent.tick.autotick(dt);
 		}
 	    }
+        } catch(RenderTree.SlotRemoved e) {
+            /* Slot was removed concurrently; ignore */
+        }
 	};
 	if(!Config.par.get())
 	    copy.forEach(task);
@@ -148,6 +152,7 @@ public class TickList implements RenderList<TickList.TickNode> {
 	    copy = new ArrayList<>(cur.values());
 	}
 	BiConsumer<Entry, Render> task = (ent, out) -> {
+        try {
 	    if(ent.mon == null) {
 		ent.tick.autogtick(out);
 	    } else {
@@ -155,6 +160,9 @@ public class TickList implements RenderList<TickList.TickNode> {
 		    ent.tick.autogtick(out);
 		}
 	    }
+        } catch(RenderTree.SlotRemoved e) {
+            /* Slot was removed concurrently; ignore */
+        }
 	};
 	if(!Config.par.get()) {
 	    copy.forEach(ent -> task.accept(ent, g));
