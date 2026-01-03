@@ -736,15 +736,20 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 						if (wdg instanceof Inventory) {
 							if (((Inventory)wdg).isz.equals(3, 3) || ((Inventory)wdg).isz.equals(1, 2)) {
 								for (WItem item : ((Inventory)wdg).wmap.values()) {
-									for (ItemInfo ii : item.item.info()) {
-										if (ii instanceof Wear) {
-											Wear wear = (Wear) ii;
-											if ((wear.m - wear.d == 1) && item.item.getres() != null) {
-												ui.gui.error("Preventing Cutlery from Breaking! The " + item.item.getname() + " is almost broken. Polish it or replace it.");
-												return;
-											}
-										}
-									}
+                                    try {
+                                        for (ItemInfo ii : item.item.info()) {
+                                            if (ii instanceof Wear) {
+                                                Wear wear = (Wear) ii;
+                                                if ((wear.m - wear.d == 1) && item.item.getres() != null) {
+                                                    ui.gui.error("Preventing Tableware from Breaking! The " + item.item.getname() + " is almost broken. Polish it or replace it.");
+                                                    return;
+                                                }
+                                            }
+                                        }
+                                    } catch (Loading l) {
+                                        ui.gui.error("Loading error when trying to check tableware durability. Try again.");
+                                        return;
+                                    }
 								}
 							}
 						}
