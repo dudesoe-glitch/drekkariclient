@@ -187,10 +187,14 @@ public class RefillWaterContainers implements Runnable {
 
     private ItemInfo.Contents.Content getContent(GItem item) {
         ItemInfo.Contents.Content content = null;
-        for (ItemInfo info : item.info()) {
-            if (info instanceof ItemInfo.Contents) {
-                content = ((ItemInfo.Contents) info).content;
+        try {
+            for (ItemInfo info : item.info()) {
+                if (info instanceof ItemInfo.Contents) {
+                    content = ((ItemInfo.Contents) info).content;
+                }
             }
+        } catch (Loading ignored) {
+
         }
         return content;
     }
