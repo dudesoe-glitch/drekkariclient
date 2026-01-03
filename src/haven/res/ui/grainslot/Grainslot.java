@@ -8,7 +8,7 @@ import java.util.*;
 import static haven.Inventory.invsq;
 
 /* >wdg: Grainslot */
-@haven.FromResource(name = "ui/grainslot", version = 22, override = true)
+@haven.FromResource(name = "ui/grainslot", version = 21)
 public class Grainslot extends Widget implements DTarget, ItemInfo.Owner {
     public final Label lbl;
     public final Button tbtn, pbtn, ebtn;
