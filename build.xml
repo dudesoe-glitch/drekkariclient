@@ -83,6 +83,7 @@
     </condition>
     <javac srcdir="src" destdir="build/classes" debug="on"
 	   source="15" target="15" includeantruntime="no"
+	   encoding="UTF-8"
 	   bootclasspath="${boot-classpath}">
       <classpath>
 	<pathelement path="lib/ext/jogl/jogl-all.jar" />
