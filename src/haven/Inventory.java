@@ -28,6 +28,7 @@ package haven;
 
 import haven.res.ui.stackinv.ItemStack;
 
+import java.awt.event.KeyEvent;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -40,22 +41,15 @@ public class Inventory extends Widget implements DTarget {
     public Map<GItem, WItem> wmap = new HashMap<GItem, WItem>();
 	public static Set<String> PLAYER_INVENTORY_NAMES = new HashSet<>(Arrays.asList("Inventory", "Belt", "Equipment", "Character Sheet", "Study"));
 
-	public static final Comparator<WItem> ITEM_COMPARATOR_ASC = new Comparator<WItem>() {
-		@Override
-		public int compare(WItem o1, WItem o2) {
+	public static final Comparator<WItem> ITEM_COMPARATOR_ASC = Comparator
+			.comparing(WItem::sortName)
+			.thenComparing(w -> w.item.resname())
+			.thenComparing(WItem::quality);
 
-			double q1 = o1.item.getQBuff() != null ? o1.item.getQBuff().q : 0;
-			double q2 = o2.item.getQBuff() != null ? o2.item.getQBuff().q : 0;
-
-			return Double.compare(q1, q2);
-		}
-	};
-	public static final Comparator<WItem> ITEM_COMPARATOR_DESC = new Comparator<WItem>() {
-		@Override
-		public int compare(WItem o1, WItem o2) {
-			return ITEM_COMPARATOR_ASC.compare(o2, o1);
-		}
-	};
+	public static final Comparator<WItem> ITEM_COMPARATOR_DESC = Comparator
+			.comparing(WItem::sortName)
+			.thenComparing(w -> w.item.resname())
+			.thenComparing(WItem::quality, Comparator.reverseOrder());
 
 	// ND: WHY is this happening when there's literally a texture resource for this?
 	// ND: This affects the menugrid slots color, I'm basically replacing it with the inventory square texture
@@ -381,5 +375,166 @@ public class Inventory extends Widget implements DTarget {
 			}
 		}
 		return items;
+	}
+
+	private volatile boolean sorting = false;
+
+	public boolean keydown(KeyDownEvent ev) {
+		if (ev.awt.getKeyCode() == KeyEvent.VK_S && ui.modshift && ui.modctrl) {
+			sortInventory();
+			return true;
+		}
+		return super.keydown(ev);
+	}
+
+	public void sortInventory() {
+		if (sorting) return;
+		GameUI gui = getparent(GameUI.class);
+		if (gui == null) return;
+		if (gui.vhand != null) {
+			gui.error("Cannot sort while holding an item.");
+			return;
+		}
+		sorting = true;
+		new Thread(() -> {
+			try {
+				doSort(gui);
+			} catch (Exception e) {
+				gui.error("Sort failed: " + e.getMessage());
+			} finally {
+				sorting = false;
+			}
+		}, "InventorySort").start();
+	}
+
+	private void doSort(GameUI gui) throws InterruptedException {
+		// Collect all items, separate 1x1 from multi-slot
+		List<WItem> sortable = new ArrayList<>();
+		boolean[][] blocked = new boolean[isz.x][isz.y];
+
+		// Mark sqmask-blocked cells
+		if (sqmask != null) {
+			for (int i = 0; i < isz.x * isz.y; i++) {
+				if (sqmask[i])
+					blocked[i % isz.x][i / isz.x] = true;
+			}
+		}
+
+		for (Widget wdg = child; wdg != null; wdg = wdg.next) {
+			if (wdg instanceof WItem) {
+				WItem wi = (WItem) wdg;
+				Coord gridSz = wi.sz.div(sqsz);
+				if (gridSz.x == 1 && gridSz.y == 1) {
+					sortable.add(wi);
+				} else {
+					// Mark multi-slot items as blocked
+					Coord gridPos = wi.c.sub(1, 1).div(sqsz);
+					for (int dx = 0; dx < gridSz.x; dx++) {
+						for (int dy = 0; dy < gridSz.y; dy++) {
+							int gx = gridPos.x + dx, gy = gridPos.y + dy;
+							if (gx >= 0 && gx < isz.x && gy >= 0 && gy < isz.y)
+								blocked[gx][gy] = true;
+						}
+					}
+				}
+			}
+		}
+
+		if (sortable.isEmpty()) return;
+
+		// Sort items by type then quality (highest first)
+		sortable.sort(ITEM_COMPARATOR_DESC);
+
+		// Build target positions: scan left-to-right, top-to-bottom, skip blocked
+		List<Coord> targets = new ArrayList<>();
+		for (int y = 0; y < isz.y; y++) {
+			for (int x = 0; x < isz.x; x++) {
+				if (!blocked[x][y]) {
+					targets.add(new Coord(x, y));
+				}
+			}
+		}
+
+		// Build current position map and target assignment
+		Map<WItem, Coord> currentPos = new HashMap<>();
+		Map<Coord, WItem> posToItem = new HashMap<>();
+		for (WItem wi : sortable) {
+			Coord gp = wi.c.sub(1, 1).div(sqsz);
+			currentPos.put(wi, gp);
+			posToItem.put(gp, wi);
+		}
+
+		// Assign targets: sortable[i] should go to targets[i]
+		Map<WItem, Coord> targetPos = new HashMap<>();
+		for (int i = 0; i < sortable.size() && i < targets.size(); i++) {
+			targetPos.put(sortable.get(i), targets.get(i));
+		}
+
+		// Swap-chain sort: move items to their target positions
+		Set<WItem> placed = new HashSet<>();
+		for (int i = 0; i < sortable.size() && i < targets.size(); i++) {
+			WItem item = sortable.get(i);
+			if (placed.contains(item)) continue;
+			Coord target = targetPos.get(item);
+			Coord current = currentPos.get(item);
+			if (current.equals(target)) {
+				placed.add(item);
+				continue;
+			}
+
+			// Start chain: pick up this item
+			item.item.wdgmsg("take", Coord.z);
+			if (!waitForCursor(gui, true)) return;
+			Thread.sleep(30);
+
+			// Follow the chain
+			WItem carrying = item;
+			while (carrying != null && !placed.contains(carrying)) {
+				Coord dropTarget = targetPos.get(carrying);
+				placed.add(carrying);
+
+				// Check what's at the drop target
+				WItem displaced = posToItem.get(dropTarget);
+
+				// Drop at target
+				wdgmsg("drop", dropTarget);
+				Thread.sleep(30);
+
+				// Update tracking
+				posToItem.remove(currentPos.get(carrying));
+				currentPos.put(carrying, dropTarget);
+				posToItem.put(dropTarget, carrying);
+
+				if (displaced != null && !placed.contains(displaced)) {
+					// The displaced item is now on cursor
+					if (!waitForCursor(gui, true)) return;
+					carrying = displaced;
+				} else {
+					// Chain ended, cursor should be empty
+					waitForCursor(gui, false);
+					carrying = null;
+				}
+			}
+
+			// Safety: if cursor still has item, drop it back into inventory
+			if (gui.vhand != null) {
+				Coord freeSlot = isRoom(1, 1);
+				if (freeSlot != null) {
+					wdgmsg("drop", freeSlot);
+				} else {
+					gui.vhand.item.wdgmsg("drop", Coord.z);
+				}
+				waitForCursor(gui, false);
+			}
+		}
+	}
+
+	private boolean waitForCursor(GameUI gui, boolean wantItem) throws InterruptedException {
+		for (int i = 0; i < 200; i++) {
+			if (wantItem && (gui.vhand != null || !gui.hand.isEmpty())) return true;
+			if (!wantItem && gui.vhand == null && gui.hand.isEmpty()) return true;
+			Thread.sleep(5);
+		}
+		return false;
 	}
 }

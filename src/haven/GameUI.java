@@ -189,6 +189,8 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 	public Thread roastingSpitThread;
 	public FishingBot fishingBot;
 	public Thread fishingThread;
+	public FarmingBot farmingBot;
+	public Thread farmingBotThread;
 
     public static abstract class BeltSlot {
 	public final int idx;
@@ -1094,7 +1096,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 	    Utils.setprefc("wndc-chr", chrwdg.c);
 	if(zerg != null)
 	    Utils.setprefc("wndc-zerg", zerg.c);
-	if(mapfile != null) {
+	if(mapfile != null)
 		mapfile.fixAndSavePos(mapfile.compact);
 	if(quickslots != null)
 		Utils.setprefc("wndc-quickslots", quickslots.c);
@@ -1106,7 +1108,6 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 		Utils.setprefc("wndc-questObjectivesWindow", questObjectivesWindow.c);
 	if (chatWnd != null)
 		Utils.setprefc("wndc-chat", chatWnd.c);
-	}
     }
 
     private final BMap<String, Window> wndids = new HashBMap<String, Window>();
@@ -1617,7 +1618,12 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 	}
 	mapfiletick();
 	if(OptWnd.autoDrinkingCheckBox.a && getmeter("stam", 0) != null){
-		float meterFullness = OptWnd.autoDrinkingThresholdTextEntry.text().isEmpty() ? 0.75f : Integer.parseInt(OptWnd.autoDrinkingThresholdTextEntry.text())/100f;
+		float meterFullness;
+		try {
+			meterFullness = OptWnd.autoDrinkingThresholdTextEntry.text().isEmpty() ? 0.75f : Integer.parseInt(OptWnd.autoDrinkingThresholdTextEntry.text())/100f;
+		} catch (NumberFormatException e) {
+			meterFullness = 0.75f;
+		}
 		if (getmeter("stam", 0).a < meterFullness) {
 			if(System.currentTimeMillis() > lastAutoDrinkTime + 1000 || System.currentTimeMillis() > lastAutoDrinkTime + 3500){
 				lastAutoDrinkTime = System.currentTimeMillis();

@@ -38,6 +38,7 @@ import java.util.List;
 import haven.Fuzzy;
 import haven.ItemInfo.AttrCache;
 import haven.res.ui.stackinv.ItemStack;
+import haven.res.ui.tt.q.qbuff.QBuff;
 import haven.resutil.Curiosity;
 
 import static haven.Inventory.sqsz;
@@ -80,6 +81,20 @@ public class WItem extends Widget implements DTarget {
 	super(sqsz);
 	this.item = item;
     }
+
+	public String sortName() {
+		try {
+			String name = ItemInfo.find(ItemInfo.Name.class, item.info()).str.text;
+			return name != null ? name : item.resname();
+		} catch (Exception e) {
+			return item.resname();
+		}
+	}
+
+	public double quality() {
+		QBuff q = item.getQBuff();
+		return q != null ? q.q : 0;
+	}
 
     public void drawmain(GOut g, GSprite spr) {
 	spr.draw(g);
@@ -171,7 +186,7 @@ public class WItem extends Widget implements DTarget {
 	    }
 	    Pipe.Op[] ops = new Pipe.Op[ols.size()];
 	    for(int i = 0; i < ops.length; i++)
-		ops[i] = ols.get(0).rstate();
+		ops[i] = ols.get(i).rstate();
 	    Pipe.Op cmp = Pipe.Op.compose(ops);
 	    return(() -> cmp);
 	});
@@ -216,10 +231,10 @@ public class WItem extends Widget implements DTarget {
 	    g.defstate();
 	    if(rstate.get() != null)
 		g.usestate(rstate.get());
-		String itemName = item.getname().toLowerCase();
-		String searchKeyword = InventorySearchWindow.inventorySearchString.toLowerCase();
+		String searchKeyword = InventorySearchWindow.inventorySearchString;
 		if (searchKeyword.length() > 1) {
-			if (Fuzzy.fuzzyContains(itemName, searchKeyword)) {
+			ItemFilter filter = ItemFilter.parse(searchKeyword);
+			if (filter != null && filter.matches(this)) {
 				int fps = GLPanel.Loop.fps > 0 ? GLPanel.Loop.fps : 1;
 				int colorShiftSpeed = 800/fps;
 				if (searchItemColorShiftUp) {
