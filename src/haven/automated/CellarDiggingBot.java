@@ -44,7 +44,7 @@ public class CellarDiggingBot extends Window implements Runnable {
                 if (!checkVitals()) { sleep(200); continue; }
                 if (active) {
                     if (gui.getmeter("stam", 0).a < 0.40) {
-                        try { AUtils.drinkTillFull(gui, 0.99, 0.99); } catch (InterruptedException ignored) {}
+                        try { AUtils.drinkTillFull(gui, 0.99, 0.99); } catch (InterruptedException ignored) { Thread.currentThread().interrupt(); return; }
                         sleep(200);
                         continue;
                     }
@@ -69,6 +69,7 @@ public class CellarDiggingBot extends Window implements Runnable {
                 sleep(200);
             }
         } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
         }
     }
 
@@ -78,7 +79,7 @@ public class CellarDiggingBot extends Window implements Runnable {
             if (hp < 0.02) {
                 System.out.println("HP IS " + hp + " .. PORTING HOME!");
                 gui.act("travel", "hearth");
-                try { Thread.sleep(8000); } catch (InterruptedException ignored) {}
+                try { Thread.sleep(8000); } catch (InterruptedException ignored) { Thread.currentThread().interrupt(); return false; }
                 active = false;
                 activeButton.change("Start");
                 return false;
@@ -92,6 +93,7 @@ public class CellarDiggingBot extends Window implements Runnable {
             }
             return true;
         } catch (Exception e) {
+            if (e instanceof InterruptedException) Thread.currentThread().interrupt();
             return true;
         }
     }
@@ -152,7 +154,7 @@ public class CellarDiggingBot extends Window implements Runnable {
         while (active && !stop && bumlingExists(bumling)) {
             if (!checkVitals()) break;
             if (gui.getmeter("stam", 0).a < 0.40) {
-                try { AUtils.drinkTillFull(gui, 0.99, 0.99); } catch (InterruptedException ignored) {}
+                try { AUtils.drinkTillFull(gui, 0.99, 0.99); } catch (InterruptedException ignored) { Thread.currentThread().interrupt(); return; }
             }
             if (isMiningOrRunning()) {
                 idleTicks = 0;

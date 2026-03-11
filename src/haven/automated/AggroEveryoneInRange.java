@@ -71,6 +71,7 @@ public class AggroEveryoneInRange implements Runnable {
         try {
             Thread.sleep(duration);
         } catch (InterruptedException ignored) {
+            Thread.currentThread().interrupt();
         }
     }
 }

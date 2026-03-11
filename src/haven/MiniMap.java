@@ -427,17 +427,38 @@ public class MiniMap extends Widget {
 	    this.tip = Text.render(m.nm);
 		if (!titleTexMap.containsKey(tip.text))
 			titleTexMap.put(tip.text, Text.renderstroked(tip.text, Color.white, Color.BLACK, Text.num12boldFnd).tex());
-	    if(marker instanceof PMarker)
-		this.hit = Area.sized(flagcc.inv(), UI.scale(flagbg.sz));
+	    if(marker instanceof PMarker) {
+		PMarker pm = (PMarker)marker;
+		if(pm.iconres == null)
+		    this.hit = Area.sized(flagcc.inv(), UI.scale(flagbg.sz));
+	    }
 	}
 
 	public void draw(GOut g, Coord c) {
 	    if(m instanceof PMarker) {
-		Coord ul = c.sub(flagcc);
-		g.chcolor(((PMarker)m).color);
-		g.image(flagfg, ul);
-		g.chcolor();
-		g.image(flagbg, ul);
+		PMarker pm = (PMarker)m;
+		if(pm.iconres != null) {
+		    try {
+			if(cc == null) {
+			    Resource res = Resource.remote().loadwait(pm.iconres);
+			    img = res.flayer(Resource.imgc);
+			    cc = img.ssz.div(2);
+			    if(hit == null)
+				hit = Area.sized(cc.inv(), img.ssz);
+			}
+		    } catch(Loading l) {
+		    } catch(Exception e) {
+			cc = Coord.z;
+		    }
+		    if(img != null)
+			g.image(img, c.sub(cc));
+		} else {
+		    Coord ul = c.sub(flagcc);
+		    g.chcolor(pm.color);
+		    g.image(flagfg, ul);
+		    g.chcolor();
+		    g.image(flagbg, ul);
+		}
 	    } else if(m instanceof SMarker) {
 		SMarker sm = (SMarker)m;
 		try {
@@ -1243,11 +1264,21 @@ public class MiniMap extends Widget {
 			}
             synchronized (Pathfinder.class) {
                 if (ui.gui.map.pf != null && button == 1) {
+                    ui.gui.map.pfFinalDest = null;
                     ui.gui.map.pf.terminate = true;
                     ui.gui.map.pfthread.interrupt();
                 }
             }
-		mv.wdgmsg("click", mc, loc.tc.sub(sessloc.tc).mul(tilesz).add(tilesz.div(2)).floor(posres),	button, ui.modflags());
+		boolean useMinimapPF = button == 1 && OptWnd.walkWithPathFinderCheckBox.a && (
+			(ui.modctrl && ui.modshift && !ui.modmeta && !ui.modsuper) ||
+			(OptWnd.pathfindOnMinimapCheckBox != null && OptWnd.pathfindOnMinimapCheckBox.a && !ui.modmeta)
+		);
+		if(useMinimapPF) {
+			Coord2d dest = loc.tc.sub(sessloc.tc).mul(tilesz).add(tilesz.div(2));
+			mv.pfLongDistance(dest.floor());
+		} else {
+			mv.wdgmsg("click", mc, loc.tc.sub(sessloc.tc).mul(tilesz).add(tilesz.div(2)).floor(posres), button, ui.modflags());
+		}
 		} else {
             if(mv.checkpointManager != null && mv.checkpointManagerThread != null && button == 3){
                 mv.checkpointManager.pauseIt();
@@ -1274,9 +1305,7 @@ public class MiniMap extends Widget {
 			}
 		mv.wdgmsg("click", args);
 		}
-        if (OptWnd.walkWithPathFinderCheckBox.a && button == 1 && ui.modctrl && ui.modshift && !ui.modmeta && !ui.modsuper) {
-            mv.pfLeftClick(dsloc.tc.sub(sessloc.tc).mul(tilesz).add(tilesz.div(2)).floor(), null);
-        }
+        // Note: minimap pathfinding is now handled above in the ground-click block
 	}
     }
 

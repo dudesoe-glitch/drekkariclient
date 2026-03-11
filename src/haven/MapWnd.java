@@ -61,6 +61,8 @@ public class MapWnd extends Window implements Console.Directory {
     private final Frame viewf;
     private GroupSelector colsel;
     private Button mremove;
+    private Button iconbtn, iconclear;
+    private MarkerIconPicker iconpicker;
     private Predicate<Marker> mflt = pmarkers;
     private Comparator<ListMarker> mcmp = namecmp;
     private List<ListMarker> markers = Collections.emptyList();
@@ -367,6 +369,13 @@ public class MapWnd extends Window implements Console.Directory {
 		if(colsel != null) {
 		    colsel.c = namesel.c.add(0, namesel.sz.y + UI.scale(10));
 		}
+		if(iconbtn != null) {
+		    int iconY = (colsel != null) ? colsel.c.y + colsel.sz.y + UI.scale(5) : namesel.c.y + namesel.sz.y + UI.scale(10);
+		    iconbtn.c = new Coord(0, iconY);
+		    if(iconclear != null) {
+			iconclear.c = new Coord(sz.x - iconclear.sz.x, iconY);
+		    }
+		}
 	    }
 	}
     }
@@ -518,7 +527,10 @@ public class MapWnd extends Window implements Console.Directory {
 
 	public static MarkerType of(Marker mark) {
 	    if(mark instanceof PMarker) {
-		return(types.intern(new PMarkerType(((PMarker)mark).color)));
+		PMarker pm = (PMarker)mark;
+		if(pm.iconres != null)
+		    return(types.intern(new IconMarkerType(pm.iconres)));
+		return(types.intern(new PMarkerType(pm.color)));
 	    } else if(mark instanceof SMarker) {
 		return(types.intern(new SMarkerType(((SMarker)mark).res)));
 	    } else {
@@ -622,6 +634,41 @@ public class MapWnd extends Window implements Console.Directory {
 	public int compareTo(MarkerType that) {
 	    if(that instanceof SMarkerType)
 		return(compareTo((SMarkerType)that));
+	    return(super.compareTo(that));
+	}
+    }
+
+    public static class IconMarkerType extends MarkerType {
+	public final String iconres;
+	private Tex icon = null;
+
+	public IconMarkerType(String iconres) {
+	    this.iconres = iconres;
+	}
+
+	public Tex icon() {
+	    if(icon == null) {
+		try {
+		    BufferedImage img = Resource.remote().loadwait(iconres).flayer(Resource.imgc).img;
+		    icon = new TexI(PUtils.uiscale(img, new Coord(iconsz, iconsz)));
+		} catch(Exception e) {
+		    return(new PMarkerType(Color.WHITE).icon());
+		}
+	    }
+	    return(icon);
+	}
+
+	public boolean equals(Object that) {
+	    return((that instanceof IconMarkerType) && ((IconMarkerType)that).iconres.equals(iconres));
+	}
+
+	public int hashCode() {
+	    return(iconres.hashCode());
+	}
+
+	public int compareTo(MarkerType that) {
+	    if(that instanceof IconMarkerType)
+		return(iconres.compareTo(((IconMarkerType)that).iconres));
 	    return(super.compareTo(that));
 	}
     }
@@ -763,6 +810,18 @@ public class MapWnd extends Window implements Console.Directory {
 		    ui.destroy(colsel);
 		    colsel = null;
 		}
+		if(iconbtn != null) {
+		    ui.destroy(iconbtn);
+		    iconbtn = null;
+		}
+		if(iconclear != null) {
+		    ui.destroy(iconclear);
+		    iconclear = null;
+		}
+		if(iconpicker != null) {
+		    iconpicker.reqdestroy();
+		    iconpicker = null;
+		}
 	    }
 
 	    if(lm != null) {
@@ -789,6 +848,29 @@ public class MapWnd extends Window implements Console.Directory {
 				view.file.update(mark);
 			    }
 			});
+		    iconbtn = tool.add(new Button(UI.scale(95), pm.iconres != null ? "Change Icon" : "Set Icon", false) {
+			    public void click() {
+				if(iconpicker != null) {
+				    iconpicker.reqdestroy();
+				    iconpicker = null;
+				} else {
+				    iconpicker = MapWnd.this.parent.add(new MarkerIconPicker(pm, mark), MapWnd.this.c.add(MapWnd.this.sz.x + UI.scale(5), 0));
+				}
+			    }
+			});
+		    if(pm.iconres != null) {
+			iconclear = tool.add(new Button(UI.scale(95), "Clear Icon", false) {
+				public void click() {
+				    pm.iconres = null;
+				    view.file.update(mark);
+				    markerseq = -1;
+				    iconbtn.change("Set Icon");
+				    ui.destroy(iconclear);
+				    iconclear = null;
+				    MapWnd.this.resize(csz());
+				}
+			    });
+		    }
 		}
 		mremove = tool.add(new Button(UI.scale(200), "Remove", false) {
 			public void click() {
@@ -1168,5 +1250,142 @@ public class MapWnd extends Window implements Console.Directory {
     @Override
     public void preventResizingOutside() { // ND: replaced by fixAndSavePos in this class
         return;
+    }
+
+    public class MarkerIconPicker extends Window {
+	private final String[][] ICON_ENTRIES = {
+	    // Ores
+	    {"Argentite", "gfx/invobjs/argentite"},
+	    {"Black Coal", "gfx/invobjs/blackcoal"},
+	    {"Cassiterite", "gfx/invobjs/cassiterite"},
+	    {"Chalcopyrite", "gfx/invobjs/chalcopyrite"},
+	    {"Cinnabar", "gfx/invobjs/cinnabar"},
+	    {"Coal", "gfx/invobjs/coal"},
+	    {"Cuprite", "gfx/invobjs/cuprite"},
+	    {"Galena", "gfx/invobjs/galena"},
+	    {"Hematite", "gfx/invobjs/hematite"},
+	    {"Horn Silver", "gfx/invobjs/hornsilver"},
+	    {"Ilmenite", "gfx/invobjs/ilmenite"},
+	    {"Lead Glance", "gfx/invobjs/leadglance"},
+	    {"Limonite", "gfx/invobjs/limonite"},
+	    {"Magnetite", "gfx/invobjs/magnetite"},
+	    {"Malachite", "gfx/invobjs/malachite"},
+	    {"Nagyagite", "gfx/invobjs/nagyagite"},
+	    {"Peacock Ore", "gfx/invobjs/peacockore"},
+	    {"Petzite", "gfx/invobjs/petzite"},
+	    {"Sylvanite", "gfx/invobjs/sylvanite"},
+	    // Rocks
+	    {"Alabaster", "gfx/invobjs/alabaster"},
+	    {"Basalt", "gfx/invobjs/basalt"},
+	    {"Chert", "gfx/invobjs/chert"},
+	    {"Dolomite", "gfx/invobjs/dolomite"},
+	    {"Feldspar", "gfx/invobjs/feldspar"},
+	    {"Flint", "gfx/invobjs/flint"},
+	    {"Granite", "gfx/invobjs/granite"},
+	    {"Limestone", "gfx/invobjs/limestone"},
+	    {"Marble", "gfx/invobjs/marble"},
+	    {"Quartz", "gfx/invobjs/quartz"},
+	    {"Sandstone", "gfx/invobjs/sandstone"},
+	    {"Slate", "gfx/invobjs/slate"},
+	    // Materials & Misc
+	    {"Halite", "gfx/invobjs/halite"},
+	    {"Fluorospar", "gfx/invobjs/fluorospar"},
+	    {"Soapstone", "gfx/invobjs/soapstone"},
+	    {"Sodalite", "gfx/invobjs/sodalite"},
+	    {"Sunstone", "gfx/invobjs/sunstone"},
+	    {"Kyanite", "gfx/invobjs/kyanite"},
+	    {"Olivine", "gfx/invobjs/olivine"},
+	};
+
+	private final PMarker pm;
+	private final Marker mark;
+	private final TextEntry search;
+	private final IconList iconlist;
+
+	MarkerIconPicker(PMarker pm, Marker mark) {
+	    super(UI.scale(200, 300), "Marker Icon", true);
+	    this.pm = pm;
+	    this.mark = mark;
+	    search = add(new TextEntry(UI.scale(190), "") {
+		    public void changed() {
+			iconlist.updateFilter(text());
+		    }
+		}, UI.scale(5, 5));
+	    iconlist = add(new IconList(UI.scale(190), 10), UI.scale(5, 30));
+	    pack();
+	}
+
+	public void close() {
+	    iconpicker = null;
+	    reqdestroy();
+	}
+
+	private void selectIcon(String res) {
+	    pm.iconres = res;
+	    view.file.update(mark);
+	    markerseq = -1;
+	    if(iconbtn != null)
+		iconbtn.change("Change Icon");
+	    close();
+	    // Refresh the edit panel to show clear button
+	    ListMarker sel = tool.list.sel;
+	    if(sel != null) {
+		tool.list.change2(null);
+		tool.list.change2(sel);
+	    }
+	}
+
+	private class IconList extends OldListBox<String[]> {
+	    private List<String[]> items;
+	    private List<String[]> filtered;
+
+	    IconList(int w, int h) {
+		super(w, h, UI.scale(20));
+		items = Arrays.asList(ICON_ENTRIES);
+		filtered = items;
+	    }
+
+	    void updateFilter(String txt) {
+		if(txt == null || txt.isEmpty()) {
+		    filtered = items;
+		} else {
+		    String lower = txt.toLowerCase();
+		    List<String[]> f = new ArrayList<>();
+		    for(String[] entry : items) {
+			if(entry[0].toLowerCase().contains(lower) || entry[1].toLowerCase().contains(lower))
+			    f.add(entry);
+		    }
+		    filtered = f;
+		}
+	    }
+
+	    protected String[] listitem(int i) {
+		return(filtered.get(i));
+	    }
+
+	    protected int listitems() {
+		return(filtered.size());
+	    }
+
+	    protected void drawitem(GOut g, String[] entry, int idx) {
+		try {
+		    BufferedImage img = Resource.remote().loadwait(entry[1]).flayer(Resource.imgc).img;
+		    int isz = UI.scale(16);
+		    g.image(new TexI(PUtils.uiscale(img, new Coord(isz, isz))), Coord.of(UI.scale(2), (itemh - isz) / 2));
+		} catch(Exception e) {
+		    // Icon not available yet
+		}
+		g.aimage(Text.render(entry[0]).tex(), Coord.of(UI.scale(22), itemh / 2), 0.0, 0.5);
+	    }
+
+	    public boolean mousedown(MouseDownEvent ev) {
+		int idx = idxat(ev.c);
+		if(idx >= 0 && idx < filtered.size()) {
+		    selectIcon(filtered.get(idx)[1]);
+		    return(true);
+		}
+		return(super.mousedown(ev));
+	    }
+	}
     }
 }

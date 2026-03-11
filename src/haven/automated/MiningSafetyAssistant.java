@@ -327,6 +327,8 @@ public class MiningSafetyAssistant extends Window implements Runnable {
             try {
                 Thread.sleep(200);
             } catch (InterruptedException ignored) {
+                Thread.currentThread().interrupt();
+                return;
             }
         }
     }

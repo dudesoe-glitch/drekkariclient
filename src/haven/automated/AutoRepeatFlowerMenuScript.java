@@ -76,6 +76,7 @@ public class AutoRepeatFlowerMenuScript implements Runnable{
                             try {
                                 Thread.sleep(ping);
                             } catch (InterruptedException ignored) {
+                                Thread.currentThread().interrupt();
                                 FlowerMenu.setNextSelection(null);
                                 return;
                             }
@@ -90,6 +91,7 @@ public class AutoRepeatFlowerMenuScript implements Runnable{
             try {
                 Thread.sleep(ping);
             } catch (InterruptedException ignored) {
+                Thread.currentThread().interrupt();
                 FlowerMenu.setNextSelection(null);
                 return;
             }

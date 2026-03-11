@@ -203,6 +203,7 @@ public class CombatDistanceTool extends Window implements Runnable {
         try {
             Thread.sleep(duration);
         } catch (InterruptedException ignored) {
+            Thread.currentThread().interrupt();
         }
     }
 

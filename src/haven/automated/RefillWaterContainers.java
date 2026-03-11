@@ -222,6 +222,7 @@ public class RefillWaterContainers implements Runnable {
                 gui.maininv.wdgmsg("drop", item.getValue());
                 Thread.sleep(5);
             } catch (InterruptedException ignored) {
+                Thread.currentThread().interrupt();
                 return;
             }
         }
@@ -238,6 +239,7 @@ public class RefillWaterContainers implements Runnable {
                 belt.wdgmsg("drop", item.getValue());
                 Thread.sleep(5);
             } catch (InterruptedException ignored) {
+                Thread.currentThread().interrupt();
                 return;
             }
         }
@@ -254,6 +256,7 @@ public class RefillWaterContainers implements Runnable {
                 equipory.wdgmsg("drop", item.getValue());
                 Thread.sleep(5);
             } catch (InterruptedException ignored) {
+                Thread.currentThread().interrupt();
                 return;
             }
         }

@@ -38,7 +38,7 @@ public class Inventory extends Widget implements DTarget {
     public boolean dropul = true;
     public Coord isz;
     public boolean[] sqmask = null;
-    public Map<GItem, WItem> wmap = new HashMap<GItem, WItem>();
+    public Map<GItem, WItem> wmap = new java.util.concurrent.ConcurrentHashMap<GItem, WItem>();
 	public static Set<String> PLAYER_INVENTORY_NAMES = new HashSet<>(Arrays.asList("Inventory", "Belt", "Equipment", "Character Sheet", "Study"));
 
 	public static final Comparator<WItem> ITEM_COMPARATOR_ASC = Comparator

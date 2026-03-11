@@ -35,7 +35,8 @@ public class FillCheeseTray implements Runnable {
                         AUtils.waitForEmptyHand(this.gui, 500, "ehwat mate");
                     }
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    Thread.currentThread().interrupt();
+                    return;
                 }
                 return;
             }
@@ -50,6 +51,8 @@ public class FillCheeseTray implements Runnable {
                     Thread.sleep(20L);
                 }
             } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                return;
             }
         }
     }

@@ -194,7 +194,10 @@ public class MappingClient {
 		}
 		try {
 		    Thread.sleep(50);
-		} catch (InterruptedException ex) { }
+		} catch (InterruptedException ex) {
+		    Thread.currentThread().interrupt();
+		    return;
+		}
 	    }
 	    try {
 		scheduler.execute(new MarkerUpdate(new JSONArray(loadedMarkers.toArray())));

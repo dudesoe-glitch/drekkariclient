@@ -3284,6 +3284,8 @@ public class OptWnd extends Window {
 	public static CheckBox enableQueuedMovementCheckBox;
     public static CheckBox walkWithPathFinderCheckBox;
     public static CheckBox drawPathfinderRouteCheckBox;
+    public static CheckBox pathfindOnMinimapCheckBox;
+    public static CheckBox continuousPathfindingCheckBox;
 
 	public class GameplayAutomationSettingsPanel extends Panel {
 
@@ -3526,6 +3528,17 @@ public class OptWnd extends Window {
                     Utils.setprefb("drawPathfinderRoute", val);
                 }
             }, prev.pos("bl").adds(12, 2));
+            prev = add(pathfindOnMinimapCheckBox = new CheckBox("Pathfind on Minimap Click"){
+                {a = Utils.getprefb("pathfindOnMinimap", false);}
+                public void set(boolean val) {
+                    Utils.setprefb("pathfindOnMinimap", val);
+                    a = val;
+                    if (ui != null && ui.gui != null) {
+                        ui.gui.optionInfoMsg("Pathfind on Minimap Click is now " + (val ? "ENABLED" : "DISABLED") + ".", (val ? msgGreen : msgRed), Audio.resclip(val ? Toggle.sfxon : Toggle.sfxoff));
+                    }
+                }
+            }, prev.pos("bl").adds(0, 2));
+            pathfindOnMinimapCheckBox.tooltip = RichText.render("When enabled, left-clicking on the minimap/world map will use the pathfinder\ninstead of walking in a straight line. Handles long distances automatically.", UI.scale(300));
 
 			Widget backButton;
 			add(backButton = new PButton(UI.scale(200), "Back", 27, back, "Advanced Settings"), prev.pos("bl").adds(0, 18));
@@ -3646,6 +3659,13 @@ public class OptWnd extends Window {
 					Utils.setprefb("continuousWalking", val);
 				}
 			}, prev.pos("bl").adds(0, 12));
+			prev = add(continuousPathfindingCheckBox = new CheckBox("Use Pathfinder while Continuous Walking"){
+				{a = Utils.getprefb("continuousPathfinding", false);}
+				public void changed(boolean val) {
+					Utils.setprefb("continuousPathfinding", val);
+				}
+			}, prev.pos("bl").adds(12, 2));
+			continuousPathfindingCheckBox.tooltip = RichText.render("When enabled alongside Continuous Walking and Walk with Pathfinder,\nholding left click will use A* pathfinding to avoid obstacles.", UI.scale(300));
 
 			Widget backButton;
 			add(backButton = new PButton(UI.scale(200), "Back", 27, back, "Advanced Settings"), prev.pos("bl").adds(0, 18));

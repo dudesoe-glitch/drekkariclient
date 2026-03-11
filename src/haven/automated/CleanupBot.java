@@ -118,6 +118,8 @@ public class CleanupBot extends Window implements Runnable {
                         try {
                             Thread.sleep(8000);
                         } catch (InterruptedException e) {
+                            Thread.currentThread().interrupt();
+                            return;
                         }
                     }
                     else if (ui.gui.getmeter("nrj", 0).a < 0.25) {
@@ -128,6 +130,8 @@ public class CleanupBot extends Window implements Runnable {
                         try {
                             AUtils.drinkTillFull(gui, 0.99, 0.99);
                         } catch (InterruptedException e) {
+                            Thread.currentThread().interrupt();
+                            return;
                         }
                     } else {
                         Gob gob = findClosestGob();
@@ -140,6 +144,7 @@ public class CleanupBot extends Window implements Runnable {
                 sleep(2000);
             }
         } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
         }
     }
 
@@ -177,6 +182,8 @@ public class CleanupBot extends Window implements Runnable {
                 try {
                     Thread.sleep(2000);
                 } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    return;
                 }
             }
         }

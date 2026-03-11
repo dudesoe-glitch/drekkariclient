@@ -75,7 +75,9 @@ public class OreAndStoneCounter extends Window implements Runnable {
     private void sleep(int duration) {
         try {
             Thread.sleep(duration);
-        } catch (InterruptedException ignored) {}
+        } catch (InterruptedException ignored) {
+            Thread.currentThread().interrupt();
+        }
     }
 
     @Override

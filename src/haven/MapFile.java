@@ -279,10 +279,16 @@ public class MapFile {
 
     public static class PMarker extends Marker {
 	public Color color;
+	public String iconres;
 
 	public PMarker(long seg, Coord tc, String nm, Color color) {
+	    this(seg, tc, nm, color, null);
+	}
+
+	public PMarker(long seg, Coord tc, String nm, Color color, String iconres) {
 	    super(seg, tc, nm);
 	    this.color = color;
+	    this.iconres = (iconres != null && iconres.isEmpty()) ? null : iconres;
 	}
     }
 
@@ -299,7 +305,7 @@ public class MapFile {
 
     private static Marker loadmarker(Message fp) {
 	int ver = fp.uint8();
-	if(ver == 1) {
+	if(ver == 1 || ver == 2) {
 	    long seg = fp.int64();
 	    Coord tc = fp.coord();
 	    String nm = fp.string();
@@ -307,7 +313,10 @@ public class MapFile {
 	    switch(type) {
 	    case 'p':
 		Color color = fp.color();
-		return(new PMarker(seg, tc, nm, color));
+		String iconres = null;
+		if(ver >= 2)
+		    iconres = fp.string();
+		return(new PMarker(seg, tc, nm, color, iconres));
 	    case 's':
 		long oid = fp.int64();
 		Resource.Saved res = new Resource.Saved(Resource.remote(), fp.string(), fp.uint16());
@@ -321,15 +330,23 @@ public class MapFile {
     }
 
     private static void savemarker(Message fp, Marker mark) {
-	fp.adduint8(1);
-	fp.addint64(mark.seg);
-	fp.addcoord(mark.tc);
-	fp.addstring(mark.nm);
 	if(mark instanceof PMarker) {
+	    PMarker pm = (PMarker)mark;
+	    boolean hasIcon = pm.iconres != null;
+	    fp.adduint8(hasIcon ? 2 : 1);
+	    fp.addint64(mark.seg);
+	    fp.addcoord(mark.tc);
+	    fp.addstring(mark.nm);
 	    fp.adduint8('p');
-	    fp.addcolor(((PMarker)mark).color);
+	    fp.addcolor(pm.color);
+	    if(hasIcon)
+		fp.addstring(pm.iconres);
 	} else if(mark instanceof SMarker) {
 	    SMarker sm = (SMarker)mark;
+	    fp.adduint8(1);
+	    fp.addint64(mark.seg);
+	    fp.addcoord(mark.tc);
+	    fp.addstring(mark.nm);
 	    fp.adduint8('s');
 	    fp.addint64(sm.oid);
 	    fp.addstring(sm.res.name);

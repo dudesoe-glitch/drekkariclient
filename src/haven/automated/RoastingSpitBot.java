@@ -97,6 +97,7 @@ public class RoastingSpitBot extends Window implements Runnable {
         try {
             Thread.sleep(duration);
         } catch (InterruptedException ignored) {
+            Thread.currentThread().interrupt();
         }
     }
 
@@ -238,6 +239,7 @@ public class RoastingSpitBot extends Window implements Runnable {
         try {
             waitProgBarRoastingSpit(gui);
         } catch (InterruptedException ignored) {
+            Thread.currentThread().interrupt();
         }
     }
 
