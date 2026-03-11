@@ -1,62 +1,48 @@
-# HANDOFF — Session 3 (Equipment Swap, Auto-Drop, Crafting, Filters, Inventory UI)
+# HANDOFF — Session 4 (Butcher Bot, Inventory Grouping)
 
 ## Resumption Prompt
-Implemented 5 new features: equipment quick-swap hotkeys (17 keybindings), per-item auto-drop (JSON config + UI), batch crafting "Craft N", expanded ItemFilter (FEP/armor/LP/wear/contents), and inventory toolbar (sort button + item count). Also verified 3 features already existed (minesweeper, drink refill, parasite auto-drop). All research doc priorities complete. Build clean with zero errors.
+Implemented 2 new features: batch animal butchering bot (4 animal categories, pathfinding, auto-drink, progress bar waiting) and inventory grouping modes (None/By Name/By Quality with colored overlays and quality-bracket sorting). Also verified 2 features already existed (flat terrain toggle, FEP modifier tooltips). Build clean with zero errors.
 
 ## Goal
-Work through research document priorities + HANDOFF priorities, verifying what already exists before building.
+Work through priority list from session 3 HANDOFF, skipping testing.
 
 ## Completed
 
 ### New Features
-1. **Equipment quick-swap hotkeys** (`GameUI.java`, `OptWnd.java`)
-   - 17 KeyBinding entries (kb_equipB12, kb_equipCutblade, etc.), all default to unbound
-   - globtype() handlers launch EquipFromBelt threads on hotkey press
-   - OptWnd BindingPanel section: "Equipment Quick-Swap (from Belt)" with color-coded rows
-     - Red = weapons (B12, Cutblade, Boar Spear, Giant Needle, swords+shields, bows)
-     - Blue = tools (Pickaxe, Sledgehammer, Scythe, shovels)
-     - Green = utility (Traveller's Sacks, Wanderer's Bindles)
+1. **Batch animal butchering bot** (`ButcherBot.java`, `GameUI.java`, `MenuGrid.java`)
+   - 4 category checkboxes: Large Game, Livestock, Predators, Small Game
+   - Finds knocked animals via `gob.getPoses().contains("knock")`
+   - Pathfinds to nearest, right-clicks with `FlowerMenu.setNextSelection("Butcher")`
+   - Vital checks: HP hearth, energy stop, stamina auto-drink
+   - Status label shows current action (Walking, Butchering, Drinking, etc.)
+   - Category prefs persisted via `butcherBot_*` preference keys
+   - 30+ animal types across all categories (cattle, sheep, bear, deer, fox, etc.)
+   - Registered in MenuGrid + GameUI (standard bot pattern)
+   - Menu resource: `res/customclient/menugrid/Bots/ButcherBot.res`
 
-2. **Per-item auto-drop** (`ItemAutoDrop.java`, `ItemAutoDropWindow.java`, `GItem.java`, `OptWnd.java`)
-   - ItemAutoDrop: ConcurrentHashMap<String, Integer> per-item thresholds, JSON in prefs
-   - ItemAutoDropWindow: scrollable list, add by name or "Add from Cursor", remove, edit threshold
-   - GItem.checkAutoDropItem(): per-item check runs BEFORE category-based check (priority)
-   - Button in OptWnd: "Per-Item Auto-Drop Config" below existing "Auto-Drop Manager"
-
-3. **Batch crafting "Craft N"** (`Makewindow.java`)
-   - TextEntry for count (persisted as "craftNCount" pref)
-   - "Craft N" button starts daemon thread: sends wdgmsg("make", 0) N times with 650ms delay
-   - "Stop" button interrupts the thread
-   - Count persists across craft windows
-
-4. **Expanded ItemFilter** (`ItemFilter.java`)
-   - New patterns: fep, fep:TYPE, armor, armor:hard/soft, lp, lph, has:SUBSTANCE, wear
-   - All support comparison operators: >, >=, <, <=, =, !=
-   - FEP types match by prefix: str, agi, int, con, per, cha, dex, wil, psy
-   - Backed by: FoodInfo.evs, Armor.hard/soft, Curiosity.exp/lph, Contents.content, Wear.percentage
-   - Refactored compare() helper and ALL_PATTERNS array for hasNameFilter()/getNamePart()
-
-5. **Inventory toolbar** (`GameUI.java`)
-   - Sort button (calls maininv.sortInventory())
-   - Search button (toggles InventorySearchWindow)
-   - Live item count label (updated in tick()): "count/capacity" with color coding
-     - White = normal, Yellow = >80% full, Red = completely full
+2. **Inventory grouping modes** (`Inventory.java`, `GameUI.java`)
+   - `GroupingMode` enum: NONE / BY_NAME / BY_QUALITY
+   - "Group" button in inventory toolbar cycles through modes
+   - Colored background tints distinguish groups (10 alternating colors, alpha 55)
+   - BY_NAME: groups by item display name (same type = same color)
+   - BY_QUALITY: groups by quality bracket (0-10, 10-25, 25-50, 50-100, 100+)
+   - Sort respects grouping mode: BY_QUALITY uses bracket-then-name-then-quality comparator
+   - Mode persisted to `inventoryGroupMode` preference
+   - Bounds-safe preference loading (handles invalid saved values)
 
 ### Verification (already existed)
-6. **Minesweeper display** — MineSweeper toggle + duration config + menu grid button
-7. **Drink refill** — RefillWaterContainers.java + auto-drink on low stamina
-8. **Parasite auto-drop** — autoDropLeeches + autoDropTicks in Equipory.tick()
+3. **Flat terrain toggle** — `OptWnd.flatWorldCheckBox`, menu grid toggle, cliff height scaling
+4. **FEP modifier tooltips** — `FoodInfo.java` already shows modified FEP with breakdown (subscription, hunger, satiation, salt, table bonus), Shift toggles unmodified values
 
 ## In Progress
 Nothing — all planned work complete.
 
 ## Next Priorities
-1. **Test all new features in-game** — especially equipment hotkeys, per-item auto-drop, Craft N, item filters
-2. **Batch animal butchering bot** — next forum priority (TIER 1 remaining)
-3. **Flat terrain toggle** — TIER 2 forum feature
-4. **FEP modifier tooltips** — TIER 2 forum feature
-5. **OptWnd refactor** — extract 5600-line god class into separate Settings objects
-6. **Extended inventory: grouping modes** — add By Name, By Quality brackets grouping to inventory
+1. **Test all features in-game** — especially ButcherBot flower menu option name ("Butcher" may need adjustment)
+2. **OptWnd refactor** — extract tooltips (~380 lines) as lowest-risk first step
+3. **More inventory features** — item type icons in group headers, collapsible groups
+4. **New bots** — Clay digging, Ore smelting automation
+5. **Port EnderWiggin ExtInventory** — full item list view, repeat mode
 
 ## Audit Findings (remaining, not yet fixed)
 - **MEDIUM**: OptWnd 5600-line god class (begin extracting Settings objects)
@@ -66,17 +52,14 @@ Nothing — all planned work complete.
 ## Files Modified
 | File | Changes |
 |------|---------|
-| `src/haven/GameUI.java` | 17 equipment KB definitions, globtype() handlers, inventory toolbar |
-| `src/haven/OptWnd.java` | itemAutoDropWindow field+init, BindingPanel equipment section, Per-Item Auto-Drop button |
-| `src/haven/Makewindow.java` | craftNEntry, Craft N button, Stop button, craftNThread |
-| `src/haven/ItemFilter.java` | Full rewrite: 8 new filter types (FEP, armor, LP, contents, wear) |
-| `src/haven/GItem.java` | Per-item auto-drop check (ItemAutoDrop.shouldDrop) before category check |
-| `src/haven/ItemAutoDrop.java` | NEW — JSON config manager for per-item drop thresholds |
-| `src/haven/ItemAutoDropWindow.java` | NEW — UI window for per-item auto-drop configuration |
+| `src/haven/automated/ButcherBot.java` | NEW — batch animal butchering bot with 4 categories |
+| `src/haven/Inventory.java` | GroupingMode enum, group overlay rendering, quality bracket comparator |
+| `src/haven/GameUI.java` | ButcherBot fields, Group button in inventory toolbar, groupingMode init |
+| `src/haven/MenuGrid.java` | ButcherBot menu registration + handler |
+| `res/customclient/menugrid/Bots/ButcherBot.res` | NEW — menu icon resource (copied from CleanupBot) |
 
 ## Files Not Modified (verified already implemented)
 | Feature | Existing Files |
 |---------|---------------|
-| Minesweeper | MiningSafetyAssistant.java, OptWnd.java, MenuGrid.java |
-| Drink refill | RefillWaterContainers.java, GameUI.java |
-| Parasite auto-drop | Equipory.java |
+| Flat terrain | OptWnd.java (flatWorldCheckBox), MapMesh.java, Ridges.java, MenuGrid.java |
+| FEP modifier tooltips | FoodInfo.java (tipimg() with hungerEfficiency, fepEfficiency, satiation, etc.) |

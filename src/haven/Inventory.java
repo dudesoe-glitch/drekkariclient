@@ -41,6 +41,70 @@ public class Inventory extends Widget implements DTarget {
     public Map<GItem, WItem> wmap = new java.util.concurrent.ConcurrentHashMap<GItem, WItem>();
 	public static Set<String> PLAYER_INVENTORY_NAMES = new HashSet<>(Arrays.asList("Inventory", "Belt", "Equipment", "Character Sheet", "Study"));
 
+	// Grouping modes for visual inventory organization
+	public enum GroupingMode {
+		NONE("No Groups"), BY_NAME("By Name"), BY_QUALITY("By Quality");
+		public final String label;
+		GroupingMode(String label) { this.label = label; }
+		public GroupingMode next() {
+			GroupingMode[] vals = values();
+			return vals[(ordinal() + 1) % vals.length];
+		}
+	}
+	public GroupingMode groupingMode = GroupingMode.NONE;
+
+	// Subtle tint colors for distinguishing groups
+	private static final java.awt.Color[] GROUP_COLORS = {
+		new java.awt.Color(50, 120, 50, 55),
+		new java.awt.Color(120, 50, 50, 55),
+		new java.awt.Color(50, 50, 120, 55),
+		new java.awt.Color(120, 120, 50, 55),
+		new java.awt.Color(120, 50, 120, 55),
+		new java.awt.Color(50, 120, 120, 55),
+		new java.awt.Color(100, 80, 50, 55),
+		new java.awt.Color(80, 100, 80, 55),
+		new java.awt.Color(100, 50, 80, 55),
+		new java.awt.Color(50, 80, 100, 55),
+	};
+
+	// Quality bracket comparator: groups by quality range, then name, then quality
+	public static final Comparator<WItem> ITEM_COMPARATOR_QUALITY_BRACKET = Comparator
+			.comparing((WItem w) -> getQualityBracket(w.quality()))
+			.thenComparing(WItem::sortName)
+			.thenComparing(w -> w.item.resname())
+			.thenComparing(WItem::quality, Comparator.reverseOrder());
+
+	private static int getQualityBracket(double q) {
+		if (q < 10) return 0;
+		if (q < 25) return 1;
+		if (q < 50) return 2;
+		if (q < 100) return 3;
+		return 4;
+	}
+
+	private static String getQualityBracketLabel(double q) {
+		if (q < 10) return "Q 0-10";
+		if (q < 25) return "Q 10-25";
+		if (q < 50) return "Q 25-50";
+		if (q < 100) return "Q 50-100";
+		return "Q 100+";
+	}
+
+	private String getGroupKey(WItem wi) {
+		try {
+			switch (groupingMode) {
+				case BY_NAME:
+					return wi.sortName();
+				case BY_QUALITY:
+					return getQualityBracketLabel(wi.quality());
+				default:
+					return "";
+			}
+		} catch (Exception e) {
+			return "?";
+		}
+	}
+
 	public static final Comparator<WItem> ITEM_COMPARATOR_ASC = Comparator
 			.comparing(WItem::sortName)
 			.thenComparing(w -> w.item.resname())
@@ -93,7 +157,30 @@ public class Inventory extends Widget implements DTarget {
 		}
 	    }
 	}
+	if (groupingMode != GroupingMode.NONE) {
+	    drawGroupOverlays(g);
+	}
 	super.draw(g);
+    }
+
+    private void drawGroupOverlays(GOut g) {
+	Map<String, Integer> groupColorIndex = new LinkedHashMap<>();
+	int nextColor = 0;
+
+	for (Widget wdg = child; wdg != null; wdg = wdg.next) {
+	    if (wdg instanceof WItem) {
+		WItem wi = (WItem) wdg;
+		String key = getGroupKey(wi);
+		if (!groupColorIndex.containsKey(key)) {
+		    groupColorIndex.put(key, nextColor++);
+		}
+		int ci = groupColorIndex.get(key) % GROUP_COLORS.length;
+		java.awt.Color col = GROUP_COLORS[ci];
+		g.chcolor(col.getRed(), col.getGreen(), col.getBlue(), col.getAlpha());
+		g.frect(wi.c.sub(1, 1), wi.sz.add(2, 2));
+		g.chcolor();
+	    }
+	}
     }
 	
     public Inventory(Coord sz) {
@@ -442,8 +529,11 @@ public class Inventory extends Widget implements DTarget {
 
 		if (sortable.isEmpty()) return;
 
-		// Sort items by type then quality (highest first)
-		sortable.sort(ITEM_COMPARATOR_DESC);
+		// Sort items using grouping-mode-aware comparator
+		Comparator<WItem> comparator = (groupingMode == GroupingMode.BY_QUALITY)
+			? ITEM_COMPARATOR_QUALITY_BRACKET
+			: ITEM_COMPARATOR_DESC;
+		sortable.sort(comparator);
 
 		// Build target positions: scan left-to-right, top-to-bottom, skip blocked
 		List<Coord> targets = new ArrayList<>();

@@ -780,6 +780,7 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 		makeLocal("customclient/menugrid/Bots/GrubGrubBot");
 		makeLocal("customclient/menugrid/Bots/RoastingSpitBot");
 		makeLocal("customclient/menugrid/Bots/FarmingBot");
+		makeLocal("customclient/menugrid/Bots/ButcherBot");
 
 		// Category: Other Scripts & Tools
 		makeLocal("customclient/menugrid/OtherScriptsAndTools/Add9CoalScript");
@@ -992,6 +993,21 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 						gui.farmingBot.reqdestroy();
 						gui.farmingBot = null;
 						gui.farmingBotThread = null;
+					}
+				}
+			} else if (ad[2].equals("ButcherBot")) {
+				if (gui.butcherBot == null && gui.butcherBotThread == null) {
+					gui.butcherBot = new ButcherBot(gui);
+					gui.add(gui.butcherBot, Utils.getprefc("wndc-butcherBotWindow", new Coord(gui.sz.x/2 - gui.butcherBot.sz.x/2, gui.sz.y/2 - gui.butcherBot.sz.y/2 - 200)));
+					gui.butcherBotThread = new Thread(gui.butcherBot, "ButcherBot");
+					gui.butcherBotThread.start();
+				} else {
+					if (gui.butcherBot != null) {
+						gui.butcherBot.stop = true;
+						gui.butcherBot.stop();
+						gui.butcherBot.reqdestroy();
+						gui.butcherBot = null;
+						gui.butcherBotThread = null;
 					}
 				}
 			}
