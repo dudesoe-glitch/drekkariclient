@@ -2447,6 +2447,10 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
 				}
 			}
 		} else { // ND: This means no object was clicked. We clicked the ground.
+			if (clickb == 1 && ui.gui.miningBot != null && ui.gui.miningBot.settingTarget) {
+				ui.gui.miningBot.setTarget(mc);
+				return;
+			}
 			if (clickb == 1 && ui.modmeta && ui.gui.vhand == null) {
 				addCheckpoint(mc);
 			} else if (clickb == 1) { // Left Click

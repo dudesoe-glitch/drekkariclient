@@ -52,6 +52,8 @@ public class FlowerMenu extends Widget {
 	public static final Color ptcYellow = new Color(252, 186, 3);
 	public static final Color ptcStroke = Color.BLACK;
 	private static String nextAutoSel;
+	public static String lastChosenOption = null;
+	public static String lastChosenResource = null;
 	public final String[] options;
 	private static final String DATABASE = "jdbc:sqlite:static_data.db";
 	public static Map<String, Boolean> autoSelectMap = new TreeMap<>();
@@ -314,6 +316,11 @@ public class FlowerMenu extends Widget {
 	if(option == null) {
 	    wdgmsg("cl", -1);
 	} else {
+		lastChosenOption = option.name;
+		if (ui != null && ui.gui != null && ui.gui.lastFlowerMenuItemRes != null) {
+			lastChosenResource = ui.gui.lastFlowerMenuItemRes;
+			ui.gui.lastFlowerMenuItemRes = null; // consume so stale value isn't reused
+		}
 		if(AutoRepeatFlowerMenuScript.option != null){
 			AutoRepeatFlowerMenuScript.option = option.name;
 		}

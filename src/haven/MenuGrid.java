@@ -783,6 +783,8 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 		makeLocal("customclient/menugrid/Bots/ButcherBot");
 		makeLocal("customclient/menugrid/Bots/ClayDiggingBot");
 		makeLocal("customclient/menugrid/Bots/OreSmeltingBot");
+		makeLocal("customclient/menugrid/Bots/ForagingBot");
+		makeLocal("customclient/menugrid/Bots/MiningBot");
 
 		// Category: Other Scripts & Tools
 		makeLocal("customclient/menugrid/OtherScriptsAndTools/Add9CoalScript");
@@ -1040,6 +1042,36 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 						gui.oreSmeltingBot.reqdestroy();
 						gui.oreSmeltingBot = null;
 						gui.oreSmeltingBotThread = null;
+					}
+				}
+			} else if (ad[2].equals("ForagingBot")) {
+				if (gui.foragingBot == null && gui.foragingBotThread == null) {
+					gui.foragingBot = new ForagingBot(gui);
+					gui.add(gui.foragingBot, Utils.getprefc("wndc-foragingBotWindow", new Coord(gui.sz.x/2 - gui.foragingBot.sz.x/2, gui.sz.y/2 - gui.foragingBot.sz.y/2 - 200)));
+					gui.foragingBotThread = new Thread(gui.foragingBot, "ForagingBot");
+					gui.foragingBotThread.start();
+				} else {
+					if (gui.foragingBot != null) {
+						gui.foragingBot.stop = true;
+						gui.foragingBot.stop();
+						gui.foragingBot.reqdestroy();
+						gui.foragingBot = null;
+						gui.foragingBotThread = null;
+					}
+				}
+			} else if (ad[2].equals("MiningBot")) {
+				if (gui.miningBot == null && gui.miningBotThread == null) {
+					gui.miningBot = new MiningBot(gui);
+					gui.add(gui.miningBot, Utils.getprefc("wndc-miningBotWindow", new Coord(gui.sz.x/2 - gui.miningBot.sz.x/2, gui.sz.y/2 - gui.miningBot.sz.y/2 - 200)));
+					gui.miningBotThread = new Thread(gui.miningBot, "MiningBot");
+					gui.miningBotThread.start();
+				} else {
+					if (gui.miningBot != null) {
+						gui.miningBot.stop = true;
+						gui.miningBot.stop();
+						gui.miningBot.reqdestroy();
+						gui.miningBot = null;
+						gui.miningBotThread = null;
 					}
 				}
 			}

@@ -1,84 +1,84 @@
-# HANDOFF — Session 5 (OptWnd Refactor, Inventory Features, New Bots, ExtInventory)
+# HANDOFF — Session 6 (List View Polish, Repeat Mode, Category Badges, New Bots)
 
 ## Resumption Prompt
-Implemented 6 features: OptWnd tooltip extraction (380 lines → separate class), inventory group headers with type icons + collapsible groups, Clay Digging bot, Ore Smelting bot, and Inventory List View window. Build clean with zero errors.
+Implemented 6 sub-features across 4 areas: list view icons + click-to-find highlighting, flower menu repeat toolbar button, item type category badges, ForagingBot, and MiningBot. Build clean with zero errors.
 
 ## Goal
-Work through all priorities from session 4 HANDOFF, skipping testing.
+Work through all priorities from session 5 HANDOFF except testing.
 
 ## Completed
 
-### Refactoring
-1. **OptWnd tooltip extraction** (`OptWndTooltips.java`)
-   - Moved ~380 lines of tooltip definitions from OptWnd.java to new `OptWndTooltips.java`
-   - OptWnd.java reduced from 5652 to 5272 lines
-   - All 168 tooltip references updated (OptWnd.java + SAttrWnd.java)
-   - Tooltips organized by category: Interface, Combat, Display, Audio, Automation, Camera, Graphics, Server
+### Inventory List View Polish
+1. **Item icons in rows** (`InventoryListWindow.java`)
+   - Each row now shows a 14x14 item icon to the left of the text
+   - Icon loaded from item's `Resource.imgc` layer, same as group headers
+   - Row height increased from 16 to 18px to accommodate icons
+   - Resource cached per item group for efficiency
 
-### Inventory Features
-2. **Group headers with type icons** (`Inventory.java`)
-   - `drawGroupHeaders()` renders floating header labels above each group
-   - Headers show: collapse arrow (▶/▼) + item name/bracket + count + representative item icon
-   - Semi-transparent black header background for readability
-   - Item icon loaded from resource's imgc layer, scaled to 11px
+2. **Click-to-find grid highlighting** (`InventoryListWindow.java`, `Inventory.java`, `WItem.java`)
+   - Clicking a row in list view highlights matching items in inventory grid
+   - `Inventory.highlightItemName` synced from list view's `highlightedName`
+   - WItem draws pulsing blue 2px border (alpha oscillates via `Math.sin(Utils.rtime() * 5)`)
 
-3. **Collapsible inventory groups** (`Inventory.java`)
-   - `collapsedGroups` Set tracks which groups are collapsed by group key
-   - Click header to toggle collapse — items are hidden from draw but still exist in grid
-   - Collapsed groups show dimmed overlay (40,40,40 alpha 140)
-   - `mousedown()` override detects clicks on header hit areas
-   - Collapsed state resets when grouping mode changes
+### Flower Menu Repeat Mode
+3. **Repeat button in inventory toolbar** (`GameUI.java`, `FlowerMenu.java`, `WItem.java`)
+   - "Repeat" button added after "List" button in inventory toolbar
+   - Tracks last chosen flower menu option and source item resource
+   - `FlowerMenu.lastChosenOption` / `lastChosenResource` static fields
+   - `GameUI.lastFlowerMenuItemRes` set on right-click before `iact` message
+   - Click "Repeat" → launches `AutoRepeatFlowerMenuScript` with stored values
+   - Shows error if no previous action to repeat
 
-4. **Inventory List View** (`InventoryListWindow.java`)
-   - Separate window showing text-based item summary
-   - Groups items by name: "3x Coal  q45-67"
-   - Quality color-coded: gray(<10), white(<25), green(<50), blue(<100), purple(100+)
-   - Sort modes: By Name, By Count, By Quality (toggleable button)
-   - Click row to highlight item type (blue highlight)
-   - Summary footer: "47 items, 12 types"
-   - Auto-refreshes every 0.5s
-   - "List" button added to inventory toolbar
-   - Window position persisted
+### Type Category Badges
+4. **Colored dot badges on inventory items** (`WItem.java`, `OptWnd.java`)
+   - `ItemCategory` enum: FOOD (green), ARMOR (blue), CURIOSITY (purple), TOOL (yellow)
+   - Detection via `AttrCache<ItemCategory>` checking `FoodInfo`, `Armor`, `Curiosity` info types
+   - Tool detection by resource name patterns (`/tools/`, `pickaxe`, `shovel`, etc.)
+   - Small filled circle drawn at bottom-left of each item
+   - Setting: "Show Item Category Badges" checkbox in Display/Quality panel (default: off)
 
 ### New Bots
-5. **Clay Digging bot** (`ClayDiggingBot.java`)
-   - Finds nearest clay patch (gfx/terobjs/clay)
-   - Pathfinds to target, right-clicks with FlowerMenu "Dig"
-   - Waits for progress bar, repeats
-   - Auto-drink at <40% stamina, hearth at <2% HP, stop at <2% energy
-   - Status label shows current action
+5. **ForagingBot** (`src/haven/automated/ForagingBot.java`, ~200 lines)
+   - Auto-finds and picks nearby herbs (`gfx/terobjs/herbs/*`)
+   - "Also pick ground items" checkbox for truffles, gemstones, etc.
+   - Pathfinds to target, `FlowerMenu.setNextSelection("Pick")`, right-clicks
+   - Safety: HP/energy/stamina checks, inventory full detection, auto-drink
    - Registered in GameUI + MenuGrid
 
-6. **Ore Smelting bot** (`OreSmeltingBot.java`, 732 lines)
-   - 7 ore type checkboxes: Copper, Tin, Iron, Gold, Silver, Lead, Zinc
-   - Configurable fuel count per smelter load (1-20)
-   - "Collect output" toggle for collecting bars
-   - Workflow: find smelter → pathfind → transfer ore → add fuel → light → wait → collect
-   - Uses existing AddCoalToSmelter pattern for item-to-smelter transfer
-   - Preferences persisted per ore type
+6. **MiningBot** (`src/haven/automated/MiningBot.java`, ~200 lines)
+   - "Mine Here" button stores player's current position as mining target
+   - Repeatedly left-clicks target coordinate to mine
+   - Waits for progress bar completion, drops cursor items
+   - Safety: HP/energy/stamina checks, inventory full detection, auto-drink
+   - Target coordinate shown in UI
    - Registered in GameUI + MenuGrid
 
 ## In Progress
 Nothing — all planned work complete.
 
 ## Next Priorities
-1. **Test all features in-game** — especially bots (flower menu option names), group headers visibility, list view
-2. **Polish list view** — add item icon in rows, click-to-find in grid
-3. **Repeat mode for flower menu** — button in toolbar to repeat last action on similar items
-4. **More inventory polish** — type category badges on grid items (food=green, armor=blue, etc.)
-5. **New bots** — Foraging, Mining automation
+1. **Test all features in-game** — especially:
+   - List view icons render correctly
+   - Click-to-find highlighting matches correct items
+   - Repeat button works with flower menu actions
+   - Category badges show correct colors for food/armor/curios/tools
+   - ForagingBot flower menu "Pick" action works
+   - MiningBot "Mine Here" targeting + repeated mining
+2. **Polish** — adjust badge size/position, refine tool detection heuristics
+3. **More bots** — consider additional automation (fishing improvements, etc.)
+4. **OptWnd further extraction** — still 5000+ lines, more panels could be extracted
 
 ## Files Modified
 | File | Changes |
 |------|---------|
-| `src/haven/OptWndTooltips.java` | NEW — 384 lines, all tooltip definitions extracted from OptWnd |
-| `src/haven/OptWnd.java` | Removed 380 lines of tooltip defs, updated 168 references to use OptWndTooltips |
-| `src/haven/SAttrWnd.java` | Updated 4 tooltip references from OptWnd → OptWndTooltips |
-| `src/haven/Inventory.java` | Group headers, collapsible groups, mousedown handler, collapsed state |
-| `src/haven/InventoryListWindow.java` | NEW — 210 lines, text-based item list with sort/filter/highlight |
-| `src/haven/GameUI.java` | List button in toolbar, OreSmeltingBot fields, collapsed groups clear |
-| `src/haven/automated/ClayDiggingBot.java` | NEW — 198 lines, clay patch digging automation |
-| `src/haven/automated/OreSmeltingBot.java` | NEW — 732 lines, full ore smelting automation with 7 ore types |
-| `src/haven/MenuGrid.java` | Registration for ClayDiggingBot + OreSmeltingBot |
-| `res/customclient/menugrid/Bots/ClayDiggingBot.res` | NEW — menu icon resource |
-| `res/customclient/menugrid/Bots/OreSmeltingBot.res` | NEW — menu icon resource |
+| `src/haven/InventoryListWindow.java` | Item icons in rows, increased row height, resource caching |
+| `src/haven/Inventory.java` | Added `highlightItemName` field |
+| `src/haven/WItem.java` | Click-to-find blue border, `ItemCategory` enum + AttrCache, badge drawing, `lastFlowerMenuItemRes` tracking |
+| `src/haven/FlowerMenu.java` | `lastChosenOption` + `lastChosenResource` static fields, tracking in `choose()` |
+| `src/haven/GameUI.java` | Repeat button in toolbar, `lastFlowerMenuItemRes` field, ForagingBot/MiningBot fields |
+| `src/haven/OptWnd.java` | `showItemCategoryBadgesCheckBox` declaration + initialization |
+| `src/haven/MenuGrid.java` | ForagingBot + MiningBot registration + handlers |
+| `src/haven/automated/ForagingBot.java` | NEW — auto-herb picking bot |
+| `src/haven/automated/MiningBot.java` | NEW — auto-mining bot |
+| `res/customclient/menugrid/Bots/ForagingBot.res` | NEW — menu icon |
+| `res/customclient/menugrid/Bots/MiningBot.res` | NEW — menu icon |

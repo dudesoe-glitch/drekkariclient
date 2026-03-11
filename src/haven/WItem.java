@@ -77,6 +77,16 @@ public class WItem extends Widget implements DTarget {
 		return new Pair<>(bar, Utils.blendcol(bar, redDurability, orangeDurability, yellowDurability, greenDurability));
 	}));
 
+	public enum ItemCategory {
+		FOOD(new Color(50, 200, 50, 200)),
+		ARMOR(new Color(80, 130, 255, 200)),
+		CURIOSITY(new Color(200, 100, 255, 200)),
+		TOOL(new Color(255, 200, 50, 200)),
+		NONE(null);
+		public final Color color;
+		ItemCategory(Color c) { this.color = c; }
+	}
+
     public WItem(GItem item) {
 	super(sqsz);
 	this.item = item;
@@ -296,6 +306,31 @@ public class WItem extends Widget implements DTarget {
 			g.aimage(item.stackQualityTex, new Coord(g.sz().x, 0), 0.95, 0.2);
 		}
 		drawDurabilityBars(g, sz);
+		if (OptWnd.showItemCategoryBadgesCheckBox != null && OptWnd.showItemCategoryBadgesCheckBox.a) {
+			ItemCategory cat = itemCategory.get();
+			if (cat != null && cat.color != null) {
+				g.chcolor(cat.color);
+				g.fcircle(UI.scale(8), sz.y - UI.scale(5), UI.scale(3), 8);
+				g.chcolor();
+			}
+		}
+		if (parent instanceof Inventory) {
+			Inventory inv = (Inventory) parent;
+			if (inv.highlightItemName != null) {
+				try {
+					if (sortName().equals(inv.highlightItemName)) {
+						int alpha = (int)(100 + 80 * Math.sin(Utils.rtime() * 5));
+						g.chcolor(80, 140, 255, alpha);
+						int bw = 2;
+						g.frect(Coord.z, new Coord(sz.x, bw));
+						g.frect(Coord.z, new Coord(bw, sz.y));
+						g.frect(new Coord(0, sz.y - bw), new Coord(sz.x, bw));
+						g.frect(new Coord(sz.x - bw, 0), new Coord(bw, sz.y));
+						g.chcolor();
+					}
+				} catch (Exception ignored) {}
+			}
+		}
 	} else {
 	    g.image(missing.layer(Resource.imgc).tex(), Coord.z, sz);
 	}
@@ -352,6 +387,7 @@ public class WItem extends Widget implements DTarget {
 				}
 			}
 		}
+		try { ui.gui.lastFlowerMenuItemRes = item.getres().name; } catch (Loading ignored) {}
 	    item.wdgmsg("iact", ev.c, ui.modflags());
 	    return(true);
 	}
@@ -505,6 +541,32 @@ public class WItem extends Widget implements DTarget {
 			}
 			return(ret);
 		});
+	});
+
+	private static final java.util.Set<String> TOOL_BASENAMES = new java.util.HashSet<>(java.util.Arrays.asList(
+		"pickaxe", "shovel", "woodenshovel", "tinkershovel", "metalshovel",
+		"axe", "stoneaxe", "boneaxe", "metalaxe",
+		"saw", "scythe", "sledgehammer", "hammer", "sewing-needle",
+		"firestarter", "smithshammer", "fryingpan", "crucible"
+	));
+
+	public final AttrCache<ItemCategory> itemCategory = new AttrCache<>(this::info, info -> {
+		for (ItemInfo inf : info) {
+			if (inf instanceof haven.resutil.FoodInfo) return () -> ItemCategory.FOOD;
+			if (inf instanceof haven.res.ui.tt.armor.Armor) return () -> ItemCategory.ARMOR;
+			if (inf instanceof haven.resutil.Curiosity) return () -> ItemCategory.CURIOSITY;
+		}
+		try {
+			String resname = WItem.this.item.resname();
+			if (resname.contains("/tools/")) {
+				return () -> ItemCategory.TOOL;
+			}
+			String basename = resname.substring(resname.lastIndexOf('/') + 1);
+			if (TOOL_BASENAMES.contains(basename)) {
+				return () -> ItemCategory.TOOL;
+			}
+		} catch (Exception ignored) {}
+		return () -> ItemCategory.NONE;
 	});
 
 	private void drawwellmined(GOut g) {
