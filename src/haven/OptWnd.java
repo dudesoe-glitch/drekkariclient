@@ -62,6 +62,7 @@ public class OptWnd extends Window {
 	public static final Color msgYellow = new Color(218, 163, 0);
 	public static FlowerMenuAutoSelectManagerWindow flowerMenuAutoSelectManagerWindow;
 	public static AutoDropManagerWindow autoDropManagerWindow;
+	public static ItemAutoDropWindow itemAutoDropWindow;
 	AlarmWindow alarmWindow;
 	public static GSettings currentgprefs;
 	public static final Map<String, Color> improvedOpeningsImageColor =	new ConcurrentHashMap<>(4);
@@ -3220,6 +3221,27 @@ public class OptWnd extends Window {
 		y+=UI.scale(20);
 		y = addbtn(cont, "Instant Log Out", GameUI.kb_instantLogout, y);
 
+		y = cont.adda(new Label("Equipment Quick-Swap (from Belt)"), cont.sz.x / 2, y + UI.scale(10), 0.5, 0.0).pos("bl").adds(0, 5).y;
+		y = addbtnImproved(cont, "B12 Axe", "Equip B12 Axe from belt (two-hander)", new Color(255, 100, 100, 255), GameUI.kb_equipB12, y);
+		y = addbtnImproved(cont, "Cutblade", "Equip Cutblade from belt (two-hander)", new Color(255, 100, 100, 255), GameUI.kb_equipCutblade, y);
+		y = addbtnImproved(cont, "Boar Spear", "Equip Boar Spear from belt (two-hander)", new Color(255, 100, 100, 255), GameUI.kb_equipBoarSpear, y);
+		y = addbtnImproved(cont, "Giant Needle", "Equip Giant Needle from belt (two-hander)", new Color(255, 100, 100, 255), GameUI.kb_equipGiantNeedle, y);
+		y = addbtnImproved(cont, "Hirdsman's Sword + Shield", "Equip Hirdsman's Sword and Wooden Shield from belt", new Color(255, 100, 100, 255), GameUI.kb_equipHirdsmanSword, y);
+		y = addbtnImproved(cont, "Bronze Sword + Shield", "Equip Bronze Sword and Wooden Shield from belt", new Color(255, 100, 100, 255), GameUI.kb_equipBronzeSword, y);
+		y = addbtnImproved(cont, "Fyrdsman's Sword + Shield", "Equip Fyrdsman's Sword and Wooden Shield from belt", new Color(255, 100, 100, 255), GameUI.kb_equipFyrdsmanSword, y);
+		y = addbtnImproved(cont, "Hunter's Bow", "Equip Hunter's Bow from belt (two-hander)", new Color(255, 100, 100, 255), GameUI.kb_equipHuntersBow, y);
+		y = addbtnImproved(cont, "Ranger's Bow", "Equip Ranger's Bow from belt (two-hander)", new Color(255, 100, 100, 255), GameUI.kb_equipRangersBow, y);
+		y += UI.scale(5);
+		y = addbtnImproved(cont, "Pickaxe", "Equip Pickaxe from belt (two-hander)", new Color(100, 200, 255, 255), GameUI.kb_equipPickaxe, y);
+		y = addbtnImproved(cont, "Sledgehammer", "Equip Sledgehammer from belt (two-hander)", new Color(100, 200, 255, 255), GameUI.kb_equipSledgehammer, y);
+		y = addbtnImproved(cont, "Scythe", "Equip Scythe from belt (two-hander)", new Color(100, 200, 255, 255), GameUI.kb_equipScythe, y);
+		y = addbtnImproved(cont, "Metal Shovel", "Equip Metal Shovel from belt (two-hander)", new Color(100, 200, 255, 255), GameUI.kb_equipMetalShovel, y);
+		y = addbtnImproved(cont, "Tinker's Shovel", "Equip Tinker's Shovel from belt (two-hander)", new Color(100, 200, 255, 255), GameUI.kb_equipTinkersShovel, y);
+		y = addbtnImproved(cont, "Wooden Shovel", "Equip Wooden Shovel from belt (two-hander)", new Color(100, 200, 255, 255), GameUI.kb_equipWoodenShovel, y);
+		y += UI.scale(5);
+		y = addbtnImproved(cont, "Traveller's Sacks", "Equip Traveller's Sacks from belt (both hands)", new Color(100, 255, 100, 255), GameUI.kb_equipTravelersSacks, y);
+		y = addbtnImproved(cont, "Wanderer's Bindles", "Equip Wanderer's Bindles from belt (both hands)", new Color(100, 255, 100, 255), GameUI.kb_equipWanderersBindles, y);
+
 		prev = adda(new PointBind(UI.scale(200)), scroll.pos("bl").adds(0, 10).x(scroll.sz.x / 2), 0.5, 0.0);
 	    prev = adda(new PButton(UI.scale(200), "Back", 27, back, "Options            "), prev.pos("bl").adds(0, 10).x(scroll.sz.x / 2), 0.5, 0.0);
 	    pack();
@@ -3456,6 +3478,14 @@ public class OptWnd extends Window {
 					autoDropManagerWindow.show(!autoDropManagerWindow.visible);
 				}
 			}),prev.pos("bl").adds(0, 12).x(0));
+			prev = add(new Button(UI.scale(250), "Per-Item Auto-Drop Config", false, () -> {
+				if(!itemAutoDropWindow.attached) {
+					this.parent.parent.add(itemAutoDropWindow);
+					itemAutoDropWindow.show();
+				} else {
+					itemAutoDropWindow.show(!itemAutoDropWindow.visible);
+				}
+			}),prev.pos("bl").adds(0, 4).x(0));
 
 			prev = add(autoPeaceAnimalsWhenCombatStartsCheckBox = new CheckBox("Auto-Peace Animals when Combat Starts"){
 				{a = Utils.getprefb("autoPeaceAnimalsWhenCombatStarts", false);}
@@ -5111,6 +5141,7 @@ public class OptWnd extends Window {
     public OptWnd(boolean gopts) {
 	super(Coord.z, "Options            ", true); // ND: Added a bunch of spaces to the caption(title) in order avoid text cutoff when changing it
 	autoDropManagerWindow = new AutoDropManagerWindow();
+	itemAutoDropWindow = new ItemAutoDropWindow();
 	flowerMenuAutoSelectManagerWindow = new FlowerMenuAutoSelectManagerWindow();
 	main = add(new Panel());
 	Panel video = add(new VideoPanel(main));

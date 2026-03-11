@@ -662,18 +662,27 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 					quality = this.info().stream().filter(info -> info instanceof Quality).mapToDouble(info -> ((Quality) info).q).findFirst().orElse(0.0);
 				}
 				if (quality > 0.1 && contentswnd == null) {
-					if (AutoDropManagerWindow.autoDropStonesCheckbox.a && Config.stoneItemBaseNames.contains(itemBaseName) && parseTextEntryInt(AutoDropManagerWindow.autoDropStonesQualityTextEntry) > quality) {
+					boolean dropped = false;
+					// Per-item auto-drop takes priority
+					if (ItemAutoDrop.shouldDrop(itemBaseName, quality)) {
 						this.wdgmsg("drop", Coord.z);
-					} else if (AutoDropManagerWindow.autoDropCoalsCheckbox.a && Config.coalItemBaseNames.contains(itemBaseName) && parseTextEntryInt(AutoDropManagerWindow.autoDropCoalsQualityTextEntry) > quality) {
-						this.wdgmsg("drop", Coord.z);
-					} else if (AutoDropManagerWindow.autoDropOresCheckbox.a && Config.oreItemBaseNames.contains(itemBaseName) && parseTextEntryInt(AutoDropManagerWindow.autoDropOresQualityTextEntry) > quality) {
-						this.wdgmsg("drop", Coord.z);
-					} else if (AutoDropManagerWindow.autoDropPreciousOresCheckbox.a && Config.preciousOreItemBaseNames.contains(itemBaseName) && parseTextEntryInt(AutoDropManagerWindow.autoDropPreciousOresQualityTextEntry) > quality) {
-						this.wdgmsg("drop", Coord.z);
-					} else if (AutoDropManagerWindow.autoDropMinedCuriosCheckbox.a && Config.minedCuriosItemBaseNames.contains(itemBaseName) && parseTextEntryInt(AutoDropManagerWindow.autoDropMinedCuriosQualityTextEntry) > quality) {
-						this.wdgmsg("drop", Coord.z);
-					} else if (AutoDropManagerWindow.autoDropQuarryartzCheckbox.a && itemBaseName.equals("quarryquartz") && parseTextEntryInt(AutoDropManagerWindow.autoDropQuarryartzQualityTextEntry) > quality) {
-						this.wdgmsg("drop", Coord.z);
+						dropped = true;
+					}
+					// Fall back to category-based auto-drop
+					if (!dropped) {
+						if (AutoDropManagerWindow.autoDropStonesCheckbox.a && Config.stoneItemBaseNames.contains(itemBaseName) && parseTextEntryInt(AutoDropManagerWindow.autoDropStonesQualityTextEntry) > quality) {
+							this.wdgmsg("drop", Coord.z);
+						} else if (AutoDropManagerWindow.autoDropCoalsCheckbox.a && Config.coalItemBaseNames.contains(itemBaseName) && parseTextEntryInt(AutoDropManagerWindow.autoDropCoalsQualityTextEntry) > quality) {
+							this.wdgmsg("drop", Coord.z);
+						} else if (AutoDropManagerWindow.autoDropOresCheckbox.a && Config.oreItemBaseNames.contains(itemBaseName) && parseTextEntryInt(AutoDropManagerWindow.autoDropOresQualityTextEntry) > quality) {
+							this.wdgmsg("drop", Coord.z);
+						} else if (AutoDropManagerWindow.autoDropPreciousOresCheckbox.a && Config.preciousOreItemBaseNames.contains(itemBaseName) && parseTextEntryInt(AutoDropManagerWindow.autoDropPreciousOresQualityTextEntry) > quality) {
+							this.wdgmsg("drop", Coord.z);
+						} else if (AutoDropManagerWindow.autoDropMinedCuriosCheckbox.a && Config.minedCuriosItemBaseNames.contains(itemBaseName) && parseTextEntryInt(AutoDropManagerWindow.autoDropMinedCuriosQualityTextEntry) > quality) {
+							this.wdgmsg("drop", Coord.z);
+						} else if (AutoDropManagerWindow.autoDropQuarryartzCheckbox.a && itemBaseName.equals("quarryquartz") && parseTextEntryInt(AutoDropManagerWindow.autoDropQuarryartzQualityTextEntry) > quality) {
+							this.wdgmsg("drop", Coord.z);
+						}
 					}
 					checkedAutodrop = true;
 				}
