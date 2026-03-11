@@ -191,6 +191,8 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 	public Thread fishingThread;
 	public FarmingBot farmingBot;
 	public Thread farmingBotThread;
+	public ButcherBot butcherBot;
+	public Thread butcherBotThread;
 
     public static abstract class BeltSlot {
 	public final int idx;
@@ -1183,6 +1185,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 	} else if(place == "inv") {
 	    invwnd = new Hidewnd(Coord.z, "Inventory") {
 		    private Label itemCountLabel;
+		    private Button groupBtn;
 
 		    {
 			int toolbarY = 0;
@@ -1206,7 +1209,18 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 			    }
 			}, sortBtn.pos("ur").adds(4, 0));
 			searchBtn.settip("Search/filter inventory items (Ctrl+Shift+F)");
-			itemCountLabel = add(new Label(""), searchBtn.pos("ur").adds(8, 3));
+			Inventory.GroupingMode initMode = Inventory.GroupingMode.values()[Math.min(Utils.getprefi("inventoryGroupMode", 0), Inventory.GroupingMode.values().length - 1)];
+			groupBtn = add(new Button(UI.scale(75), initMode.label) {
+			    public void click() {
+				if (maininv != null) {
+				    maininv.groupingMode = maininv.groupingMode.next();
+				    Utils.setprefi("inventoryGroupMode", maininv.groupingMode.ordinal());
+				    this.change(maininv.groupingMode.label);
+				}
+			    }
+			}, searchBtn.pos("ur").adds(4, 0));
+			groupBtn.settip("Cycle grouping mode: colors items by group. Sort to arrange.");
+			itemCountLabel = add(new Label(""), groupBtn.pos("ur").adds(8, 3));
 		    }
 
 		    public void cresize(Widget ch) {
@@ -1237,6 +1251,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 		};
 	    maininv = (Inventory)child;
 	    maininv.c = new Coord(0, UI.scale(22));
+	    maininv.groupingMode = Inventory.GroupingMode.values()[Math.min(Utils.getprefi("inventoryGroupMode", 0), Inventory.GroupingMode.values().length - 1)];
 	    invwnd.add(maininv);
 	    invwnd.pack();
 	    invwnd.hide();
