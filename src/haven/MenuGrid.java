@@ -781,6 +781,8 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 		makeLocal("customclient/menugrid/Bots/RoastingSpitBot");
 		makeLocal("customclient/menugrid/Bots/FarmingBot");
 		makeLocal("customclient/menugrid/Bots/ButcherBot");
+		makeLocal("customclient/menugrid/Bots/ClayDiggingBot");
+		makeLocal("customclient/menugrid/Bots/OreSmeltingBot");
 
 		// Category: Other Scripts & Tools
 		makeLocal("customclient/menugrid/OtherScriptsAndTools/Add9CoalScript");
@@ -1008,6 +1010,36 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 						gui.butcherBot.reqdestroy();
 						gui.butcherBot = null;
 						gui.butcherBotThread = null;
+					}
+				}
+			} else if (ad[2].equals("ClayDiggingBot")) {
+				if (gui.clayDiggingBot == null && gui.clayDiggingBotThread == null) {
+					gui.clayDiggingBot = new ClayDiggingBot(gui);
+					gui.add(gui.clayDiggingBot, Utils.getprefc("wndc-clayDiggingBotWindow", new Coord(gui.sz.x/2 - gui.clayDiggingBot.sz.x/2, gui.sz.y/2 - gui.clayDiggingBot.sz.y/2 - 200)));
+					gui.clayDiggingBotThread = new Thread(gui.clayDiggingBot, "ClayDiggingBot");
+					gui.clayDiggingBotThread.start();
+				} else {
+					if (gui.clayDiggingBot != null) {
+						gui.clayDiggingBot.stop = true;
+						gui.clayDiggingBot.stop();
+						gui.clayDiggingBot.reqdestroy();
+						gui.clayDiggingBot = null;
+						gui.clayDiggingBotThread = null;
+					}
+				}
+			} else if (ad[2].equals("OreSmeltingBot")) {
+				if (gui.oreSmeltingBot == null && gui.oreSmeltingBotThread == null) {
+					gui.oreSmeltingBot = new OreSmeltingBot(gui);
+					gui.add(gui.oreSmeltingBot, Utils.getprefc("wndc-oreSmeltingBotWindow", new Coord(gui.sz.x/2 - gui.oreSmeltingBot.sz.x/2, gui.sz.y/2 - gui.oreSmeltingBot.sz.y/2 - 200)));
+					gui.oreSmeltingBotThread = new Thread(gui.oreSmeltingBot, "OreSmeltingBot");
+					gui.oreSmeltingBotThread.start();
+				} else {
+					if (gui.oreSmeltingBot != null) {
+						gui.oreSmeltingBot.stop = true;
+						gui.oreSmeltingBot.stop();
+						gui.oreSmeltingBot.reqdestroy();
+						gui.oreSmeltingBot = null;
+						gui.oreSmeltingBotThread = null;
 					}
 				}
 			}

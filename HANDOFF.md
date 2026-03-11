@@ -1,65 +1,84 @@
-# HANDOFF — Session 4 (Butcher Bot, Inventory Grouping)
+# HANDOFF — Session 5 (OptWnd Refactor, Inventory Features, New Bots, ExtInventory)
 
 ## Resumption Prompt
-Implemented 2 new features: batch animal butchering bot (4 animal categories, pathfinding, auto-drink, progress bar waiting) and inventory grouping modes (None/By Name/By Quality with colored overlays and quality-bracket sorting). Also verified 2 features already existed (flat terrain toggle, FEP modifier tooltips). Build clean with zero errors.
+Implemented 6 features: OptWnd tooltip extraction (380 lines → separate class), inventory group headers with type icons + collapsible groups, Clay Digging bot, Ore Smelting bot, and Inventory List View window. Build clean with zero errors.
 
 ## Goal
-Work through priority list from session 3 HANDOFF, skipping testing.
+Work through all priorities from session 4 HANDOFF, skipping testing.
 
 ## Completed
 
-### New Features
-1. **Batch animal butchering bot** (`ButcherBot.java`, `GameUI.java`, `MenuGrid.java`)
-   - 4 category checkboxes: Large Game, Livestock, Predators, Small Game
-   - Finds knocked animals via `gob.getPoses().contains("knock")`
-   - Pathfinds to nearest, right-clicks with `FlowerMenu.setNextSelection("Butcher")`
-   - Vital checks: HP hearth, energy stop, stamina auto-drink
-   - Status label shows current action (Walking, Butchering, Drinking, etc.)
-   - Category prefs persisted via `butcherBot_*` preference keys
-   - 30+ animal types across all categories (cattle, sheep, bear, deer, fox, etc.)
-   - Registered in MenuGrid + GameUI (standard bot pattern)
-   - Menu resource: `res/customclient/menugrid/Bots/ButcherBot.res`
+### Refactoring
+1. **OptWnd tooltip extraction** (`OptWndTooltips.java`)
+   - Moved ~380 lines of tooltip definitions from OptWnd.java to new `OptWndTooltips.java`
+   - OptWnd.java reduced from 5652 to 5272 lines
+   - All 168 tooltip references updated (OptWnd.java + SAttrWnd.java)
+   - Tooltips organized by category: Interface, Combat, Display, Audio, Automation, Camera, Graphics, Server
 
-2. **Inventory grouping modes** (`Inventory.java`, `GameUI.java`)
-   - `GroupingMode` enum: NONE / BY_NAME / BY_QUALITY
-   - "Group" button in inventory toolbar cycles through modes
-   - Colored background tints distinguish groups (10 alternating colors, alpha 55)
-   - BY_NAME: groups by item display name (same type = same color)
-   - BY_QUALITY: groups by quality bracket (0-10, 10-25, 25-50, 50-100, 100+)
-   - Sort respects grouping mode: BY_QUALITY uses bracket-then-name-then-quality comparator
-   - Mode persisted to `inventoryGroupMode` preference
-   - Bounds-safe preference loading (handles invalid saved values)
+### Inventory Features
+2. **Group headers with type icons** (`Inventory.java`)
+   - `drawGroupHeaders()` renders floating header labels above each group
+   - Headers show: collapse arrow (▶/▼) + item name/bracket + count + representative item icon
+   - Semi-transparent black header background for readability
+   - Item icon loaded from resource's imgc layer, scaled to 11px
 
-### Verification (already existed)
-3. **Flat terrain toggle** — `OptWnd.flatWorldCheckBox`, menu grid toggle, cliff height scaling
-4. **FEP modifier tooltips** — `FoodInfo.java` already shows modified FEP with breakdown (subscription, hunger, satiation, salt, table bonus), Shift toggles unmodified values
+3. **Collapsible inventory groups** (`Inventory.java`)
+   - `collapsedGroups` Set tracks which groups are collapsed by group key
+   - Click header to toggle collapse — items are hidden from draw but still exist in grid
+   - Collapsed groups show dimmed overlay (40,40,40 alpha 140)
+   - `mousedown()` override detects clicks on header hit areas
+   - Collapsed state resets when grouping mode changes
+
+4. **Inventory List View** (`InventoryListWindow.java`)
+   - Separate window showing text-based item summary
+   - Groups items by name: "3x Coal  q45-67"
+   - Quality color-coded: gray(<10), white(<25), green(<50), blue(<100), purple(100+)
+   - Sort modes: By Name, By Count, By Quality (toggleable button)
+   - Click row to highlight item type (blue highlight)
+   - Summary footer: "47 items, 12 types"
+   - Auto-refreshes every 0.5s
+   - "List" button added to inventory toolbar
+   - Window position persisted
+
+### New Bots
+5. **Clay Digging bot** (`ClayDiggingBot.java`)
+   - Finds nearest clay patch (gfx/terobjs/clay)
+   - Pathfinds to target, right-clicks with FlowerMenu "Dig"
+   - Waits for progress bar, repeats
+   - Auto-drink at <40% stamina, hearth at <2% HP, stop at <2% energy
+   - Status label shows current action
+   - Registered in GameUI + MenuGrid
+
+6. **Ore Smelting bot** (`OreSmeltingBot.java`, 732 lines)
+   - 7 ore type checkboxes: Copper, Tin, Iron, Gold, Silver, Lead, Zinc
+   - Configurable fuel count per smelter load (1-20)
+   - "Collect output" toggle for collecting bars
+   - Workflow: find smelter → pathfind → transfer ore → add fuel → light → wait → collect
+   - Uses existing AddCoalToSmelter pattern for item-to-smelter transfer
+   - Preferences persisted per ore type
+   - Registered in GameUI + MenuGrid
 
 ## In Progress
 Nothing — all planned work complete.
 
 ## Next Priorities
-1. **Test all features in-game** — especially ButcherBot flower menu option name ("Butcher" may need adjustment)
-2. **OptWnd refactor** — extract tooltips (~380 lines) as lowest-risk first step
-3. **More inventory features** — item type icons in group headers, collapsible groups
-4. **New bots** — Clay digging, Ore smelting automation
-5. **Port EnderWiggin ExtInventory** — full item list view, repeat mode
-
-## Audit Findings (remaining, not yet fixed)
-- **MEDIUM**: OptWnd 5600-line god class (begin extracting Settings objects)
-- **MEDIUM**: `String ==` comparison used pervasively (fragile but intentional for interned protocol strings)
-- **LOW**: Mixed tabs/spaces, 400+ lines of commented-out code in GameUI
+1. **Test all features in-game** — especially bots (flower menu option names), group headers visibility, list view
+2. **Polish list view** — add item icon in rows, click-to-find in grid
+3. **Repeat mode for flower menu** — button in toolbar to repeat last action on similar items
+4. **More inventory polish** — type category badges on grid items (food=green, armor=blue, etc.)
+5. **New bots** — Foraging, Mining automation
 
 ## Files Modified
 | File | Changes |
 |------|---------|
-| `src/haven/automated/ButcherBot.java` | NEW — batch animal butchering bot with 4 categories |
-| `src/haven/Inventory.java` | GroupingMode enum, group overlay rendering, quality bracket comparator |
-| `src/haven/GameUI.java` | ButcherBot fields, Group button in inventory toolbar, groupingMode init |
-| `src/haven/MenuGrid.java` | ButcherBot menu registration + handler |
-| `res/customclient/menugrid/Bots/ButcherBot.res` | NEW — menu icon resource (copied from CleanupBot) |
-
-## Files Not Modified (verified already implemented)
-| Feature | Existing Files |
-|---------|---------------|
-| Flat terrain | OptWnd.java (flatWorldCheckBox), MapMesh.java, Ridges.java, MenuGrid.java |
-| FEP modifier tooltips | FoodInfo.java (tipimg() with hungerEfficiency, fepEfficiency, satiation, etc.) |
+| `src/haven/OptWndTooltips.java` | NEW — 384 lines, all tooltip definitions extracted from OptWnd |
+| `src/haven/OptWnd.java` | Removed 380 lines of tooltip defs, updated 168 references to use OptWndTooltips |
+| `src/haven/SAttrWnd.java` | Updated 4 tooltip references from OptWnd → OptWndTooltips |
+| `src/haven/Inventory.java` | Group headers, collapsible groups, mousedown handler, collapsed state |
+| `src/haven/InventoryListWindow.java` | NEW — 210 lines, text-based item list with sort/filter/highlight |
+| `src/haven/GameUI.java` | List button in toolbar, OreSmeltingBot fields, collapsed groups clear |
+| `src/haven/automated/ClayDiggingBot.java` | NEW — 198 lines, clay patch digging automation |
+| `src/haven/automated/OreSmeltingBot.java` | NEW — 732 lines, full ore smelting automation with 7 ore types |
+| `src/haven/MenuGrid.java` | Registration for ClayDiggingBot + OreSmeltingBot |
+| `res/customclient/menugrid/Bots/ClayDiggingBot.res` | NEW — menu icon resource |
+| `res/customclient/menugrid/Bots/OreSmeltingBot.res` | NEW — menu icon resource |

@@ -53,6 +53,12 @@ public class Inventory extends Widget implements DTarget {
 	}
 	public GroupingMode groupingMode = GroupingMode.NONE;
 
+	// Collapsed groups tracking (by group key)
+	public final Set<String> collapsedGroups = new HashSet<>();
+
+	// Cached group header hit areas for click detection
+	private final Map<String, Coord[]> groupHeaderAreas = new LinkedHashMap<>();
+
 	// Subtle tint colors for distinguishing groups
 	private static final java.awt.Color[] GROUP_COLORS = {
 		new java.awt.Color(50, 120, 50, 55),
@@ -160,7 +166,31 @@ public class Inventory extends Widget implements DTarget {
 	if (groupingMode != GroupingMode.NONE) {
 	    drawGroupOverlays(g);
 	}
+	// Hide collapsed items before drawing children
+	if (groupingMode != GroupingMode.NONE && !collapsedGroups.isEmpty()) {
+	    for (Widget wdg = child; wdg != null; wdg = wdg.next) {
+		if (wdg instanceof WItem) {
+		    WItem wi = (WItem) wdg;
+		    String key = getGroupKey(wi);
+		    if (collapsedGroups.contains(key)) {
+			wi.visible = false;
+		    }
+		}
+	    }
+	}
 	super.draw(g);
+	// Restore visibility after draw
+	if (groupingMode != GroupingMode.NONE && !collapsedGroups.isEmpty()) {
+	    for (Widget wdg = child; wdg != null; wdg = wdg.next) {
+		if (wdg instanceof WItem) {
+		    ((WItem) wdg).visible = true;
+		}
+	    }
+	}
+	// Draw group headers on top of everything
+	if (groupingMode != GroupingMode.NONE) {
+	    drawGroupHeaders(g);
+	}
     }
 
     private void drawGroupOverlays(GOut g) {
@@ -176,11 +206,114 @@ public class Inventory extends Widget implements DTarget {
 		}
 		int ci = groupColorIndex.get(key) % GROUP_COLORS.length;
 		java.awt.Color col = GROUP_COLORS[ci];
-		g.chcolor(col.getRed(), col.getGreen(), col.getBlue(), col.getAlpha());
+		boolean collapsed = collapsedGroups.contains(key);
+		if (collapsed) {
+		    // Dimmed overlay for collapsed groups
+		    g.chcolor(40, 40, 40, 140);
+		} else {
+		    g.chcolor(col.getRed(), col.getGreen(), col.getBlue(), col.getAlpha());
+		}
 		g.frect(wi.c.sub(1, 1), wi.sz.add(2, 2));
 		g.chcolor();
 	    }
 	}
+    }
+
+    private void drawGroupHeaders(GOut g) {
+	// Build group info: first item position + item count + representative icon
+	Map<String, Coord> groupFirstPos = new LinkedHashMap<>();
+	Map<String, Integer> groupCounts = new LinkedHashMap<>();
+	Map<String, WItem> groupRepItem = new LinkedHashMap<>();
+
+	for (Widget wdg = child; wdg != null; wdg = wdg.next) {
+	    if (wdg instanceof WItem) {
+		WItem wi = (WItem) wdg;
+		String key = getGroupKey(wi);
+		groupCounts.merge(key, 1, Integer::sum);
+		if (!groupFirstPos.containsKey(key)) {
+		    groupFirstPos.put(key, wi.c.sub(1, 1));
+		    groupRepItem.put(key, wi);
+		} else {
+		    // Track topmost-leftmost position
+		    Coord cur = groupFirstPos.get(key);
+		    if (wi.c.y < cur.y || (wi.c.y == cur.y && wi.c.x < cur.x)) {
+			groupFirstPos.put(key, wi.c.sub(1, 1));
+			groupRepItem.put(key, wi);
+		    }
+		}
+	    }
+	}
+
+	groupHeaderAreas.clear();
+	int headerH = UI.scale(12);
+
+	for (Map.Entry<String, Coord> entry : groupFirstPos.entrySet()) {
+	    String key = entry.getKey();
+	    Coord pos = entry.getValue();
+	    int count = groupCounts.getOrDefault(key, 0);
+	    boolean collapsed = collapsedGroups.contains(key);
+
+	    // Draw header background
+	    String label = collapsed ? "\u25B6 " + key + " (" + count + ")" : "\u25BC " + key + " (" + count + ")";
+	    Tex labelTex;
+	    try {
+		labelTex = Text.renderstroked(label, java.awt.Color.WHITE, java.awt.Color.BLACK, Text.num12boldFnd).tex();
+	    } catch (Exception e) {
+		continue;
+	    }
+
+	    // Draw small item icon next to label
+	    int iconSz = UI.scale(11);
+	    Coord headerPos = new Coord(pos.x, pos.y - headerH);
+	    Coord headerSz = new Coord(labelTex.sz().x + iconSz + UI.scale(4), headerH);
+
+	    // Semi-transparent header background
+	    g.chcolor(0, 0, 0, 160);
+	    g.frect(headerPos, headerSz);
+	    g.chcolor();
+
+	    // Draw representative item icon
+	    WItem rep = groupRepItem.get(key);
+	    if (rep != null) {
+		try {
+		    Resource res = rep.item.resource();
+		    if (res != null) {
+			Resource.Image img = res.layer(Resource.imgc);
+			if (img != null) {
+			    g.image(img.tex(), headerPos.add(1, 0), new Coord(iconSz, iconSz));
+			}
+		    }
+		} catch (Exception ignored) {}
+	    }
+
+	    // Draw label text
+	    g.image(labelTex, headerPos.add(iconSz + UI.scale(3), 0));
+	    labelTex.dispose();
+
+	    // Store header area for click detection
+	    groupHeaderAreas.put(key, new Coord[]{headerPos, headerSz});
+	}
+    }
+
+    public boolean mousedown(MouseDownEvent ev) {
+	if (groupingMode != GroupingMode.NONE && ev.b == 1) {
+	    Coord mc = ev.c;
+	    for (Map.Entry<String, Coord[]> entry : groupHeaderAreas.entrySet()) {
+		Coord pos = entry.getValue()[0];
+		Coord sz = entry.getValue()[1];
+		if (mc.x >= pos.x && mc.x <= pos.x + sz.x &&
+		    mc.y >= pos.y && mc.y <= pos.y + sz.y) {
+		    String key = entry.getKey();
+		    if (collapsedGroups.contains(key)) {
+			collapsedGroups.remove(key);
+		    } else {
+			collapsedGroups.add(key);
+		    }
+		    return true;
+		}
+	    }
+	}
+	return super.mousedown(ev);
     }
 	
     public Inventory(Coord sz) {
