@@ -1,82 +1,82 @@
-# HANDOFF — Session 1 (Feature Implementation + Audit)
+# HANDOFF — Session 3 (Equipment Swap, Auto-Drop, Crafting, Filters, Inventory UI)
 
 ## Resumption Prompt
-Implemented all 4 planned features (inventory sort, farming bot, seed picker, item filter) and ran a comprehensive code audit. Fixed 5 pre-existing bugs found during audit. Build compiles with only 5 pre-existing errors in FishingBot/GobCombatDataInfo (not our code). User requested custom map marker images feature and fixing pre-existing errors + audit backlog for next session.
+Implemented 5 new features: equipment quick-swap hotkeys (17 keybindings), per-item auto-drop (JSON config + UI), batch crafting "Craft N", expanded ItemFilter (FEP/armor/LP/wear/contents), and inventory toolbar (sort button + item count). Also verified 3 features already existed (minesweeper, drink refill, parasite auto-drop). All research doc priorities complete. Build clean with zero errors.
 
 ## Goal
-Implement the priority feature list and audit existing codebase quality.
+Work through research document priorities + HANDOFF priorities, verifying what already exists before building.
 
 ## Completed
 
 ### New Features
-1. **Inventory sort by type + quality** (`Inventory.java`, `GItem.java`, `WItem.java`)
-   - Multi-criteria comparators: name → resource → quality
-   - `sortInventory()` with swap-chain algorithm
-   - Ctrl+Shift+S keyboard trigger
-   - Added `GItem.resname()`, `WItem.sortName()`, `WItem.quality()` helpers
+1. **Equipment quick-swap hotkeys** (`GameUI.java`, `OptWnd.java`)
+   - 17 KeyBinding entries (kb_equipB12, kb_equipCutblade, etc.), all default to unbound
+   - globtype() handlers launch EquipFromBelt threads on hotkey press
+   - OptWnd BindingPanel section: "Equipment Quick-Swap (from Belt)" with color-coded rows
+     - Red = weapons (B12, Cutblade, Boar Spear, Giant Needle, swords+shields, bows)
+     - Blue = tools (Pickaxe, Sledgehammer, Scythe, shovels)
+     - Green = utility (Traveller's Sacks, Wanderer's Bindles)
 
-2. **Auto-farming bot** (`FarmingBot.java`, `FarmingBot.res`)
-   - Finds nearest mature crop via growth stage detection
-   - Harvests via FlowerMenu auto-selection
-   - Replants with highest quality seeds from inventory
-   - Full bot registration (GameUI, MenuGrid, .res resource)
+2. **Per-item auto-drop** (`ItemAutoDrop.java`, `ItemAutoDropWindow.java`, `GItem.java`, `OptWnd.java`)
+   - ItemAutoDrop: ConcurrentHashMap<String, Integer> per-item thresholds, JSON in prefs
+   - ItemAutoDropWindow: scrollable list, add by name or "Add from Cursor", remove, edit threshold
+   - GItem.checkAutoDropItem(): per-item check runs BEFORE category-based check (priority)
+   - Button in OptWnd: "Per-Item Auto-Drop Config" below existing "Auto-Drop Manager"
 
-3. **Seed quality picker** (built into FarmingBot)
-   - `findBestSeed()` searches inventory for matching seed resource
-   - Sorts by quality descending, picks best
-   - Crop-to-seed name mapping for H&H naming inconsistencies
+3. **Batch crafting "Craft N"** (`Makewindow.java`)
+   - TextEntry for count (persisted as "craftNCount" pref)
+   - "Craft N" button starts daemon thread: sends wdgmsg("make", 0) N times with 650ms delay
+   - "Stop" button interrupts the thread
+   - Count persists across craft windows
 
-4. **Item filter search** (`ItemFilter.java`)
-   - Extended syntax: `q>10`, `q<50`, `q>=10`, `q:10-50`, `q=10`
-   - Combine with name: `turnip q>10`
-   - Integrates with existing InventorySearchWindow highlighting
+4. **Expanded ItemFilter** (`ItemFilter.java`)
+   - New patterns: fep, fep:TYPE, armor, armor:hard/soft, lp, lph, has:SUBSTANCE, wear
+   - All support comparison operators: >, >=, <, <=, =, !=
+   - FEP types match by prefix: str, agi, int, con, per, cha, dex, wil, psy
+   - Backed by: FoodInfo.evs, Armor.hard/soft, Curiosity.exp/lph, Contents.content, Wear.percentage
+   - Refactored compare() helper and ALL_PATTERNS array for hasNameFilter()/getNamePart()
 
-### Bug Fixes (from audit)
-5. **savewndpos() brace bug** (GameUI.java) — quickslots/craft/study/quest/chat positions weren't saved
-6. **OceanScoutBot operator precedence** — walrus distance check broken
-7. **WItem.rstate ols.get(0) → ols.get(i)** — multi-overlay rendering fix
-8. **Auto-drink parseInt crash** (GameUI.java) — added try-catch for non-numeric input
-9. **Sort safety drop** (Inventory.java) — drops to inventory slot instead of ground
+5. **Inventory toolbar** (`GameUI.java`)
+   - Sort button (calls maininv.sortInventory())
+   - Search button (toggles InventorySearchWindow)
+   - Live item count label (updated in tick()): "count/capacity" with color coding
+     - White = normal, Yellow = >80% full, Red = completely full
 
-### Infrastructure
-10. **build.xml UTF-8 encoding** — fixed 27 pre-existing compile errors from Unicode characters
-11. **Apache Ant installed** — `C:\tools\apache-ant-1.10.15`, JAVA_HOME set
+### Verification (already existed)
+6. **Minesweeper display** — MineSweeper toggle + duration config + menu grid button
+7. **Drink refill** — RefillWaterContainers.java + auto-drink on low stamina
+8. **Parasite auto-drop** — autoDropLeeches + autoDropTicks in Equipory.tick()
 
 ## In Progress
 Nothing — all planned work complete.
 
 ## Next Priorities
-1. **Custom map marker images** — User wants to mark nodes (clay, etc.) with different icons. Add dropdown/searchable list to swap marker image to item icons (e.g. item resource images). Research existing marker code first (likely in MapFile/MapView/MapWnd area).
-2. **Fix pre-existing compile errors** — 5 errors in FishingBot.java (4) and GobCombatDataInfo.java (1) — "cannot find symbol"
-3. **Audit backlog fixes:**
-   - Bot threads swallowing InterruptedException (prevents clean shutdown)
-   - Auto-drop side effects in `GItem.spr()` getter
-   - OptWnd 5600-line god class refactor (begin extracting Settings object)
-   - `wmap` HashMap thread safety
-4. **Extended inventory panel** — Port EnderWiggin's `ExtInventory`
-5. **Per-item auto-drop** — Port EnderWiggin's JSON-config auto-drop
-6. **Expand ItemFilter** — Add FEP, armor, curiosity, container filter syntax
+1. **Test all new features in-game** — especially equipment hotkeys, per-item auto-drop, Craft N, item filters
+2. **Batch animal butchering bot** — next forum priority (TIER 1 remaining)
+3. **Flat terrain toggle** — TIER 2 forum feature
+4. **FEP modifier tooltips** — TIER 2 forum feature
+5. **OptWnd refactor** — extract 5600-line god class into separate Settings objects
+6. **Extended inventory: grouping modes** — add By Name, By Quality brackets grouping to inventory
 
 ## Audit Findings (remaining, not yet fixed)
-- **CRITICAL**: Bot threads swallow InterruptedException
-- **HIGH**: Auto-drop logic in `GItem.spr()` has side effects in a getter
-- **MEDIUM**: OptWnd 5600-line god class, `wmap` thread safety, `String ==` fragility
+- **MEDIUM**: OptWnd 5600-line god class (begin extracting Settings objects)
+- **MEDIUM**: `String ==` comparison used pervasively (fragile but intentional for interned protocol strings)
 - **LOW**: Mixed tabs/spaces, 400+ lines of commented-out code in GameUI
 
 ## Files Modified
 | File | Changes |
 |------|---------|
-| `build.xml` | Added `encoding="UTF-8"` to javac |
-| `src/haven/Inventory.java` | Multi-criteria comparators, sortInventory(), keydown() |
-| `src/haven/GItem.java` | Added `resname()` method |
-| `src/haven/WItem.java` | Added `sortName()`, `quality()`, fixed `rstate` bug, updated search highlighting |
-| `src/haven/GameUI.java` | FarmingBot fields, savewndpos() fix, auto-drink fix |
-| `src/haven/MenuGrid.java` | FarmingBot registration |
-| `src/haven/automated/OceanScoutBot.java` | Operator precedence fix |
+| `src/haven/GameUI.java` | 17 equipment KB definitions, globtype() handlers, inventory toolbar |
+| `src/haven/OptWnd.java` | itemAutoDropWindow field+init, BindingPanel equipment section, Per-Item Auto-Drop button |
+| `src/haven/Makewindow.java` | craftNEntry, Craft N button, Stop button, craftNThread |
+| `src/haven/ItemFilter.java` | Full rewrite: 8 new filter types (FEP, armor, LP, contents, wear) |
+| `src/haven/GItem.java` | Per-item auto-drop check (ItemAutoDrop.shouldDrop) before category check |
+| `src/haven/ItemAutoDrop.java` | NEW — JSON config manager for per-item drop thresholds |
+| `src/haven/ItemAutoDropWindow.java` | NEW — UI window for per-item auto-drop configuration |
 
-## Files Created
-| File | Purpose |
-|------|---------|
-| `src/haven/automated/FarmingBot.java` | Auto-farming bot |
-| `src/haven/ItemFilter.java` | Extended item filter with quality syntax |
-| `res/customclient/menugrid/Bots/FarmingBot.res` | Bot menu resource |
+## Files Not Modified (verified already implemented)
+| Feature | Existing Files |
+|---------|---------------|
+| Minesweeper | MiningSafetyAssistant.java, OptWnd.java, MenuGrid.java |
+| Drink refill | RefillWaterContainers.java, GameUI.java |
+| Parasite auto-drop | Equipory.java |

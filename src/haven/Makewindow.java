@@ -142,14 +142,67 @@ public class Makewindow extends Widget {
 
     public static final KeyBinding kb_make = KeyBinding.get("make/one", KeyMatch.forcode(java.awt.event.KeyEvent.VK_ENTER, 0));
     public static final KeyBinding kb_makeall = KeyBinding.get("make/all", KeyMatch.forcode(java.awt.event.KeyEvent.VK_ENTER, KeyMatch.C));
+    private TextEntry craftNEntry;
+    private volatile Thread craftNThread;
+
     public Makewindow(String rcpnm) {
 	int inputW = add(new Label("Input:"), new Coord(0, UI.scale(8))).sz.x;
 	int resultW = add(new Label("Result:"), new Coord(0, outy + UI.scale(8))).sz.x;
 	xoff = Math.max(inputW, resultW) + UI.scale(10);
 	add(new Button(UI.scale(85), "Craft"), UI.scale(new Coord(265, 75))).action(() -> wdgmsg("make", 0)).setgkey(kb_make);
 	add(new Button(UI.scale(85), "Craft All"), UI.scale(new Coord(360, 75))).action(() -> wdgmsg("make", 1)).setgkey(kb_makeall);
+	craftNEntry = add(new TextEntry(UI.scale(36), Utils.getpref("craftNCount", "5")) {
+	    protected void changed() {
+		this.settext(this.text().replaceAll("[^\\d]", ""));
+		Utils.setpref("craftNCount", this.text());
+		super.changed();
+	    }
+	}, UI.scale(new Coord(265, 100)));
+	add(new Button(UI.scale(85), "Craft N") {
+	    public void click() { startCraftN(); }
+	}, UI.scale(new Coord(310, 98)));
+	add(new Button(UI.scale(45), "Stop") {
+	    public void click() { stopCraftN(); }
+	}, UI.scale(new Coord(400, 98)));
 	pack();
 	this.rcpnm = rcpnm;
+    }
+
+    private void startCraftN() {
+	stopCraftN();
+	int count;
+	try {
+	    count = Integer.parseInt(craftNEntry.text().trim());
+	} catch (NumberFormatException e) {
+	    return;
+	}
+	if (count <= 0)
+	    return;
+	final int n = count;
+	craftNThread = new Thread(() -> {
+	    try {
+		for (int i = 0; i < n; i++) {
+		    if (Thread.currentThread().isInterrupted())
+			break;
+		    wdgmsg("make", 0);
+		    if (i < n - 1)
+			Thread.sleep(650);
+		}
+	    } catch (InterruptedException e) {
+		Thread.currentThread().interrupt();
+	    }
+	    craftNThread = null;
+	}, "CraftN");
+	craftNThread.setDaemon(true);
+	craftNThread.start();
+    }
+
+    private void stopCraftN() {
+	Thread t = craftNThread;
+	if (t != null) {
+	    t.interrupt();
+	    craftNThread = null;
+	}
     }
 
     public void uimsg(String msg, Object... args) {

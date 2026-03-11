@@ -1182,11 +1182,62 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 	    fs = add((Fightsess)child, Coord.z);
 	} else if(place == "inv") {
 	    invwnd = new Hidewnd(Coord.z, "Inventory") {
+		    private Label itemCountLabel;
+
+		    {
+			int toolbarY = 0;
+			Button sortBtn = add(new Button(UI.scale(45), "Sort") {
+			    public void click() {
+				if (maininv != null) maininv.sortInventory();
+			    }
+			}, UI.scale(0), toolbarY);
+			sortBtn.settip("Sort items by type, then quality (Ctrl+Shift+S)");
+			Button searchBtn = add(new Button(UI.scale(55), "Search") {
+			    public void click() {
+				if (inventorySearchWindow != null) {
+				    Utils.setprefc("wndc-inventorySearchWindow", inventorySearchWindow.c);
+				    inventorySearchWindow.reqdestroy();
+				    inventorySearchWindow = null;
+				    InventorySearchWindow.inventorySearchString = "";
+				} else {
+				    inventorySearchWindow = new InventorySearchWindow(GameUI.this);
+				    GameUI.this.add(inventorySearchWindow, new Coord(Utils.getprefc("wndc-inventorySearchWindow", new Coord(GameUI.this.sz.x/2 - 100, GameUI.this.sz.y/2 - 300))));
+				}
+			    }
+			}, sortBtn.pos("ur").adds(4, 0));
+			searchBtn.settip("Search/filter inventory items (Ctrl+Shift+F)");
+			itemCountLabel = add(new Label(""), searchBtn.pos("ur").adds(8, 3));
+		    }
+
 		    public void cresize(Widget ch) {
+			if (ch instanceof Inventory && maininv != null) {
+			    maininv.c = new Coord(0, UI.scale(22));
+			}
 			pack();
 		    }
+
+		    public void tick(double dt) {
+			super.tick(dt);
+			if (maininv != null && itemCountLabel != null) {
+			    int count = maininv.wmap.size();
+			    int capacity = maininv.isz.x * maininv.isz.y;
+			    if (maininv.sqmask != null) {
+				for (boolean b : maininv.sqmask)
+				    if (b) capacity--;
+			    }
+			    itemCountLabel.settext(count + "/" + capacity);
+			    if (count >= capacity)
+				itemCountLabel.setcolor(new java.awt.Color(255, 100, 100));
+			    else if (count > capacity * 0.8)
+				itemCountLabel.setcolor(new java.awt.Color(255, 200, 100));
+			    else
+				itemCountLabel.setcolor(java.awt.Color.WHITE);
+			}
+		    }
 		};
-	    invwnd.add(maininv = (Inventory)child, Coord.z);
+	    maininv = (Inventory)child;
+	    maininv.c = new Coord(0, UI.scale(22));
+	    invwnd.add(maininv);
 	    invwnd.pack();
 	    invwnd.hide();
 	    add(invwnd, Utils.getprefc("wndc-inv", new Coord(100, 100)));
@@ -1927,6 +1978,25 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
     public static KeyBinding kb_leaderTarget = KeyBinding.get("leaderTarget", KeyMatch.nil);
     public static KeyBinding kb_blt = KeyBinding.get("blt", KeyMatch.forchar('R', KeyMatch.M));
 
+	// Equipment Quick-Swap from Belt
+	public static KeyBinding kb_equipB12 = KeyBinding.get("equipB12KB", KeyMatch.nil);
+	public static KeyBinding kb_equipCutblade = KeyBinding.get("equipCutbladeKB", KeyMatch.nil);
+	public static KeyBinding kb_equipBoarSpear = KeyBinding.get("equipBoarSpearKB", KeyMatch.nil);
+	public static KeyBinding kb_equipGiantNeedle = KeyBinding.get("equipGiantNeedleKB", KeyMatch.nil);
+	public static KeyBinding kb_equipHirdsmanSword = KeyBinding.get("equipHirdsmanSwordKB", KeyMatch.nil);
+	public static KeyBinding kb_equipBronzeSword = KeyBinding.get("equipBronzeSwordKB", KeyMatch.nil);
+	public static KeyBinding kb_equipFyrdsmanSword = KeyBinding.get("equipFyrdsmanSwordKB", KeyMatch.nil);
+	public static KeyBinding kb_equipHuntersBow = KeyBinding.get("equipHuntersBowKB", KeyMatch.nil);
+	public static KeyBinding kb_equipRangersBow = KeyBinding.get("equipRangersBowKB", KeyMatch.nil);
+	public static KeyBinding kb_equipPickaxe = KeyBinding.get("equipPickaxeKB", KeyMatch.nil);
+	public static KeyBinding kb_equipSledgehammer = KeyBinding.get("equipSledgehammerKB", KeyMatch.nil);
+	public static KeyBinding kb_equipScythe = KeyBinding.get("equipScytheKB", KeyMatch.nil);
+	public static KeyBinding kb_equipMetalShovel = KeyBinding.get("equipMetalShovelKB", KeyMatch.nil);
+	public static KeyBinding kb_equipTinkersShovel = KeyBinding.get("equipTinkersShovelKB", KeyMatch.nil);
+	public static KeyBinding kb_equipWoodenShovel = KeyBinding.get("equipWoodenShovelKB", KeyMatch.nil);
+	public static KeyBinding kb_equipTravelersSacks = KeyBinding.get("equipTravelersSacksKB", KeyMatch.nil);
+	public static KeyBinding kb_equipWanderersBindles = KeyBinding.get("equipWanderersBindlesKB", KeyMatch.nil);
+
     public boolean globtype(GlobKeyEvent ev) {
 	if(ev.c == ':') {
 	    entercmd();
@@ -2176,6 +2246,58 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
             }
         }
         return(true);
+	// Equipment Quick-Swap hotkeys
+	} else if(kb_equipB12.key().match(ev)) {
+		new Thread(new haven.automated.EquipFromBelt(this, "Equip_B12"), "EquipFromBelt").start();
+		return(true);
+	} else if(kb_equipCutblade.key().match(ev)) {
+		new Thread(new haven.automated.EquipFromBelt(this, "Equip_Cutblade"), "EquipFromBelt").start();
+		return(true);
+	} else if(kb_equipBoarSpear.key().match(ev)) {
+		new Thread(new haven.automated.EquipFromBelt(this, "Equip_BoarSpear"), "EquipFromBelt").start();
+		return(true);
+	} else if(kb_equipGiantNeedle.key().match(ev)) {
+		new Thread(new haven.automated.EquipFromBelt(this, "Equip_GiantNeedle"), "EquipFromBelt").start();
+		return(true);
+	} else if(kb_equipHirdsmanSword.key().match(ev)) {
+		new Thread(new haven.automated.EquipFromBelt(this, "Equip_HirdsmansSwordWoodenShield"), "EquipFromBelt").start();
+		return(true);
+	} else if(kb_equipBronzeSword.key().match(ev)) {
+		new Thread(new haven.automated.EquipFromBelt(this, "Equip_BronzeSwordWoodenShield"), "EquipFromBelt").start();
+		return(true);
+	} else if(kb_equipFyrdsmanSword.key().match(ev)) {
+		new Thread(new haven.automated.EquipFromBelt(this, "Equip_FyrdsmansSwordWoodenShield"), "EquipFromBelt").start();
+		return(true);
+	} else if(kb_equipHuntersBow.key().match(ev)) {
+		new Thread(new haven.automated.EquipFromBelt(this, "Equip_HuntersBow"), "EquipFromBelt").start();
+		return(true);
+	} else if(kb_equipRangersBow.key().match(ev)) {
+		new Thread(new haven.automated.EquipFromBelt(this, "Equip_RangersBow"), "EquipFromBelt").start();
+		return(true);
+	} else if(kb_equipPickaxe.key().match(ev)) {
+		new Thread(new haven.automated.EquipFromBelt(this, "Equip_Pickaxe"), "EquipFromBelt").start();
+		return(true);
+	} else if(kb_equipSledgehammer.key().match(ev)) {
+		new Thread(new haven.automated.EquipFromBelt(this, "Equip_Sledgehammer"), "EquipFromBelt").start();
+		return(true);
+	} else if(kb_equipScythe.key().match(ev)) {
+		new Thread(new haven.automated.EquipFromBelt(this, "Equip_Scythe"), "EquipFromBelt").start();
+		return(true);
+	} else if(kb_equipMetalShovel.key().match(ev)) {
+		new Thread(new haven.automated.EquipFromBelt(this, "Equip_MetalShovel"), "EquipFromBelt").start();
+		return(true);
+	} else if(kb_equipTinkersShovel.key().match(ev)) {
+		new Thread(new haven.automated.EquipFromBelt(this, "Equip_TinkersShovel"), "EquipFromBelt").start();
+		return(true);
+	} else if(kb_equipWoodenShovel.key().match(ev)) {
+		new Thread(new haven.automated.EquipFromBelt(this, "Equip_WoodenShovel"), "EquipFromBelt").start();
+		return(true);
+	} else if(kb_equipTravelersSacks.key().match(ev)) {
+		new Thread(new haven.automated.EquipFromBelt(this, "Equip_TravelersSacks"), "EquipFromBelt").start();
+		return(true);
+	} else if(kb_equipWanderersBindles.key().match(ev)) {
+		new Thread(new haven.automated.EquipFromBelt(this, "Equip_WanderersBindles"), "EquipFromBelt").start();
+		return(true);
     } else if((ev.c == 27) && (map != null) && !map.hasfocus) {
 	    setfocus(map);
 	    return(true);
