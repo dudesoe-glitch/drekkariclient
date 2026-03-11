@@ -2877,6 +2877,7 @@ public class OptWnd extends Window {
 
 
 	public static CheckBox showQualityDisplayCheckBox;
+	public static CheckBox showItemCategoryBadgesCheckBox;
 	public static CheckBox roundedQualityCheckBox;
 	public static CheckBox customQualityColorsCheckBox;
 
@@ -2902,6 +2903,12 @@ public class OptWnd extends Window {
 					a = val;
 				}
 			}, 0, 6);
+			prev = add(showItemCategoryBadgesCheckBox = new CheckBox("Show Item Category Badges"){
+				{a = Utils.getprefb("showItemCategoryBadges", false);}
+				public void changed(boolean val) {
+					Utils.setprefb("showItemCategoryBadges", val);
+				}
+			}, prev.pos("bl").adds(0, 2));
 			prev = add(roundedQualityCheckBox = new CheckBox("Rounded Quality Number"){
 				{a = (Utils.getprefb("roundedQuality", true));}
 				public void changed(boolean val) {

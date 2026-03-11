@@ -153,6 +153,8 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
     }};
     private Widget combatBarsWdg;
 
+	public String lastFlowerMenuItemRes = null;
+
 	// Script Threads
 	public Thread autoRepeatFlowerMenuScriptThread;
 	public Thread interactWithNearestObjectThread;
@@ -198,6 +200,10 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 	public Thread clayDiggingBotThread;
 	public OreSmeltingBot oreSmeltingBot;
 	public Thread oreSmeltingBotThread;
+	public ForagingBot foragingBot;
+	public Thread foragingBotThread;
+	public MiningBot miningBot;
+	public Thread miningBotThread;
 
     public static abstract class BeltSlot {
 	public final int idx;
@@ -1239,7 +1245,26 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 			    }
 			}, groupBtn.pos("ur").adds(4, 0));
 			listBtn.settip("Toggle item list view — shows items by name with counts and quality.");
-			itemCountLabel = add(new Label(""), listBtn.pos("ur").adds(8, 3));
+			Button repeatBtn = add(new Button(UI.scale(55), "Repeat") {
+			    public void click() {
+				if (FlowerMenu.lastChosenOption != null && FlowerMenu.lastChosenResource != null) {
+				    if (autoRepeatFlowerMenuScriptThread != null) {
+					autoRepeatFlowerMenuScriptThread.interrupt();
+					autoRepeatFlowerMenuScriptThread = null;
+				    }
+				    autoRepeatFlowerMenuScriptThread = new Thread(
+					new haven.automated.AutoRepeatFlowerMenuScript(GameUI.this, FlowerMenu.lastChosenResource),
+					"autoRepeatFlowerMenu"
+				    );
+				    haven.automated.AutoRepeatFlowerMenuScript.option = FlowerMenu.lastChosenOption;
+				    autoRepeatFlowerMenuScriptThread.start();
+				} else {
+				    error("No flower menu action to repeat. Right-click an item first.");
+				}
+			    }
+			}, listBtn.pos("ur").adds(4, 0));
+			repeatBtn.settip("Repeat last flower menu action on all similar items");
+			itemCountLabel = add(new Label(""), repeatBtn.pos("ur").adds(8, 3));
 		    }
 
 		    public void cresize(Widget ch) {

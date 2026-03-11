@@ -72,6 +72,7 @@ public class InventoryListWindow extends Window {
 		// Aggregate items: name -> (count, total quality, min quality, max quality)
 		Map<String, int[]> itemStats = new LinkedHashMap<>(); // [count, totalQ*100, minQ*100, maxQ*100]
 		Map<String, String> itemResNames = new LinkedHashMap<>();
+		final Map<String, Resource> itemResources = new LinkedHashMap<>();
 
 		List<WItem> allItems = gui.maininv.getAllItems();
 		for (WItem wi : allItems) {
@@ -82,6 +83,7 @@ public class InventoryListWindow extends Window {
 				if (!itemStats.containsKey(name)) {
 					itemStats.put(name, new int[]{1, qi, qi, qi});
 					itemResNames.put(name, wi.item.resname());
+					try { itemResources.put(name, wi.item.resource()); } catch (Exception ignored) {}
 				} else {
 					int[] stats = itemStats.get(name);
 					stats[0]++;
@@ -112,7 +114,7 @@ public class InventoryListWindow extends Window {
 
 		// Render rows
 		int y = 0;
-		int rowH = UI.scale(16);
+		int rowH = UI.scale(18);
 		for (Map.Entry<String, int[]> entry : sorted) {
 			String name = entry.getKey();
 			int[] stats = entry.getValue();
@@ -142,7 +144,18 @@ public class InventoryListWindow extends Window {
 					}
 					g.chcolor(qColor);
 					Tex tex = Text.renderstroked(text, qColor, Color.BLACK).tex();
-					g.image(tex, new Coord(UI.scale(2), 1));
+					int iconSz = UI.scale(14);
+					int textX = iconSz + UI.scale(3);
+					Resource itemRes = itemResources.get(itemName);
+					if (itemRes != null) {
+						try {
+							Resource.Image img = itemRes.layer(Resource.imgc);
+							if (img != null) {
+								g.image(img.tex(), new Coord(UI.scale(1), 0), new Coord(iconSz, iconSz));
+							}
+						} catch (Exception ignored) {}
+					}
+					g.image(tex, new Coord(textX, 1));
 					tex.dispose();
 					g.chcolor();
 				}
@@ -153,6 +166,9 @@ public class InventoryListWindow extends Window {
 							highlightedName = null;
 						} else {
 							highlightedName = itemName;
+						}
+						if (gui.maininv != null) {
+							gui.maininv.highlightItemName = highlightedName;
 						}
 						refreshList();
 						return true;
@@ -191,9 +207,16 @@ public class InventoryListWindow extends Window {
 		return new Color(200, 100, 255);                    // Purple - elite
 	}
 
+	private void clearHighlight() {
+		highlightedName = null;
+		if (gui.maininv != null)
+			gui.maininv.highlightItemName = null;
+	}
+
 	@Override
 	public void wdgmsg(Widget sender, String msg, Object... args) {
 		if ((sender == this) && msg.equals("close")) {
+			clearHighlight();
 			Utils.setprefc("wndc-inventoryListWindow", this.c);
 			gui.inventoryListWindow = null;
 			reqdestroy();
