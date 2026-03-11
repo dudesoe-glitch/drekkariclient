@@ -209,7 +209,7 @@ public class FishingBot extends Window implements Runnable {
         }
 
         Collections.shuffle(candidates);
-        WItem chosen = candidates.getFirst();
+        WItem chosen = candidates.get(0);
 
         chosen.item.wdgmsg("take", Coord.z);
 
@@ -243,7 +243,7 @@ public class FishingBot extends Window implements Runnable {
         }
 
         Collections.shuffle(candidates);
-        WItem chosen = candidates.getFirst();
+        WItem chosen = candidates.get(0);
 
         chosen.item.wdgmsg("take", Coord.z);
 
@@ -278,7 +278,7 @@ public class FishingBot extends Window implements Runnable {
         }
 
         Collections.shuffle(candidates);
-        WItem chosen = candidates.getFirst();
+        WItem chosen = candidates.get(0);
 
         chosen.item.wdgmsg("take", Coord.z);
 
@@ -312,7 +312,7 @@ public class FishingBot extends Window implements Runnable {
         }
 
         Collections.shuffle(candidates);
-        WItem chosen = candidates.getFirst();
+        WItem chosen = candidates.get(0);
 
         chosen.item.wdgmsg("take", Coord.z);
 
@@ -360,10 +360,13 @@ public class FishingBot extends Window implements Runnable {
                         }
                     } catch (Loading e) {
                         // Resource not loaded yet, skip
-                    } catch (Exception ignored) {}
+                    } catch (Exception ignored) {
+                        if (ignored instanceof InterruptedException) Thread.currentThread().interrupt();
+                    }
                 }
             }
         } catch (Exception e) {
+            if (e instanceof InterruptedException) Thread.currentThread().interrupt();
             System.out.println("Fishing Bot: Error finding fish action ID: " + e.getMessage());
         }
     }
@@ -376,6 +379,8 @@ public class FishingBot extends Window implements Runnable {
                 try {
                     Thread.sleep(8000);
                 } catch (InterruptedException ignored) {
+                    Thread.currentThread().interrupt();
+                    return false;
                 }
                 deactivate("Fishing Bot: HP IS " + hp + " .. PORTING HOME!");
                 return false;
@@ -387,6 +392,7 @@ public class FishingBot extends Window implements Runnable {
             }
             return true;
         } catch (Exception e) {
+            if (e instanceof InterruptedException) Thread.currentThread().interrupt();
             return true;
         }
     }
@@ -439,6 +445,7 @@ public class FishingBot extends Window implements Runnable {
         try {
             Thread.sleep(duration);
         } catch (InterruptedException ignored) {
+            Thread.currentThread().interrupt();
         }
     }
 

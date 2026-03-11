@@ -72,6 +72,7 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
 	public Thread checkpointManagerThread;
 	public Pathfinder pf;
 	public Thread pfthread;
+	Coord pfFinalDest;
 	private static final int MAX_TILE_RANGE = 40;
 	private AreaSelectCallback areaSelectCallback;
 	public boolean areaSelect = false;
@@ -2051,21 +2052,31 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
 
 	if (OptWnd.continuousWalkingCheckBox.a && holdingLeftClick) {
 		long now = System.currentTimeMillis();
-		if ((now - lastContinuousClick) > 50) {
-			lastContinuousClick = System.currentTimeMillis();
+		boolean usePF = OptWnd.walkWithPathFinderCheckBox.a
+			&& OptWnd.continuousPathfindingCheckBox != null
+			&& OptWnd.continuousPathfindingCheckBox.a;
+		int interval = usePF ? 800 : 50;
+		if ((now - lastContinuousClick) > interval) {
 			if (currentCursorLocation.x >= 0 && currentCursorLocation.y >= 0 && currentCursorLocation.x < ui.gui.sz.x && currentCursorLocation.y < ui.gui.sz.y
 					&& !ui.modctrl && !ui.modshift && !ui.modmeta && !ui.modsuper && ui.checkCursorImage("gfx/hud/curs/arw")){
-				new Click(currentCursorLocation, 1).run();
-
-				// ND: I think this Hittest stuff is the same as the Click one above?
-				// I'll leave it commented for future reference I guess.
-
-//				new Hittest(currentCursorLocation) {
-//					@Override
-//					protected void hit(Coord pc, Coord2d mc, ClickData inf) {
-//						wdgmsg("click", currentCursorLocation, mc.floor(posres), 1, 0);
-//					}
-//				}.run();
+				if(usePF) {
+					boolean pfActive;
+					synchronized (Pathfinder.class) {
+						pfActive = pf != null && pfthread != null && pfthread.isAlive();
+					}
+					if(!pfActive) {
+						lastContinuousClick = now;
+						new Hittest(currentCursorLocation) {
+							protected void hit(Coord pc, Coord2d mc, ClickData inf) {
+								if(inf == null)
+									pfLeftClick(mc.floor(), null);
+							}
+						}.run();
+					}
+				} else {
+					lastContinuousClick = now;
+					new Click(currentCursorLocation, 1).run();
+				}
 			}
 		}
 	}
@@ -2447,6 +2458,7 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
 			}
             synchronized (Pathfinder.class) {
                 if (pf != null && clickb == 1) {
+                    pfFinalDest = null;
                     pf.terminate = true;
                     pfthread.interrupt();
                 }
@@ -3165,6 +3177,24 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
 	public void pfDone(final Pathfinder thread) {
 		if (haven.automated.pathfinder.Map.DEBUG_TIMINGS)
 			System.out.println("-= PF DONE =-");
+		if(pfFinalDest != null && !thread.terminate) {
+			Gob player = player();
+			if(player != null) {
+				double dist = pfFinalDest.dist(player.rc.floor());
+				if(dist > 11 * 5) {
+					// Not close enough — schedule next hop after brief delay
+					Coord dest = pfFinalDest;
+					new Thread(() -> {
+						try { Thread.sleep(200); } catch(InterruptedException e) { Thread.currentThread().interrupt(); return; }
+						pfLongDistance(dest);
+					}, "PF-LongDistance").start();
+				} else {
+					pfFinalDest = null;
+				}
+			} else {
+				pfFinalDest = null;
+			}
+		}
 	}
 
 	public void pfLeftClick(Coord mc, String action) {
@@ -3199,6 +3229,21 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
 			}
 		} catch (Exception e){
 			e.getMessage();
+		}
+	}
+
+	public void pfLongDistance(Coord finalDest) {
+		this.pfFinalDest = finalDest;
+		pfLeftClick(finalDest, null);
+	}
+
+	public void cancelLongDistance() {
+		pfFinalDest = null;
+		synchronized (Pathfinder.class) {
+			if (pf != null) {
+				pf.terminate = true;
+				pfthread.interrupt();
+			}
 		}
 	}
 

@@ -66,6 +66,7 @@ public class GrubGrubBot extends Window implements Runnable {
                 sleep(1000);
             }
         } catch (InterruptedException ignored) {
+            Thread.currentThread().interrupt();
         }
     }
 
@@ -89,6 +90,7 @@ public class GrubGrubBot extends Window implements Runnable {
         try {
             Thread.sleep(duration);
         } catch (InterruptedException ignored) {
+            Thread.currentThread().interrupt();
         }
     }
 

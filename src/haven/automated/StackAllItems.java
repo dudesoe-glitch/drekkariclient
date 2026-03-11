@@ -85,6 +85,7 @@ public class StackAllItems implements Runnable {
                 Thread.sleep(10);
             }
         } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
             gui.error("Stack items script interrupted");
         }
     }

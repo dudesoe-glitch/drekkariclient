@@ -196,14 +196,15 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 	    } catch(Loading l) {
 	    }
 	}
-	try {
-		if (spr != null) {
-			if (OptWnd.autoDropManagerWindow != null) {
-				checkAutoDropItem();
-			}
-		}
-	} catch (Exception ignored) {}
 	return(spr);
+    }
+
+    public void validateAutoDrop() {
+	try {
+	    if(spr != null && OptWnd.autoDropManagerWindow != null) {
+		checkAutoDropItem();
+	    }
+	} catch(Exception ignored) {}
     }
 
     public void tick(double dt) {
@@ -212,6 +213,7 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 	if(spr != null) {
 		spr.tick(dt);
 	}
+	validateAutoDrop();
 	updcontinfo();
 	if(!hoverset)
 	    hovering = null;

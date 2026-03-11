@@ -239,6 +239,7 @@ public class FarmingBot extends Window implements Runnable {
 
 			return stage == maxStage;
 		} catch (Exception e) {
+			if (e instanceof InterruptedException) Thread.currentThread().interrupt();
 			return false;
 		}
 	}
