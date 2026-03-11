@@ -283,13 +283,13 @@ public class SAttrWnd extends Widget {
 	    Widget f = Frame.around(this, Collections.singletonList(child));
 		Widget prevStudyCheckbox;
 		prevStudyCheckbox = add(showStudyReportHistoryCheckBox, child.pos("bl").adds(0, 11));
-		prevStudyCheckbox.tooltip = OptWnd.showStudyReportHistoryTooltip;
+		prevStudyCheckbox.tooltip = OptWndTooltips.showStudyReportHistory;
 		prevStudyCheckbox = add(lockStudyReportCheckBox, prevStudyCheckbox.pos("bl").adds(0, 2));
-		prevStudyCheckbox.tooltip = OptWnd.lockStudyReportTooltip;
+		prevStudyCheckbox.tooltip = OptWndTooltips.lockStudyReport;
 		prevStudyCheckbox = add(soundAlertForFinishedCuriositiesCheckBox, prevStudyCheckbox.pos("bl").adds(0, 2));
-		prevStudyCheckbox.tooltip = OptWnd.soundAlertForFinishedCuriositiesTooltip;
+		prevStudyCheckbox.tooltip = OptWndTooltips.soundAlertForFinishedCuriosities;
 		prevStudyCheckbox = add(autoReloadCuriositiesFromInventoryCheckBox, prevStudyCheckbox.pos("bl").adds(0, 2));
-		prevStudyCheckbox.tooltip = OptWnd.autoReloadCuriositiesFromInventoryTooltip;
+		prevStudyCheckbox.tooltip = OptWndTooltips.autoReloadCuriositiesFromInventory;
 	    Widget inf = add(new StudyInfo(new Coord(attrw - child.sz.x - wbox.bisz().x - UI.scale(5), child.sz.y), child), child.pos("ur").add(wbox.bisz().x + UI.scale(5), 0));
 	    Frame.around(this, Collections.singletonList(inf));
 		getparent(GameUI.class).miniStudy.setStudy((Inventory) child);

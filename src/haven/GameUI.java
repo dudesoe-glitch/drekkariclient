@@ -105,6 +105,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 	public static boolean flowerMenuAutoSelect = Utils.getprefb("flowerMenuAutoSelect", false);
 	public Gob lastInspectedGob;
 	public InventorySearchWindow inventorySearchWindow;
+	public InventoryListWindow inventoryListWindow;
 	public ObjectSearchWindow objectSearchWindow;
 	public Thread keyboundActionThread;
 	public long lastopponent = -1;
@@ -193,6 +194,10 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 	public Thread farmingBotThread;
 	public ButcherBot butcherBot;
 	public Thread butcherBotThread;
+	public ClayDiggingBot clayDiggingBot;
+	public Thread clayDiggingBotThread;
+	public OreSmeltingBot oreSmeltingBot;
+	public Thread oreSmeltingBotThread;
 
     public static abstract class BeltSlot {
 	public final int idx;
@@ -1214,13 +1219,27 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 			    public void click() {
 				if (maininv != null) {
 				    maininv.groupingMode = maininv.groupingMode.next();
+				    maininv.collapsedGroups.clear();
 				    Utils.setprefi("inventoryGroupMode", maininv.groupingMode.ordinal());
 				    this.change(maininv.groupingMode.label);
 				}
 			    }
 			}, searchBtn.pos("ur").adds(4, 0));
 			groupBtn.settip("Cycle grouping mode: colors items by group. Sort to arrange.");
-			itemCountLabel = add(new Label(""), groupBtn.pos("ur").adds(8, 3));
+			Button listBtn = add(new Button(UI.scale(40), "List") {
+			    public void click() {
+				if (inventoryListWindow != null) {
+				    Utils.setprefc("wndc-inventoryListWindow", inventoryListWindow.c);
+				    inventoryListWindow.reqdestroy();
+				    inventoryListWindow = null;
+				} else {
+				    inventoryListWindow = new InventoryListWindow(GameUI.this);
+				    GameUI.this.add(inventoryListWindow, Utils.getprefc("wndc-inventoryListWindow", new Coord(GameUI.this.sz.x/2 + 100, GameUI.this.sz.y/2 - 200)));
+				}
+			    }
+			}, groupBtn.pos("ur").adds(4, 0));
+			listBtn.settip("Toggle item list view — shows items by name with counts and quality.");
+			itemCountLabel = add(new Label(""), listBtn.pos("ur").adds(8, 3));
 		    }
 
 		    public void cresize(Widget ch) {
