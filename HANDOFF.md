@@ -1,60 +1,66 @@
-# HANDOFF — Session 16 (BotBase Migration, Bot Audit, Client Research)
+# HANDOFF — Session 17 (Sorting Overhaul, Pathfinding Audit, Ship-Blocker Fix)
 
 ## Resumption Prompt
-Migrated 4 remaining Window+Runnable tools to BotBase (CombatDistanceTool, CombatRotationBot, MiningSafetyAssistant, OreAndStoneCounter). Removed 4 Thread fields from GameUI. Fixed bot audit findings across 6 bots (null safety, ui.gui→gui, Loading try-catch). Fixed volatile stop in AutoRepeatFlowerMenuScript and CheckpointManager. Researched 8 H&H custom clients — confirmed Hurricane already has every major feature they offer. Build clean.
+Overhauled inventory sorting: containers now use player inventory as staging area (transfer out, place back sorted), multi-slot items sorted by area first, small inventories (symbels) skip toolbar, removed redundant BY_QUALITY grouping. Fixed 5 critical pathfinding bugs: A* compareTo assignment corruption, Double.MIN_VALUE bounding box error, multi-box early return, silent crash on unloaded maps, no user feedback on failure. Fixed the ship-blocker: GameUI.destroy() now stops all bots and script threads on disconnect. Build clean.
 
 ## Goal
-Work through HANDOFF priorities: bot audit, client research comparison, BotBase migration, cleanup.
+Address sorting issues (large items, full containers, symbels), audit pathfinding failures (stone paths + debris), fix ship-blockers from shippability audit.
 
 ## Completed
 
-### BotBase Migration (4 tools)
-1. **CombatDistanceTool** → BotBase — fixed non-volatile stop, standardized lifecycle, skip idlePlayer in combat
-2. **CombatRotationBot** → BotBase — mapped activeButton/statusLabel to BotBase fields, skip idlePlayer
-3. **MiningSafetyAssistant** → BotBase — fixed non-volatile stop, standardized lifecycle
-4. **OreAndStoneCounter** → BotBase — fixed non-volatile stop, removed duplicate sleep()/stop()/reqdestroy()
-5. **GameUI** — removed 4 Thread fields (combatDistanceToolThread, combatRotationBotThread, miningSafetyAssistantThread, oreAndStoneCounterThread)
-6. **MenuGrid** — all 4 tools now use startThread() pattern, simplified toggle-off
+### Sorting Overhaul
+1. **Default sort = name then quality** — removed separate ITEM_COMPARATOR_QUALITY_BRACKET, all sorting groups by name first
+2. **Container sort via staging** — doSortContainer() transfers items to player inv, places back in sorted order (solves full-container + mixed-size problems)
+3. **Multi-slot by area** — MULTI_SLOT_COMPARATOR sorts largest items first for better bin packing
+4. **Small inventory skip** — inventories ≤4 slots (symbels) don't get Sort/Grp/Ext toolbar
+5. **Removed BY_QUALITY grouping** — redundant since sort already groups by name; GroupingMode is now NONE/BY_NAME only
+6. **Thread safety** — wmap.values() snapshots, volatile sortThread, widget validity checks before take
+7. **Cursor safety** — try/finally cleanup in sortInventory(), waitForCursorEmpty() handles displaced items
 
-### Bot Audit Fixes (6 bots)
-7. **CellarDiggingBot** — ui.gui.map → gui.map, player null check
-8. **CleanupBot** — cached player in findClosestGob(), null guard
-9. **FishingBot** — ui.gui.getmeter → gui.getmeter, getmeters null/size check
-10. **OceanScoutBot** — ui.gui.map → gui.map throughout, Loading try-catch in isGobCollision/isDangerZone/isVeryDangerZone
-11. **TarKilnCleanerBot** — ui.gui → gui throughout, player null check
-12. **OreSmeltingBot** — gui.vhand null guard before item access
+### Pathfinding Audit Fixes (5 critical + 5 major)
+8. **A* compareTo fix** — `order = n.order` → `order - n.order` (assignment corrupted node ordering)
+9. **Double.MIN_VALUE fix** — 8 locations in Map.java + Pathfinder.java → `-Double.MAX_VALUE`
+10. **Multi-box continue fix** — `return` → `continue` in analyzeGobHitBoxes loop (compound obstacles)
+11. **Loading crash fix** — Pathfinder.run() catches Loading + Exception, always calls notifyListeners()
+12. **User feedback** — "No path found" error message instead of silent failure
+13. **Volatile flags** — terminate, moveinterupted now volatile
+14. **ConcurrentHashMap** — HitBoxes.collisionBoxMap thread-safe
+15. **getFreeLocation expanded** — searches up to 33 units (3 tiles) instead of 12
+16. **pfLeftClick logging** — exception was swallowed with no-op e.getMessage()
+17. **Null player guard** — Pathfinder.run() checks player != null
 
-### Volatile Stop Fixes
-13. **AutoRepeatFlowerMenuScript** — `private boolean stop` → `private volatile boolean stop` (scheduler thread writes)
-14. **CheckpointManager** — `final boolean stop = false` → `volatile boolean stop` (was dead code, now functional)
+### Ship-Blocker Fix
+18. **GameUI.destroy()** — stops all 17 bot fields + interrupts all 12 script thread fields on disconnect
+19. **BotBase.dispose()** — sets stop=true and interrupts botThread as defense-in-depth
+20. **BotBase.checkVitals()** — catches Exception not just Loading (prevents NPE on null meters)
+21. **Actions.rightClick()** — null-checks gui and gui.map
 
-### Client Research (8 clients compared)
-15. Researched ArdClient, Amber, Purus-Pasta, Paragon, Kami, Minion, Nurgling, Yoink-Pasta
-16. Confirmed Hurricane already has every major feature (farming, mining, fishing, foraging, butchering, clay, ore smelting, tar kiln, trellis, cellar, inventory sort/filter/grouping, quality display, auto-drop, pathfinding, combat tools, alarms, equipment swap, batch crafting, map markers, etc.)
-17. Hurricane has unique features no other client offers (CombatRotationBot, CombatDistanceTool with RoB weapon ranges, BotBase framework, PathQueue with gold lines, ItemType enum, inventory list view, NotepadWindow)
+## Known Issues (Still Open)
+- **Client update notification** — Config.clientVersion = "v1.56" doesn't match GitHub latest release tag
+- **16 sessions untested in-game** — need manual QA pass
+- **Gobs without hitbox data invisible to pathfinding** — structural issue, needs fallback hitbox or lazy re-registration
+- **String == comparison** — 141 places across 43 files (works due to protocol interning, fragile)
+- **No automated test infrastructure** — normal for H&H clients but risky for regressions
+- **Inventory child linked list not concurrent** — wmap is ConcurrentHashMap but child/next/prev isn't
+- **Pathfinder rotation handling** — gob hitbox rotation approximated as AABB (acknowledged FIXME)
 
 ## Next Priorities
-1. **Test all changes in-game** — 16 sessions of untested features
-2. **Livestock manager UI** — we have animal data overlays (GobQualityInfo, GobFoodWaterInfo) but no table/list view like other clients
-3. **Tune BASE_MELEE_DIST** — needs in-game calibration (currently 13.5)
-4. **Disable animations option** — FPS boost for low-end machines (other clients have this)
-5. **LP/H display in study tooltip** — Curiosity.java has data, could show in curio tooltip
-6. **Consider scripting API** — big effort but ArdClient's PBot was popular
+1. **In-game testing** — especially sorting (container vs player inv), pathfinding (stone paths + debris areas)
+2. **Update Config.clientVersion** — bump to match next GitHub release
+3. **Pathfinding: fallback hitbox for unknown gobs** — treat unregistered gobs as small default obstacles
+4. **Pathfinding: terrain cost weighting** — roads/paths faster than forests/swamps
+5. **Livestock manager UI** — table/list view for animal data
+6. **LP/H display in study tooltip**
 
 ## Files Modified
 | File | Changes |
 |------|---------|
-| `src/haven/GameUI.java` | Removed 4 Thread fields |
-| `src/haven/MenuGrid.java` | startThread() pattern for 4 tools, simplified toggle-off |
-| `src/haven/CheckpointManager.java` | volatile stop fix |
-| `src/haven/automated/CombatDistanceTool.java` | BotBase migration |
-| `src/haven/automated/CombatRotationBot.java` | BotBase migration |
-| `src/haven/automated/MiningSafetyAssistant.java` | BotBase migration |
-| `src/haven/automated/OreAndStoneCounter.java` | BotBase migration |
-| `src/haven/automated/AutoRepeatFlowerMenuScript.java` | volatile stop fix |
-| `src/haven/automated/CellarDiggingBot.java` | Null safety, ui.gui→gui |
-| `src/haven/automated/CleanupBot.java` | Player null guard in findClosestGob |
-| `src/haven/automated/FishingBot.java` | Null safety, ui.gui→gui |
-| `src/haven/automated/OceanScoutBot.java` | Null safety, ui.gui→gui, Loading try-catch |
-| `src/haven/automated/TarKilnCleanerBot.java` | Null safety, ui.gui→gui |
-| `src/haven/automated/OreSmeltingBot.java` | gui.vhand null guard |
+| `src/haven/Inventory.java` | Sorting overhaul: container staging, multi-slot comparator, small inv skip, BY_QUALITY removal |
+| `src/haven/GameUI.java` | destroy() stops all bots + script threads |
+| `src/haven/MapView.java` | pfDone "No path found" feedback, pfLeftClick exception logging |
+| `src/haven/automated/BotBase.java` | dispose() override, checkVitals catch Exception |
+| `src/haven/automated/Actions.java` | rightClick null safety |
+| `src/haven/automated/pathfinder/AStar.java` | compareTo fix (= → -) |
+| `src/haven/automated/pathfinder/Map.java` | Double.MIN_VALUE fix, return→continue, getFreeLocation radius |
+| `src/haven/automated/pathfinder/Pathfinder.java` | Loading catch, volatile flags, Double.MIN_VALUE fix, null player guard |
+| `src/haven/automated/helpers/HitBoxes.java` | ConcurrentHashMap |
