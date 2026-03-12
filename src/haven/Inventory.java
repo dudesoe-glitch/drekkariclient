@@ -30,6 +30,7 @@ import haven.res.ui.stackinv.ItemStack;
 
 import java.awt.event.KeyEvent;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 public class Inventory extends Widget implements DTarget {
@@ -61,10 +62,10 @@ public class Inventory extends Widget implements DTarget {
 	public GroupingMode groupingMode = GroupingMode.NONE;
 
 	// Collapsed groups tracking (by group key)
-	public final Set<String> collapsedGroups = new HashSet<>();
+	public final Set<String> collapsedGroups = ConcurrentHashMap.newKeySet();
 
 	// Cached group key assignments — avoids calling getGroupKey() (which calls sortName()/info()) every frame
-	private Map<WItem, String> cachedGroupKeys = new HashMap<>();
+	private Map<WItem, String> cachedGroupKeys = new ConcurrentHashMap<>();
 	private int lastGroupKeyCacheChildCount = -1;
 	private GroupingMode lastGroupKeyCacheMode = null;
 
@@ -378,13 +379,15 @@ public class Inventory extends Widget implements DTarget {
 		List<WItem> items = new ArrayList<WItem>();
 		for (Widget wdg = child; wdg != null; wdg = wdg.next) {
 			if (wdg instanceof WItem) {
-				String wdgname = ((WItem)wdg).item.getname();
-				for (String name : names) {
-					if (wdgname.equals(name)) {
-						items.add((WItem) wdg);
-						break;
+				try {
+					String wdgname = ((WItem)wdg).item.getname();
+					for (String name : names) {
+						if (wdgname.equals(name)) {
+							items.add((WItem) wdg);
+							break;
+						}
 					}
-				}
+				} catch (Loading ignored) {}
 			}
 		}
 		return items;
@@ -395,9 +398,11 @@ public class Inventory extends Widget implements DTarget {
 			return null;
 		for (Widget wdg = child; wdg != null; wdg = wdg.next) {
 			if (wdg instanceof WItem) {
-				String wdgname = ((WItem)wdg).item.getname();
-				if (wdgname.equals(name))
-					return (WItem) wdg;
+				try {
+					String wdgname = ((WItem)wdg).item.getname();
+					if (wdgname.equals(name))
+						return (WItem) wdg;
+				} catch (Loading ignored) {}
 			}
 		}
 		return null;
@@ -408,9 +413,11 @@ public class Inventory extends Widget implements DTarget {
 			return null;
 		for (Widget wdg = child; wdg != null; wdg = wdg.next) {
 			if (wdg instanceof WItem) {
-				String wdgname = ((WItem)wdg).item.getname();
-				if (wdgname.contains(name))
-					return (WItem) wdg;
+				try {
+					String wdgname = ((WItem)wdg).item.getname();
+					if (wdgname.contains(name))
+						return (WItem) wdg;
+				} catch (Loading ignored) {}
 			}
 		}
 		return null;
@@ -559,15 +566,17 @@ public class Inventory extends Widget implements DTarget {
 		List<WItem> items = new ArrayList<WItem>();
 		for (Widget wdg = child; wdg != null; wdg = wdg.next) {
 			if (wdg instanceof WItem) {
-				String wdgname = ((WItem)wdg).item.getname();
-				for (String name : names) {
-					if (name == null)
-						continue;
-					if (wdgname.contains(name)) {
-						items.add((WItem) wdg);
-						break;
+				try {
+					String wdgname = ((WItem)wdg).item.getname();
+					for (String name : names) {
+						if (name == null)
+							continue;
+						if (wdgname.contains(name)) {
+							items.add((WItem) wdg);
+							break;
+						}
 					}
-				}
+				} catch (Loading ignored) {}
 			}
 		}
 		return items;

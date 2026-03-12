@@ -98,7 +98,9 @@ public class MiningBot extends BotBase {
 		List<Gob> supports = GobHelper.findAllSupports(gui);
 		for (Gob support : supports) {
 			try {
-				String res = support.getres().name;
+				Resource r = support.getres();
+				if (r == null) continue;
+				String res = r.name;
 				double dist = support.rc.dist(pos);
 				if ((res.equals("gfx/terobjs/ladder") || res.equals("gfx/terobjs/minesupport")) && dist <= 100)
 					return true;

@@ -659,8 +659,9 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 				}
 				String itemBaseName = this.resource().basename();
 				double quality = 0.0;
-				if(this.rawinfo != null){
-					quality = this.info().stream().filter(info -> info instanceof Quality).mapToDouble(info -> ((Quality) info).q).findFirst().orElse(0.0);
+				QBuff qb = this.getQBuff();
+				if (qb != null) {
+					quality = qb.q;
 				}
 				if (quality > 0.1 && contentswnd == null) {
 					boolean dropped = false;

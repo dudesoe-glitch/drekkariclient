@@ -85,9 +85,11 @@ public class CleanupBot extends BotBase {
 	}
 
 	private void dropStones() {
-		for (WItem wItem : ui.gui.maininv.getAllItems()) {
-			GItem gitem = wItem.item;
-			if (Config.stoneItemBaseNames.contains(gitem.resource().basename())) gitem.wdgmsg("drop", new Coord(wItem.item.sz.x / 2, wItem.item.sz.y / 2));
+		for (WItem wItem : gui.maininv.getAllItems()) {
+			try {
+				GItem gitem = wItem.item;
+				if (Config.stoneItemBaseNames.contains(gitem.resource().basename())) gitem.wdgmsg("drop", new Coord(wItem.item.sz.x / 2, wItem.item.sz.y / 2));
+			} catch (Loading ignored) {}
 		}
 	}
 

@@ -22,7 +22,7 @@ public class Quality extends QBuff implements GItem.OverlayInfo<Tex> {
 
     public Quality(Owner owner, double q) {
     super(owner, qualityWorkaround, "Quality", q); // ND: workaround suggested by loftar
-    this.multiplier = Math.sqrt(q / 10.0);
+    this.multiplier = Math.sqrt(Math.max(0, q) / 10.0);
     }
 
     public static ItemInfo mkinfo(Owner owner, Object... args) {

@@ -73,7 +73,7 @@ public class QualityList {
         public QualityEntry(String type, double value) {
             this.type = type;
             this.value = value;
-            this.multiplier = Math.sqrt(value / 10.0);
+            this.multiplier = Math.sqrt(Math.max(0, value) / 10.0);
         }
     }
 

@@ -51,7 +51,7 @@ public class FlowerMenu extends Widget {
 	public static final Color ptcGreen = new Color(0, 200, 50);
 	public static final Color ptcYellow = new Color(252, 186, 3);
 	public static final Color ptcStroke = Color.BLACK;
-	private static String nextAutoSel;
+	private static volatile String nextAutoSel;
 	public static String lastChosenOption = null;
 	public static String lastChosenResource = null;
 	public final String[] options;
@@ -334,13 +334,16 @@ public class FlowerMenu extends Widget {
 
 	public void tryAutoSelect() {
 		if (nextAutoSel != null) {
+			String sel = nextAutoSel;
 			for (String option : options) {
-				if (option.equals(nextAutoSel)) {
+				if (option.equals(sel)) {
 					choose(getPetalFromName(option));
 					nextAutoSel = null;
 					return;
 				}
 			}
+			if (ui != null && ui.gui != null)
+				ui.gui.errorsilent("FlowerMenu: option not found: " + sel);
 			choose(null);
 			nextAutoSel = null;
 		} else {

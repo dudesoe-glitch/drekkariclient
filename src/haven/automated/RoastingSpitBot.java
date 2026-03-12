@@ -39,6 +39,7 @@ public class RoastingSpitBot extends BotBase {
 				if (active) {
 					Gob theObject = null;
 					Gob player = gui.map.player();
+					if (player == null) { active = false; return; }
 					Coord2d plc = player.rc;
 					for (Gob gob : Utils.getAllGobs(gui)) {
 						double distFromPlayer = gob.rc.dist(plc);

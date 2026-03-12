@@ -91,7 +91,7 @@ public class GobReadyForHarvestInfo extends GobInfo {
 		BufferedImage[] parts = null;
 		Message data = getDrawableData(gob);
 		Resource res = gob.getres();
-		if(data != null && !data.eom()) {
+		if(data != null && !data.eom() && res != null) {
 			data.skip(1);
 			int growth = data.eom() ? -1 : data.uint8();
 			if (growth != -1) {

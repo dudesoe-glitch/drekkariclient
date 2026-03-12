@@ -96,7 +96,11 @@ public class InvHelper {
         WItem best = null;
         double bestQ = -1;
         for (WItem wi : items) {
-            double q = getQuality(wi.item);
+            double q = 0;
+            try {
+                QBuff qb = wi.item.getQBuff();
+                if (qb != null) q = qb.q;
+            } catch (Loading ignored) {}
             if (q > bestQ) {
                 bestQ = q;
                 best = wi;
@@ -133,18 +137,6 @@ public class InvHelper {
             }
         } catch (Loading ignored) {}
         return false;
-    }
-
-    /** Get item quality, or -1 if not loaded or unavailable. */
-    public static double getQuality(GItem item) {
-        if (item == null) return -1;
-        try {
-            QBuff qb = item.getQBuff();
-            if (qb != null) {
-                return qb.q;
-            }
-        } catch (Loading ignored) {}
-        return -1;
     }
 
     /** Get item resource name, or null if not loaded. */

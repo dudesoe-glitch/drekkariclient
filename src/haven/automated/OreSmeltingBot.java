@@ -211,7 +211,9 @@ public class OreSmeltingBot extends BotBase {
 	}
 
 	private void collectOutputFromSmelter(Gob smelter) throws InterruptedException {
-		if (smelter.rc.dist(gui.map.player().rc) > MAX_INTERACT_DIST) {
+		Gob player = gui.map.player();
+		if (player == null) return;
+		if (smelter.rc.dist(player.rc) > MAX_INTERACT_DIST) {
 			gui.map.pfLeftClick(smelter.rc.floor().add(2, 0), null);
 			if (!Actions.waitPf(gui)) return;
 		}
@@ -255,7 +257,7 @@ public class OreSmeltingBot extends BotBase {
 	}
 
 	private WItem findOreInInventory() {
-		for (WItem wi : gui.getAllItemsFromAllInventoriesAndStacks()) {
+		for (WItem wi : InvHelper.getAllItemsExcludeBeltKeyring(gui)) {
 			try { if (isOreEnabled(wi.item.getname())) return wi; } catch (Loading ignored) {}
 		}
 		return null;
@@ -263,14 +265,14 @@ public class OreSmeltingBot extends BotBase {
 
 	private List<WItem> findAllOreInInventory() {
 		List<WItem> ores = new ArrayList<>();
-		for (WItem wi : gui.getAllItemsFromAllInventoriesAndStacks()) {
+		for (WItem wi : InvHelper.getAllItemsExcludeBeltKeyring(gui)) {
 			try { if (isOreEnabled(wi.item.getname())) ores.add(wi); } catch (Loading ignored) {}
 		}
 		return ores;
 	}
 
 	private WItem findFuelInInventory() {
-		for (WItem wi : gui.getAllItemsFromAllInventoriesAndStacks()) {
+		for (WItem wi : InvHelper.getAllItemsExcludeBeltKeyring(gui)) {
 			try {
 				String name = wi.item.getname();
 				if (name != null) { for (String fuelName : FUEL_NAMES) { if (name.contains(fuelName)) return wi; } }
