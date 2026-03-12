@@ -1,64 +1,71 @@
-# HANDOFF — Session 9 (OptWnd Full Extraction, QualityList, PathQueue Minimap, Bot Migration)
+# HANDOFF — Session 10 (OptWnd Complete, QualityList UI, Actions Class, ExtInventory)
 
 ## Resumption Prompt
-Extracted 8 OptWnd panels (Phase 3 + Hard: ActionBars, AggroExclusion, Chat, Quality, Camera, GameplayAutomation, Hiding, Alarms), reducing OptWnd from 3150 to 1898 lines. Added PathQueue gold lines to minimap. Ported QualityList multi-type quality aggregation from EnderWiggin into GItem/WItem. Migrated FishingBot/RoastingSpitBot/TarKilnCleanerBot to InvHelper/GobHelper. Build clean.
+Completed all 4 remaining OptWnd panel extractions (AutoLoot, Binding, InterfaceSettings, Video), reducing OptWnd from 1898 to 944 lines (82% total reduction from original 5279). Added QualityList UI display mode selector (Default/Mean/Average/Min/Max) wired through Quality.overlay(). Extracted 13 action methods from AUtils into new Actions.java, updated 18 bot/script files. Built ExtInventoryWindow with 5 grouping modes, ItemFilter integration, collapsible groups, click-to-highlight. Build clean.
 
 ## Goal
-Complete all non-testing priorities: OptWnd extraction, QualityList port, PathQueue minimap, bot migration.
+Complete all non-testing priorities: final OptWnd extraction, QualityList UI, Actions class, ExtInventory.
 
 ## Completed
 
-### PathQueue Minimap Rendering (NEW)
-1. **MiniMap.drawmovequeue()** — Added PathQueue gold lines + waypoint dots after existing CheckpointManager rendering. Uses `p2c()` for world-to-minimap coordinate transform. Same visual style as MapView (gold RGB(255,200,0) lines with black outline, gold+black waypoint dots).
+### OptWnd Final Extraction (4 panels)
+1. **OptWndAutoLootPanel.java** — 167 lines. Equipment slot checkboxes, `addbtn()` helper.
+2. **OptWndBindingPanel.java** — 195 lines. 60+ keybindings, scrollport, `addbtn()`/`addbtnImproved()` helpers. References `OptWnd.PointBind` and `OptWnd.SetButton`.
+3. **OptWndInterfaceSettingsPanel.java** — 386 lines. Two-column layout, 30+ settings, OldDropBox theme selector, map icon size/zoom sliders, audio preview, SAttrWnd sync.
+4. **OptWndVideoPanel.java** — 297 lines. CPanel build logic via functional interfaces (PrefsGetter, PrefsSetter, ErrorHandler). VideoPanel shell stays in OptWnd (manages mutable state).
 
-### OptWnd Phase 3 Extraction (4 panels)
-2. **OptWndActionBarsPanel.java** — 151 lines. Has `addbtn()` + `addOrientationRadio()` static helpers. RadioGroup `ui` resolved via captured `final Widget p`.
-3. **OptWndAggroExclusionPanel.java** — 75 lines. BuddyWnd.gc[] color labels.
-4. **OptWndChatPanel.java** — 105 lines. Chat alerts, village name, system messages.
-5. **OptWndQualityPanel.java** — 185 lines. 7 ColorOptionWidget + TextEntry pairs, reset buttons.
+### QualityList UI Display Mode
+5. **OptWndQualityPanel.java** — Added RadioGroup: Default/Mean (RMS)/Average/Min/Max. Stored in `OptWnd.qualityAggMode` via Utils.getprefi/setprefi.
+6. **Quality.java** — Added `resolveDisplayQuality()` that uses QualityList aggregation when mode != Default. Extracted `renderQualityTex()` shared method.
 
-### OptWnd Hard Panel Extraction (4 panels)
-6. **OptWndCameraPanel.java** — 246 lines. RadioGroup camera selection, visibility state machine via Consumer<Boolean> lambdas, single-element arrays for lambda capture of local widgets.
-7. **OptWndGameplayAutomationPanel.java** — 279 lines. Manager window coordination via `optWnd.` prefix, cross-class sync with SAttrWnd/TableInfo/Equipory.
-8. **OptWndHidingPanel.java** — 193 lines. HidingBox render pipeline mutation, gobAction() sync.
-9. **OptWndAlarmsPanel.java** — 162 lines. AlarmWidgetComponents inner class, addAlarmWidget() helper, audio preview with AudioSystem.
+### Actions Class Extraction
+7. **Actions.java** — 164 lines. 13 methods moved from AUtils: drinkTillFull, waitPf, unstuck, waitProgBar, waitForEmptyHand, waitForOccupiedHand, attackGob, rightClick, rightClickGobAndSelectOption, rightClickShiftCtrl, rightClickGobOverlayWithItem, rightClickGobOverlayAndSelectOption, clickWItemAndSelectOption.
+8. **AUtils.java** — Reduced from 449 to 296 lines. Retains query/helper methods only.
+9. **18 bot/script files** — All `AUtils.method()` → `Actions.method()` imports updated.
 
-### QualityList Port (NEW)
-10. **QualityList.java** — Multi-type quality aggregation. `SingleType` enum (Mean, Max, Min, Average) with abstract `aggregate()`. `QualityEntry` with type/value/multiplier. `fromItem()` handles containers. `EMPTY` singleton.
-11. **GItem.getQualityList()** — Lazily-initialized QualityList via `QualityList.fromItem(this)`.
-12. **WItem.qualityList()** / **WItem.qualityAgg(SingleType)** — Convenience accessors. Named `qualityAgg` to avoid method reference ambiguity with `quality()`.
-
-### Bot Migration
-13. **FishingBot** — `AUtils.getAllItemsFromAllInventoriesAndStacksExcludeBeltAndKeyring()` → `InvHelper.getAllItemsExcludeBeltKeyring()`
-14. **RoastingSpitBot** — Same migration as FishingBot
-15. **TarKilnCleanerBot** — `AUtils.getGobs()` → `GobHelper.findByName()` with 550.0 maxDist
+### ExtInventory Window
+10. **ItemGrouping.java** — 73 lines. Enum: NONE, BY_NAME, BY_QUALITY, BY_Q5, BY_Q10. Each has `groupKey(WItem)` and `groupSortKey()`.
+11. **ExtInventoryWindow.java** — 521 lines. Grouping mode cycling, sort options (Name/Quality/Count), ItemFilter text entry, collapsible group headers with icons/counts/quality, item rows with 14x14 icons, click-to-highlight, Tex caching, dirty-flag refresh, position persistence.
+12. **GameUI.java** — Added `extInventoryWindow` field + "Ext" toolbar button in inventory toolbar.
 
 ## In Progress
 Nothing — all planned work complete.
 
 ## Next Priorities
-1. **Test everything in-game** — 9 sessions of features untested!
-2. **OptWnd remaining panels** — InterfaceSettings (~370 lines), BindingPanel (~73 lines), VideoPanel (~260 lines), AutoLoot (~90 lines)
-3. **QualityList UI** — Add display mode setting when game supports multiple quality types
-4. **Port EnderWiggin features** — Actions class (reusable automation actions), ExtInventory (grouping/filtering UI)
-5. **Migrate AUtils action methods** — Extract reusable game actions (drinkTillFull, waitPf, etc.) to a cleaner Actions class
+1. **Test everything in-game** — 10 sessions of features untested!
+2. **Port more EnderWiggin features** — ExtInventory repeat-action-for-group, ItemType metadata class
+3. **AUtils cleanup** — Deprecate/remove methods already ported to InvHelper/GobHelper
+4. **Code review** — Review all 10 sessions of work for quality, consistency, edge cases
 
 ## Files Modified/Created
 | File | Changes |
 |------|---------|
-| `src/haven/MiniMap.java` | PathQueue gold lines + dots in drawmovequeue() |
-| `src/haven/OptWnd.java` | 8 panel classes → thin wrappers (3150→1898 lines) |
-| `src/haven/OptWndActionBarsPanel.java` | NEW — extracted Action Bars |
-| `src/haven/OptWndAggroExclusionPanel.java` | NEW — extracted Aggro Exclusion |
-| `src/haven/OptWndChatPanel.java` | NEW — extracted Chat |
-| `src/haven/OptWndQualityPanel.java` | NEW — extracted Quality Display |
-| `src/haven/OptWndCameraPanel.java` | NEW — extracted Camera |
-| `src/haven/OptWndGameplayAutomationPanel.java` | NEW — extracted Gameplay Automation |
-| `src/haven/OptWndHidingPanel.java` | NEW — extracted Hiding |
-| `src/haven/OptWndAlarmsPanel.java` | NEW — extracted Alarms |
-| `src/haven/QualityList.java` | NEW — multi-type quality aggregation |
-| `src/haven/GItem.java` | Added qualityList field + getQualityList() |
-| `src/haven/WItem.java` | Added qualityList(), qualityAgg(SingleType) |
-| `src/haven/automated/FishingBot.java` | InvHelper migration |
-| `src/haven/automated/RoastingSpitBot.java` | InvHelper migration |
-| `src/haven/automated/TarKilnCleanerBot.java` | GobHelper migration |
+| `src/haven/OptWnd.java` | 4 more panels extracted (1898→944 lines), added qualityAggMode field |
+| `src/haven/OptWndAutoLootPanel.java` | NEW — extracted Auto-Loot |
+| `src/haven/OptWndBindingPanel.java` | NEW — extracted Keybindings |
+| `src/haven/OptWndInterfaceSettingsPanel.java` | NEW — extracted Interface Settings |
+| `src/haven/OptWndVideoPanel.java` | NEW — extracted Video/Graphics |
+| `src/haven/OptWndQualityPanel.java` | Added quality aggregation mode RadioGroup |
+| `src/haven/res/ui/tt/q/quality/Quality.java` | resolveDisplayQuality() + renderQualityTex() |
+| `src/haven/automated/Actions.java` | NEW — 13 game action methods |
+| `src/haven/automated/AUtils.java` | 13 methods removed (449→296 lines) |
+| `src/haven/automated/AggroEveryoneInRange.java` | Actions import |
+| `src/haven/automated/AggroNearestTarget.java` | Actions import |
+| `src/haven/automated/AggroNearestPlayer.java` | Actions import |
+| `src/haven/automated/AggroOrTargetCursorNearest.java` | Actions import |
+| `src/haven/automated/AttackOpponent.java` | Actions import |
+| `src/haven/automated/BotBase.java` | Actions import |
+| `src/haven/automated/ButcherBot.java` | Actions import |
+| `src/haven/automated/CellarDiggingBot.java` | Actions import |
+| `src/haven/automated/CleanupBot.java` | Actions import |
+| `src/haven/automated/ClayDiggingBot.java` | Actions import |
+| `src/haven/automated/FarmingBot.java` | Actions import |
+| `src/haven/automated/FillCheeseTray.java` | Actions import |
+| `src/haven/automated/FishingBot.java` | Actions import |
+| `src/haven/automated/ForagingBot.java` | Actions import |
+| `src/haven/automated/OreSmeltingBot.java` | Actions import |
+| `src/haven/automated/RoastingSpitBot.java` | Actions import |
+| `src/haven/automated/TarKilnCleanerBot.java` | Actions import |
+| `src/haven/ItemGrouping.java` | NEW — 5 inventory grouping strategies |
+| `src/haven/ExtInventoryWindow.java` | NEW — Extended Inventory window |
+| `src/haven/GameUI.java` | extInventoryWindow field + "Ext" toolbar button |

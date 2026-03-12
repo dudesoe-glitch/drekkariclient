@@ -35,12 +35,12 @@ public class AggroOrTargetCursorNearest implements Runnable {
                     if (clickedGob != null) {
                         if (isPlayer(clickedGob)) {
                             if (!clickedGob.isFriend()) {
-                                AUtils.attackGob(gui, clickedGob);
+                                Actions.attackGob(gui, clickedGob);
                             }
                             return;
                         }
                         if (potentialAggroTargets.contains(clickedGob.getres().name)) {
-                            AUtils.attackGob(gui, clickedGob);
+                            Actions.attackGob(gui, clickedGob);
                         } else if (clickedGob.getres().name.equals("gfx/kritter/cattle/cattle")) { // ND: Special case for Aurochs
                             for (GAttrib g : clickedGob.attr.values()) {
                                 if (g instanceof Drawable) {
@@ -49,7 +49,7 @@ public class AggroOrTargetCursorNearest implements Runnable {
                                         if (c.comp.cmod.size() > 0) {
                                             for (Composited.MD item : c.comp.cmod) {
                                                 if (item.mod.get().basename().equals("aurochs")) {
-                                                    AUtils.attackGob(gui, clickedGob);
+                                                    Actions.attackGob(gui, clickedGob);
                                                     return;
                                                 }
                                             }
@@ -65,7 +65,7 @@ public class AggroOrTargetCursorNearest implements Runnable {
                                         if (c.comp.cmod.size() > 0) {
                                             for (Composited.MD item : c.comp.cmod) {
                                                 if (item.mod.get().basename().equals("mouflon")) {
-                                                    AUtils.attackGob(gui, clickedGob);
+                                                    Actions.attackGob(gui, clickedGob);
                                                     return;
                                                 }
                                             }
@@ -101,7 +101,7 @@ public class AggroOrTargetCursorNearest implements Runnable {
                 }
 
                 if (closestEnemy != null) {
-                    AUtils.attackGob(gui, closestEnemy);
+                    Actions.attackGob(gui, closestEnemy);
                 }
 
             }

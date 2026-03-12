@@ -105,7 +105,7 @@ public class OreSmeltingBot extends BotBase {
 		Gob smelter = findNearestSmelter();
 		if (smelter == null) { setStatus("No smelters found nearby"); smelterCountLabel.settext(""); Thread.sleep(3000); return; }
 		smelterCountLabel.settext("Smelters nearby: " + countSmelters());
-		if (gui.vhand != null) { gui.vhand.item.wdgmsg("drop", Coord.z); AUtils.waitForEmptyHand(gui, 1000, "Ore Smelting Bot: Couldn't clear hand"); }
+		if (gui.vhand != null) { gui.vhand.item.wdgmsg("drop", Coord.z); Actions.waitForEmptyHand(gui, 1000, "Ore Smelting Bot: Couldn't clear hand"); }
 
 		WItem oreItem = findOreInInventory();
 		if (oreItem == null) {
@@ -123,7 +123,7 @@ public class OreSmeltingBot extends BotBase {
 	private void processSmelter(Gob smelter) throws InterruptedException {
 		setStatus("Walking to smelter...");
 		gui.map.pfLeftClick(smelter.rc.floor().add(2, 0), null);
-		if (!AUtils.waitPf(gui)) { AUtils.unstuck(gui); Thread.sleep(1000); return; }
+		if (!Actions.waitPf(gui)) { Actions.unstuck(gui); Thread.sleep(1000); return; }
 		if (smelter.rc.dist(gui.map.player().rc) > MAX_INTERACT_DIST) { setStatus("Too far from smelter, retrying..."); Thread.sleep(1000); return; }
 
 		setStatus("Loading ore...");
@@ -146,7 +146,7 @@ public class OreSmeltingBot extends BotBase {
 		int maxWait = 300000;
 		while (waitTime < maxWait && active && !stop) {
 			if (gui.prog != null) { waitForProgressBar(60000); Thread.sleep(500); }
-			if (gui.getmeter("stam", 0).a < STAMINA_THRESHOLD) { AUtils.drinkTillFull(gui, 0.99, 0.99); }
+			if (gui.getmeter("stam", 0).a < STAMINA_THRESHOLD) { Actions.drinkTillFull(gui, 0.99, 0.99); }
 			try {
 				ResDrawable rd = smelter.getattr(ResDrawable.class);
 				if (rd != null && waitTime > 5000 && rd.sdt.checkrbuf(0) == 0) { setStatus("Smelting complete!"); break; }
@@ -174,13 +174,13 @@ public class OreSmeltingBot extends BotBase {
 				while (timeout < HAND_TIMEOUT) {
 					WItem handNow = gui.vhand;
 					if (handNow == null) break;
-					else if (handNow.item != handItem) { handNow.item.wdgmsg("drop", Coord.z); AUtils.waitForEmptyHand(gui, 1000, ""); break; }
+					else if (handNow.item != handItem) { handNow.item.wdgmsg("drop", Coord.z); Actions.waitForEmptyHand(gui, 1000, ""); break; }
 					timeout += HAND_DELAY; Thread.sleep(HAND_DELAY);
 				}
 				loaded++; Thread.sleep(100);
 			} catch (Loading ignored) {}
 		}
-		if (gui.vhand != null) { gui.vhand.item.wdgmsg("drop", Coord.z); AUtils.waitForEmptyHand(gui, 1000, ""); }
+		if (gui.vhand != null) { gui.vhand.item.wdgmsg("drop", Coord.z); Actions.waitForEmptyHand(gui, 1000, ""); }
 		return loaded;
 	}
 
@@ -204,14 +204,14 @@ public class OreSmeltingBot extends BotBase {
 			}
 			if (timeout >= HAND_TIMEOUT || done) break;
 		}
-		if (gui.vhand != null) { gui.vhand.item.wdgmsg("drop", Coord.z); AUtils.waitForEmptyHand(gui, 1000, ""); }
+		if (gui.vhand != null) { gui.vhand.item.wdgmsg("drop", Coord.z); Actions.waitForEmptyHand(gui, 1000, ""); }
 		return loaded;
 	}
 
 	private void collectOutputFromSmelter(Gob smelter) throws InterruptedException {
 		if (smelter.rc.dist(gui.map.player().rc) > MAX_INTERACT_DIST) {
 			gui.map.pfLeftClick(smelter.rc.floor().add(2, 0), null);
-			if (!AUtils.waitPf(gui)) return;
+			if (!Actions.waitPf(gui)) return;
 		}
 		gui.map.wdgmsg("click", Coord.z, smelter.rc.floor(posres), 3, 0, 0, (int) smelter.id, smelter.rc.floor(posres), 0, -1);
 		Thread.sleep(1500);

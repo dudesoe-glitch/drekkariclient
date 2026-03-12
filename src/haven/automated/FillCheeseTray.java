@@ -32,7 +32,7 @@ public class FillCheeseTray implements Runnable {
                     if (this.gui.vhand != null) {
                         final Coord freeroom = this.gui.maininv.isRoom(1, 1);
                         this.gui.maininv.wdgmsg("drop", freeroom);
-                        AUtils.waitForEmptyHand(this.gui, 500, "ehwat mate");
+                        Actions.waitForEmptyHand(this.gui, 500, "ehwat mate");
                     }
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
@@ -43,7 +43,7 @@ public class FillCheeseTray implements Runnable {
             try {
                 if (this.gui.vhand == null) {
                     curd.item.wdgmsg("take", Coord.z);
-                    if (!AUtils.waitForOccupiedHand(this.gui, 2000, "waitForOccupiedHand timed-out")) {
+                    if (!Actions.waitForOccupiedHand(this.gui, 2000, "waitForOccupiedHand timed-out")) {
                         return;
                     }
                 } else {

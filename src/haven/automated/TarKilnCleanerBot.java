@@ -45,12 +45,12 @@ public class TarKilnCleanerBot extends BotBase {
 					Coord newCoord = closest.rc.floor().add(option[0], option[1]);
 					gui.map.pfLeftClick(newCoord, null);
 					Thread.sleep(500);
-					AUtils.waitPf(gui);
+					Actions.waitPf(gui);
 					if (gui.map.player().rc.dist(new Coord2d(newCoord)) < 40) break;
 				}
-				AUtils.rightClickShiftCtrl(gui, closest);
+				Actions.rightClickShiftCtrl(gui, closest);
 				Thread.sleep(1000);
-				AUtils.waitProgBar(gui);
+				Actions.waitProgBar(gui);
 			}
 		}
 		Thread.sleep(200);

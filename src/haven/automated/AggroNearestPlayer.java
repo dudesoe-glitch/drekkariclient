@@ -56,7 +56,7 @@ public class AggroNearestPlayer implements Runnable {
         }
 
         if (closestEnemy != null) {
-            AUtils.attackGob(gui, closestEnemy);
+            Actions.attackGob(gui, closestEnemy);
             return;
         }
     }
@@ -80,7 +80,7 @@ public class AggroNearestPlayer implements Runnable {
         }
         
         if (closestEnemy != null) {
-            AUtils.attackGob(gui, closestEnemy);
+            Actions.attackGob(gui, closestEnemy);
             return;
         }
     }

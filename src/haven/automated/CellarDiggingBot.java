@@ -29,7 +29,7 @@ public class CellarDiggingBot extends BotBase {
 				if (!checkVitals()) { sleep(200); continue; }
 				if (active) {
 					if (gui.getmeter("stam", 0).a < STAMINA_THRESHOLD) {
-						try { AUtils.drinkTillFull(gui, 0.99, 0.99); } catch (InterruptedException ignored) { Thread.currentThread().interrupt(); return; }
+						try { Actions.drinkTillFull(gui, 0.99, 0.99); } catch (InterruptedException ignored) { Thread.currentThread().interrupt(); return; }
 						sleep(200); continue;
 					}
 					if (gui.maininv.getFreeSpace() < MIN_FREE_SLOTS) {
@@ -69,9 +69,9 @@ public class CellarDiggingBot extends BotBase {
 
 	private void tryEnterCellar(Gob cell) throws InterruptedException {
 		gui.map.pfLeftClick(cell.rc.floor().add(12, 0), null);
-		if (!AUtils.waitPf(gui)) AUtils.unstuck(gui);
+		if (!Actions.waitPf(gui)) Actions.unstuck(gui);
 		clearhand();
-		AUtils.rightClickGobAndSelectOption(gui, cell, 0);
+		Actions.rightClickGobAndSelectOption(gui, cell, 0);
 		gui.map.wdgmsg("click", Coord.z, cell.rc.floor(posres), 3, 0, 0, (int) cell.id, cell.rc.floor(posres), 0, -1);
 		Coord playerCoord = ui.gui.map.player().rc.floor(posres);
 		ui.gui.map.wdgmsg("click", Coord.z, playerCoord, 3, 0);
@@ -83,15 +83,15 @@ public class CellarDiggingBot extends BotBase {
 
 	private void chipBoulderOnce(Gob bumling) throws InterruptedException {
 		if (!bumlingExists(bumling) || !active || stop) return;
-		if (bumling.rc.dist(gui.map.player().rc) > 11 * 5) { gui.map.pfLeftClick(bumling.rc.floor().add(10, 0), null); if (!AUtils.waitPf(gui)) AUtils.unstuck(gui); }
+		if (bumling.rc.dist(gui.map.player().rc) > 11 * 5) { gui.map.pfLeftClick(bumling.rc.floor().add(10, 0), null); if (!Actions.waitPf(gui)) Actions.unstuck(gui); }
 		if (!bumlingExists(bumling) || !active || stop) return;
 		clearhand();
-		AUtils.rightClickGobAndSelectOption(gui, bumling, 0);
+		Actions.rightClickGobAndSelectOption(gui, bumling, 0);
 		gui.map.wdgmsg("click", Coord.z, bumling.rc.floor(posres), 3, 0, 0, (int) bumling.id, bumling.rc.floor(posres), 0, -1);
 		int idleTicks = 0;
 		while (active && !stop && bumlingExists(bumling)) {
 			if (!checkVitals()) break;
-			if (gui.getmeter("stam", 0).a < STAMINA_THRESHOLD) { try { AUtils.drinkTillFull(gui, 0.99, 0.99); } catch (InterruptedException ignored) { Thread.currentThread().interrupt(); return; } }
+			if (gui.getmeter("stam", 0).a < STAMINA_THRESHOLD) { try { Actions.drinkTillFull(gui, 0.99, 0.99); } catch (InterruptedException ignored) { Thread.currentThread().interrupt(); return; } }
 			if (isMiningOrRunning()) idleTicks = 0; else { idleTicks++; if (idleTicks >= 3) break; }
 			sleep(100);
 		}
@@ -115,7 +115,7 @@ public class CellarDiggingBot extends BotBase {
 		return false;
 	}
 
-	private void clearhand() { if (gui.vhand != null) gui.vhand.item.wdgmsg("drop", Coord.z); AUtils.rightClick(gui); }
+	private void clearhand() { if (gui.vhand != null) gui.vhand.item.wdgmsg("drop", Coord.z); Actions.rightClick(gui); }
 
 	@Override protected String windowPrefKey() { return "wndc-cellarDiggingBotWindow"; }
 	@Override protected void onCleanup() { gui.cellarDiggingBot = null; }

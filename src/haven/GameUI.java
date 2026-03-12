@@ -106,6 +106,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 	public Gob lastInspectedGob;
 	public InventorySearchWindow inventorySearchWindow;
 	public InventoryListWindow inventoryListWindow;
+	public ExtInventoryWindow extInventoryWindow;
 	public ObjectSearchWindow objectSearchWindow;
 	public Thread keyboundActionThread;
 	public long lastopponent = -1;
@@ -1251,7 +1252,20 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 			    }
 			}, listBtn.pos("ur").adds(4, 0));
 			repeatBtn.settip("Repeat last flower menu action on all similar items");
-			itemCountLabel = add(new Label(""), repeatBtn.pos("ur").adds(8, 3));
+			Button extBtn = add(new Button(UI.scale(35), "Ext") {
+			    public void click() {
+				if (extInventoryWindow != null) {
+				    Utils.setprefc("wndc-extInventoryWindow", extInventoryWindow.c);
+				    extInventoryWindow.reqdestroy();
+				    extInventoryWindow = null;
+				} else {
+				    extInventoryWindow = new ExtInventoryWindow(GameUI.this);
+				    GameUI.this.add(extInventoryWindow, Utils.getprefc("wndc-extInventoryWindow", new Coord(GameUI.this.sz.x/2 + 150, GameUI.this.sz.y/2 - 250)));
+				}
+			    }
+			}, repeatBtn.pos("ur").adds(4, 0));
+			extBtn.settip("Toggle Extended Inventory — grouping, filtering, and enhanced item display");
+			itemCountLabel = add(new Label(""), extBtn.pos("ur").adds(8, 3));
 		    }
 
 		    public void cresize(Widget ch) {
@@ -3391,15 +3405,15 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 		ui.lcc = Coord.z;
 		if (fv != null && fv.current != null) {
 			if (watercontainer != null) {
-				AUtils.clickWItemAndSelectOption(this, watercontainer, 0);
+				Actions.clickWItemAndSelectOption(this, watercontainer, 0);
 			} else {
-				AUtils.clickWItemAndSelectOption(this, teacontainer, 0);
+				Actions.clickWItemAndSelectOption(this, teacontainer, 0);
 			}
 		} else {
 			if ((nrj != null && nrj.a < 0.85 && teacontainer != null) || watercontainer == null) {
-				AUtils.clickWItemAndSelectOption(this, teacontainer, 0);
+				Actions.clickWItemAndSelectOption(this, teacontainer, 0);
 			} else {
-				AUtils.clickWItemAndSelectOption(this, watercontainer, 0);
+				Actions.clickWItemAndSelectOption(this, watercontainer, 0);
 			}
 		}
 		return true;

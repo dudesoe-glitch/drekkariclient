@@ -107,8 +107,8 @@ public class FarmingBot extends BotBase {
 
 		setStatus("Walking to " + cropBaseName + "...");
 		gui.map.pfLeftClick(crop.rc.floor().add(2, 0), null);
-		if (!AUtils.waitPf(gui)) {
-			AUtils.unstuck(gui);
+		if (!Actions.waitPf(gui)) {
+			Actions.unstuck(gui);
 			return;
 		}
 
@@ -119,7 +119,7 @@ public class FarmingBot extends BotBase {
 
 		if (gui.vhand != null) {
 			gui.vhand.item.wdgmsg("drop", Coord.z);
-			AUtils.waitForEmptyHand(gui, 1000, "Farming Bot: Couldn't clear hand");
+			Actions.waitForEmptyHand(gui, 1000, "Farming Bot: Couldn't clear hand");
 		}
 
 		if (harvestCheckBox.a) {
@@ -127,7 +127,7 @@ public class FarmingBot extends BotBase {
 			FlowerMenu.setNextSelection("Harvest");
 			gui.map.wdgmsg("click", Coord.z, crop.rc.floor(posres), 3, 0, 0, (int) crop.id, crop.rc.floor(posres), 0, -1);
 			Thread.sleep(300);
-			AUtils.waitProgBar(gui);
+			Actions.waitProgBar(gui);
 			Thread.sleep(500);
 		}
 
@@ -136,17 +136,17 @@ public class FarmingBot extends BotBase {
 			WItem seed = findBestSeed(cropBaseName);
 			if (seed != null) {
 				seed.item.wdgmsg("take", Coord.z);
-				if (!AUtils.waitForOccupiedHand(gui, 2000, "Farming Bot: Couldn't pick up seed")) {
+				if (!Actions.waitForOccupiedHand(gui, 2000, "Farming Bot: Couldn't pick up seed")) {
 					return;
 				}
 				Thread.sleep(100);
 				gui.map.wdgmsg("itemact", Coord.z, cropPos.floor(posres), 0);
 				Thread.sleep(500);
-				AUtils.waitProgBar(gui);
+				Actions.waitProgBar(gui);
 				Thread.sleep(300);
 				if (gui.vhand != null) {
 					gui.vhand.item.wdgmsg("drop", Coord.z);
-					AUtils.waitForEmptyHand(gui, 1000, "");
+					Actions.waitForEmptyHand(gui, 1000, "");
 				}
 			} else {
 				setStatus("No seeds for " + cropBaseName);

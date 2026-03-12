@@ -71,7 +71,7 @@ public class AggroNearestTarget implements Runnable {
         }
 
         if (closestEnemy != null) {
-            AUtils.attackGob(gui, closestEnemy);
+            Actions.attackGob(gui, closestEnemy);
             return;
         }
     }
@@ -89,7 +89,7 @@ public class AggroNearestTarget implements Runnable {
         }
 
         if (closestEnemy != null) {
-            AUtils.attackGob(gui, closestEnemy);
+            Actions.attackGob(gui, closestEnemy);
             return;
         }
     }
@@ -113,7 +113,7 @@ public class AggroNearestTarget implements Runnable {
         }
 
         if (closestEnemy != null) {
-            AUtils.attackGob(gui, closestEnemy);
+            Actions.attackGob(gui, closestEnemy);
             return true;
         }
         return false;
@@ -147,7 +147,7 @@ public class AggroNearestTarget implements Runnable {
         }
         
         if (closestEnemy != null) {
-            AUtils.attackGob(gui, closestEnemy);
+            Actions.attackGob(gui, closestEnemy);
             return;
         }
     }

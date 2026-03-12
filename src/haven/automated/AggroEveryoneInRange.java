@@ -43,7 +43,7 @@ public class AggroEveryoneInRange implements Runnable {
         for (Gob gob : allAttackableMap.values()) {
             if (isPlayer(gob) && !aggrodplayers.contains(gob.id) && !gob.isFriend() && !gob.getPoses().contains("knock")) {
                 if (gob.rc.dist(player.rc) < 195) {
-                    AUtils.attackGob(gui, gob);
+                    Actions.attackGob(gui, gob);
                 }
             }
             Integer ping = GameUI.getPingValue();
@@ -55,7 +55,7 @@ public class AggroEveryoneInRange implements Runnable {
         for (Gob gob : allAttackableMap.values()) {
             if (isPlayer(gob) && !gob.isFriend()&& !gob.getPoses().contains("knock")) {
                 if (gob.rc.dist(player.rc) < 195) {
-                    AUtils.attackGob(gui, gob);
+                    Actions.attackGob(gui, gob);
                 }
             }
             Integer ping = GameUI.getPingValue();

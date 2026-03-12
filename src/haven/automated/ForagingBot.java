@@ -77,8 +77,8 @@ public class ForagingBot extends BotBase {
 
 		setStatus("Walking to forageable...");
 		gui.map.pfLeftClick(herb.rc.floor().add(2, 0), null);
-		if (!AUtils.waitPf(gui)) {
-			AUtils.unstuck(gui);
+		if (!Actions.waitPf(gui)) {
+			Actions.unstuck(gui);
 			Thread.sleep(1000);
 			return;
 		}

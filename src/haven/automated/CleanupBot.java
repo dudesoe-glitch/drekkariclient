@@ -50,16 +50,16 @@ public class CleanupBot extends BotBase {
 		} else {
 			if (gob != null) {
 				gui.map.pfLeftClick(gob.rc.floor().add(20, 0), null);
-				if (!AUtils.waitPf(gui)) AUtils.unstuck(gui);
+				if (!Actions.waitPf(gui)) Actions.unstuck(gui);
 				if (gob.rc.dist(gui.map.player().rc) < 11 * 5) {
 					Resource res = gob.getres();
 					clearhand();
 					if (res.name.contains("/trees/") && !res.name.endsWith("stump") && !res.name.endsWith("log") && !res.name.endsWith("oldtrunk") || res.name.contains("/bushes/")) {
-						AUtils.rightClickGobAndSelectOption(gui, gob, 0);
+						Actions.rightClickGobAndSelectOption(gui, gob, 0);
 						gui.map.wdgmsg("click", Coord.z, gob.rc.floor(posres), 3, 0, 0, (int) gob.id, gob.rc.floor(posres), 0, -1);
 						waitWhileWorking(2000);
 					} else if (res.name.contains("/bumlings/")) {
-						AUtils.rightClickGobAndSelectOption(gui, gob, 0);
+						Actions.rightClickGobAndSelectOption(gui, gob, 0);
 						gui.map.wdgmsg("click", Coord.z, gob.rc.floor(posres), 3, 0, 0, (int) gob.id, gob.rc.floor(posres), 0, -1);
 						waitWhileWorking(2000);
 					} else if (res.name.endsWith("stump") || res.name.endsWith("/stockpile-soil")) {
@@ -77,7 +77,7 @@ public class CleanupBot extends BotBase {
 		}
 	}
 
-	private void clearhand() { if (gui.vhand != null) gui.vhand.item.wdgmsg("drop", Coord.z); AUtils.rightClick(gui); }
+	private void clearhand() { if (gui.vhand != null) gui.vhand.item.wdgmsg("drop", Coord.z); Actions.rightClick(gui); }
 
 	private void waitWhileWorking(int timeout) throws InterruptedException {
 		sleep(1500);
