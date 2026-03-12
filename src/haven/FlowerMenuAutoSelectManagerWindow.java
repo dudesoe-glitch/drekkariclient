@@ -3,6 +3,7 @@ package haven;
 import haven.res.ui.pag.toggle.Toggle;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -87,7 +88,13 @@ public class FlowerMenuAutoSelectManagerWindow extends Window {
         }
 
         public void clearItems() {
-            this.children().forEach(w -> {if(w instanceof PetalItem)w.destroy();});
+            List<Widget> toDestroy = new ArrayList<>();
+            for (Widget w = child; w != null; w = w.next) {
+                if (w instanceof PetalItem)
+                    toDestroy.add(w);
+            }
+            for (Widget w : toDestroy)
+                w.destroy();
             items.clear();
         }
 

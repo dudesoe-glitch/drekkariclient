@@ -38,6 +38,7 @@ public class Map {
     private final static int tbbby = 2;
 
     private final byte[][] map = new byte[sz][sz];
+    private final float[][] terrainCost = new float[sz][sz];
     private final TraversableObstacle[][] pomap = new TraversableObstacle[sz][sz];
     private final ArrayList<TraversableObstacle> tocandidates = new ArrayList<TraversableObstacle>(300);
     public Coord plc;
@@ -56,7 +57,8 @@ public class Map {
         this.mcache = mcache;
         dbg = new Dbg(DEBUG);
         dbg.init();
-
+        for (float[] row : terrainCost)
+            Arrays.fill(row, 1.0f);
     }
 
     private void initGeography() {
@@ -139,6 +141,83 @@ public class Map {
             dbg.dot(mapborder, i, Color.CYAN);
             dbg.dot(sz - mapborder, i, Color.CYAN);
         }
+    }
+
+    private void initTerrainCosts() {
+        if (!haven.Utils.getprefb("terrainWeightedPathfinding", false))
+            return;
+
+        Coord pltc = new Coord(plc.x / 11, plc.y / 11);
+        int dx = (int) (plc.x / 11.0d * 11.0d - pltc.x * 11) - 5;
+        int dy = (int) (plc.y / 11.0d * 11.0d - pltc.y * 11) - 5;
+
+        for (int x = -origintile; x < origintile; x++) {
+            for (int y = -origintile; y < origintile; y++) {
+                int t;
+                Resource res;
+                try {
+                    t = mcache.gettile(pltc.sub(x, y));
+                    res = mcache.tilesetr(t);
+                } catch (Loading l) {
+                    continue;
+                }
+                if (res == null)
+                    continue;
+
+                float cost = classifyTerrainCost(res.name);
+                if (cost == 1.0f)
+                    continue;
+
+                int gcx = origin - (x * 11) - dx;
+                int gcy = origin - (y * 11) - dy;
+
+                for (int px = -5; px <= 5; px++) {
+                    for (int py = -5; py <= 5; py++) {
+                        int mx = gcx + px;
+                        int my = gcy + py;
+                        if (mx >= 0 && mx < sz && my >= 0 && my < sz)
+                            terrainCost[mx][my] = cost;
+                    }
+                }
+            }
+        }
+    }
+
+    private static float classifyTerrainCost(String tileName) {
+        // Roads/paving — preferred
+        if (tileName.contains("paving") || tileName.contains("boards"))
+            return 0.7f;
+        if (tileName.contains("dirt"))
+            return 0.9f;
+        // Swamp/bog — slow
+        if (tileName.contains("swamp") || tileName.contains("bog") || tileName.contains("moor") ||
+                tileName.contains("fen") || tileName.contains("peatmoss"))
+            return 1.6f;
+        // Dense forest — slower
+        if (tileName.contains("thicket") || tileName.contains("blackwood") || tileName.contains("sourtimber"))
+            return 1.4f;
+        // Lighter forest
+        if (tileName.contains("timberland") || tileName.contains("grove") || tileName.contains("oakwilds") ||
+                tileName.contains("shadycopse"))
+            return 1.2f;
+        // Shallow water
+        if (tileName.contains("shallowwater"))
+            return 1.5f;
+        return 1.0f;
+    }
+
+    private double getEdgeTerrainMultiplier(int x1, int y1, int x2, int y2) {
+        final int samples = 5;
+        float sum = 0;
+        for (int i = 0; i <= samples; i++) {
+            int sx = x1 + (x2 - x1) * i / samples;
+            int sy = y1 + (y2 - y1) * i / samples;
+            if (sx >= 0 && sx < sz && sy >= 0 && sy < sz)
+                sum += terrainCost[sx][sy];
+            else
+                sum += 1.0f;
+        }
+        return sum / (samples + 1);
     }
 
     private static final HitBoxes.CollisionBoxSecondary[] DEFAULT_FALLBACK_HITBOX = new HitBoxes.CollisionBoxSecondary[]{
@@ -407,6 +486,7 @@ public class Map {
                     int dx = vert1.x - vert2.x;
                     int dy = vert1.y - vert2.y;
                     double distance = Math.sqrt(dx * dx + dy * dy);
+                    distance *= getEdgeTerrainMultiplier(vert1.x, vert1.y, vert2.x, vert2.y);
 
                     visedges += 2;
                     vert1.edges.add(new Edge(vert1, vert2, distance));
@@ -484,6 +564,11 @@ public class Map {
         initGeography();
         if (DEBUG_TIMINGS)
             System.out.println("            Geography: " + (double) (System.nanoTime() - start) / 1000000.0 + " ms.");
+
+        start = System.nanoTime();
+        initTerrainCosts();
+        if (DEBUG_TIMINGS)
+            System.out.println("        Terrain Costs: " + (double) (System.nanoTime() - start) / 1000000.0 + " ms.");
 
         start = System.nanoTime();
         identTraversableObstacles();

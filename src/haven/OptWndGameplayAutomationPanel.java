@@ -270,6 +270,13 @@ class OptWndGameplayAutomationPanel {
 			}
 		}, prev.pos("bl").adds(0, 2));
 		OptWnd.pathfindOnMinimapCheckBox.tooltip = RichText.render("When enabled, left-clicking on the minimap/world map will use the pathfinder\ninstead of walking in a straight line. Handles long distances automatically.", UI.scale(300));
+		prev = panel.add(OptWnd.terrainWeightedPathfindingCheckBox = new CheckBox("Terrain-Weighted Pathfinding"){
+			{a = Utils.getprefb("terrainWeightedPathfinding", false);}
+			public void changed(boolean val) {
+				Utils.setprefb("terrainWeightedPathfinding", val);
+			}
+		}, prev.pos("bl").adds(12, 2));
+		OptWnd.terrainWeightedPathfindingCheckBox.tooltip = RichText.render("When enabled, the pathfinder prefers roads and avoids swamps/bogs.\nRoads cost less, dense terrain costs more.", UI.scale(300));
 
 		Widget backButton;
 		panel.add(backButton = optWnd.new PButton(UI.scale(200), "Back", 27, back, "Advanced Settings"), prev.pos("bl").adds(0, 18));
