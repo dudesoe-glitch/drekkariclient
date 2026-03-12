@@ -30,6 +30,8 @@ import java.util.regex.Pattern;
  * - "lph>50"          — LP per hour greater than 50
  * - "has:water"       — container contains specified substance
  * - "wear>50"         — durability remaining % greater than 50
+ * - "type:food"       — item type (food/armor/curio/tool/seed/container/material/weapon)
+ * - "!name"           — exclude items matching name (negation)
  * - Combine with space: "turnip q>10 fep>5" — all conditions must match (AND)
  */
 public class ItemFilter {
@@ -43,11 +45,12 @@ public class ItemFilter {
 	private static final Pattern LPH_FILTER = Pattern.compile("lph\\s*([><=!]+)\\s*([\\d.]+)");
 	private static final Pattern HAS_FILTER = Pattern.compile("has:(\\w+)");
 	private static final Pattern WEAR_FILTER = Pattern.compile("wear\\s*([><=!]+)\\s*([\\d.]+)");
+	private static final Pattern TYPE_FILTER = Pattern.compile("type:(\\w+)");
 
 	// All patterns for stripping from remaining text
 	private static final Pattern[] ALL_PATTERNS = {
 		QUALITY_RANGE, QUALITY_CMP, FEP_TYPE, FEP_TOTAL,
-		ARMOR_TYPE, ARMOR_TOTAL, LP_FILTER, LPH_FILTER, HAS_FILTER, WEAR_FILTER
+		ARMOR_TYPE, ARMOR_TOTAL, LP_FILTER, LPH_FILTER, HAS_FILTER, WEAR_FILTER, TYPE_FILTER
 	};
 
 	private final List<Predicate> predicates;
@@ -171,10 +174,26 @@ public class ItemFilter {
 		}
 		remaining = WEAR_FILTER.matcher(remaining).replaceAll("").trim();
 
-		// Remaining text is a name filter (fuzzy match)
+		// Type filter: type:food, type:armor, type:curio, etc.
+		m = TYPE_FILTER.matcher(remaining);
+		while (m.find()) {
+			String typeName = m.group(1).toLowerCase();
+			predicates.add((item, name) -> {
+				ItemType type = ItemType.classify(item);
+				return type.label().toLowerCase().startsWith(typeName);
+			});
+		}
+		remaining = TYPE_FILTER.matcher(remaining).replaceAll("").trim();
+
+		// Remaining text is a name filter (fuzzy match), supports ! prefix for negation
 		if (!remaining.isEmpty()) {
-			String nameFilter = remaining.toLowerCase();
-			predicates.add((item, name) -> Fuzzy.fuzzyContains(name.toLowerCase(), nameFilter));
+			if (remaining.startsWith("!") && remaining.length() > 1) {
+				String excludeFilter = remaining.substring(1).trim().toLowerCase();
+				predicates.add((item, name) -> !Fuzzy.fuzzyContains(name.toLowerCase(), excludeFilter));
+			} else {
+				String nameFilter = remaining.toLowerCase();
+				predicates.add((item, name) -> Fuzzy.fuzzyContains(name.toLowerCase(), nameFilter));
+			}
 		}
 
 		if (predicates.isEmpty()) {

@@ -2832,7 +2832,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 		}
 
 		public void loadLocal() {
-			if (chrid != "") {
+			if (chrid != null && !chrid.isEmpty()) {
 				String[] resnames = Utils.getprefsa("actionBar" + barNumber + "_" + chrid, null);
 				if (resnames != null) {
 					for (int i = (curbelt * 12); i < (curbelt * 12)+12; i++) {
@@ -2855,7 +2855,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 
 		private void saveLocally() {
 			String chrid = ui.gui.chrid;
-			if (chrid != "") {
+			if (chrid != null && !chrid.isEmpty()) {
 				String[] resnames = new String[144];
 				for (int i = (curbelt * 12); i < (curbelt * 12)+12; i++) {
 					try {

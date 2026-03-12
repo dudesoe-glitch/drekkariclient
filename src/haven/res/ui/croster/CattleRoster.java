@@ -189,15 +189,15 @@ public abstract class CattleRoster <T extends Entry> extends Widget {
     public abstract T parse(Object... args);
 
     public void uimsg(String msg, Object... args) {
-	if(msg == "add") {
+	if("add".equals(msg)) {
 	    addentry(parse(args));
-	} else if(msg == "upd") {
+	} else if("upd".equals(msg)) {
 	    T entry = parse(args);
 	    delentry(entry.id);
 	    addentry(entry);
-	} else if(msg == "rm") {
+	} else if("rm".equals(msg)) {
 	    delentry((UID)args[0]);
-	} else if(msg == "addto") {
+	} else if("addto".equals(msg)) {
 	    GameUI gui = (GameUI)ui.getwidget(Utils.iv(args[0]));
 	    Pagina pag = gui.menu.paginafor(ui.sess.getresv(args[1]));
 	    RosterButton btn = (RosterButton)Loading.waitfor(pag::button);

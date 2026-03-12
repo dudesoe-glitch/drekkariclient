@@ -30,7 +30,7 @@ public class StudyInventory extends Inventory {
             if (histtex == null) {
                 histtex = new Tex[16];
                 String chrid = ui.gui.chrid;
-                if (chrid != "") {
+                if (chrid != null && !chrid.isEmpty()) {
                     String[] hist = Utils.getprefsa("studyhist_" + chrid, null);
                     if (hist != null) {
                         for (int i = 0; i < 16; i++) {
@@ -76,7 +76,7 @@ public class StudyInventory extends Inventory {
 
         if (OptWnd.showStudyReportHistoryCheckBox.a) {
             String chrid = ui.gui.chrid;
-            if (chrid != "") {
+            if (chrid != null && !chrid.isEmpty()) {
                 String[] hist = Utils.getprefsa("studyhist_" + chrid, new String[16]);
                 if (histtex == null) {
                     histtex = new Tex[16];

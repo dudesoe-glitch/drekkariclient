@@ -1,6 +1,8 @@
 package haven;
 
 import haven.automated.GobHelper;
+import haven.res.ui.croster.CattleId;
+import haven.res.ui.croster.Entry;
 
 import java.awt.*;
 import java.util.*;
@@ -14,19 +16,21 @@ public class LivestockManager extends Window {
 	private static final long REFRESH_INTERVAL = 2000;
 	private static final int VISIBLE_ROWS = 14;
 	private static final int ROW_H = UI.scale(16);
-	private static final int WIN_W = 440;
+	private static final int WIN_W = 520;
 	private static final int TABLE_W = UI.scale(WIN_W - 20);
 	private static final int TABLE_H = VISIBLE_ROWS * ROW_H;
 	private static final Text.Foundry fndr = new Text.Foundry(Text.sans, 11).aa(true);
 	private static final Text.Foundry fndb = new Text.Foundry(Text.sans.deriveFont(Font.BOLD), 11).aa(true);
-	private int sortCol = 2; // default sort by distance
+	private int sortCol = 3; // default sort by distance
 	private boolean sortAsc = true;
 
-	// Column definitions: name, x offset, width
+	// Column x offsets
 	private static final int COL_NAME_X = 0;
-	private static final int COL_TYPE_X = UI.scale(140);
+	private static final int COL_TYPE_X = UI.scale(130);
+	private static final int COL_QUALITY_X = UI.scale(210);
 	private static final int COL_DIST_X = UI.scale(260);
-	private static final int COL_STATUS_X = UI.scale(330);
+	private static final int COL_STATUS_X = UI.scale(320);
+	private static final int COL_INFO_X = UI.scale(400);
 
 	// Animal categories
 	private static final Set<String> LIVESTOCK = new HashSet<>(Arrays.asList(
@@ -42,7 +46,7 @@ public class LivestockManager extends Window {
 	private CheckBox livestockCb, wildCb, predatorCb;
 
 	public LivestockManager(GameUI gui) {
-		super(UI.scale(WIN_W, 320), "Livestock Manager", true);
+		super(UI.scale(WIN_W, 330), "Livestock Manager", true);
 		this.gui = gui;
 
 		int y = 0;
@@ -61,7 +65,7 @@ public class LivestockManager extends Window {
 
 		add(new Button(UI.scale(70), "Refresh") {
 			public void click() { refreshNow(); }
-		}, UI.scale(300, y - 4));
+		}, UI.scale(380, y - 4));
 
 		this.c = Utils.getprefc("wndc-livestockManager", UI.unscale(new Coord(200, 100)));
 		pack();
@@ -98,10 +102,27 @@ public class LivestockManager extends Window {
 				GobHealth health = gob.getattr(GobHealth.class);
 				float hp = (health != null) ? health.hp : 1.0f;
 
-				String displayName = prettifyName(variant.isEmpty() ? species : variant);
-				String status = knocked ? "Knocked" : (hp < 1.0f ? String.format("%d%%", Math.round(hp * 100)) : "Healthy");
+				// Try to get roster data (quality, custom name, breeding info)
+				double quality = -1;
+				String customName = null;
+				String info = "";
+				CattleId cattleId = gob.getattr(CattleId.class);
+				if (cattleId != null) {
+					try {
+						Entry entry = cattleId.entry();
+						if (entry != null) {
+							quality = entry.q;
+							if (entry.name != null && !entry.name.isEmpty())
+								customName = entry.name;
+						}
+					} catch (Exception ignored) {}
+				}
 
-				entries.add(new AnimalEntry(displayName, category, dist, status, knocked, hp, gob.id));
+				String displayName = customName != null ? customName :
+					prettifyName(variant.isEmpty() ? species : variant);
+				String status = knocked ? "Knocked" : (hp < 1.0f ? String.format("%d%%", Math.round(hp * 100)) : "Alive");
+
+				entries.add(new AnimalEntry(displayName, category, dist, status, knocked, hp, quality, info, gob.id));
 			} catch (Loading ignored) {}
 		}
 
@@ -115,8 +136,9 @@ public class LivestockManager extends Window {
 		switch (sortCol) {
 			case 0: cmp = Comparator.comparing(e -> e.name.toLowerCase()); break;
 			case 1: cmp = Comparator.comparing(e -> e.category); break;
-			case 2: cmp = Comparator.comparingDouble(e -> e.distance); break;
-			case 3: cmp = Comparator.comparing(e -> e.status); break;
+			case 2: cmp = Comparator.comparingDouble(e -> e.quality); break;
+			case 3: cmp = Comparator.comparingDouble(e -> e.distance); break;
+			case 4: cmp = Comparator.comparing(e -> e.status); break;
 			default: cmp = Comparator.comparingDouble(e -> e.distance); break;
 		}
 		if (!sortAsc) cmp = cmp.reversed();
@@ -124,13 +146,11 @@ public class LivestockManager extends Window {
 	}
 
 	private static String extractSpecies(String resName) {
-		// gfx/kritter/horse/mare -> horse
 		String[] parts = resName.split("/");
 		return parts.length >= 3 ? parts[2] : resName;
 	}
 
 	private static String extractVariant(String resName) {
-		// gfx/kritter/horse/mare -> mare
 		String[] parts = resName.split("/");
 		return parts.length >= 4 ? parts[3] : "";
 	}
@@ -143,7 +163,6 @@ public class LivestockManager extends Window {
 
 	private static String prettifyName(String raw) {
 		if (raw.isEmpty()) return "Unknown";
-		// capitalize first letter, handle multi-word
 		return raw.substring(0, 1).toUpperCase() + raw.substring(1);
 	}
 
@@ -165,11 +184,12 @@ public class LivestockManager extends Window {
 		g.frect(tablePos, new Coord(TABLE_W, ROW_H));
 		g.chcolor();
 
-		// Column headers (clickable for sorting)
+		// Column headers
 		drawHeader(g, tablePos, "Name", COL_NAME_X, 0);
 		drawHeader(g, tablePos, "Type", COL_TYPE_X, 1);
-		drawHeader(g, tablePos, "Dist", COL_DIST_X, 2);
-		drawHeader(g, tablePos, "Status", COL_STATUS_X, 3);
+		drawHeader(g, tablePos, "Q", COL_QUALITY_X, 2);
+		drawHeader(g, tablePos, "Dist", COL_DIST_X, 3);
+		drawHeader(g, tablePos, "Status", COL_STATUS_X, 4);
 
 		// Table background
 		Coord bodyPos = tablePos.add(0, ROW_H);
@@ -184,7 +204,6 @@ public class LivestockManager extends Window {
 			int yOff = (i - startRow) * ROW_H;
 			AnimalEntry e = animals.get(i);
 
-			// Alternate row shading
 			if ((i - startRow) % 2 == 1) {
 				g.chcolor(255, 255, 255, 15);
 				g.frect(bodyPos.add(0, yOff), new Coord(TABLE_W, ROW_H));
@@ -194,6 +213,9 @@ public class LivestockManager extends Window {
 			Color nameColor = getTypeColor(e.category);
 			drawCell(g, bodyPos, e.name, COL_NAME_X, yOff, nameColor);
 			drawCell(g, bodyPos, e.category, COL_TYPE_X, yOff, nameColor);
+			String qStr = e.quality >= 0 ? String.format("%.0f", e.quality) : "-";
+			Color qColor = e.quality >= 0 ? getQualityColor(e.quality) : Color.GRAY;
+			drawCell(g, bodyPos, qStr, COL_QUALITY_X, yOff, qColor);
 			drawCell(g, bodyPos, String.format("%.0f", e.distance / 11.0), COL_DIST_X, yOff, Color.LIGHT_GRAY);
 			Color statusColor = e.knocked ? Color.RED : (e.hp < 1.0f ? Color.YELLOW : new Color(100, 220, 100));
 			drawCell(g, bodyPos, e.status, COL_STATUS_X, yOff, statusColor);
@@ -250,6 +272,13 @@ public class LivestockManager extends Window {
 		}
 	}
 
+	private static Color getQualityColor(double q) {
+		if (q >= 50) return new Color(100, 255, 100);
+		if (q >= 30) return new Color(200, 220, 100);
+		if (q >= 10) return new Color(220, 180, 80);
+		return new Color(200, 130, 130);
+	}
+
 	@Override
 	public boolean mousewheel(MouseWheelEvent ev) {
 		scrollOffset = Math.max(0, Math.min(animals.size() - VISIBLE_ROWS, scrollOffset + ev.a));
@@ -259,12 +288,12 @@ public class LivestockManager extends Window {
 	@Override
 	public boolean mousedown(MouseDownEvent ev) {
 		Coord tablePos = UI.scale(new Coord(10, 26));
-		// Check if clicking on header row
 		if (ev.c.y >= tablePos.y && ev.c.y < tablePos.y + ROW_H) {
 			int x = ev.c.x - tablePos.x;
 			int clickedCol = -1;
-			if (x >= COL_STATUS_X) clickedCol = 3;
-			else if (x >= COL_DIST_X) clickedCol = 2;
+			if (x >= COL_STATUS_X) clickedCol = 4;
+			else if (x >= COL_DIST_X) clickedCol = 3;
+			else if (x >= COL_QUALITY_X) clickedCol = 2;
 			else if (x >= COL_TYPE_X) clickedCol = 1;
 			else if (x >= COL_NAME_X) clickedCol = 0;
 
@@ -273,7 +302,7 @@ public class LivestockManager extends Window {
 					sortAsc = !sortAsc;
 				else {
 					sortCol = clickedCol;
-					sortAsc = true;
+					sortAsc = (clickedCol != 2); // quality defaults to descending
 				}
 				sortAnimals();
 				return true;
@@ -299,15 +328,20 @@ public class LivestockManager extends Window {
 		final String status;
 		final boolean knocked;
 		final float hp;
+		final double quality;
+		final String info;
 		final long gobId;
 
-		AnimalEntry(String name, String category, double distance, String status, boolean knocked, float hp, long gobId) {
+		AnimalEntry(String name, String category, double distance, String status,
+				   boolean knocked, float hp, double quality, String info, long gobId) {
 			this.name = name;
 			this.category = category;
 			this.distance = distance;
 			this.status = status;
 			this.knocked = knocked;
 			this.hp = hp;
+			this.quality = quality;
+			this.info = info;
 			this.gobId = gobId;
 		}
 	}
