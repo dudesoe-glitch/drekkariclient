@@ -139,7 +139,7 @@ public class RoastingSpitBot extends BotBase {
 				if (active && fireplace != null) {
 					try {
 						if (!passiveMode) {
-							List<WItem> invItems = AUtils.getAllItemsFromAllInventoriesAndStacksExcludeBeltAndKeyring(this.gui);
+							List<WItem> invItems = InvHelper.getAllItemsExcludeBeltKeyring(this.gui);
 							List<GItem> foundSpitroastableItems = findSpitroastableItems(invItems);
 							if (!foundSpitroastableItems.isEmpty() && !readyToRoast() && !isCooked()) {
 								GItem spitroastableItem = foundSpitroastableItems.get(0);
