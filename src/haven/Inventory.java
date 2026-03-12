@@ -426,6 +426,15 @@ public class Inventory extends Widget implements DTarget {
 	    ui.destroy(wmap.remove(i));
 	}
     }
+
+    @Override
+    public void destroy() {
+	if (sortThread != null) {
+	    sortThread.interrupt();
+	    sortThread = null;
+	}
+	super.destroy();
+    }
     
     public boolean drop(Coord cc, Coord ul) {
 	Coord dc;
@@ -674,6 +683,7 @@ public class Inventory extends Widget implements DTarget {
 	}
 
 	private volatile boolean sorting = false;
+	private Thread sortThread;
 
 	public boolean keydown(KeyDownEvent ev) {
 		if (ev.awt.getKeyCode() == KeyEvent.VK_S && ui.modshift && ui.modctrl) {
@@ -692,15 +702,19 @@ public class Inventory extends Widget implements DTarget {
 			return;
 		}
 		sorting = true;
-		new Thread(() -> {
+		sortThread = new Thread(() -> {
 			try {
 				doSort(gui);
+			} catch (InterruptedException ignored) {
+				Thread.currentThread().interrupt();
 			} catch (Exception e) {
 				gui.error("Sort failed: " + e.getMessage());
 			} finally {
 				sorting = false;
+				sortThread = null;
 			}
-		}, "InventorySort").start();
+		}, "InventorySort");
+		sortThread.start();
 	}
 
 	private void doSort(GameUI gui) throws InterruptedException {

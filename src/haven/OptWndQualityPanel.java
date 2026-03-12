@@ -25,6 +25,18 @@ class OptWndQualityPanel {
 				Utils.setprefb("showItemCategoryBadges", val);
 			}
 		}, prev.pos("bl").adds(0, 2));
+		prev = panel.add(OptWnd.showArmorValuesCheckBox = new CheckBox("Show Armor Values on Items"){
+			{a = Utils.getprefb("showArmorValues", false);}
+			public void changed(boolean val) {
+				Utils.setprefb("showArmorValues", val);
+			}
+		}, prev.pos("bl").adds(0, 2));
+		prev = panel.add(OptWnd.showDurabilityNumberCheckBox = new CheckBox("Show Durability Number on Items"){
+			{a = Utils.getprefb("showDurabilityNumber", false);}
+			public void changed(boolean val) {
+				Utils.setprefb("showDurabilityNumber", val);
+			}
+		}, prev.pos("bl").adds(0, 2));
 
 		prev = panel.add(new Label("Quality Display Mode:"), prev.pos("bl").adds(0, 10));
 		final Widget p = panel;

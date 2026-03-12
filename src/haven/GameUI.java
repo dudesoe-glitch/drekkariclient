@@ -2057,6 +2057,10 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 	public static KeyBinding kb_equipTravelersSacks = KeyBinding.get("equipTravelersSacksKB", KeyMatch.nil);
 	public static KeyBinding kb_equipWanderersBindles = KeyBinding.get("equipWanderersBindlesKB", KeyMatch.nil);
 
+	// Quick-action keybinds
+	public static KeyBinding kb_toggleGate = KeyBinding.get("toggleGateKB", KeyMatch.nil);
+	public static KeyBinding kb_pickupNearest = KeyBinding.get("pickupNearestKB", KeyMatch.nil);
+
     public boolean globtype(GlobKeyEvent ev) {
 	if(ev.c == ':') {
 	    entercmd();
@@ -2357,6 +2361,12 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 		return(true);
 	} else if(kb_equipWanderersBindles.key().match(ev)) {
 		new Thread(new haven.automated.EquipFromBelt(this, "Equip_WanderersBindles"), "EquipFromBelt").start();
+		return(true);
+	} else if(kb_toggleGate.key().match(ev)) {
+		haven.automated.Actions.toggleNearestGate(this);
+		return(true);
+	} else if(kb_pickupNearest.key().match(ev)) {
+		haven.automated.Actions.pickupNearest(this);
 		return(true);
     } else if((ev.c == 27) && (map != null) && !map.hasfocus) {
 	    setfocus(map);

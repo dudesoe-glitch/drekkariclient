@@ -511,9 +511,11 @@ public class ExtInventoryWindow extends Window {
 		// Remove any existing context menu
 		closeContextMenu();
 
-		int menuW = UI.scale(100);
+		int menuW = UI.scale(130);
 		int btnH = UI.scale(20);
-		int menuH = btnH * 2 + UI.scale(4);
+		String lastAction = FlowerMenu.lastChosenOption;
+		boolean hasRepeat = (lastAction != null && !lastAction.isEmpty());
+		int menuH = btnH * (hasRepeat ? 3 : 2) + UI.scale(4);
 
 		Widget menu = new Widget(new Coord(menuW, menuH)) {
 			public void draw(GOut g) {
@@ -528,12 +530,12 @@ public class ExtInventoryWindow extends Window {
 			public boolean mousedown(MouseDownEvent ev) {
 				if (super.mousedown(ev))
 					return true;
-				// Click outside the menu closes it
 				closeContextMenu();
 				return true;
 			}
 		};
 
+		int btnY = UI.scale(2);
 		Button transferBtn = new Button(menuW - UI.scale(4), "Transfer All") {
 			public void click() {
 				transferAllByName(sortName);
@@ -541,7 +543,8 @@ public class ExtInventoryWindow extends Window {
 			}
 		};
 		transferBtn.settip("Transfer all \"" + sortName + "\" items");
-		menu.add(transferBtn, UI.scale(2, 2));
+		menu.add(transferBtn, UI.scale(2), btnY);
+		btnY += btnH;
 
 		Button dropBtn = new Button(menuW - UI.scale(4), "Drop All") {
 			public void click() {
@@ -550,11 +553,25 @@ public class ExtInventoryWindow extends Window {
 			}
 		};
 		dropBtn.settip("Drop all \"" + sortName + "\" items");
-		menu.add(dropBtn, UI.scale(2, 2 + btnH));
+		menu.add(dropBtn, UI.scale(2), btnY);
+		btnY += btnH;
+
+		if (hasRepeat) {
+			String label = "\"" + lastAction + "\" All";
+			if (label.length() > 20) label = label.substring(0, 17) + "...";
+			final String actionName = lastAction;
+			Button repeatBtn = new Button(menuW - UI.scale(4), label) {
+				public void click() {
+					repeatActionOnAll(sortName, actionName);
+					closeContextMenu();
+				}
+			};
+			repeatBtn.settip("Repeat \"" + lastAction + "\" on all \"" + sortName + "\" items");
+			menu.add(repeatBtn, UI.scale(2), btnY);
+		}
 
 		// Position the menu near the mouse cursor, within the root widget
 		Coord menuPos = ui.mc.sub(menuW / 2, 0);
-		// Clamp to screen bounds
 		if (menuPos.x < 0) menuPos.x = 0;
 		if (menuPos.y < 0) menuPos.y = 0;
 		Coord rootSz = ui.root.sz;
@@ -562,12 +579,12 @@ public class ExtInventoryWindow extends Window {
 		if (menuPos.y + menuH > rootSz.y) menuPos.y = rootSz.y - menuH;
 
 		ui.root.add(menu, menuPos);
-		// Grab focus so clicking outside closes it
 		menu.raise();
 		activeContextMenu = menu;
 	}
 
 	private Widget activeContextMenu = null;
+	private Thread repeatThread = null;
 
 	private void closeContextMenu() {
 		if (activeContextMenu != null) {
@@ -622,6 +639,50 @@ public class ExtInventoryWindow extends Window {
 		dirty = true;
 	}
 
+	/**
+	 * Repeat a flower menu action on all items matching the given sortName.
+	 * Spawns a thread that right-clicks each item with the flower menu option pre-selected.
+	 */
+	private void repeatActionOnAll(String sortName, String actionName) {
+		if (repeatThread != null && repeatThread.isAlive()) {
+			gui.error("Repeat action already in progress.");
+			return;
+		}
+		Inventory inv = getTargetInv();
+		if (inv == null) return;
+
+		List<GItem> targets = new ArrayList<>();
+		for (Widget wdg = inv.child; wdg != null; wdg = wdg.next) {
+			if (wdg instanceof WItem) {
+				WItem wi = (WItem) wdg;
+				try {
+					if (wi.sortName().equals(sortName)) {
+						targets.add(wi.item);
+					}
+				} catch (Exception ignored) {}
+			}
+		}
+
+		if (targets.isEmpty()) return;
+
+		repeatThread = new Thread(() -> {
+			try {
+				for (GItem item : targets) {
+					if (Thread.interrupted()) break;
+					if (item.parent == null) continue; // item was destroyed
+					FlowerMenu.setNextSelection(actionName);
+					item.wdgmsg("iact", Coord.z, 0);
+					Thread.sleep(600);
+				}
+			} catch (InterruptedException ignored) {
+				Thread.currentThread().interrupt();
+			}
+			repeatThread = null;
+			dirty = true;
+		}, "ExtInv-RepeatAction");
+		repeatThread.start();
+	}
+
 	private void toggleHighlight(String itemName) {
 		Inventory inv = getTargetInv();
 		if (itemName.equals(highlightedItemName)) {
@@ -653,6 +714,10 @@ public class ExtInventoryWindow extends Window {
 		if ((sender == this) && msg.equals("close")) {
 			clearHighlight();
 			closeContextMenu();
+			if (repeatThread != null) {
+				repeatThread.interrupt();
+				repeatThread = null;
+			}
 			Utils.setprefc("wndc-extInventoryWindow", this.c);
 			gui.extInventoryWindow = null;
 			reqdestroy();

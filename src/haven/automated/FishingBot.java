@@ -186,112 +186,25 @@ public class FishingBot extends BotBase {
 
 
     private void putOnFishingLine(List<WItem> items, int hand) {
-        List<String> selected = fishLineChoice.getSelected();
-        Set<String> allowedNames = (selected != null && !selected.isEmpty())
-                ? new HashSet<>(selected) : FishingAtlas.fishingLines;
-
-        List<WItem> candidates = new ArrayList<>();
-        for (WItem it : items) {
-            if (it == null || it.item == null) continue;
-            String name = it.item.getname();
-            if (name != null && allowedNames.contains(name)) {
-                candidates.add(it);
-            }
-        }
-
-        if (candidates.isEmpty()) {
-            deactivate("Fishbot: No matching fishlines found in inventory. Stopping..");
-            return;
-        }
-
-        Collections.shuffle(candidates);
-        WItem chosen = candidates.get(0);
-
-        chosen.item.wdgmsg("take", Coord.z);
-
-        WItem handItem = gui.getequipory().slots[hand];
-        if (handItem != null && handItem.item != null) {
-            handItem.item.wdgmsg("itemact", 0);
-            sleep(500);
-        } else {
-            deactivate("Fishbot: No fishing pole in hand slot: " + hand + " to attach the line to. Stopping..");
-        }
+        attachToPole(items, hand, fishLineChoice.getSelected(), FishingAtlas.fishingLines, "fishlines", "line");
     }
 
     private void putOnHook(List<WItem> items, int hand) {
-        List<String> selected = hookChoice.getSelected();
-        Set<String> allowedNames = (selected != null && !selected.isEmpty())
-                ? new HashSet<>(selected)
-                : FishingAtlas.fishingHooks;
-
-        List<WItem> candidates = new ArrayList<>();
-        for (WItem it : items) {
-            if (it == null || it.item == null) continue;
-            String name = it.item.getname();
-            if (name != null && allowedNames.contains(name)) {
-                candidates.add(it);
-            }
-        }
-
-        if (candidates.isEmpty()) {
-            deactivate("Fishbot: No matching hooks found in inventory. Stopping..");
-            return;
-        }
-
-        Collections.shuffle(candidates);
-        WItem chosen = candidates.get(0);
-
-        chosen.item.wdgmsg("take", Coord.z);
-
-        WItem handItem = gui.getequipory().slots[hand];
-        if (handItem != null && handItem.item != null) {
-            handItem.item.wdgmsg("itemact", 0);
-            sleep(500);
-        } else {
-            deactivate("Fishbot: No fishing pole in hand slot: " + hand + " to attach the hook to. Stopping..");
-        }
+        attachToPole(items, hand, hookChoice.getSelected(), FishingAtlas.fishingHooks, "hooks", "hook");
     }
 
-
     private void putOnBait(List<WItem> items, int hand) {
-        List<String> selected = baitChoice.getSelected();
-        Set<String> allowedNames = (selected != null && !selected.isEmpty())
-                ? new HashSet<>(selected)
-                : FishingAtlas.fishingBaits;
-
-        List<WItem> candidates = new ArrayList<>();
-        for (WItem it : items) {
-            if (it == null || it.item == null) continue;
-            String name = it.item.getname();
-            if (name != null && allowedNames.contains(name)) {
-                candidates.add(it);
-            }
-        }
-
-        if (candidates.isEmpty()) {
-            deactivate("Fishbot: No matching baits found in inventory. Stopping..");
-            return;
-        }
-
-        Collections.shuffle(candidates);
-        WItem chosen = candidates.get(0);
-
-        chosen.item.wdgmsg("take", Coord.z);
-
-        WItem handItem = gui.getequipory().slots[hand];
-        if (handItem != null && handItem.item != null) {
-            handItem.item.wdgmsg("itemact", 0);
-            sleep(500);
-        } else {
-            deactivate("Fishbot: No fishing pole in hand slot: " + hand + " to attach the bait to. Stopping..");
-        }
+        attachToPole(items, hand, baitChoice.getSelected(), FishingAtlas.fishingBaits, "baits", "bait");
     }
 
     private void putOnLure(List<WItem> items, int hand) {
-        List<String> selected = lureChoice.getSelected();
+        attachToPole(items, hand, lureChoice.getSelected(), FishingAtlas.fishingLures, "lures", "lure");
+    }
+
+    private void attachToPole(List<WItem> items, int hand, List<String> selected,
+                              Collection<String> defaults, String typePlural, String typeSingular) {
         Set<String> allowedNames = (selected != null && !selected.isEmpty())
-                ? new HashSet<>(selected)
-                : FishingAtlas.fishingLures;
+                ? new HashSet<>(selected) : new HashSet<>(defaults);
 
         List<WItem> candidates = new ArrayList<>();
         for (WItem it : items) {
@@ -303,7 +216,7 @@ public class FishingBot extends BotBase {
         }
 
         if (candidates.isEmpty()) {
-            deactivate("Fishbot: No matching lures found in inventory. Stopping..");
+            deactivate("Fishbot: No matching " + typePlural + " found in inventory. Stopping..");
             return;
         }
 
@@ -317,7 +230,7 @@ public class FishingBot extends BotBase {
             handItem.item.wdgmsg("itemact", 0);
             sleep(500);
         } else {
-            deactivate("Fishbot: No fishing pole in hand slot: " + hand + " to attach the lure to. Stopping..");
+            deactivate("Fishbot: No fishing pole in hand slot: " + hand + " to attach the " + typeSingular + " to. Stopping..");
         }
     }
 

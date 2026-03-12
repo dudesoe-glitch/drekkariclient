@@ -110,7 +110,7 @@ public abstract class BotBase extends Window implements Runnable {
 					return false;
 				}
 			} catch (InterruptedException e) { throw e; }
-			catch (Exception ignored) {}
+			catch (Loading ignored) {}
 		}
 		if (checkEnergy) {
 			try {
@@ -121,7 +121,7 @@ public abstract class BotBase extends Window implements Runnable {
 					return false;
 				}
 			} catch (InterruptedException e) { throw e; }
-			catch (Exception ignored) {}
+			catch (Loading ignored) {}
 		}
 		if (checkStamina) {
 			try {
@@ -140,7 +140,7 @@ public abstract class BotBase extends Window implements Runnable {
 					return false;
 				}
 			} catch (InterruptedException e) { throw e; }
-			catch (Exception ignored) {}
+			catch (Loading ignored) {}
 		}
 		return true;
 	}

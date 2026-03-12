@@ -176,4 +176,73 @@ public class Actions {
         gui.ui.rcvr.rcvmsg(gui.ui.lastWidgetID+1, "cl", index, gui.ui.modflags());
     }
 
+    /**
+     * Toggle the nearest gate (open/close) within ~3 tiles.
+     * Works with all gate types (palisade, brick, pole, drystone).
+     */
+    public static void toggleNearestGate(GameUI gui) {
+        if (gui == null || gui.map == null) return;
+        Gob player = gui.map.player();
+        if (player == null) return;
+
+        double maxDist = 36.0; // ~3 tiles
+        Gob nearest = null;
+        double nearestDist = Double.MAX_VALUE;
+
+        synchronized (gui.map.glob.oc) {
+            for (Gob gob : gui.map.glob.oc) {
+                try {
+                    if (gob.getres() == null) continue;
+                    String basename = gob.getres().basename();
+                    if (InteractWithNearestObject.smallGates.contains(basename) ||
+                        InteractWithNearestObject.reinforcedGates.contains(basename)) {
+                        double dist = gob.rc.dist(player.rc);
+                        if (dist < maxDist && dist < nearestDist) {
+                            nearestDist = dist;
+                            nearest = gob;
+                        }
+                    }
+                } catch (Loading ignored) {}
+            }
+        }
+
+        if (nearest != null) {
+            FlowerMenu.setNextSelection("Open");
+            gui.map.wdgmsg("click", Coord.z, nearest.rc.floor(posres), 3, 0, 0, (int) nearest.id, nearest.rc.floor(posres), 0, -1);
+        }
+    }
+
+    /**
+     * Pick up the nearest item on the ground within ~2 tiles.
+     */
+    public static void pickupNearest(GameUI gui) {
+        if (gui == null || gui.map == null) return;
+        Gob player = gui.map.player();
+        if (player == null) return;
+
+        double maxDist = 24.0; // ~2 tiles
+        Gob nearest = null;
+        double nearestDist = Double.MAX_VALUE;
+
+        synchronized (gui.map.glob.oc) {
+            for (Gob gob : gui.map.glob.oc) {
+                try {
+                    if (gob.getres() == null) continue;
+                    String name = gob.getres().name;
+                    // Ground items are in gfx/terobjs/items/
+                    if (name.contains("gfx/terobjs/items/")) {
+                        double dist = gob.rc.dist(player.rc);
+                        if (dist < maxDist && dist < nearestDist) {
+                            nearestDist = dist;
+                            nearest = gob;
+                        }
+                    }
+                } catch (Loading ignored) {}
+            }
+        }
+
+        if (nearest != null) {
+            gui.map.wdgmsg("click", Coord.z, nearest.rc.floor(posres), 3, 0, 0, (int) nearest.id, nearest.rc.floor(posres), 0, -1);
+        }
+    }
 }

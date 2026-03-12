@@ -1,68 +1,57 @@
-# HANDOFF — Session 11 (Code Review Fixes, AUtils Cleanup, ItemType, ExtInventory Context Menu)
+# HANDOFF — Session 12 (Code Review Fixes, WItem Refactor, EnderWiggin Ports)
 
 ## Resumption Prompt
-Committed session 10's work, then ran comprehensive code review (6 critical, 11 major issues found) and research on EnderWiggin port candidates. Fixed all critical/major bugs in parallel: NPE guards in Actions, BotBase stop/destroy ordering, CleanupBot null checks, OptWndAutoLootPanel pref key, RoastingSpitBot Loading/Exception safety, aggro scripts gui.fv null dereference. Cleaned up AUtils (deleted dead code, deprecated 5 superseded methods). Added GobHelper.isPlayer/hasOverlay/findAllSupports, InvHelper.findFirstByNameInAllInventories. Migrated FillCheeseTray, MiningSafetyAssistant, 4 aggro scripts, ButcherBot to use helpers. Fixed Tex leaks in ExtInventoryWindow/Inventory. Added ItemType enum with classify(), BY_TYPE grouping, right-click context menu (Transfer All/Drop All). Build clean.
+Completed all 3 remaining code review items (FishingBot dedup, BotBase checkVitals narrow catch, sortInventory tracked thread). Refactored WItem badge system to use centralized ItemType.classify() instead of duplicate inline detection. Added armor/durability text overlays on items (toggleable in Quality settings). Added repeat-action-for-group in ExtInventory context menu. Added toggleNearestGate and pickupNearest quick-action keybinds. Build clean.
 
 ## Goal
-Code review + bug fixes, AUtils cleanup, EnderWiggin feature ports.
+Complete remaining code review items, port EnderWiggin features, refactor WItem badges.
 
 ## Completed
 
-### Critical Bug Fixes
-1. **Actions.java** — NPE guards on player() in rightClick(), waitPf(), unstuck(); added clearhand() method
-2. **BotBase.java** — Removed premature this.destroy() from stop() (was tearing down widget before reqdestroy could save position)
-3. **CleanupBot.java** — Fixed null dereference on getres() in both destroyGob() and findClosestGob(); migrated clearhand to Actions
-4. **OptWndAutoLootPanel.java** — Fixed Pouches checkbox reading/writing "autoLootCloakRobe" instead of "autoLootPouches"
-5. **RoastingSpitBot.java** — Added Loading try-catch in findSpitroastableItems(); wrapped readyToRoast()/isCooked() unsafe render tree casts in try-catch
+### Code Review Fixes
+1. **FishingBot.java** — Collapsed 4 identical putOn* methods into `attachToPole()` helper (-90 lines)
+2. **BotBase.java** — Narrowed `catch (Exception ignored)` to `catch (Loading ignored)` in checkVitals() (3 locations)
+3. **Inventory.java** — Added `sortThread` field, stored thread reference, interrupt on destroy, separate InterruptedException handling
 
-### Aggro/Combat Fixes
-6. **AggroNearestTarget/Player/EveryoneInRange** — Fixed gui.fv null dereference before synchronized block
-7. **All 4 aggro scripts** — Replaced private isPlayer() with GobHelper.isPlayer()
-8. **ButcherBot.java** — Replaced inline knock pose check with GobHelper.isKnocked()
+### WItem Badge Refactor
+4. **WItem.java** — Deleted `ItemCategory` enum, `TOOL_BASENAMES`, `CONTAINER_BASENAMES`, 35-line inline classification AttrCache; replaced with 3-line `ItemType.classify()` delegation (~50 lines removed)
 
-### AUtils Cleanup
-9. **AUtils.java** — Deleted 2 zero-caller methods (getAllItemsFromAllInventoriesAndStacksExcludeBeltAndKeyring, isBeltOrKeyring); deprecated 5 superseded methods with @Deprecated + javadoc pointers
-10. **GobHelper.java** — Added isPlayer(), hasOverlay(), findAllSupports()
-11. **InvHelper.java** — Added findFirstByNameInAllInventories()
-12. **FillCheeseTray.java** — Migrated from AUtils to InvHelper
-13. **MiningSafetyAssistant.java** — Migrated from AUtils to GobHelper
-14. **CellarDiggingBot.java** — Migrated clearhand to Actions
+### Armor + Durability Text Overlays
+5. **WItem.java** — Added `armorText` AttrCache (renders "hard/soft" in blue), `durabilityNum` AttrCache (renders remaining durability in cyan); chained into `drawnum()` after quantity/heurnum
+6. **OptWnd.java** — Added `showArmorValuesCheckBox`, `showDurabilityNumberCheckBox` fields
+7. **OptWndQualityPanel.java** — Added "Show Armor Values on Items" and "Show Durability Number on Items" checkboxes
 
-### UI Improvements
-15. **ExtInventoryWindow.java** — Fixed Tex leak (icon cache), static Color constants, right-click context menu (Transfer All/Drop All)
-16. **Inventory.java** — Fixed Tex leak in drawGroupHeaders (icon cache)
-17. **ItemType.java** — NEW — Centralized item classification enum (9 types: Food/Armor/Curiosity/Tool/Seed/Container/Material/Weapon/Unknown) with classify(), color(), label()
-18. **ItemGrouping.java** — Added BY_TYPE grouping mode using ItemType.classify()
+### Repeat Action for Group (ExtInventory)
+8. **ExtInventoryWindow.java** — Right-click context menu now shows 3rd option "'{Action}' All" when FlowerMenu.lastChosenOption is set; spawns thread to iterate all matching items with FlowerMenu.setNextSelection + iact; thread interrupted on window close
+
+### Quick-Action Keybinds
+9. **Actions.java** — Added `toggleNearestGate()` (finds gate within ~3 tiles, auto-selects "Open") and `pickupNearest()` (finds ground item within ~2 tiles, right-clicks)
+10. **GameUI.java** — Added `kb_toggleGate` and `kb_pickupNearest` keybindings + globtype handlers
+11. **OptWndBindingPanel.java** — Added "Quick Actions" section with Toggle Nearest Gate and Pickup Nearest Item bindings
+
+### Bot Menu Fix
+12. **Fixed 5 broken .res files** — ButcherBot, ClayDiggingBot, ForagingBot, MiningBot, OreSmeltingBot were all copies of CleanupBot.res (same name "Cleanup Bot" + same icon). Generated correct .res files with proper display names and unique colored icons via `tools/gen_bot_res.py`
 
 ## In Progress
 Nothing — all planned work complete.
 
 ## Next Priorities
-1. **Test everything in-game** — 11 sessions of features untested!
-2. **Remaining code review items** — FishingBot putOn* method deduplication, BotBase.checkVitals() broad catch, sortInventory() untracked thread
-3. **More EnderWiggin ports** — repeat-action-for-group in ExtInventory, ItemType metadata enrichment
-4. **WItem badge refactor** — Replace WItem's inline badge detection with ItemType.classify()
+1. **Fix pathfinding UX** — stop-and-go movement (needs smoother re-pathing), poor wall handling, continuous pathfinding mouse tracking inconsistent (800ms throttle too slow?)
+2. **Container inventory features** — sorting/filtering/grouping/ExtInventory should work on container inventories (chests, barrels), not just main inventory
+3. **More EnderWiggin ports** — camera keybinds, container info JSON, gob timer overlay
+4. **ItemType metadata enrichment** — curiosity LP/MW in ExtInventory list rows
+5. **GobDamageInfo** — floating damage numbers above gobs in combat
 
 ## Files Modified/Created
 | File | Changes |
 |------|---------|
-| `src/haven/automated/Actions.java` | NPE guards + clearhand() |
-| `src/haven/automated/BotBase.java` | Remove premature destroy() in stop() |
-| `src/haven/automated/CleanupBot.java` | Null checks + clearhand migration |
-| `src/haven/automated/CellarDiggingBot.java` | clearhand migration |
-| `src/haven/OptWndAutoLootPanel.java` | Fix Pouches pref key |
-| `src/haven/automated/RoastingSpitBot.java` | Loading + Exception safety |
-| `src/haven/automated/AggroEveryoneInRange.java` | gui.fv null fix + isPlayer migration |
-| `src/haven/automated/AggroNearestPlayer.java` | gui.fv null fix + isPlayer migration |
-| `src/haven/automated/AggroNearestTarget.java` | gui.fv null fix + isPlayer migration |
-| `src/haven/automated/AggroOrTargetCursorNearest.java` | isPlayer migration |
-| `src/haven/automated/ButcherBot.java` | GobHelper.isKnocked() |
-| `src/haven/automated/AUtils.java` | Delete dead code, deprecate 5 methods |
-| `src/haven/automated/GobHelper.java` | isPlayer + hasOverlay + findAllSupports |
-| `src/haven/automated/InvHelper.java` | findFirstByNameInAllInventories |
-| `src/haven/automated/FillCheeseTray.java` | Migrate to InvHelper |
-| `src/haven/automated/MiningSafetyAssistant.java` | Migrate to GobHelper |
-| `src/haven/ExtInventoryWindow.java` | Tex cache + Color constants + context menu |
-| `src/haven/Inventory.java` | Icon Tex cache in drawGroupHeaders |
-| `src/haven/ItemType.java` | NEW — Item classification enum |
-| `src/haven/ItemGrouping.java` | BY_TYPE grouping mode |
+| `src/haven/automated/FishingBot.java` | Collapsed 4 putOn* → attachToPole() |
+| `src/haven/automated/BotBase.java` | catch Exception → catch Loading in checkVitals |
+| `src/haven/Inventory.java` | sortThread field + destroy() interrupt |
+| `src/haven/WItem.java` | Deleted ItemCategory enum, refactored to ItemType; added armorText + durabilityNum AttrCaches; updated drawnum chain |
+| `src/haven/OptWnd.java` | Added showArmorValuesCheckBox, showDurabilityNumberCheckBox |
+| `src/haven/OptWndQualityPanel.java` | Added armor/durability checkboxes |
+| `src/haven/ExtInventoryWindow.java` | Repeat-action context menu + repeatThread |
+| `src/haven/automated/Actions.java` | toggleNearestGate(), pickupNearest() |
+| `src/haven/GameUI.java` | kb_toggleGate, kb_pickupNearest keybinds |
+| `src/haven/OptWndBindingPanel.java` | Quick Actions section |
