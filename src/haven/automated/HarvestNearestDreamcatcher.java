@@ -14,13 +14,16 @@ public class HarvestNearestDreamcatcher implements Runnable {
 
     @Override
     public void run() {
+        Gob player = gui.map.player();
+        if (player == null)
+            return;
         Gob dreca = null;
         synchronized (gui.map.glob.oc) {
             for (Gob gob : gui.map.glob.oc) {
                 try {
                     Resource res = gob.getres();
                     if (res != null && res.name.startsWith("gfx/terobjs/dreca")) {
-                        Coord2d plc = gui.map.player().rc;
+                        Coord2d plc = player.rc;
                         if ((dreca == null || gob.rc.dist(plc) < dreca.rc.dist(plc)))
                             dreca = gob;
                     }

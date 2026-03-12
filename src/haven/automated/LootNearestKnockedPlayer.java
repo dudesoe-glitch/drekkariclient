@@ -16,6 +16,9 @@ public class LootNearestKnockedPlayer implements Runnable {
 
     @Override
     public void run() {
+        Gob me = gui.map.player();
+        if (me == null)
+            return;
         Gob player = null;
         synchronized (gui.map.glob.oc) {
             for (Gob gob : gui.map.glob.oc) {
@@ -23,7 +26,7 @@ public class LootNearestKnockedPlayer implements Runnable {
                     Resource res = gob.getres();
                     if (res != null && res.name.startsWith("gfx/borka/body")) {
                         if (gob.knocked) {
-                            Coord2d plc = gui.map.player().rc;
+                            Coord2d plc = me.rc;
                             if ((player == null || gob.rc.dist(plc) < player.rc.dist(plc)))
                                 player = gob;
                         }

@@ -23,6 +23,8 @@ public class RefillWaterContainers implements Runnable {
     @Override
     public void run() {
         try {
+            int maxRetries = 20;
+            int retryCount = 0;
             do {
                 Gob player = gui.map.player();
                 if (player == null)
@@ -82,10 +84,17 @@ public class RefillWaterContainers implements Runnable {
                         refillContainers(null, barrelGob);
                     }
                 }
+                retryCount++;
+                if (retryCount >= maxRetries) {
+                    gui.ui.error("Refill Water Script: Stopped after too many attempts. Some containers may not have been filled.");
+                    return;
+                }
             } while (getInventoryContainers().size() != 0 || getBeltContainers().size() != 0 || getEquiporyPouchContainers().size() != 0);
             gui.ui.msg("Water Refilled!");
+        } catch (Loading l) {
+            gui.ui.error("Refill Water Script: Resources still loading, try again.");
         } catch (Exception e) {
-//            gui.ui.error("Refill Water Containers Script: An Unknown Error has occured.");
+            gui.ui.error("Refill Water Script: An error occurred: " + e.getMessage());
         }
     }
 
@@ -164,8 +173,11 @@ public class RefillWaterContainers implements Runnable {
     }
 
     public Map<WItem, Integer> getEquiporyPouchContainers() {
-        WItem leftPouch = gui.getequipory().slots[19];
-        WItem rightPouch = gui.getequipory().slots[20];
+        Equipory eq = gui.getequipory();
+        if (eq == null)
+            return new HashMap<>();
+        WItem leftPouch = eq.slots[19];
+        WItem rightPouch = eq.slots[20];
         Map<WItem, Integer> containers = new HashMap<>();
         if (leftPouch != null) {
             String resName = leftPouch.item.res.get().name;

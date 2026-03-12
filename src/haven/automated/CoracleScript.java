@@ -40,7 +40,7 @@ public class CoracleScript implements Runnable {
                     try {
                         Resource res = gob.getres();
                         if (res != null && (res.name.startsWith("gfx/terobjs/vehicle/coracle"))) {
-                            Coord2d plc = gui.map.player().rc;
+                            Coord2d plc = player.rc;
                             if ((gobCoracle == null || gob.rc.dist(plc) < gobCoracle.rc.dist(plc)))
                                 gobCoracle = gob;
                         }
@@ -52,21 +52,21 @@ public class CoracleScript implements Runnable {
             if (gobCoracle == null)
                 return;
 
-            if (gobCoracle.rc.dist(gui.map.player().rc) < 11*5) {
+            if (gobCoracle.rc.dist(player.rc) < 11*5) {
 
                 // ND: Check if we're too far from a shore/shallow water tile, to prevent picking up the coracle. Just check the 8 tiles directly adjacent to us, that's good enough.
                 // I do it this way rather than just checking if we're on shallow water cause sometimes deep water tiles and land tiles have no shallow tiles between them.
                 // (So basically it would be retarded to prevent dismounting just by being in deep water, even when we're literally touching land)
                 boolean preventCoraclePickup = false;
                 MCache mcache = gui.ui.sess.glob.map;
-                int t = mcache.gettile(gui.map.player().rc.floor(MCache.tilesz));
+                int t = mcache.gettile(player.rc.floor(MCache.tilesz));
                 Tiler tl = mcache.tiler(t);
                 if (tl instanceof WaterTile){
                     Resource res = mcache.tilesetr(t);
                     if (res != null) {
                         if (res.name.contains("deep")){ // ND: If the tile I'm currently on is deep water
                             for (double[] position : surroundingTilesPositions) { // ND: Check all 8 tiles encircling me
-                                Coord2d tilePosition = new Coord2d(gui.map.player().rc.x + position[0], gui.map.player().rc.y + position[1]);
+                                Coord2d tilePosition = new Coord2d(player.rc.x + position[0], player.rc.y + position[1]);
                                 int nearTileInt = mcache.gettile(tilePosition.floor(MCache.tilesz));
                                 Tiler nearTile = mcache.tiler(nearTileInt);
                                 if (nearTile instanceof WaterTile){
@@ -143,16 +143,16 @@ public class CoracleScript implements Runnable {
                 try {
                     // ND: Check for about 4 seconds if I'm on a water tile
                     MCache mcache = gui.ui.sess.glob.map;
-                    Tiler tl = mcache.tiler(mcache.gettile(gui.map.player().rc.floor(MCache.tilesz)));
-                    int id = mcache.gettile(gui.map.player().rc.floor(MCache.tilesz));
+                    Tiler tl = mcache.tiler(mcache.gettile(player.rc.floor(MCache.tilesz)));
+                    int id = mcache.gettile(player.rc.floor(MCache.tilesz));
                     int timeout = 0;
                     Resource tileRes = mcache.tilesetr(id);
                     while (tl != null && !(tl instanceof WaterTile || bogtype.contains(tileRes.name))) {
-                        tl = mcache.tiler(mcache.gettile(gui.map.player().rc.floor(MCache.tilesz)));
+                        tl = mcache.tiler(mcache.gettile(player.rc.floor(MCache.tilesz)));
                         timeout++;
                         // ND: I copied this from Cediner. I wonder if this is less stressful for the CPU compared to just doing something like (System.currentTimeMillis() - start > 4000)
                         if (tl instanceof WaterTile){
-                            int t = mcache.gettile(gui.map.player().rc.floor(MCache.tilesz));
+                            int t = mcache.gettile(player.rc.floor(MCache.tilesz));
                             Resource res = mcache.tilesetr(t);
                             if (res != null) {
                                 if (res.name.contains("deep")){
@@ -173,7 +173,7 @@ public class CoracleScript implements Runnable {
                         }
                     }
                     if (tl != null && tl instanceof WaterTile){
-                        int t = mcache.gettile(gui.map.player().rc.floor(MCache.tilesz));
+                        int t = mcache.gettile(player.rc.floor(MCache.tilesz));
                         Resource res = mcache.tilesetr(t);
                         if (res != null) {
                             if (res.name.contains("deep")){
@@ -208,7 +208,7 @@ public class CoracleScript implements Runnable {
                         try {
                             Resource res = gob.getres();
                             if (res != null && (res.name.startsWith("gfx/terobjs/vehicle/coracle"))) {
-                                Coord2d plc = gui.map.player().rc;
+                                Coord2d plc = player.rc;
                                 if ((gobCoracle == null || gob.rc.dist(plc) < gobCoracle.rc.dist(plc)))
                                     gobCoracle = gob;
                             }
@@ -227,7 +227,7 @@ public class CoracleScript implements Runnable {
                         }
                     }
                     if (peekrbuf != null && peekrbuf == 22) { // ND: peekrbuf 22 means empty coracle, on water
-                        if (gobCoracle.rc.dist(gui.map.player().rc) < 11 * 6) {
+                        if (gobCoracle.rc.dist(player.rc) < 11 * 6) {
                             moutableCoracle = true;
                             FlowerMenu.setNextSelection("Into the blue yonder!");
                             gui.map.wdgmsg("click", Coord.z, gobCoracle.rc.floor(posres), 3, 0, 0, (int) gobCoracle.id, gobCoracle.rc.floor(posres), 0, -1);

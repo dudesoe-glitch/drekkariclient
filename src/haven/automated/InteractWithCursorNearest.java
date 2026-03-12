@@ -52,7 +52,7 @@ public class InteractWithCursorNearest implements Runnable {
                             boolean isNonVisitorGate = isSmallGate || isReinforcedGate;
                             if ((isNonVisitorGate && Utils.getprefb("clickNearestObject_NonVisitorGates", true))
                             || ((res.name.startsWith("gfx/terobjs/herbs") || InteractWithNearestObject.otherPickableObjects.contains(res.basename())) && Utils.getprefb("clickNearestObject_Forageables", true))
-                            || (Arrays.stream(Config.critterResPaths).anyMatch(res.name::matches) || res.name.matches(".*(rabbit|bunny)$")) && Utils.getprefb("clickNearestObject_Critters", true)
+                            || ((Arrays.stream(Config.critterResPaths).anyMatch(res.name::matches) || res.name.matches(".*(rabbit|bunny)$")) && Utils.getprefb("clickNearestObject_Critters", true))
                             || (InteractWithNearestObject.caves.contains(res.name) && Utils.getprefb("clickNearestObject_Caves", false))
                             || (InteractWithNearestObject.mines.contains(res.name) && Utils.getprefb("clickNearestObject_MineholesAndLadders", false))) {
                                 if (res.name.startsWith("gfx/terobjs/herbs")) FlowerMenu.setNextSelection("Pick"); // ND: Set the flower menu option to "pick" only for these particular ones.
@@ -93,7 +93,7 @@ public class InteractWithCursorNearest implements Runnable {
                         } catch (NullPointerException ignored) {}
                         if ((isGate && Utils.getprefb("clickNearestObject_NonVisitorGates", true))
                                 || ((res.name.startsWith("gfx/terobjs/herbs") || InteractWithNearestObject.otherPickableObjects.contains(res.basename())) && Utils.getprefb("clickNearestObject_Forageables", true))
-                                || (Arrays.stream(Config.critterResPaths).anyMatch(res.name::matches) || res.name.matches(".*(rabbit|bunny)$")) && Utils.getprefb("clickNearestObject_Critters", true)
+                                || ((Arrays.stream(Config.critterResPaths).anyMatch(res.name::matches) || res.name.matches(".*(rabbit|bunny)$")) && Utils.getprefb("clickNearestObject_Critters", true))
                                 || (InteractWithNearestObject.caves.contains(res.name) && Utils.getprefb("clickNearestObject_Caves", false))
                                 || (InteractWithNearestObject.mines.contains(res.name) && Utils.getprefb("clickNearestObject_MineholesAndLadders", false))) {
                             if (distFromPlayer < maxDistance && (theObject == null || distFromPlayer < theObject.rc.dist(mc))) {

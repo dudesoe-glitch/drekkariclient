@@ -95,7 +95,7 @@ public class InteractWithNearestObject implements Runnable {
                 boolean isNonVisitorGate = isSmallGate || isReinforcedGate;
                 if ((isNonVisitorGate && Utils.getprefb("clickNearestObject_NonVisitorGates", true))
                 || ((res.name.startsWith("gfx/terobjs/herbs") || otherPickableObjects.contains(res.basename())) && Utils.getprefb("clickNearestObject_Forageables", true))
-                || (Arrays.stream(Config.critterResPaths).anyMatch(res.name::matches) || res.name.matches(".*(rabbit|bunny)$")) && Utils.getprefb("clickNearestObject_Critters", true)
+                || ((Arrays.stream(Config.critterResPaths).anyMatch(res.name::matches) || res.name.matches(".*(rabbit|bunny)$")) && Utils.getprefb("clickNearestObject_Critters", true))
                 || (caves.contains(res.name) && Utils.getprefb("clickNearestObject_Caves", false))
                 || (mines.contains(res.name) && Utils.getprefb("clickNearestObject_MineholesAndLadders", false))) {
                     if (distFromPlayer < maxDistance && (theObject == null || distFromPlayer < theObject.rc.dist(plc))) {

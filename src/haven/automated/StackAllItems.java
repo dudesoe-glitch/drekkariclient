@@ -61,10 +61,13 @@ public class StackAllItems implements Runnable {
                 Map<WItem, Integer> stackSizes = new HashMap<>();
                 for (WItem wItem : similarItems) {
                     int amount = 1;
-                    for (ItemInfo info : wItem.info()) {
-                        if (info instanceof GItem.Amount) {
-                            amount = ((GItem.Amount)info).itemnum();
+                    try {
+                        for (ItemInfo info : wItem.info()) {
+                            if (info instanceof GItem.Amount) {
+                                amount = ((GItem.Amount) info).itemnum();
+                            }
                         }
+                    } catch (Loading ignored) {
                     }
                     stackSizes.put(wItem, amount);
                 }
