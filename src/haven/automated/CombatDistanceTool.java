@@ -20,7 +20,7 @@ public class CombatDistanceTool extends Window implements Runnable {
             Map.entry("gfx/kritter/cattle/cattle", 27.0),
             Map.entry("gfx/kritter/badger/badger", 19.9),
             Map.entry("gfx/kritter/bear/bear", 24.7),
-            Map.entry("gfx/kritter/bear/polarbear", 24.7), // ND: I'm doing guess work here, but I bet they're just copy-pasted bears
+            Map.entry("gfx/kritter/bear/polarbear", 24.7),
             Map.entry("gfx/kritter/boar/boar", 25.1),
             Map.entry("gfx/kritter/caveangler/caveangler", 27.2),
             Map.entry("gfx/kritter/cavelouse/cavelouse", 22.0),
@@ -48,33 +48,78 @@ public class CombatDistanceTool extends Window implements Runnable {
             Map.entry("gfx/kritter/horse/mare", 5.4)
     );
 
+    // Weapon type → optimal combat distance (world units)
+    // Range multipliers from Ring of Brodgar wiki. World distance ≈ BASE_MELEE_DIST * multiplier.
+    // Partial name match on resource path (e.g., "hirdsword" matches "gfx/invobjs/small/hirdsword").
+    public static final double BASE_MELEE_DIST = 13.5; // Base melee distance for range 1.0 weapons
+    public static final Map<String, Double> weaponDistances = new HashMap<>();
+    static {
+        // Range 1.0 weapons (~13.5 world units)
+        weaponDistances.put("stoneaxe", BASE_MELEE_DIST * 1.0);      // Stone Axe
+        weaponDistances.put("metalaxe", BASE_MELEE_DIST * 1.0);      // Metal Axe
+        weaponDistances.put("cleaver", BASE_MELEE_DIST * 1.0);       // Butcher's Cleaver
+        weaponDistances.put("flintknife", BASE_MELEE_DIST * 1.0);    // Flint Knife
+        weaponDistances.put("ceramicknife", BASE_MELEE_DIST * 1.0);  // Ceramic Knife
+        weaponDistances.put("obsidiandagger", BASE_MELEE_DIST * 1.0);// Obsidian Dagger
+        weaponDistances.put("throwingaxe", BASE_MELEE_DIST * 1.0);   // Tinker's Throwing Axe
+        // Range 1.2 weapons (~16.2 world units)
+        weaponDistances.put("hirdsword", BASE_MELEE_DIST * 1.2);     // Hirdsman's Sword
+        weaponDistances.put("bronzesword", BASE_MELEE_DIST * 1.2);   // Bronze Sword
+        weaponDistances.put("fyrdsword", BASE_MELEE_DIST * 1.2);     // Fyrdsman's Sword
+        weaponDistances.put("woodsmansaxe", BASE_MELEE_DIST * 1.2);  // Woodsman's Axe
+        weaponDistances.put("pickaxe", BASE_MELEE_DIST * 1.2);       // Pickaxe
+        // Range 1.4 weapons (~18.9 world units)
+        weaponDistances.put("b12axe", BASE_MELEE_DIST * 1.4);        // Battleaxe of the 12th Bay
+        // Range 1.5 weapons (~20.3 world units)
+        weaponDistances.put("cutblade", BASE_MELEE_DIST * 1.5);      // Cutblade
+        // Range 1.6 weapons (~21.6 world units)
+        weaponDistances.put("boarspear", BASE_MELEE_DIST * 1.6);     // Boar Spear
+        weaponDistances.put("giantneedle", BASE_MELEE_DIST * 1.6);   // Giant Needle
+        // Blunt (estimated — not on wiki range table)
+        weaponDistances.put("sledgehammer", BASE_MELEE_DIST * 1.3);  // Sledgehammer (estimated)
+        weaponDistances.put("scythe", BASE_MELEE_DIST * 1.4);        // Scythe (estimated)
+        // Ranged weapons (estimated — wiki doesn't list bow/sling ranges)
+        weaponDistances.put("huntersbow", 50.0);
+        weaponDistances.put("rangersbow", 55.0);
+        weaponDistances.put("sling", 40.0);
+    }
+
     private final GameUI gui;
     public boolean stop;
 
     private final Label currentDistanceLabel;
+    private TextEntry distanceEntry;
 
     private String value;
+    private boolean autoRespace;
+    private boolean autoWeaponDetect;
+    private boolean autoReattack;
+    private long lastRespaceTime;
 
     public void setValue(String value) {
         this.value = value;
     }
 
     public CombatDistanceTool(GameUI gui) {
-        super(new Coord(180, 60), "Combat Distancing Tool", true);
+        super(new Coord(240, 120), "Combat Distancing Tool", true);
         this.gui = gui;
         this.stop = false;
         this.value = "";
+        this.autoRespace = Utils.getprefb("combatDist_autoRespace", false);
+        this.autoWeaponDetect = Utils.getprefb("combatDist_autoWeapon", false);
+        this.autoReattack = Utils.getprefb("combatDist_autoReattack", false);
 
         Widget prev;
 
         prev = add(new Label("Set Distance:"), 0, 6);
 
-        prev = add(new TextEntry(UI.scale(100), value) {
+        distanceEntry = new TextEntry(UI.scale(80), value) {
             @Override
             protected void changed() {
                 setValue(this.buf.line());
             }
-        }, prev.pos("ur").adds(2, 0));
+        };
+        prev = add(distanceEntry, prev.pos("ur").adds(2, 0));
 
         prev = add(new Button(UI.scale(40), "Go") {
             @Override
@@ -90,39 +135,106 @@ public class CombatDistanceTool extends Window implements Runnable {
             }
         }, prev.pos("bl").adds(0, 6));
 
+        int y = UI.scale(40);
+        add(new CheckBox("Auto-respace") {{ a = autoRespace; }
+            public void set(boolean val) { autoRespace = val; a = val; Utils.setprefb("combatDist_autoRespace", val); }
+        }, UI.scale(0, y));
+        y += UI.scale(18);
+        add(new CheckBox("Auto-detect weapon") {{ a = autoWeaponDetect; }
+            public void set(boolean val) { autoWeaponDetect = val; a = val; Utils.setprefb("combatDist_autoWeapon", val); }
+        }, UI.scale(0, y));
+        y += UI.scale(18);
+        add(new CheckBox("Auto-re-attack peaced") {{ a = autoReattack; }
+            public void set(boolean val) { autoReattack = val; a = val; Utils.setprefb("combatDist_autoReattack", val); }
+        }, UI.scale(0, y));
+        y += UI.scale(20);
+
         currentDistanceLabel = new Label("Current dist: No target");
-        add(currentDistanceLabel, UI.scale(new Coord(0, 40)));
+        add(currentDistanceLabel, UI.scale(new Coord(0, y)));
         pack();
     }
 
     @Override
     public void run() {
         while (!stop) {
-            if (gui.fv.current != null) {
-                double dist = getDistance(gui.fv.current.gobid);
-                if (dist < 0) {
-                    currentDistanceLabel.settext("No target");
+            try {
+                Fightview fv = gui.fv;
+                if (fv != null && fv.current != null) {
+                    double dist = getDistance(fv.current.gobid);
+                    if (dist < 0) {
+                        currentDistanceLabel.settext("No target");
+                    } else {
+                        DecimalFormat df = new DecimalFormat("#.##");
+                        String result = df.format(dist);
+                        currentDistanceLabel.settext("Current dist: " + result + " units.");
+                    }
+
+                    // Auto-detect weapon distance
+                    if (autoWeaponDetect) {
+                        double weaponDist = detectWeaponDistance();
+                        if (weaponDist > 0) {
+                            value = String.valueOf(weaponDist);
+                            distanceEntry.settext(value);
+                        }
+                    }
+
+                    // Auto-respace: continuously maintain set distance
+                    if (autoRespace && System.currentTimeMillis() - lastRespaceTime > 600) {
+                        try {
+                            double targetDist = Double.parseDouble(value);
+                            if (dist > 0 && Math.abs(dist - targetDist) > 3.0) {
+                                moveToDistance(targetDist);
+                                lastRespaceTime = System.currentTimeMillis();
+                            }
+                        } catch (NumberFormatException ignored) {}
+                    }
                 } else {
-                    DecimalFormat df = new DecimalFormat("#.##");
-                    String result = df.format(dist);
-                    currentDistanceLabel.settext("Current dist: " + result + " units.");
+                    currentDistanceLabel.settext("Current dist: No target");
+
+                    // Auto-re-attack: if we had targets that were peaced, re-engage
+                    if (autoReattack && fv != null) {
+                        for (Fightview.Relation rel : fv.lsrel) {
+                            if (rel.gobid != 0 && fv.current == null) {
+                                Gob gob = gui.map.glob.oc.getgob(rel.gobid);
+                                if (gob != null) {
+                                    gui.fv.wdgmsg("bump", (int) rel.gobid);
+                                    break;
+                                }
+                            }
+                        }
+                    }
                 }
-            } else {
-                currentDistanceLabel.settext("Current dist: No target");
-            }
+            } catch (Exception ignored) {}
 
             sleep(500);
         }
     }
 
+    private double detectWeaponDistance() {
+        try {
+            Equipory equip = gui.getequipory();
+            if (equip == null) return -1;
+            WItem leftHand = equip.slots[6];
+            if (leftHand == null) return -1;
+            String resName = leftHand.item.res.get().name;
+            // Match by partial name (resource path ends with weapon name)
+            for (Map.Entry<String, Double> entry : weaponDistances.entrySet()) {
+                if (resName.contains(entry.getKey())) {
+                    return entry.getValue();
+                }
+            }
+        } catch (Exception ignored) {}
+        return -1;
+    }
+
     private void tryToAutoDistance() {
-        if (gui != null && gui.map != null && gui.map.player() != null && gui.fv.current != null) {
+        if (gui != null && gui.map != null && gui.map.player() != null && gui.fv != null && gui.fv.current != null) {
             Double value = -1.0;
 
             double addedValue = 0.0;
 
             Gob player = ui.gui.map.player();
-            if (player.occupiedGobID != null) {
+            if (player != null && player.occupiedGobID != null) {
                 Gob vehicle = ui.sess.glob.oc.getgob(player.occupiedGobID);
                 if (vehicle != null && vehicle.getres() != null) {
                     addedValue = vehicleDistance.getOrDefault(vehicle.getres().name, 0.0);
@@ -210,22 +322,21 @@ public class CombatDistanceTool extends Window implements Runnable {
     @Override
     public void wdgmsg(Widget sender, String msg, Object... args) {
         if ((sender == this) && (Objects.equals(msg, "close"))) {
-            if (gui.combatDistanceTool != null) {
-                gui.combatDistanceTool.stop();
-                gui.combatDistanceTool.reqdestroy();
-                gui.combatDistanceTool = null;
-                gui.combatDistanceToolThread = null;
-            }
+            stop();
+            reqdestroy();
+            gui.combatDistanceTool = null;
+            gui.combatDistanceToolThread = null;
         } else
             super.wdgmsg(sender, msg, args);
     }
 
     public void stop() {
         stop = true;
-        if (gui.map.pfthread != null) {
-            gui.map.pfthread.interrupt();
-        }
-        this.destroy();
+        try {
+            if (gui.map != null && gui.map.pfthread != null) {
+                gui.map.pfthread.interrupt();
+            }
+        } catch (Exception ignored) {}
     }
 
     @Override

@@ -25,7 +25,7 @@ public class Pathfinder implements Runnable {
     private String action;
     public Coord mc;
     private int modflags;
-    private int interruptedRetries = 5;
+    private int interruptedRetries = 8;
     private static final int RESPONSE_TIMEOUT = 800;
     private long avgOverrun = 0;
     public List<Coord2d> pathWaypoints = new ArrayList<>();
@@ -76,8 +76,16 @@ public class Pathfinder implements Runnable {
 
     public void pathfind(Coord src) {
         long starttotal = System.nanoTime();
-        Map m = new Map(src, dest, map);
         Gob player = mv.player();
+
+        // Adjust hitbox for mounted players (horses have larger collision)
+        if (player != null && player.occupiedGobID != null) {
+            Map.setPlayerBBox(6); // ~double hitbox for horse
+        } else {
+            Map.setPlayerBBox(3); // default player hitbox
+        }
+
+        Map m = new Map(src, dest, map);
 
         long start = System.nanoTime();
         synchronized (oc) {

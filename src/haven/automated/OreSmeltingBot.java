@@ -33,7 +33,7 @@ public class OreSmeltingBot extends BotBase {
 		put("Zinc Ore", "oreSmeltingBot_zinc");
 	}};
 
-	private static final String[] FUEL_NAMES = {"Coal", "Charcoal"};
+	private static final String[] FUEL_NAMES = {"Coal", "Black Coal", "Charcoal"};
 	private static final double MAX_INTERACT_DIST = 11 * 5;
 	private static final int HAND_TIMEOUT = 2000;
 	private static final int HAND_DELAY = 8;
@@ -253,23 +253,26 @@ public class OreSmeltingBot extends BotBase {
 	}
 
 	private WItem findOreInInventory() {
-		for (Widget wdg = gui.maininv.child; wdg != null; wdg = wdg.next) {
-			if (wdg instanceof WItem) { WItem wi = (WItem) wdg; try { if (isOreEnabled(wi.item.getname())) return wi; } catch (Loading ignored) {} }
+		for (WItem wi : gui.getAllItemsFromAllInventoriesAndStacks()) {
+			try { if (isOreEnabled(wi.item.getname())) return wi; } catch (Loading ignored) {}
 		}
 		return null;
 	}
 
 	private List<WItem> findAllOreInInventory() {
 		List<WItem> ores = new ArrayList<>();
-		for (Widget wdg = gui.maininv.child; wdg != null; wdg = wdg.next) {
-			if (wdg instanceof WItem) { WItem wi = (WItem) wdg; try { if (isOreEnabled(wi.item.getname())) ores.add(wi); } catch (Loading ignored) {} }
+		for (WItem wi : gui.getAllItemsFromAllInventoriesAndStacks()) {
+			try { if (isOreEnabled(wi.item.getname())) ores.add(wi); } catch (Loading ignored) {}
 		}
 		return ores;
 	}
 
 	private WItem findFuelInInventory() {
-		for (Widget wdg = gui.maininv.child; wdg != null; wdg = wdg.next) {
-			if (wdg instanceof WItem) { WItem wi = (WItem) wdg; try { String name = wi.item.getname(); if (name != null && !name.contains("stack of")) { for (String fuelName : FUEL_NAMES) { if (name.contains(fuelName)) return wi; } } } catch (Loading ignored) {} }
+		for (WItem wi : gui.getAllItemsFromAllInventoriesAndStacks()) {
+			try {
+				String name = wi.item.getname();
+				if (name != null) { for (String fuelName : FUEL_NAMES) { if (name.contains(fuelName)) return wi; } }
+			} catch (Loading ignored) {}
 		}
 		return null;
 	}

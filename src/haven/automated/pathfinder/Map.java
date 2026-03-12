@@ -20,8 +20,14 @@ public class Map {
     public final static int origin = origintile * 11;
     public final static int sz = origin * 2;
     public static int plbbox = 3;
-    private final static int way = plbbox + 2;
-    private final static int clr = way + 1;
+    private static int way = plbbox + 2;
+    private static int clr = way + 1;
+
+    public static void setPlayerBBox(int bbox) {
+        plbbox = bbox;
+        way = plbbox + 2;
+        clr = way + 1;
+    }
     private final static int concaveclr = 2;
     private final static int tomaxside = 33;
     private final static int mapborder = 4;
@@ -578,17 +584,17 @@ public class Map {
         return map[origin][origin] == CELL_BLK || map[origin][origin] == CELL_TO;
     }
 
-    // 3 pixels away from origin
+    // Search 8 directions at increasing radii for a free cell
     public Pair<Integer, Integer> getFreeLocation() {
-        if (map[origin + 3][origin] == CELL_FREE)
-            return new Pair<Integer, Integer>(origin + 3, origin);
-        else if (map[origin - 3][origin] == CELL_FREE)
-            return new Pair<Integer, Integer>(origin - 3, origin);
-        else if (map[origin][origin + 3] == CELL_FREE)
-            return new Pair<Integer, Integer>(origin, origin + 3);
-        else if (map[origin][origin - 3] == CELL_FREE)
-            return new Pair<Integer, Integer>(origin, origin - 3);
-
+        int[][] dirs = {{1,0},{-1,0},{0,1},{0,-1},{1,1},{1,-1},{-1,1},{-1,-1}};
+        for (int radius = 3; radius <= 12; radius += 3) {
+            for (int[] d : dirs) {
+                int x = origin + d[0] * radius;
+                int y = origin + d[1] * radius;
+                if (x >= 0 && x < sz && y >= 0 && y < sz && map[x][y] == CELL_FREE)
+                    return new Pair<Integer, Integer>(x, y);
+            }
+        }
         return null;
     }
 
