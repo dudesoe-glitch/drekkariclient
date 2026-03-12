@@ -61,10 +61,10 @@ public class AutoRepeatFlowerMenuScript implements Runnable{
             if(option != null && !option.equals("")){
                 scheduler.shutdown();
                 if (option.equals("Study")){
-                    gui.error("Auto-Repeat Flower-Menu Script: Stopped script. The \"Study\" option disabled for this script, cause you can only study one at a time.");
+                    gui.errorsilent("Auto-Repeat Flower-Menu Script: Stopped script. The \"Study\" option disabled for this script, cause you can only study one at a time.");
                     stop = true;
                 } else if (option.equals("Eat")){
-                    gui.error("Auto-Repeat Flower-Menu Script: Stopped script. The \"Eat\" option is disabled for this script, to avoid user error.");
+                    gui.errorsilent("Auto-Repeat Flower-Menu Script: Stopped script. The \"Eat\" option is disabled for this script, to avoid user error.");
                     stop = true;
                 } else {
                     int counter = 0;

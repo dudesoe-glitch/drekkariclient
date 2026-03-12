@@ -246,7 +246,7 @@ public class MiningSafetyAssistant extends BotBase {
                         }
                         if (gobsInRange.size() < 1) {
                             ui.root.wdgmsg("gk", 27);
-                            gui.error("Trying to mine outside supports.");
+                            gui.errorsilent("Trying to mine outside supports.");
                         }
                     }
 
@@ -260,7 +260,7 @@ public class MiningSafetyAssistant extends BotBase {
                             if (looseRock.rc.dist(minedTile) <= 125) {
                                 looseRock.highlight(Color.red);
                                 ui.root.wdgmsg("gk", 27);
-                                gui.error("Loose rock is too close to mine safely.");
+                                gui.errorsilent("Loose rock is too close to mine safely.");
                             }
                         }
                     }
@@ -275,11 +275,11 @@ public class MiningSafetyAssistant extends BotBase {
                                     if (support.getattr(GobHealth.class) != null) {
                                         if (support.getattr(GobHealth.class).hp <= 0.5 && stopMiningFiftyCheckBox.a) {
                                             ui.root.wdgmsg("gk", 27);
-                                            gui.error("Support nearby below 50%..");
+                                            gui.errorsilent("Support nearby below 50%..");
                                             support.highlight(Color.red);
                                         } else if (support.getattr(GobHealth.class).hp <= 0.25 && stopMiningTwentyFiveCheckBox.a) {
                                             ui.root.wdgmsg("gk", 27);
-                                            gui.error("Support nearby below 25%..");
+                                            gui.errorsilent("Support nearby below 25%..");
                                             support.highlight(Color.red);
                                         }
                                     }
@@ -289,11 +289,11 @@ public class MiningSafetyAssistant extends BotBase {
                                     if (support.getattr(GobHealth.class) != null) {
                                         if (support.getattr(GobHealth.class).hp <= 0.5 && stopMiningFiftyCheckBox.a) {
                                             ui.root.wdgmsg("gk", 27);
-                                            gui.error("Support nearby below 50%..");
+                                            gui.errorsilent("Support nearby below 50%..");
                                             support.highlight(Color.red);
                                         } else if (support.getattr(GobHealth.class).hp <= 0.25 && stopMiningTwentyFiveCheckBox.a) {
                                             ui.root.wdgmsg("gk", 27);
-                                            gui.error("Support nearby below 25%..");
+                                            gui.errorsilent("Support nearby below 25%..");
                                             support.highlight(Color.red);
                                         }
                                     }
@@ -303,11 +303,11 @@ public class MiningSafetyAssistant extends BotBase {
                                     if (support.getattr(GobHealth.class) != null) {
                                         if (support.getattr(GobHealth.class).hp <= 0.5 && stopMiningFiftyCheckBox.a) {
                                             ui.root.wdgmsg("gk", 27);
-                                            gui.error("Support nearby below 50%..");
+                                            gui.errorsilent("Support nearby below 50%..");
                                             support.highlight(Color.red);
                                         } else if (support.getattr(GobHealth.class).hp <= 0.25 && stopMiningTwentyFiveCheckBox.a) {
                                             ui.root.wdgmsg("gk", 27);
-                                            gui.error("Support nearby below 25%..");
+                                            gui.errorsilent("Support nearby below 25%..");
                                             support.highlight(Color.red);
                                         }
                                     }

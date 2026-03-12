@@ -836,6 +836,10 @@ public class UI {
 	msg(new ErrorMessage(msg));
     }
 
+    public void errorsilent(String msg) {
+	msg(new SimpleMessage(msg, ErrorMessage.color, SimpleMessage.nosfx));
+    }
+
     public void msg(String msg) {
 	msg(new InfoMessage(msg));
     }

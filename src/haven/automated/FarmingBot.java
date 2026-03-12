@@ -41,6 +41,7 @@ public class FarmingBot extends BotBase {
 
 	public FarmingBot(GameUI gui) {
 		super(gui, UI.scale(220, 130), "Farming Bot");
+		checkInventory = false; // Farming works with full inventory (harvest+replant cycle)
 
 		int y = 10;
 		harvestCheckBox = new CheckBox("Harvest mature crops") {{a = true;}};
@@ -78,10 +79,16 @@ public class FarmingBot extends BotBase {
 	protected void tick() throws InterruptedException {
 		Gob player = gui.map.player();
 		if (player == null) {
-			Thread.sleep(500);
+			Thread.sleep(200);
 			return;
 		}
 		if (!checkVitals()) return;
+
+		if (!harvestCheckBox.a) {
+			setStatus("Enable harvest to begin.");
+			Thread.sleep(500);
+			return;
+		}
 
 		Gob crop = findMatureCrop();
 		if (crop != null) {
@@ -90,7 +97,6 @@ public class FarmingBot extends BotBase {
 			setStatus("No mature crops found.");
 			deactivate();
 		}
-		Thread.sleep(1000);
 	}
 
 	private void processCrop(Gob crop) throws InterruptedException {
@@ -98,7 +104,9 @@ public class FarmingBot extends BotBase {
 
 		String cropRes = null;
 		try {
-			cropRes = crop.getres().name;
+			Resource res = crop.getres();
+			if (res == null) return;
+			cropRes = res.name;
 		} catch (Loading l) {
 			return;
 		}
@@ -112,45 +120,43 @@ public class FarmingBot extends BotBase {
 			return;
 		}
 
-		if (crop.rc.dist(gui.map.player().rc) > 11 * 5) {
+		Gob player = gui.map.player();
+		if (player == null) return;
+		if (crop.rc.dist(player.rc) > 11 * 5) {
 			setStatus("Too far from crop, skipping.");
 			return;
 		}
 
 		if (gui.vhand != null) {
 			gui.vhand.item.wdgmsg("drop", Coord.z);
-			Actions.waitForEmptyHand(gui, 1000, "Farming Bot: Couldn't clear hand");
+			Actions.waitForEmptyHand(gui, 1000, "");
 		}
 
-		if (harvestCheckBox.a) {
-			setStatus("Harvesting " + cropBaseName + "...");
-			FlowerMenu.setNextSelection("Harvest");
-			gui.map.wdgmsg("click", Coord.z, crop.rc.floor(posres), 3, 0, 0, (int) crop.id, crop.rc.floor(posres), 0, -1);
-			Thread.sleep(300);
-			Actions.waitProgBar(gui);
-			Thread.sleep(500);
-		}
+		// Harvest
+		setStatus("Harvesting " + cropBaseName + "...");
+		FlowerMenu.setNextSelection("Harvest");
+		gui.map.wdgmsg("click", Coord.z, crop.rc.floor(posres), 3, 0, 0, (int) crop.id, crop.rc.floor(posres), 0, -1);
+		Thread.sleep(50);
+		Actions.waitProgBar(gui);
 
+		// Replant
 		if (replantCheckBox.a) {
-			setStatus("Replanting " + cropBaseName + "...");
 			WItem seed = findBestSeed(cropBaseName);
 			if (seed != null) {
+				setStatus("Replanting " + cropBaseName + "...");
 				seed.item.wdgmsg("take", Coord.z);
-				if (!Actions.waitForOccupiedHand(gui, 2000, "Farming Bot: Couldn't pick up seed")) {
+				if (!Actions.waitForOccupiedHand(gui, 2000, "")) {
 					return;
 				}
-				Thread.sleep(100);
 				gui.map.wdgmsg("itemact", Coord.z, cropPos.floor(posres), 0);
-				Thread.sleep(500);
+				Thread.sleep(50);
 				Actions.waitProgBar(gui);
-				Thread.sleep(300);
 				if (gui.vhand != null) {
 					gui.vhand.item.wdgmsg("drop", Coord.z);
 					Actions.waitForEmptyHand(gui, 1000, "");
 				}
 			} else {
 				setStatus("No seeds for " + cropBaseName);
-				Thread.sleep(1000);
 			}
 		}
 	}
@@ -189,19 +195,28 @@ public class FarmingBot extends BotBase {
 		}
 
 		List<WItem> seeds = new ArrayList<>();
-		Inventory inv = gui.maininv;
 
-		for (Widget wdg = inv.child; wdg != null; wdg = wdg.next) {
-			if (wdg instanceof WItem) {
-				WItem wi = (WItem) wdg;
+		// Search main inventory via wmap (ConcurrentHashMap — thread-safe)
+		for (WItem wi : gui.maininv.wmap.values()) {
+			try {
+				Resource res = wi.item.getres();
+				if (res != null && res.name.equals(seedResName)) {
+					seeds.add(wi);
+				}
+			} catch (Loading | NullPointerException ignored) {}
+		}
+
+		// Also search inside stacks (seeds may be stacked)
+		try {
+			for (WItem wi : gui.getAllContentsWindows()) {
 				try {
-					if (wi.item.getres().name.equals(seedResName)) {
+					Resource res = wi.item.getres();
+					if (res != null && res.name.equals(seedResName)) {
 						seeds.add(wi);
 					}
-				} catch (Loading ignored) {
-				}
+				} catch (Loading | NullPointerException ignored) {}
 			}
-		}
+		} catch (Exception ignored) {}
 
 		if (seeds.isEmpty()) return null;
 

@@ -35,12 +35,11 @@ public class CleanupBot extends BotBase {
 
 	@Override
 	protected void tick() throws InterruptedException {
-		if (!(chopBushes || chopTrees || destroyStumps || chipRocks || destroySoil)) { sleep(2000); return; }
+		if (!(chopBushes || chopTrees || destroyStumps || chipRocks || destroySoil)) { sleep(500); return; }
 		if (!checkVitals()) return;
 		Gob gob = findClosestGob();
 		if (chipRocks) dropStones();
 		destroyGob(gob);
-		sleep(2000);
 	}
 
 	private void destroyGob(Gob gob) throws InterruptedException {
@@ -51,7 +50,9 @@ public class CleanupBot extends BotBase {
 			if (gob != null) {
 				gui.map.pfLeftClick(gob.rc.floor().add(20, 0), null);
 				if (!Actions.waitPf(gui)) Actions.unstuck(gui);
-				if (gob.rc.dist(gui.map.player().rc) < 11 * 5) {
+				player = gui.map.player();
+				if (player == null) return;
+				if (gob.rc.dist(player.rc) < 11 * 5) {
 					Resource res = gob.getres();
 					if (res == null) return;
 					Actions.clearhand(gui);
@@ -71,15 +72,14 @@ public class CleanupBot extends BotBase {
 					}
 				}
 			} else {
-				gui.error("Cleanup Bot: Nothing left to destroy.");
+				gui.errorsilent("Cleanup Bot: Nothing left to destroy.");
 				deactivate();
-				sleep(2000);
 			}
 		}
 	}
 
 	private void waitWhileWorking(int timeout) throws InterruptedException {
-		sleep(1500);
+		sleep(200);
 		int hz = 50; int time = 0;
 		while (gui.prog != null && gui.prog.prog != -1 && time < timeout && gui.getmeter("stam", 0).a > 0.40) { time += hz; sleep(hz); }
 	}

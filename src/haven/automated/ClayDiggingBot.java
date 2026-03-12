@@ -36,33 +36,32 @@ public class ClayDiggingBot extends BotBase {
 		if (gui.prog != null) {
 			setStatus("Digging...");
 			waitForProgressBar(30000);
-			Thread.sleep(500);
 			return;
 		}
 
 		Gob clay = findNearestClay();
 		if (clay == null) {
 			setStatus("No clay patches found");
-			Thread.sleep(3000);
+			deactivate();
 			return;
 		}
 
 		if (gui.vhand != null) {
 			gui.vhand.item.wdgmsg("drop", Coord.z);
-			Thread.sleep(500);
+			Actions.waitForEmptyHand(gui, 1000, "");
 		}
 
 		setStatus("Walking to clay...");
 		gui.map.pfLeftClick(clay.rc.floor().add(2, 0), null);
 		if (!Actions.waitPf(gui)) {
 			Actions.unstuck(gui);
-			Thread.sleep(1000);
 			return;
 		}
 
-		if (clay.rc.dist(gui.map.player().rc) > 11 * 5) {
+		Gob player = gui.map.player();
+		if (player == null) return;
+		if (clay.rc.dist(player.rc) > 11 * 5) {
 			setStatus("Too far, retrying...");
-			Thread.sleep(1000);
 			return;
 		}
 
@@ -70,14 +69,12 @@ public class ClayDiggingBot extends BotBase {
 		FlowerMenu.setNextSelection("Dig");
 		gui.map.wdgmsg("click", Coord.z, clay.rc.floor(posres), 3, 0, 0,
 			(int) clay.id, clay.rc.floor(posres), 0, -1);
-		Thread.sleep(1000);
+		Thread.sleep(50);
 		waitForProgressBar(30000);
-		Thread.sleep(500);
 		if (gui.vhand != null) {
 			gui.vhand.item.wdgmsg("drop", Coord.z);
-			Thread.sleep(500);
+			Actions.waitForEmptyHand(gui, 1000, "");
 		}
-		Thread.sleep(1000);
 	}
 
 	private Gob findNearestClay() {

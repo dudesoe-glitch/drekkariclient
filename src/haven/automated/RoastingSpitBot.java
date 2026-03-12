@@ -57,7 +57,7 @@ public class RoastingSpitBot extends BotBase {
 						}
 					}
 					if (theObject == null) {
-						gui.error("Roasting Spit Bot: You're not standing next to a Fireplace that has a Roasting Spit!");
+						gui.errorsilent("Roasting Spit Bot: No Roasting Spit found nearby.");
 						active = false;
 					} else {
 						fireplace = theObject;
@@ -175,7 +175,7 @@ public class RoastingSpitBot extends BotBase {
 						}
 					} catch (Exception e) {
 						if (e instanceof InterruptedException) { Thread.currentThread().interrupt(); return; }
-						gui.error("Roasting Spit Bot: Something went wrong, resetting...");
+						gui.errorsilent("Roasting Spit Bot: Something went wrong, resetting...");
 						active = false;
 						activeButton.change("Start");
 						fireplace = null;
@@ -193,7 +193,7 @@ public class RoastingSpitBot extends BotBase {
 		if (Actions.rightClickGobOverlayWithItem(this.gui, fireplace, roastingSpitOverlayName)) {
 			sleep(2000);
 		} else {
-			gui.error("Roasting Spit Bot: The Roasting Spit is gone!");
+			gui.errorsilent("Roasting Spit Bot: The Roasting Spit is gone!");
 			active = false;
 			fireplace = null;
 			activeButton.change("Start");

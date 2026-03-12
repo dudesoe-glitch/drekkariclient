@@ -2544,6 +2544,10 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
     public void error(String msg) {
 	ui.error(msg);
     }
+
+    public void errorsilent(String msg) {
+	ui.errorsilent(msg);
+    }
     
     public void act(String... args) {
 	wdgmsg("act", (Object[])args);

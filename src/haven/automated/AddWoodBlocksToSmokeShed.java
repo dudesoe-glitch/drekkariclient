@@ -31,7 +31,7 @@ public class AddWoodBlocksToSmokeShed implements Runnable {
         }
 
         if (smokeShed == null) {
-            gui.error("No smoke shed found");
+            gui.errorsilent("No smoke shed found");
             return;
         }
 
@@ -43,7 +43,7 @@ public class AddWoodBlocksToSmokeShed implements Runnable {
             }
         }
         if (woodblockw == null) {
-            gui.error("No wood block found in the inventory");
+            gui.errorsilent("No wood block found in the inventory");
             return;
         }
         GItem woodblock = woodblockw.item;
@@ -53,7 +53,7 @@ public class AddWoodBlocksToSmokeShed implements Runnable {
         while (gui.hand.isEmpty() || gui.vhand == null) {
             timeout += HAND_DELAY;
             if (timeout >= TIMEOUT) {
-                gui.error("No wood block found in the inventory");
+                gui.errorsilent("No wood block found in the inventory");
                 return;
             }
             try {
@@ -78,7 +78,7 @@ public class AddWoodBlocksToSmokeShed implements Runnable {
 
                 timeout += HAND_DELAY;
                 if (timeout >= TIMEOUT) {
-                    gui.error("Not enough wood blocks. Need to add " + (count - 1) + " more.");
+                    gui.errorsilent("Not enough wood blocks. Need to add " + (count - 1) + " more.");
                     return;
                 }
                 try {

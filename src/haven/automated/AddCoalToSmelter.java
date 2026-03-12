@@ -31,7 +31,7 @@ public class AddCoalToSmelter implements Runnable {
         }
 
         if (smelter == null) {
-            gui.error("No smelters found");
+            gui.errorsilent("No smelters found");
             return;
         }
 
@@ -43,7 +43,7 @@ public class AddCoalToSmelter implements Runnable {
             }
         }
         if (coalw == null) {
-            gui.error("No coal found in the inventory");
+            gui.errorsilent("No coal found in the inventory");
             return;
         }
         GItem coal = coalw.item;
@@ -53,7 +53,7 @@ public class AddCoalToSmelter implements Runnable {
         while (gui.hand.isEmpty() || gui.vhand == null) {
             timeout += HAND_DELAY;
             if (timeout >= TIMEOUT) {
-                gui.error("No coal found in the inventory");
+                gui.errorsilent("No coal found in the inventory");
                 return;
             }
             try {
@@ -78,7 +78,7 @@ public class AddCoalToSmelter implements Runnable {
 
                 timeout += HAND_DELAY;
                 if (timeout >= TIMEOUT) {
-                    gui.error("Not enough coal. Need to add " + (count - 1) + " more.");
+                    gui.errorsilent("Not enough coal. Need to add " + (count - 1) + " more.");
                     return;
                 }
                 try {

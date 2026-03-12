@@ -38,7 +38,7 @@ public class TarKilnCleanerBot extends BotBase {
 				}
 			}
 
-			if (closest == null) { active = false; activeBox.set(false); gui.error("No full tar kilns nearby."); return; }
+			if (closest == null) { active = false; activeBox.set(false); gui.errorsilent("No full tar kilns nearby."); return; }
 
 			if (gui.prog == null) {
 				int[][] options = {{33, 0}, {-33, 0}, {0, 33}, {0, -33}};

@@ -22,7 +22,7 @@ public class UnstackAllItems implements Runnable {
     public void run() {
         try {
             if (gui.vhand != null) {
-                gui.error("Can't unstack items with an occupied cursor!");
+                gui.errorsilent("Can't unstack items with an occupied cursor!");
                 return;
             }
 
@@ -33,7 +33,7 @@ public class UnstackAllItems implements Runnable {
                 }
             }
         } catch (Exception e) {
-            gui.error("Unstack items script failed. Try again.");
+            gui.errorsilent("Unstack items script failed. Try again.");
         }
     }
 }

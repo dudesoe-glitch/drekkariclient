@@ -33,13 +33,13 @@ public class CellarDiggingBot extends BotBase {
 						sleep(200); continue;
 					}
 					if (gui.maininv.getFreeSpace() < MIN_FREE_SLOTS) {
-						gui.error("Cellar Digging Bot: Inventory full, stopping.");
+						gui.errorsilent("Cellar Digging Bot: Inventory full, stopping.");
 						deactivate(); sleep(2000); continue;
 					}
 
 					Gob cellar = findCellarGob();
 					if (cellar == null) {
-						gui.error("Cellar Digging Bot: No cellar door present! Stopping.");
+						gui.errorsilent("Cellar Digging Bot: No cellar door present! Stopping.");
 						deactivate(); continue;
 					}
 

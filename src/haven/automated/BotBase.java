@@ -115,7 +115,7 @@ public abstract class BotBase extends Window implements Runnable {
 		if (checkEnergy) {
 			try {
 				if (gui.getmeter("nrj", 0).a < ENERGY_THRESHOLD) {
-					gui.error(cap + ": Low on energy, stopping.");
+					gui.errorsilent(cap + ": Low on energy, stopping.");
 					deactivate();
 					Thread.sleep(2000);
 					return false;
@@ -135,7 +135,7 @@ public abstract class BotBase extends Window implements Runnable {
 		if (checkInventory) {
 			try {
 				if (gui.maininv.getFreeSpace() < MIN_FREE_SLOTS) {
-					gui.error(cap + ": Inventory full, stopping.");
+					gui.errorsilent(cap + ": Inventory full, stopping.");
 					deactivate();
 					Thread.sleep(2000);
 					return false;

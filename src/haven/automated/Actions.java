@@ -36,7 +36,7 @@ public class Actions {
         while (gui.vhand != null) {
             t += 5;
             if (t >= timeout) {
-                gui.error(error);
+                if (error != null && !error.isEmpty()) gui.errorsilent(error);
                 return false;
             }
             try {
@@ -54,7 +54,7 @@ public class Actions {
         while (gui.vhand == null) {
             t += 5;
             if (t >= timeout) {
-                gui.error(error);
+                if (error != null && !error.isEmpty()) gui.errorsilent(error);
                 return false;
             }
             try {
@@ -73,7 +73,7 @@ public class Actions {
         }
         int time = 0;
         boolean moved = false;
-        Thread.sleep(300);
+        Thread.sleep(50);
         Gob player = gui.map.player();
         if (player == null) return false;
         while (gui.map.pfthread.isAlive() || player.getv() > 0) {

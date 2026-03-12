@@ -186,22 +186,22 @@ public class CombatRotationBot extends BotBase {
 			int slot = Integer.parseInt(slotEntry.text().trim()) - 1;
 			int count = Integer.parseInt(countEntry.text().trim());
 			if (slot < 0 || slot > 9) {
-				gui.error("Slot must be 1-10");
+				gui.errorsilent("Slot must be 1-10");
 				return;
 			}
 			if (count < 1 || count > 99) {
-				gui.error("Count must be 1-99");
+				gui.errorsilent("Count must be 1-99");
 				return;
 			}
 			if (steps.size() >= MAX_DISPLAY_STEPS) {
-				gui.error("Max " + MAX_DISPLAY_STEPS + " steps");
+				gui.errorsilent("Max " + MAX_DISPLAY_STEPS + " steps");
 				return;
 			}
 			steps.add(new int[]{slot, count});
 			saveRotation();
 			refreshStepLabels();
 		} catch (NumberFormatException e) {
-			gui.error("Invalid number");
+			gui.errorsilent("Invalid number");
 		}
 	}
 

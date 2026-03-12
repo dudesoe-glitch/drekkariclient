@@ -3210,8 +3210,7 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
 		if (haven.automated.pathfinder.Map.DEBUG_TIMINGS)
 			System.out.println("-= PF DONE =-");
 		if (thread.terminate && pfFinalDest == null) {
-			if (ui != null && ui.gui != null)
-				ui.gui.error("No path found.");
+			// Silently fail — "No path found" notification was disruptive
 		}
 		if(pfFinalDest != null && !thread.terminate) {
 			Gob player = player();

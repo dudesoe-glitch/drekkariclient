@@ -54,40 +54,38 @@ public class ForagingBot extends BotBase {
 	@Override
 	protected void tick() throws InterruptedException {
 		Gob player = gui.map.player();
-		if (player == null) { Thread.sleep(500); return; }
+		if (player == null) { Thread.sleep(200); return; }
 		if (!checkVitals()) return;
 
 		if (gui.prog != null) {
 			setStatus("Working...");
-			Thread.sleep(500);
+			Actions.waitProgBar(gui);
 			return;
 		}
 
 		Gob herb = findNearestForageable();
 		if (herb == null) {
 			setStatus("No forageables found");
-			Thread.sleep(3000);
+			deactivate();
 			return;
 		}
 
 		if (gui.vhand != null) {
 			gui.vhand.item.wdgmsg("drop", Coord.z);
-			Thread.sleep(300);
+			Actions.waitForEmptyHand(gui, 1000, "");
 		}
 
 		setStatus("Walking to forageable...");
 		gui.map.pfLeftClick(herb.rc.floor().add(2, 0), null);
 		if (!Actions.waitPf(gui)) {
 			Actions.unstuck(gui);
-			Thread.sleep(1000);
 			return;
 		}
 
 		player = gui.map.player();
-		if (player == null) { Thread.sleep(500); return; }
+		if (player == null) { Thread.sleep(200); return; }
 		if (herb.rc.dist(player.rc) > 11 * 5) {
 			setStatus("Too far, retrying...");
-			Thread.sleep(1000);
 			return;
 		}
 
@@ -100,13 +98,13 @@ public class ForagingBot extends BotBase {
 		} catch (Loading ignored) {}
 		gui.map.wdgmsg("click", Coord.z, herb.rc.floor(posres), 3, 0, 0,
 			(int) herb.id, herb.rc.floor(posres), 0, -1);
-		Thread.sleep(1500);
+		Thread.sleep(50);
+		Actions.waitProgBar(gui);
 
 		if (gui.vhand != null) {
 			gui.vhand.item.wdgmsg("drop", Coord.z);
-			Thread.sleep(300);
+			Actions.waitForEmptyHand(gui, 1000, "");
 		}
-		Thread.sleep(500);
 	}
 
 	private Gob findNearestForageable() {

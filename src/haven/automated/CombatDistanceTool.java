@@ -289,7 +289,7 @@ public class CombatDistanceTool extends BotBase {
             }
             setfocus(ui.gui.portrait); // ND: do this to defocus the text entry box after you click on "Go"
         } catch (NumberFormatException e) {
-            gui.error("Wrong distance format. Use ##.###");
+            gui.errorsilent("Wrong distance format. Use ##.###");
         }
     }
 
@@ -304,7 +304,7 @@ public class CombatDistanceTool extends BotBase {
             }
             setfocus(ui.gui.portrait); // ND: do this to defocus the text entry box after you click on "Go"
         } catch (NumberFormatException e) {
-            gui.error("Wrong distance format. Use ##.###");
+            gui.errorsilent("Wrong distance format. Use ##.###");
         }
     }
 

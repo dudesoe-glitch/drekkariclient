@@ -45,7 +45,7 @@ public class GrubGrubBot extends BotBase {
 				// Energy check
 				try {
 					if (gui.getmeter("nrj", 0).a < ENERGY_THRESHOLD) {
-						gui.error("Grub Grub Bot: Low on energy, stopping.");
+						gui.errorsilent("Grub Grub Bot: Low on energy, stopping.");
 						GrubGrubBot.transferTicks = false;
 						active = false;
 						Thread.sleep(2000);

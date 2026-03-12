@@ -88,7 +88,7 @@ public class CoracleScript implements Runnable {
                     }
                 }
                 if (preventCoraclePickup) {
-                    gui.error("Coracle Script: You're surrounded by Deep Water! Get closer to Shallow Water or Land before Picking up the Coracle.");
+                    gui.errorsilent("Coracle Script: You're surrounded by Deep Water! Get closer to Shallow Water or Land before Picking up the Coracle.");
                     return;
                 } else {
                     FlowerMenu.setNextSelection("Pick up");
@@ -103,7 +103,7 @@ public class CoracleScript implements Runnable {
                 while (gui.hand.isEmpty() || gui.vhand == null) {
                     timeout += HAND_DELAY;
                     if (timeout >= TIMEOUT) {
-                        gui.error("Coracle Script: Timed out trying to Pick up Coracle");
+                        gui.errorsilent("Coracle Script: Timed out trying to Pick up Coracle");
                         return;
                     }
                     try {
@@ -118,7 +118,7 @@ public class CoracleScript implements Runnable {
                 if (freecoord != null) {
                     gui.maininv.wdgmsg("drop", freecoord);
                 } else {
-                    gui.error("Coracle Script: No free space in Inventory for Coracle.");
+                    gui.errorsilent("Coracle Script: No free space in Inventory for Coracle.");
                 }
             }
 
@@ -156,13 +156,13 @@ public class CoracleScript implements Runnable {
                             Resource res = mcache.tilesetr(t);
                             if (res != null) {
                                 if (res.name.contains("deep")){
-                                    gui.error("Coracle Script: You can't drop a Coracle while swimming in Deep Water! You must be in Shallow Water!");
+                                    gui.errorsilent("Coracle Script: You can't drop a Coracle while swimming in Deep Water! You must be in Shallow Water!");
                                     return;
                                 }
                             }
                         }
                         if (timeout > 300) {
-                            gui.error("Coracle Script: Timed out waiting for Water Tile to drop Coracle on.");
+                            gui.errorsilent("Coracle Script: Timed out waiting for Water Tile to drop Coracle on.");
                             return;
                         }
                         try {
@@ -177,7 +177,7 @@ public class CoracleScript implements Runnable {
                         Resource res = mcache.tilesetr(t);
                         if (res != null) {
                             if (res.name.contains("deep")){
-                                gui.error("Coracle Script: You can't drop a Coracle while swimming in Deep Water! You must be in Shallow Water!");
+                                gui.errorsilent("Coracle Script: You can't drop a Coracle while swimming in Deep Water! You must be in Shallow Water!");
                                 return;
                             }
                         }
@@ -186,7 +186,7 @@ public class CoracleScript implements Runnable {
                     GItem coracleItem = coracle.item;
                     coracleItem.wdgmsg("drop", new Coord(coracleItem.sz.x / 2, coracleItem.sz.y / 2));
                 } catch(Exception e) {
-                    gui.error("Coracle Script: Some error occured, stopping script.");
+                    gui.errorsilent("Coracle Script: Some error occured, stopping script.");
                     return;
                 }
             }
@@ -237,7 +237,7 @@ public class CoracleScript implements Runnable {
                 }
             }
             if (coracle == null && (gobCoracle == null || !moutableCoracle)){
-                gui.error("Coracle Script: No Coracle found in Inventory and no mountable Coracle found in close proximity.");
+                gui.errorsilent("Coracle Script: No Coracle found in Inventory and no mountable Coracle found in close proximity.");
             }
         }
     }

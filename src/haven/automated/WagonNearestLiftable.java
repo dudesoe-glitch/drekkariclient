@@ -245,7 +245,7 @@ public class WagonNearestLiftable implements Runnable {
             }
 
         } catch (InterruptedException e) {
-            gui.error(e.getMessage());
+            gui.errorsilent(e.getMessage());
         } finally {
             if (gui.wagonNearestLiftableThread != null) {
                 gui.wagonNearestLiftableThread.interrupt();

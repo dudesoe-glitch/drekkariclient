@@ -85,7 +85,7 @@ public class CloverScript implements Runnable {
         }
 
         if (animal == null) {
-            gui.error("Clover Script: No applicable animal found in close proximity. (Max: 7 tiles)");
+            gui.errorsilent("Clover Script: No applicable animal found in close proximity. (Max: 7 tiles)");
             return;
         }
 
@@ -107,13 +107,13 @@ public class CloverScript implements Runnable {
             }
         }
         if (cloverw == null) {
-            gui.error("Clover Script: No clover found anywhere in the inventory.");
+            gui.errorsilent("Clover Script: No clover found anywhere in the inventory.");
             return;
         }
         if (!gui.hand.isEmpty()){
             if (gui.vhand != null){
                 if (!gui.vhand.item.getname().equals("Clover")){
-                    gui.error("Clover Script: I can't pick up the clover, you're already holding something else on the cursor!");
+                    gui.errorsilent("Clover Script: I can't pick up the clover, you're already holding something else on the cursor!");
                     return;
                 }
             }
@@ -124,7 +124,7 @@ public class CloverScript implements Runnable {
         while (gui.hand.isEmpty() || gui.vhand == null) {
             timeout += HAND_DELAY;
             if (timeout >= TIMEOUT) {
-                gui.error("Clover Script: I found a clover in the inventory, but somehow I didn't pick it up on the cursor.");
+                gui.errorsilent("Clover Script: I found a clover in the inventory, but somehow I didn't pick it up on the cursor.");
                 return;
             }
             try {

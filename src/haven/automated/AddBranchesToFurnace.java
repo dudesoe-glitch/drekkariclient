@@ -31,7 +31,7 @@ public class AddBranchesToFurnace implements Runnable {
         }
 
         if (furnace == null) {
-            gui.error("No Kiln or Oven found");
+            gui.errorsilent("No Kiln or Oven found");
             return;
         }
 
@@ -43,7 +43,7 @@ public class AddBranchesToFurnace implements Runnable {
             }
         }
         if (branchw == null) {
-            gui.error("No branch found in the inventory");
+            gui.errorsilent("No branch found in the inventory");
             return;
         }
         GItem branch = branchw.item;
@@ -53,7 +53,7 @@ public class AddBranchesToFurnace implements Runnable {
         while (gui.hand.isEmpty() || gui.vhand == null) {
             timeout += HAND_DELAY;
             if (timeout >= TIMEOUT) {
-                gui.error("No branch found in the inventory");
+                gui.errorsilent("No branch found in the inventory");
                 return;
             }
             try {
@@ -78,7 +78,7 @@ public class AddBranchesToFurnace implements Runnable {
 
                 timeout += HAND_DELAY;
                 if (timeout >= TIMEOUT) {
-                    gui.error("Not enough branches. Need to add " + (count - 1) + " more.");
+                    gui.errorsilent("Not enough branches. Need to add " + (count - 1) + " more.");
                     return;
                 }
                 try {

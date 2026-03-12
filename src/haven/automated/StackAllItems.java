@@ -26,7 +26,7 @@ public class StackAllItems implements Runnable {
         // TODO: ND: Gotta make this crap ignore "quantity" items, like Seeds, Flour, Coins, etc.
         try {
             if (gui.vhand != null) {
-                gui.error("Can't stack items with an occupied cursor!");
+                gui.errorsilent("Can't stack items with an occupied cursor!");
                 return;
             }
 
@@ -89,7 +89,7 @@ public class StackAllItems implements Runnable {
             }
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            gui.error("Stack items script interrupted");
+            gui.errorsilent("Stack items script interrupted");
         }
     }
 }

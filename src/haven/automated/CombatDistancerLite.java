@@ -76,7 +76,7 @@ public class CombatDistancerLite implements Runnable {
                 gui.msg("No visible target.", Color.WHITE);
             }
         } catch (NumberFormatException e) {
-            gui.error("Wrong distance format. Use ##.###");
+            gui.errorsilent("Wrong distance format. Use ##.###");
         }
     }
 

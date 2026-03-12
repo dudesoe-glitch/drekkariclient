@@ -56,7 +56,7 @@ public class SkisScript implements Runnable {
                 while (gui.hand.isEmpty() || gui.vhand == null) {
                     timeout += HAND_DELAY;
                     if (timeout >= TIMEOUT) {
-                        gui.error("Skis Script: Timed out trying to Pick up Skis");
+                        gui.errorsilent("Skis Script: Timed out trying to Pick up Skis");
                         return;
                     }
                     try {
@@ -71,7 +71,7 @@ public class SkisScript implements Runnable {
                 if (freecoord != null) {
                     gui.maininv.wdgmsg("drop", freecoord);
                 } else {
-                    gui.error("Skis Script: No free space in Inventory for Skis.");
+                    gui.errorsilent("Skis Script: No free space in Inventory for Skis.");
                 }
             }
 
@@ -144,7 +144,7 @@ public class SkisScript implements Runnable {
                 }
             }
             if (skis == null && (gobSkis == null || !moutableSkis)){
-                gui.error("Skis Script: No Skis found in Inventory and no mountable Skis found in close proximity.");
+                gui.errorsilent("Skis Script: No Skis found in Inventory and no mountable Skis found in close proximity.");
             }
         }
     }

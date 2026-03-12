@@ -73,22 +73,22 @@ public class PointerTriangulation extends Window {
                     gui.mapfile.view.addSprite(new ClueSprite(firstCoord, lineData.angle, lineData.angle, 1, 10000, 10));
 
                 } else {
-                    gui.error("You have to be in the same segment for each pointer");
+                    gui.errorsilent("You have to be in the same segment for each pointer");
                     return;
                 }
             }
         } catch (Exception e) {
-            gui.error("Something went wrong.");
+            gui.errorsilent("Something went wrong.");
         }
     }
 
     public void saveCheckpoint() {
         if(gui.map.player() == null){
-            gui.error("Questgiver Triangulation: I don't see you on the screen, can't calculate angle.");
+            gui.errorsilent("Questgiver Triangulation: I don't see you on the screen, can't calculate angle.");
             return;
         }
         if (!pointerChecked){
-            gui.error("Questgiver Triangulation: You need to mouse over the pointer first. Read the instructions.");
+            gui.errorsilent("Questgiver Triangulation: You need to mouse over the pointer first. Read the instructions.");
             return;
         }
         try {

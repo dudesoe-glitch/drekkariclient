@@ -62,9 +62,9 @@ public class MiningBot extends BotBase {
 
 	@Override
 	protected void tick() throws InterruptedException {
-		if (targetPos == null) { Thread.sleep(500); return; }
+		if (targetPos == null) { Thread.sleep(200); return; }
 		Gob player = gui.map.player();
-		if (player == null) { Thread.sleep(500); return; }
+		if (player == null) { Thread.sleep(200); return; }
 		if (!checkVitals()) return;
 
 		if (safeMining && !isInSupportRange(targetPos)) {
@@ -76,24 +76,22 @@ public class MiningBot extends BotBase {
 		if (gui.prog != null) {
 			setStatus("Mining...");
 			waitForProgressBar(60000);
-			Thread.sleep(500);
 			if (gui.vhand != null) {
 				gui.vhand.item.wdgmsg("drop", Coord.z);
-				Thread.sleep(500);
+				Actions.waitForEmptyHand(gui, 1000, "");
 			}
 			return;
 		}
 
 		setStatus("Mining...");
 		gui.map.wdgmsg("click", Coord.z, targetPos.floor(posres), 1, 0);
-		Thread.sleep(1000);
+		Thread.sleep(50);
 
 		for (int i = 0; i < 30; i++) {
 			if (gui.prog != null) break;
 			if (stop || !active) break;
-			Thread.sleep(200);
+			Thread.sleep(100);
 		}
-		Thread.sleep(500);
 	}
 
 	private boolean isInSupportRange(Coord2d pos) {

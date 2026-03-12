@@ -98,63 +98,64 @@ public class OreSmeltingBot extends BotBase {
 
 	@Override
 	protected void tick() throws InterruptedException {
-		if (!hasAnyOreSelected()) { Thread.sleep(1000); return; }
+		if (!hasAnyOreSelected()) { Thread.sleep(500); return; }
 		if (!checkVitals()) return;
-		if (gui.prog != null) { setStatus("Working..."); waitForProgressBar(10000); Thread.sleep(500); return; }
+		if (gui.prog != null) { setStatus("Working..."); waitForProgressBar(10000); return; }
 
 		Gob smelter = findNearestSmelter();
-		if (smelter == null) { setStatus("No smelters found nearby"); smelterCountLabel.settext(""); Thread.sleep(3000); return; }
+		if (smelter == null) { setStatus("No smelters found nearby"); smelterCountLabel.settext(""); deactivate(); return; }
 		smelterCountLabel.settext("Smelters nearby: " + countSmelters());
-		if (gui.vhand != null) { gui.vhand.item.wdgmsg("drop", Coord.z); Actions.waitForEmptyHand(gui, 1000, "Ore Smelting Bot: Couldn't clear hand"); }
+		if (gui.vhand != null) { gui.vhand.item.wdgmsg("drop", Coord.z); Actions.waitForEmptyHand(gui, 1000, ""); }
 
 		WItem oreItem = findOreInInventory();
 		if (oreItem == null) {
 			if (doCollectOutput) { setStatus("No ore found. Collecting output..."); collectOutputFromSmelter(smelter); }
 			else { setStatus("No ore in inventory"); deactivate(); }
-			Thread.sleep(2000); return;
+			return;
 		}
 		WItem fuelItem = findFuelInInventory();
-		if (fuelItem == null) { setStatus("No fuel (Coal/Charcoal) in inventory"); deactivate(); Thread.sleep(2000); return; }
+		if (fuelItem == null) { setStatus("No fuel (Coal/Charcoal) in inventory"); deactivate(); return; }
 
 		processSmelter(smelter);
-		Thread.sleep(2000);
 	}
 
 	private void processSmelter(Gob smelter) throws InterruptedException {
 		setStatus("Walking to smelter...");
 		gui.map.pfLeftClick(smelter.rc.floor().add(2, 0), null);
-		if (!Actions.waitPf(gui)) { Actions.unstuck(gui); Thread.sleep(1000); return; }
-		if (smelter.rc.dist(gui.map.player().rc) > MAX_INTERACT_DIST) { setStatus("Too far from smelter, retrying..."); Thread.sleep(1000); return; }
+		if (!Actions.waitPf(gui)) { Actions.unstuck(gui); return; }
+		Gob player = gui.map.player();
+		if (player == null) return;
+		if (smelter.rc.dist(player.rc) > MAX_INTERACT_DIST) { setStatus("Too far from smelter, retrying..."); return; }
 
 		setStatus("Loading ore...");
 		int oreLoaded = loadItemsIntoSmelter(smelter);
-		if (oreLoaded == 0) { setStatus("Failed to load ore"); Thread.sleep(1000); return; }
-		setStatus("Loaded " + oreLoaded + " ore"); Thread.sleep(300);
+		if (oreLoaded == 0) { setStatus("Failed to load ore"); return; }
+		setStatus("Loaded " + oreLoaded + " ore"); Thread.sleep(50);
 
 		setStatus("Loading fuel...");
 		int fuelLoaded = loadFuelIntoSmelter(smelter);
-		if (fuelLoaded == 0) { setStatus("Failed to load fuel"); Thread.sleep(1000); return; }
-		setStatus("Loaded " + fuelLoaded + " fuel"); Thread.sleep(300);
+		if (fuelLoaded == 0) { setStatus("Failed to load fuel"); return; }
+		setStatus("Loaded " + fuelLoaded + " fuel"); Thread.sleep(50);
 
 		setStatus("Lighting smelter...");
 		FlowerMenu.setNextSelection("Light");
 		gui.map.wdgmsg("click", Coord.z, smelter.rc.floor(posres), 3, 0, 0, (int) smelter.id, smelter.rc.floor(posres), 0, -1);
-		Thread.sleep(1500);
+		Thread.sleep(500);
 
 		setStatus("Smelting in progress...");
 		int waitTime = 0;
 		int maxWait = 300000;
 		while (waitTime < maxWait && active && !stop) {
-			if (gui.prog != null) { waitForProgressBar(60000); Thread.sleep(500); }
+			if (gui.prog != null) { waitForProgressBar(60000); }
 			if (gui.getmeter("stam", 0).a < STAMINA_THRESHOLD) { Actions.drinkTillFull(gui, 0.99, 0.99); }
 			try {
 				ResDrawable rd = smelter.getattr(ResDrawable.class);
 				if (rd != null && waitTime > 5000 && rd.sdt.checkrbuf(0) == 0) { setStatus("Smelting complete!"); break; }
 			} catch (Exception ignored) {}
-			Thread.sleep(3000); waitTime += 3000;
+			Thread.sleep(2000); waitTime += 2000;
 			setStatus("Smelting... " + (waitTime / 60000) + "m " + ((waitTime % 60000) / 1000) + "s");
 		}
-		Thread.sleep(1000);
+		Thread.sleep(200);
 		if (doCollectOutput && active && !stop) { setStatus("Collecting output..."); collectOutputFromSmelter(smelter); }
 	}
 
@@ -215,7 +216,7 @@ public class OreSmeltingBot extends BotBase {
 			if (!Actions.waitPf(gui)) return;
 		}
 		gui.map.wdgmsg("click", Coord.z, smelter.rc.floor(posres), 3, 0, 0, (int) smelter.id, smelter.rc.floor(posres), 0, -1);
-		Thread.sleep(1500);
+		Thread.sleep(500);
 		List<Inventory> allInvs = gui.getAllInventories();
 		for (Inventory inv : allInvs) {
 			if (inv == gui.maininv) continue;
@@ -229,7 +230,7 @@ public class OreSmeltingBot extends BotBase {
 				}
 			}
 		}
-		Thread.sleep(500);
+		Thread.sleep(100);
 	}
 
 	private Gob findNearestSmelter() {
