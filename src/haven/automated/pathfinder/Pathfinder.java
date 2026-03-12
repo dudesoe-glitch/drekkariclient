@@ -169,11 +169,12 @@ public class Pathfinder implements Runnable {
         while (it.hasNext() && !moveinterupted && !terminate) {
             Edge e = it.next();
             mc = new Coord2d(src.x + e.dest.x - Map.origin, src.y + e.dest.y - Map.origin).floor(posres);
+            boolean isLastSegment = !it.hasNext();
 
-            if (action != null && !it.hasNext())
+            if (action != null && isLastSegment)
                 mv.ui.gui.act(action);
 
-            if (gob != null && !it.hasNext())
+            if (gob != null && isLastSegment)
                 mv.wdgmsg("click", Coord.z, mc, clickb, modflags, 0, (int) gob.id, gob.rc.floor(posres), 0, meshid);
             else
                 mv.wdgmsg("click", Coord.z, mc, 1, 0);
@@ -193,31 +194,31 @@ public class Pathfinder implements Runnable {
             Coord2d destWorld = mc.mul(posres);
             long segmentStart = System.currentTimeMillis();
             long estimate = estimateTravelTimeWorld(player.rc, destWorld, player);
-            long lead = Math.min(50, (long) (estimate * 0.05));
-            long wait = Math.max(0, estimate - lead - avgOverrun);
-            if (wait > 0) {
-                try {
-                    Thread.sleep(wait);
-                } catch (InterruptedException e1) {
-                    return;
+
+            if (isLastSegment) {
+                // Last segment: precise arrival — wait until fully stopped
+                long lead = Math.min(50, (long) (estimate * 0.05));
+                long wait = Math.max(0, estimate - lead - avgOverrun);
+                if (wait > 0) {
+                    try { Thread.sleep(wait); } catch (InterruptedException e1) { return; }
                 }
+                while (!moveinterupted && !terminate) {
+                    if (!player.isMoving()) break;
+                    try { Thread.sleep(25); } catch (InterruptedException e1) { return; }
+                }
+                long actual = System.currentTimeMillis() - segmentStart;
+                long overrun = actual - estimate;
+                avgOverrun = (avgOverrun + overrun) / 2;
+            } else {
+                // Intermediate segment: pre-click next waypoint before arriving
+                // This creates smooth chained movement instead of stop-and-go
+                long lead = Math.max(200, (long) (estimate * 0.20));
+                long wait = Math.max(0, estimate - lead);
+                if (wait > 0) {
+                    try { Thread.sleep(wait); } catch (InterruptedException e1) { return; }
+                }
+                // Don't wait for stop — proceed directly to click next waypoint
             }
-
-
-            while (!moveinterupted && !terminate) {
-                if (!player.isMoving()) {
-                    break;
-                }
-                try {
-                    Thread.sleep(25);
-                } catch (InterruptedException e1) {
-                    return;
-                }
-            }
-
-            long actual = System.currentTimeMillis() - segmentStart;
-            long overrun = actual - estimate;
-            avgOverrun = (avgOverrun + overrun) / 2;
 
             if (pathWaypoints.size() > 1) {
                 pathWaypoints.remove(1);

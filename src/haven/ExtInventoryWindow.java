@@ -63,6 +63,14 @@ public class ExtInventoryWindow extends Window {
 
 	private static final int WIN_W = 300;
 	private static final int WIN_H = 420;
+
+	private static String getTitle(Inventory inv) {
+		if (inv != null) {
+			Window w = inv.getparent(Window.class);
+			if (w != null && w.cap != null) return "Ext: " + w.cap;
+		}
+		return "Extended Inventory";
+	}
 	private static final int ROW_H = 18;
 	private static final int HEADER_H = 20;
 	private static final int ICON_SZ = 14;
@@ -72,7 +80,7 @@ public class ExtInventoryWindow extends Window {
 	}
 
 	public ExtInventoryWindow(GameUI gui, Inventory inv) {
-		super(UI.scale(new Coord(WIN_W, WIN_H)), "Extended Inventory");
+		super(UI.scale(new Coord(WIN_W, WIN_H)), getTitle(inv));
 		this.gui = gui;
 		this.targetInv = inv;
 
@@ -170,6 +178,11 @@ public class ExtInventoryWindow extends Window {
 	@Override
 	public void tick(double dt) {
 		super.tick(dt);
+		// Close if target container inventory was destroyed (window closed)
+		if (targetInv != null && targetInv.parent == null) {
+			wdgmsg(this, "close");
+			return;
+		}
 		lastCheckTime += dt;
 		if (lastCheckTime >= CHECK_INTERVAL) {
 			lastCheckTime = 0;
@@ -719,7 +732,8 @@ public class ExtInventoryWindow extends Window {
 				repeatThread = null;
 			}
 			Utils.setprefc("wndc-extInventoryWindow", this.c);
-			gui.extInventoryWindow = null;
+			if (gui.extInventoryWindow == this)
+				gui.extInventoryWindow = null;
 			reqdestroy();
 		} else {
 			super.wdgmsg(sender, msg, args);
