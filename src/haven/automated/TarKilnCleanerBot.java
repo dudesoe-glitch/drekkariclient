@@ -3,137 +3,64 @@ package haven.automated;
 import haven.*;
 
 import java.util.ArrayList;
-import java.util.Objects;
 
 import static haven.OCache.posres;
 
-public class TarKilnCleanerBot extends Window implements Runnable {
-    private final CheckBox activeBox;
-    private GameUI gui;
+public class TarKilnCleanerBot extends BotBase {
+	private final CheckBox activeBox;
+	private int phase = 1;
 
-    private volatile boolean stop;
-    private int phase = 1;
-    private volatile boolean active;
+	public TarKilnCleanerBot(GameUI gui) {
+		super(gui, UI.scale(150, 50), "Tar Kiln Emptier");
+		checkHP = false; checkEnergy = false; checkStamina = false; checkInventory = false;
 
-    public TarKilnCleanerBot(GameUI gui) {
-        super(UI.scale(150, 50), "Tar Kiln Emptier");
-        this.gui = gui;
-        stop = false;
-        active = false;
+		activeBox = new CheckBox("Active") {
+			{ a = active; }
+			public void set(boolean val) { active = val; a = val; phase = 1; }
+		};
+		add(activeBox, UI.scale(40, 15));
+	}
 
-        activeBox = new CheckBox("Active") {
-            {
-                a = active;
-            }
+	@Override
+	protected void tick() throws InterruptedException {
+		if (phase == 1) {
+			if (gui.vhand != null && gui.vhand.item != null) gui.vhand.item.wdgmsg("drop", Coord.z);
+			dropCoal();
 
-            public void set(boolean val) {
-                active = val;
-                a = val;
-                phase = 1;
-            }
-        };
+			ArrayList<Gob> tarKilns = AUtils.getGobs("gfx/terobjs/tarkiln", gui);
+			Gob closest = null;
+			for (Gob tarKiln : tarKilns) {
+				if (closest == null || tarKiln.rc.dist(gui.map.player().rc) < closest.rc.dist(gui.map.player().rc)) {
+					ResDrawable resDrawable = tarKiln.getattr(ResDrawable.class);
+					if (resDrawable != null && (resDrawable.sdt.checkrbuf(0) == 10 || resDrawable.sdt.checkrbuf(0) == 42)) closest = tarKiln;
+				}
+			}
 
-        add(activeBox, UI.scale(40, 15));
-    }
+			if (closest == null) { active = false; activeBox.set(false); ui.gui.error("No full tar kilns nearby."); return; }
 
-    @Override
-    public void run() {
-        try {
-            while (!stop) {
-                if (active) {
-                    if (phase == 1) {
-                        if (gui.vhand != null && gui.vhand.item != null) {
-                            gui.vhand.item.wdgmsg("drop", Coord.z);
-                        }
-                        dropCoal();
+			if (gui.prog == null) {
+				int[][] options = {{33, 0}, {-33, 0}, {0, 33}, {0, -33}};
+				for (int[] option : options) {
+					Coord newCoord = closest.rc.floor().add(option[0], option[1]);
+					gui.map.pfLeftClick(newCoord, null);
+					Thread.sleep(500);
+					AUtils.waitPf(gui);
+					if (gui.map.player().rc.dist(new Coord2d(newCoord)) < 40) break;
+				}
+				AUtils.rightClickShiftCtrl(gui, closest);
+				Thread.sleep(1000);
+				AUtils.waitProgBar(gui);
+			}
+		}
+		Thread.sleep(200);
+	}
 
-                        ArrayList<Gob> tarKilns = AUtils.getGobs("gfx/terobjs/tarkiln", gui);
+	private void dropCoal() {
+		for (WItem wItem : ui.gui.maininv.getAllItems()) {
+			try { GItem gitem = wItem.item; if (gitem.getname().contains("Coal")) gitem.wdgmsg("drop", new Coord(wItem.item.sz.x / 2, wItem.item.sz.y / 2)); } catch (Loading ignored) {}
+		}
+	}
 
-                        Gob closest = null;
-                        for (Gob tarKiln : tarKilns) {
-                            if (closest == null || tarKiln.rc.dist(gui.map.player().rc) < closest.rc.dist(gui.map.player().rc)) {
-                                ResDrawable resDrawable = tarKiln.getattr(ResDrawable.class);
-                                if(resDrawable != null && (resDrawable.sdt.checkrbuf(0) == 10 || resDrawable.sdt.checkrbuf(0) == 42)){
-                                    closest = tarKiln;
-                                }
-                            }
-                        }
-
-                        if (closest == null) {
-                            active = false;
-                            activeBox.set(false);
-                            ui.gui.error("No full tar kilns nearby.");
-                            continue;
-                        }
-
-                        if(gui.prog == null) {
-                            int[][] options = {{33, 0}, {-33, 0}, {0, 33}, {0, -33}};
-
-                            for (int[] option : options) {
-                                Coord newCoord = closest.rc.floor().add(option[0], option[1]);
-                                gui.map.pfLeftClick(newCoord, null);
-                                Thread.sleep(500);
-                                AUtils.waitPf(gui);
-
-                                if (gui.map.player().rc.dist(new Coord2d(newCoord)) < 40) {
-                                    break;
-                                }
-                            }
-                            AUtils.rightClickShiftCtrl(gui, closest);
-                            Thread.sleep(1000);
-                            AUtils.waitProgBar(gui);
-                        }
-                    }
-                }
-
-                Thread.sleep(200);
-            }
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            System.out.println("interrupted..");
-        }
-    }
-
-    private void dropCoal() {
-        for (WItem wItem : ui.gui.maininv.getAllItems()) {
-            try {
-                GItem gitem = wItem.item;
-                if (gitem.getname().contains("Coal")) {
-                    gitem.wdgmsg("drop", new Coord(wItem.item.sz.x / 2, wItem.item.sz.y / 2));
-                }
-            } catch (Loading ignored) {}
-        }
-    }
-
-    @Override
-    public void wdgmsg(Widget sender, String msg, Object... args) {
-        if ((sender == this) && (Objects.equals(msg, "close"))) {
-            stop = true;
-            stop();
-            reqdestroy();
-            gui.tarKilnCleanerBot = null;
-            gui.tarKilnCleanerThread = null;
-        } else
-            super.wdgmsg(sender, msg, args);
-    }
-
-    public void stop() {
-        Gob player = ui.gui.map.player();
-        if (player != null)
-            ui.gui.map.wdgmsg("click", Coord.z, player.rc.floor(posres), 1, 0);
-        if (ui.gui.map.pfthread != null) {
-            ui.gui.map.pfthread.interrupt();
-        }
-        if (gui.tarKilnCleanerThread != null) {
-            gui.tarKilnCleanerThread.interrupt();
-            gui.tarKilnCleanerThread = null;
-        }
-        this.destroy();
-    }
-
-    @Override
-    public void reqdestroy() {
-        Utils.setprefc("wndc-tarKilnCleanerBotWindow", this.c);
-        super.reqdestroy();
-    }
+	@Override protected String windowPrefKey() { return "wndc-tarKilnCleanerBotWindow"; }
+	@Override protected void onCleanup() { gui.tarKilnCleanerBot = null; }
 }

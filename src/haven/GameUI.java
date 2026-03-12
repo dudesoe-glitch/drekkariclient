@@ -177,33 +177,20 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 	public OreAndStoneCounter oreAndStoneCounter;
 	public Thread oreAndStoneCounterThread;
 
-	// Bot Threads
+	// Bot Instances (threads managed by BotBase.botThread)
 	public OceanScoutBot OceanScoutBot;
-	public Thread oceanScoutBotThread;
 	public TarKilnCleanerBot tarKilnCleanerBot;
-	public Thread tarKilnCleanerThread;
 	public CleanupBot cleanupBot;
-	public Thread cleanupThread;
 	public GrubGrubBot grubGrubBot;
-	public Thread grubGrubThread;
 	public CellarDiggingBot cellarDiggingBot;
-	public Thread cellarDiggingThread;
 	public RoastingSpitBot roastingSpitBot;
-	public Thread roastingSpitThread;
 	public FishingBot fishingBot;
-	public Thread fishingThread;
 	public FarmingBot farmingBot;
-	public Thread farmingBotThread;
 	public ButcherBot butcherBot;
-	public Thread butcherBotThread;
 	public ClayDiggingBot clayDiggingBot;
-	public Thread clayDiggingBotThread;
 	public OreSmeltingBot oreSmeltingBot;
-	public Thread oreSmeltingBotThread;
 	public ForagingBot foragingBot;
-	public Thread foragingBotThread;
 	public MiningBot miningBot;
-	public Thread miningBotThread;
 
     public static abstract class BeltSlot {
 	public final int idx;

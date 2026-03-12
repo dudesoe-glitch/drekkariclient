@@ -3,7 +3,6 @@ package haven.automated;
 import haven.*;
 import haven.Button;
 import haven.Label;
-import haven.Window;
 import haven.automated.helpers.FishingAtlas;
 import haven.widgets.MultiSelectList;
 import haven.widgets.TwoOptionSwitch;
@@ -14,14 +13,9 @@ import java.util.List;
 
 import static haven.OCache.posres;
 
-public class FishingBot extends Window implements Runnable {
-    private final GameUI gui;
-
-    private volatile boolean stop;
-    private volatile boolean active;
+public class FishingBot extends BotBase {
     private Integer fishActionId = null;
 
-    private final Button startButton;
     private final CheckBox startCheckBox;
 
     private final TwoOptionSwitch<String> fishingPoleChoice;
@@ -31,10 +25,11 @@ public class FishingBot extends Window implements Runnable {
     private final MultiSelectList<String> lureChoice;
 
     public FishingBot(GameUI gui) {
-        super(UI.scale(415, 190), "Fishing Bot");
-        this.gui = gui;
-        this.stop = false;
-        this.active = false;
+        super(gui, UI.scale(415, 190), "Fishing Bot");
+        checkHP = false;
+        checkEnergy = false;
+        checkStamina = false;
+        checkInventory = false;
 
         Label fishingLabel = new Label("Choose Fishing Pole:") {
             {
@@ -77,13 +72,13 @@ public class FishingBot extends Window implements Runnable {
                     lureChoice.hide();
                     baitLabel.settext("Choose Bait:");
                     active = false;
-                    startButton.change("Start");
+                    activeButton.change("Start");
                 } else {
                     baitChoice.hide();
                     lureChoice.show();
                     baitLabel.settext("Choose Lure:");
                     active = false;
-                    startButton.change("Start");
+                    activeButton.change("Start");
                 }
             }
         }, UI.scale(10, 20));
@@ -115,7 +110,7 @@ public class FishingBot extends Window implements Runnable {
             }
         }, UI.scale(100, 177));
 
-        startButton = add(new Button(UI.scale(50), "Start") {
+        activeButton = add(new Button(UI.scale(50), "Start") {
             @Override
             public void click() {
                 active = !active;
@@ -128,7 +123,7 @@ public class FishingBot extends Window implements Runnable {
         }, UI.scale(210, 175));
 
         findFishActionId();
-        this.c = Utils.getprefc("wndc-fishingBotWindow", this.c);
+        this.c = Utils.getprefc(windowPrefKey(), this.c);
     }
 
     private int contentAnalysis(WItem item) {
@@ -331,7 +326,7 @@ public class FishingBot extends Window implements Runnable {
     public void run() {
         try {
             while (!stop) {
-                if (!checkVitals()) {
+                if (!checkVitalsLocal()) {
                     sleep(1000);
                     continue;
                 }
@@ -376,10 +371,10 @@ public class FishingBot extends Window implements Runnable {
         }
     }
 
-    private boolean checkVitals() {
+    private boolean checkVitalsLocal() {
         try {
             double hp = gui.getmeters("hp").get(1).a;
-            if (hp < 0.02) {
+            if (hp < HP_THRESHOLD) {
                 gui.act("travel", "hearth");
                 try {
                     Thread.sleep(8000);
@@ -391,12 +386,12 @@ public class FishingBot extends Window implements Runnable {
                 return false;
             }
             double nrj = ui.gui.getmeter("nrj", 0).a;
-            if (nrj < 0.25) {
+            if (nrj < ENERGY_THRESHOLD) {
                 deactivate("Fishing Bot: Low on energy! Stopping..");
                 return false;
             }
             // Stamina check
-            if (gui.getmeter("stam", 0).a < 0.40) {
+            if (gui.getmeter("stam", 0).a < STAMINA_THRESHOLD) {
                 try {
                     AUtils.drinkTillFull(gui, 0.99, 0.99);
                 } catch (InterruptedException e) {
@@ -467,45 +462,23 @@ public class FishingBot extends Window implements Runnable {
         gui.msg(message, Color.WHITE);
         System.out.println(message);
         active = false;
-        startButton.change("Start");
+        activeButton.change("Start");
     }
 
     @Override
-    public void wdgmsg(Widget sender, String msg, Object... args) {
-        if ((sender == this) && (Objects.equals(msg, "close"))) {
-            stop = true;
-            stop();
-            reqdestroy();
-            gui.fishingBot = null;
-            gui.fishingThread = null;
-        } else
-            super.wdgmsg(sender, msg, args);
-    }
-
-    public void stop() {
-        Gob player = gui.map.player();
-        if (player != null)
-            gui.map.wdgmsg("click", Coord.z, player.rc.floor(posres), 1, 0);
-        if (gui.map.pfthread != null) {
-            gui.map.pfthread.interrupt();
-        }
-        if (gui.fishingThread != null) {
-            gui.fishingThread.interrupt();
-            gui.fishingThread = null;
-        }
-        this.destroy();
+    protected String windowPrefKey() {
+        return "wndc-fishingBotWindow";
     }
 
     @Override
-    public void reqdestroy() {
-        Utils.setprefc("wndc-fishingBotWindow", this.c);
-        super.reqdestroy();
+    protected void onCleanup() {
+        gui.fishingBot = null;
     }
 
     private List<FishWindowRow> returnFishWindow() {
         List<FishWindowRow> rows;
 
-        Optional<Window> test = returnFishingWindow();
+        Optional<haven.Window> test = returnFishingWindow();
 
         if (test.isPresent()) {
             sleep(1000);
@@ -580,10 +553,10 @@ public class FishingBot extends Window implements Runnable {
         return rows;
     }
 
-    private Optional<Window> returnFishingWindow() {
+    private Optional<haven.Window> returnFishingWindow() {
         return ui.getAllWidgets().stream()
-                .filter(Window.class::isInstance)
-                .map(Window.class::cast)
+                .filter(haven.Window.class::isInstance)
+                .map(haven.Window.class::cast)
                 .filter(win -> "This is bait".equals(win.cap))
                 .findFirst();
     }

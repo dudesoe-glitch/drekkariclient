@@ -2,119 +2,92 @@ package haven.automated;
 
 import haven.*;
 
-import java.util.Objects;
+public class GrubGrubBot extends BotBase {
+	public static boolean transferTicks = false;
 
-public class GrubGrubBot extends Window implements Runnable {
-    public static boolean transferTicks = false;
-    private final GameUI gui;
-    private volatile boolean stop = false;
-    private volatile boolean active = false;
+	public GrubGrubBot(GameUI gui) {
+		super(gui, UI.scale(UI.scale(254, 96)), "Grub-Grub Bot");
+		checkHP = false;
+		checkStamina = false;
+		checkInventory = false;
 
-    public GrubGrubBot(GameUI gui) {
-        super(UI.scale(UI.scale(254, 96)), "Grub-Grub Bot");
-        this.gui = gui;
+		add(new Label(""), UI.scale(243, 0));
+		add(new Button(UI.scale(160), "Start"){
+			@Override
+			public void click() {
+				active = !active;
+				if (active){
+					GrubGrubBot.transferTicks = true;
+					this.change("Stop");
+				} else {
+					GrubGrubBot.transferTicks = false;
+					this.change("Start");
+				}
+			}
+		}, UI.scale(32, 10));
+		pack();
+	}
 
-        add(new Label(""), UI.scale(243, 0)); // ND: Label to fix horizontal size
-        add(new Button(UI.scale(160), "Start"){
-            @Override
-            public void click() {
-                active = !active;
-                if (active){
-                    GrubGrubBot.transferTicks = true;
-                    this.change("Stop");
-                } else {
-                    GrubGrubBot.transferTicks = false;
-                    this.change("Start");
-                }
-            }
-        }, UI.scale(32, 10));
-        pack();
-    }
+	@Override
+	public void stop() {
+		GrubGrubBot.transferTicks = false;
+		super.stop();
+	}
 
-    @Override
-    public void run() {
-        try {
-            while (!stop) {
-                if (!active) {
-                    Thread.sleep(200);
-                    continue;
-                }
-                // Energy check
-                try {
-                    if (gui.getmeter("nrj", 0).a < 0.25) {
-                        gui.error("Grub Grub Bot: Low on energy, stopping.");
-                        GrubGrubBot.transferTicks = false;
-                        active = false;
-                        Thread.sleep(2000);
-                        continue;
-                    }
-                } catch (Exception e) {
-                    if (e instanceof InterruptedException) { Thread.currentThread().interrupt(); return; }
-                }
-                int totalTicks = gui.maininv.getItemsPartial("Tick").size();
-                if (totalTicks >= 2 ) {
-                    if(gui.makewnd != null && gui.makewnd.makeWidget != null){
-                        if (gui.makewnd.cap.equals("Grub-Grub"))
-                            gui.makewnd.makeWidget.wdgmsg("make",0);
-                        else
-                            gui.ui.error("Grub Grub Bot: Crafting Window is not set to craft Grub-Grub!");
-                    } else {
-                        gui.ui.error("Grub Grub Bot: Couldn't find Grub-Grub Crafting Window!");
-                    }
-                }
-                sleep(200);
+	@Override
+	public void run() {
+		try {
+			while (!stop) {
+				if (!active) {
+					Thread.sleep(200);
+					continue;
+				}
+				// Energy check
+				try {
+					if (gui.getmeter("nrj", 0).a < ENERGY_THRESHOLD) {
+						gui.error("Grub Grub Bot: Low on energy, stopping.");
+						GrubGrubBot.transferTicks = false;
+						active = false;
+						Thread.sleep(2000);
+						continue;
+					}
+				} catch (Exception e) {
+					if (e instanceof InterruptedException) { Thread.currentThread().interrupt(); return; }
+				}
+				int totalTicks = gui.maininv.getItemsPartial("Tick").size();
+				if (totalTicks >= 2 ) {
+					if(gui.makewnd != null && gui.makewnd.makeWidget != null){
+						if (gui.makewnd.cap.equals("Grub-Grub"))
+							gui.makewnd.makeWidget.wdgmsg("make",0);
+						else
+							gui.ui.error("Grub Grub Bot: Crafting Window is not set to craft Grub-Grub!");
+					} else {
+						gui.ui.error("Grub Grub Bot: Couldn't find Grub-Grub Crafting Window!");
+					}
+				}
+				Thread.sleep(200);
 
-                if(gui.prog != null) {
-                    sleep(2000);
-                }
+				if(gui.prog != null) {
+					Thread.sleep(2000);
+				}
 
-                for (haven.WItem witem : gui.maininv.getItemsPartial("Grub-Grub")) {
-                    witem.item.wdgmsg("transfer", Coord.z);
-                }
-                sleep(200);
+				for (haven.WItem witem : gui.maininv.getItemsPartial("Grub-Grub")) {
+					witem.item.wdgmsg("transfer", Coord.z);
+				}
+				Thread.sleep(200);
 
-                GrubGrubBot.transferTicks = gui.maininv.getFreeSpace() > 1;
+				GrubGrubBot.transferTicks = gui.maininv.getFreeSpace() > 1;
 
-                sleep(1000);
-            }
-        } catch (InterruptedException ignored) {
-            Thread.currentThread().interrupt();
-        }
-    }
+				Thread.sleep(1000);
+			}
+		} catch (InterruptedException ignored) {
+			Thread.currentThread().interrupt();
+		}
+	}
 
-    public void stop() {
-        stop = true;
-        GrubGrubBot.transferTicks = false;
-        if (gui.grubGrubThread != null) {
-            gui.grubGrubThread.interrupt();
-            gui.grubGrubThread = null;
-        }
-        this.destroy();
-    }
+	@Override
+	protected String windowPrefKey() { return "wndc-grubGrubBotWindow"; }
 
-    @Override
-    public void reqdestroy() {
-        Utils.setprefc("wndc-grubGrubBotWindow", this.c);
-        super.reqdestroy();
-    }
-
-    private void sleep(int duration) {
-        try {
-            Thread.sleep(duration);
-        } catch (InterruptedException ignored) {
-            Thread.currentThread().interrupt();
-        }
-    }
-
-    @Override
-    public void wdgmsg(Widget sender, String msg, Object... args) {
-        if((sender == this) && (Objects.equals(msg, "close"))) {
-            stop();
-            reqdestroy();
-            gui.grubGrubBot = null;
-        } else {
-            super.wdgmsg(sender, msg, args);
-        }
-    }
-
+	@Override
+	protected void onCleanup() { gui.grubGrubBot = null; }
 }
