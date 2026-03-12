@@ -2078,7 +2078,7 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
 		boolean usePF = OptWnd.walkWithPathFinderCheckBox.a
 			&& OptWnd.continuousPathfindingCheckBox != null
 			&& OptWnd.continuousPathfindingCheckBox.a;
-		int interval = usePF ? 800 : 50;
+		int interval = usePF ? 400 : 50;
 		if ((now - lastContinuousClick) > interval) {
 			if (currentCursorLocation.x >= 0 && currentCursorLocation.y >= 0 && currentCursorLocation.x < ui.gui.sz.x && currentCursorLocation.y < ui.gui.sz.y
 					&& !ui.modctrl && !ui.modshift && !ui.modmeta && !ui.modsuper && ui.checkCursorImage("gfx/hud/curs/arw")){
@@ -3217,7 +3217,7 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
 					// Not close enough — schedule next hop after brief delay
 					Coord dest = pfFinalDest;
 					new Thread(() -> {
-						try { Thread.sleep(200); } catch(InterruptedException e) { Thread.currentThread().interrupt(); return; }
+						try { Thread.sleep(50); } catch(InterruptedException e) { Thread.currentThread().interrupt(); return; }
 						pfLongDistance(dest);
 					}, "PF-LongDistance").start();
 				} else {

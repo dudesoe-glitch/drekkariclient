@@ -155,6 +155,11 @@ public class Inventory extends Widget implements DTarget {
 		}
 	}
 
+	// Container toolbar support
+	private boolean containerStatusChecked = false;
+	public boolean isContainerInventory = false;
+	private Button containerGroupBtn;
+
 	public static final Comparator<WItem> ITEM_COMPARATOR_ASC = Comparator
 			.comparing(WItem::sortName)
 			.thenComparing(w -> w.item.resname())
@@ -396,7 +401,62 @@ public class Inventory extends Widget implements DTarget {
 	super(sqsz.mul(sz).add(1, 1));
 	isz = sz;
     }
-    
+
+    @Override
+    protected void added() {
+	super.added();
+	checkContainerToolbar();
+    }
+
+    private void checkContainerToolbar() {
+	if (containerStatusChecked) return;
+	containerStatusChecked = true;
+	Window w = getparent(Window.class);
+	if (w == null || w.cap == null) return;
+	if (PLAYER_INVENTORY_NAMES.contains(w.cap)) return;
+
+	isContainerInventory = true;
+	int toolbarH = UI.scale(22);
+	int btnY = sz.y + UI.scale(2);
+
+	Button sortBtn = add(new Button(UI.scale(40), "Sort") {
+	    public void click() {
+		sortInventory();
+	    }
+	}, new Coord(UI.scale(1), btnY));
+	sortBtn.settip("Sort items by type, then quality (Ctrl+Shift+S)");
+
+	containerGroupBtn = add(new Button(UI.scale(65), groupingMode.label) {
+	    public void click() {
+		groupingMode = groupingMode.next();
+		collapsedGroups.clear();
+		this.change(groupingMode.label);
+	    }
+	}, sortBtn.pos("ur").adds(4, 0));
+	containerGroupBtn.settip("Cycle grouping mode");
+
+	Button extBtn = add(new Button(UI.scale(35), "Ext") {
+	    public void click() {
+		GameUI gui = getparent(GameUI.class);
+		if (gui == null) return;
+		if (gui.extInventoryWindow != null) {
+		    Utils.setprefc("wndc-extInventoryWindow", gui.extInventoryWindow.c);
+		    gui.extInventoryWindow.reqdestroy();
+		    gui.extInventoryWindow = null;
+		}
+		gui.extInventoryWindow = new ExtInventoryWindow(gui, Inventory.this);
+		gui.add(gui.extInventoryWindow, Utils.getprefc("wndc-extInventoryWindow",
+		    new Coord(gui.sz.x / 2 + 150, gui.sz.y / 2 - 250)));
+	    }
+	}, containerGroupBtn.pos("ur").adds(4, 0));
+	extBtn.settip("Open Extended Inventory for this container");
+
+	// Resize inventory to include toolbar
+	resize(sz.add(0, toolbarH));
+	// Resize parent window to fit new content
+	w.resize(w.contentsz());
+    }
+
     public boolean mousewheel(MouseWheelEvent ev) {
 	if(ui.modshift) {
 	    Inventory minv = getparent(GameUI.class).maininv;
