@@ -9,7 +9,7 @@ import java.util.*;
 
 public class HitBoxes {
     private static final String DATABASE = "jdbc:sqlite:hitboxes.db";
-    public static Map<String, CollisionBoxSecondary[]> collisionBoxMap = new HashMap<>();
+    public static Map<String, CollisionBoxSecondary[]> collisionBoxMap = new java.util.concurrent.ConcurrentHashMap<>();
 
     private static Set<String> passableGobs = new HashSet<>(Arrays.asList(
             "gfx/terobjs/herbs", "gfx/terobjs/items", "gfx/terobjs/plants", "gfx/terobjs/clue", "gfx/terobjs/boostspeed",

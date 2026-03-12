@@ -116,7 +116,7 @@ public class AStar {
                 diff = (int) Math.signum(h - n.h);
 
             if (diff == 0)
-                diff = order = n.order;
+                diff = order - n.order;
 
             return diff;
         }

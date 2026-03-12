@@ -18,6 +18,7 @@ public class Actions {
     }
 
     public static void rightClick(GameUI gui) {
+        if (gui == null || gui.map == null) return;
         Gob player = gui.map.player();
         if (player == null) return;
         gui.map.wdgmsg("click", Coord.z, player.rc.floor(posres), 3, 0);

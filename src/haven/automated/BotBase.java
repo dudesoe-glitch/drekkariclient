@@ -110,7 +110,7 @@ public abstract class BotBase extends Window implements Runnable {
 					return false;
 				}
 			} catch (InterruptedException e) { throw e; }
-			catch (Loading ignored) {}
+			catch (Exception ignored) {}
 		}
 		if (checkEnergy) {
 			try {
@@ -121,7 +121,7 @@ public abstract class BotBase extends Window implements Runnable {
 					return false;
 				}
 			} catch (InterruptedException e) { throw e; }
-			catch (Loading ignored) {}
+			catch (Exception ignored) {}
 		}
 		if (checkStamina) {
 			try {
@@ -130,6 +130,7 @@ public abstract class BotBase extends Window implements Runnable {
 					Actions.drinkTillFull(gui, 0.99, 0.99);
 				}
 			} catch (InterruptedException e) { throw e; }
+			catch (Exception ignored) {}
 		}
 		if (checkInventory) {
 			try {
@@ -140,7 +141,7 @@ public abstract class BotBase extends Window implements Runnable {
 					return false;
 				}
 			} catch (InterruptedException e) { throw e; }
-			catch (Loading ignored) {}
+			catch (Exception ignored) {}
 		}
 		return true;
 	}
@@ -207,6 +208,16 @@ public abstract class BotBase extends Window implements Runnable {
 	public void reqdestroy() {
 		Utils.setprefc(windowPrefKey(), this.c);
 		super.reqdestroy();
+	}
+
+	@Override
+	public void dispose() {
+		stop = true;
+		if (botThread != null) {
+			botThread.interrupt();
+			botThread = null;
+		}
+		super.dispose();
 	}
 
 	// --- Progress Bar ---

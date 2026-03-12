@@ -3209,6 +3209,10 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
 	public void pfDone(final Pathfinder thread) {
 		if (haven.automated.pathfinder.Map.DEBUG_TIMINGS)
 			System.out.println("-= PF DONE =-");
+		if (thread.terminate && pfFinalDest == null) {
+			if (ui != null && ui.gui != null)
+				ui.gui.error("No path found.");
+		}
 		if(pfFinalDest != null && !thread.terminate) {
 			Gob player = player();
 			if(player != null) {
@@ -3260,7 +3264,8 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
 				pfthread.start();
 			}
 		} catch (Exception e){
-			e.getMessage();
+			System.err.println("pfLeftClick error: " + e.getMessage());
+			e.printStackTrace();
 		}
 	}
 
