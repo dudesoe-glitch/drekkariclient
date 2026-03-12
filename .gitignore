@@ -5,3 +5,9 @@
 /build.properties
 /.idea
 *~
+
+# Claude Code project files
+/.claude/
+CLAUDE.md
+HANDOFF.md
+/Diary/
