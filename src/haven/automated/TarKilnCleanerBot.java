@@ -3,6 +3,7 @@ package haven.automated;
 import haven.*;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import static haven.OCache.posres;
 
@@ -27,7 +28,7 @@ public class TarKilnCleanerBot extends BotBase {
 			if (gui.vhand != null && gui.vhand.item != null) gui.vhand.item.wdgmsg("drop", Coord.z);
 			dropCoal();
 
-			ArrayList<Gob> tarKilns = AUtils.getGobs("gfx/terobjs/tarkiln", gui);
+			List<Gob> tarKilns = GobHelper.findByName(gui, "gfx/terobjs/tarkiln", 550.0);
 			Gob closest = null;
 			for (Gob tarKiln : tarKilns) {
 				if (closest == null || tarKiln.rc.dist(gui.map.player().rc) < closest.rc.dist(gui.map.player().rc)) {

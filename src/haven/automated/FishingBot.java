@@ -164,7 +164,7 @@ public class FishingBot extends BotBase {
         int state = contentAnalysis(pole);
 
         List<WItem> items = (state < 3)
-                ? AUtils.getAllItemsFromAllInventoriesAndStacksExcludeBeltAndKeyring(gui)
+                ? InvHelper.getAllItemsExcludeBeltKeyring(gui)
                 : Collections.emptyList();
 
         if (state == 0) {

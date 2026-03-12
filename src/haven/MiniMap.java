@@ -1517,6 +1517,33 @@ public class MiniMap extends Widget {
 				}
 			}
 		}
+
+		// Draw PathQueue waypoints (gold lines + dots)
+		if (mv.pathQueue != null && OptWnd.enableQueuedMovementCheckBox.a && !mv.pathQueue.isEmpty()) {
+			try {
+				List<Coord2d[]> segments = mv.pathQueue.getSegments();
+				for (Coord2d[] seg : segments) {
+					Coord startScreen = p2c(seg[0]);
+					Coord endScreen = p2c(seg[1]);
+					if (startScreen != null && endScreen != null) {
+						g.chcolor(new Color(0, 0, 0, 180));
+						g.line(startScreen, endScreen, 3);
+						g.chcolor(new Color(255, 200, 0, 200));
+						g.line(startScreen, endScreen, 2);
+					}
+				}
+				for (Coord2d[] seg : segments) {
+					Coord endScreen = p2c(seg[1]);
+					if (endScreen != null) {
+						g.chcolor(new Color(255, 200, 0, 230));
+						g.fellipse(endScreen, new Coord(4, 4));
+						g.chcolor(Color.BLACK);
+						g.fellipse(endScreen, new Coord(2, 2));
+					}
+				}
+				g.chcolor();
+			} catch (Exception ignored) {}
+		}
 	}
 
 	public void refreshMapCache() {

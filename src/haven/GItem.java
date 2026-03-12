@@ -58,6 +58,7 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 	public double studytime = 0.0;
 	private boolean checkedAutodrop = false;
 	private QBuff qBuff;
+	private QualityList qualityList;
     public boolean attemptedAutoloot = false;
 
     @RName("item")
@@ -721,6 +722,17 @@ public class GItem extends AWidget implements ItemInfo.SpriteOwner, GSprite.Owne
 			}
 		}
 		return qBuff;
+	}
+
+	/**
+	 * Get multi-type quality aggregation for this item.
+	 * Lazily initialized, handles containers (checks contents first).
+	 */
+	public QualityList getQualityList() {
+		if (qualityList == null) {
+			qualityList = QualityList.fromItem(this);
+		}
+		return qualityList;
 	}
 
 	public ItemInfo.Contents getcontents() {

@@ -111,6 +111,16 @@ public class WItem extends Widget implements DTarget {
 		return q != null ? q.q : 0;
 	}
 
+	/** Get multi-type quality aggregation for this item. */
+	public QualityList qualityList() {
+		return item.getQualityList();
+	}
+
+	/** Get aggregated quality using the specified method (Mean, Max, Min, Average). */
+	public double qualityAgg(QualityList.SingleType type) {
+		return item.getQualityList().get(type);
+	}
+
     public void drawmain(GOut g, GSprite spr) {
 	spr.draw(g);
     }
