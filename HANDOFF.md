@@ -1,57 +1,36 @@
-# HANDOFF — Session 12 (Code Review Fixes, WItem Refactor, EnderWiggin Ports)
+# HANDOFF — Session 13 (Pathfinding UX, Container Inventory)
 
 ## Resumption Prompt
-Completed all 3 remaining code review items (FishingBot dedup, BotBase checkVitals narrow catch, sortInventory tracked thread). Refactored WItem badge system to use centralized ItemType.classify() instead of duplicate inline detection. Added armor/durability text overlays on items (toggleable in Quality settings). Added repeat-action-for-group in ExtInventory context menu. Added toggleNearestGate and pickupNearest quick-action keybinds. Build clean.
+Improved pathfinding to eliminate stop-and-go movement by pre-clicking next waypoints before arriving at intermediate segments. Added container inventory toolbar (Sort/Group/Ext buttons) that auto-detects chest/cupboard/crate windows. ExtInventoryWindow now supports targeting container inventories with auto-close on container dismiss. Build clean. Short session — only priorities 1-2 addressed.
 
 ## Goal
-Complete remaining code review items, port EnderWiggin features, refactor WItem badges.
+Fix pathfinding UX issues and add container inventory features.
 
 ## Completed
 
-### Code Review Fixes
-1. **FishingBot.java** — Collapsed 4 identical putOn* methods into `attachToPole()` helper (-90 lines)
-2. **BotBase.java** — Narrowed `catch (Exception ignored)` to `catch (Loading ignored)` in checkVitals() (3 locations)
-3. **Inventory.java** — Added `sortThread` field, stored thread reference, interrupt on destroy, separate InterruptedException handling
+### Pathfinding UX Improvements
+1. **Pathfinder.java** — Split waypoint loop into intermediate vs last segment. Intermediate segments use generous 20% lead time and skip the poll-until-stopped loop, pre-clicking the next waypoint while still moving. Last segment retains precise arrival behavior with overrun tracking.
+2. **MapView.java** — Reduced continuous pathfinding throttle from 800ms to 400ms for more responsive movement.
+3. **MapView.java** — Reduced long-distance hop delay from 200ms to 50ms for faster multi-hop pathfinding.
 
-### WItem Badge Refactor
-4. **WItem.java** — Deleted `ItemCategory` enum, `TOOL_BASENAMES`, `CONTAINER_BASENAMES`, 35-line inline classification AttrCache; replaced with 3-line `ItemType.classify()` delegation (~50 lines removed)
-
-### Armor + Durability Text Overlays
-5. **WItem.java** — Added `armorText` AttrCache (renders "hard/soft" in blue), `durabilityNum` AttrCache (renders remaining durability in cyan); chained into `drawnum()` after quantity/heurnum
-6. **OptWnd.java** — Added `showArmorValuesCheckBox`, `showDurabilityNumberCheckBox` fields
-7. **OptWndQualityPanel.java** — Added "Show Armor Values on Items" and "Show Durability Number on Items" checkboxes
-
-### Repeat Action for Group (ExtInventory)
-8. **ExtInventoryWindow.java** — Right-click context menu now shows 3rd option "'{Action}' All" when FlowerMenu.lastChosenOption is set; spawns thread to iterate all matching items with FlowerMenu.setNextSelection + iact; thread interrupted on window close
-
-### Quick-Action Keybinds
-9. **Actions.java** — Added `toggleNearestGate()` (finds gate within ~3 tiles, auto-selects "Open") and `pickupNearest()` (finds ground item within ~2 tiles, right-clicks)
-10. **GameUI.java** — Added `kb_toggleGate` and `kb_pickupNearest` keybindings + globtype handlers
-11. **OptWndBindingPanel.java** — Added "Quick Actions" section with Toggle Nearest Gate and Pickup Nearest Item bindings
-
-### Bot Menu Fix
-12. **Fixed 5 broken .res files** — ButcherBot, ClayDiggingBot, ForagingBot, MiningBot, OreSmeltingBot were all copies of CleanupBot.res (same name "Cleanup Bot" + same icon). Generated correct .res files with proper display names and unique colored icons via `tools/gen_bot_res.py`
+### Container Inventory Features
+4. **Inventory.java** — Added `checkContainerToolbar()` in `added()` lifecycle hook. Detects non-player windows (not in `PLAYER_INVENTORY_NAMES`) and adds Sort/Group/Ext buttons below the inventory grid. Resizes inventory and parent window to fit toolbar.
+5. **ExtInventoryWindow.java** — Container-aware title via `getTitle()` helper ("Ext: Chest"). Auto-closes when target container is destroyed (`targetInv.parent == null`). Fixed close handler to only null `gui.extInventoryWindow` when `this` matches.
 
 ## In Progress
-Nothing — all planned work complete.
+Nothing — session ended early.
 
 ## Next Priorities
-1. **Fix pathfinding UX** — stop-and-go movement (needs smoother re-pathing), poor wall handling, continuous pathfinding mouse tracking inconsistent (800ms throttle too slow?)
-2. **Container inventory features** — sorting/filtering/grouping/ExtInventory should work on container inventories (chests, barrels), not just main inventory
-3. **More EnderWiggin ports** — camera keybinds, container info JSON, gob timer overlay
-4. **ItemType metadata enrichment** — curiosity LP/MW in ExtInventory list rows
-5. **GobDamageInfo** — floating damage numbers above gobs in combat
+1. **Test pathfinding + container toolbar in-game** — 13 sessions of untested features!
+2. **More EnderWiggin ports** — camera keybinds, gob timer overlay, GobDamageInfo
+3. **ItemType metadata enrichment** — curiosity LP/MW in ExtInventory list rows
+4. **GobDamageInfo** — floating damage numbers above gobs in combat
+5. **InventoryListWindow container support** — add targetInv parameter like ExtInventoryWindow
 
-## Files Modified/Created
+## Files Modified
 | File | Changes |
 |------|---------|
-| `src/haven/automated/FishingBot.java` | Collapsed 4 putOn* → attachToPole() |
-| `src/haven/automated/BotBase.java` | catch Exception → catch Loading in checkVitals |
-| `src/haven/Inventory.java` | sortThread field + destroy() interrupt |
-| `src/haven/WItem.java` | Deleted ItemCategory enum, refactored to ItemType; added armorText + durabilityNum AttrCaches; updated drawnum chain |
-| `src/haven/OptWnd.java` | Added showArmorValuesCheckBox, showDurabilityNumberCheckBox |
-| `src/haven/OptWndQualityPanel.java` | Added armor/durability checkboxes |
-| `src/haven/ExtInventoryWindow.java` | Repeat-action context menu + repeatThread |
-| `src/haven/automated/Actions.java` | toggleNearestGate(), pickupNearest() |
-| `src/haven/GameUI.java` | kb_toggleGate, kb_pickupNearest keybinds |
-| `src/haven/OptWndBindingPanel.java` | Quick Actions section |
+| `src/haven/automated/pathfinder/Pathfinder.java` | Pre-click intermediate waypoints, split last vs intermediate segment handling |
+| `src/haven/MapView.java` | Continuous PF throttle 800→400ms, long-distance hop delay 200→50ms |
+| `src/haven/Inventory.java` | Container toolbar: Sort/Group/Ext buttons, added() hook, window resize |
+| `src/haven/ExtInventoryWindow.java` | Container title, auto-close on destroy, safe close handler |
