@@ -62,6 +62,8 @@ public class Inventory extends Widget implements DTarget {
 
 	// Cached group header Tex objects — invalidated when groups change
 	private final Map<String, Tex> groupHeaderTexCache = new HashMap<>();
+	// Cached icon Tex objects for group header icons — keyed by resource name
+	private final Map<String, Tex> groupHeaderIconCache = new HashMap<>();
 	private GroupingMode lastCachedGroupingMode = null;
 	private int lastCachedChildCount = -1;
 
@@ -267,6 +269,8 @@ public class Inventory extends Widget implements DTarget {
 	    try { t.dispose(); } catch (Exception ignored) {}
 	}
 	groupHeaderTexCache.clear();
+	// Clear icon cache references (don't dispose — they are owned by Resource.Image)
+	groupHeaderIconCache.clear();
     }
 
     private void drawGroupHeaders(GOut g) {
@@ -337,15 +341,23 @@ public class Inventory extends Widget implements DTarget {
 	    g.frect(headerPos, headerSz);
 	    g.chcolor();
 
-	    // Draw representative item icon
+	    // Draw representative item icon (cached)
 	    WItem rep = groupRepItem.get(key);
 	    if (rep != null) {
 		try {
 		    Resource res = rep.item.resource();
 		    if (res != null) {
-			Resource.Image img = res.layer(Resource.imgc);
-			if (img != null) {
-			    g.image(img.tex(), headerPos.add(1, 0), new Coord(iconSz, iconSz));
+			String resName = res.name;
+			Tex iconTex = groupHeaderIconCache.get(resName);
+			if (iconTex == null) {
+			    Resource.Image img = res.layer(Resource.imgc);
+			    if (img != null) {
+				iconTex = img.tex();
+				groupHeaderIconCache.put(resName, iconTex);
+			    }
+			}
+			if (iconTex != null) {
+			    g.image(iconTex, headerPos.add(1, 0), new Coord(iconSz, iconSz));
 			}
 		    }
 		} catch (Exception ignored) {}

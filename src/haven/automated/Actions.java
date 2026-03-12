@@ -18,7 +18,16 @@ public class Actions {
     }
 
     public static void rightClick(GameUI gui) {
-        gui.map.wdgmsg("click", Coord.z, gui.map.player().rc.floor(posres), 3, 0);
+        Gob player = gui.map.player();
+        if (player == null) return;
+        gui.map.wdgmsg("click", Coord.z, player.rc.floor(posres), 3, 0);
+    }
+
+    public static void clearhand(GameUI gui) {
+        if (gui.vhand != null) {
+            gui.vhand.item.wdgmsg("drop", Coord.z);
+        }
+        rightClick(gui);
     }
 
     public static boolean waitForEmptyHand(final GameUI gui, final int timeout, final String error) throws InterruptedException {
@@ -64,10 +73,14 @@ public class Actions {
         int time = 0;
         boolean moved = false;
         Thread.sleep(300);
-        while (gui.map.pfthread.isAlive() || gui.map.player().getv() > 0) {
+        Gob player = gui.map.player();
+        if (player == null) return false;
+        while (gui.map.pfthread.isAlive() || player.getv() > 0) {
             time += 70;
             Thread.sleep(70);
-            if (gui.map.player().getv() > 0) {
+            player = gui.map.player();
+            if (player == null) return false;
+            if (player.getv() > 0) {
                 time = 0;
                 moved = true;
             }
@@ -100,7 +113,9 @@ public class Actions {
     }
 
     public static void unstuck(GameUI gui) throws InterruptedException {
-        Coord2d pc = gui.map.player().rc;
+        Gob player = gui.map.player();
+        if (player == null) return;
+        Coord2d pc = player.rc;
         Random r = new Random();
         for (int i = 0; i < 5; i++) {
             int xAdd = r.nextInt(500) - 250;

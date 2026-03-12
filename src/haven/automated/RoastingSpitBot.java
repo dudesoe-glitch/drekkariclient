@@ -97,37 +97,43 @@ public class RoastingSpitBot extends BotBase {
 		for (Object item : invItems.toArray()) {
 			if (item instanceof WItem) {
 				WItem wi = (WItem) item;
-				if (isSpitroastableItem(wi.item.resource().name)) foundSpitroastableItems.add(wi.item);
+				try {
+					if (isSpitroastableItem(wi.item.resource().name)) foundSpitroastableItems.add(wi.item);
+				} catch (Loading ignored) {}
 			}
 		}
 		return foundSpitroastableItems;
 	}
 
 	public boolean readyToRoast() {
-		if (fireplace != null && !fireplace.ols.isEmpty()) {
-			Optional<Gob.Overlay> foundOverlay = fireplace.ols.stream()
-					.filter(ol -> ol != null && ol.spr != null && ol.spr.res != null && roastingSpitOverlayName.equals(ol.spr.res.name))
-					.findFirst();
-			if (foundOverlay.isPresent()) {
-				Gob.Overlay gobOverlay = foundOverlay.get();
-				if(((RenderTree.TreeSlot)((ArrayList<?>) gobOverlay.slots).get(0)).children[0].children.length > 2 && ((RenderTree.TreeSlot)((ArrayList<?>) gobOverlay.slots).get(0)).children[0].children[2] != null)
-					return ((RenderTree.TreeSlot)((ArrayList<?>) gobOverlay.slots).get(0)).children[0].children[2].toString().contains("raw");
+		try {
+			if (fireplace != null && !fireplace.ols.isEmpty()) {
+				Optional<Gob.Overlay> foundOverlay = fireplace.ols.stream()
+						.filter(ol -> ol != null && ol.spr != null && ol.spr.res != null && roastingSpitOverlayName.equals(ol.spr.res.name))
+						.findFirst();
+				if (foundOverlay.isPresent()) {
+					Gob.Overlay gobOverlay = foundOverlay.get();
+					if(((RenderTree.TreeSlot)((ArrayList<?>) gobOverlay.slots).get(0)).children[0].children.length > 2 && ((RenderTree.TreeSlot)((ArrayList<?>) gobOverlay.slots).get(0)).children[0].children[2] != null)
+						return ((RenderTree.TreeSlot)((ArrayList<?>) gobOverlay.slots).get(0)).children[0].children[2].toString().contains("raw");
+				}
 			}
-		}
+		} catch (Exception ignored) {}
 		return false;
 	}
 
 	public boolean isCooked() {
-		if (fireplace != null && !fireplace.ols.isEmpty()) {
-			Optional<Gob.Overlay> foundOverlay = fireplace.ols.stream()
-					.filter(ol -> ol != null && ol.spr != null && ol.spr.res != null && roastingSpitOverlayName.equals(ol.spr.res.name))
-					.findFirst();
-			if (foundOverlay.isPresent()) {
-				Gob.Overlay gobOverlay = foundOverlay.get();
-				if(((RenderTree.TreeSlot)((ArrayList<?>) gobOverlay.slots).get(0)).children[0].children.length > 2 && ((RenderTree.TreeSlot)((ArrayList<?>) gobOverlay.slots).get(0)).children[0].children[2] != null)
-					return ((RenderTree.TreeSlot)((ArrayList<?>) gobOverlay.slots).get(0)).children[0].children[2].toString().contains("roast");
+		try {
+			if (fireplace != null && !fireplace.ols.isEmpty()) {
+				Optional<Gob.Overlay> foundOverlay = fireplace.ols.stream()
+						.filter(ol -> ol != null && ol.spr != null && ol.spr.res != null && roastingSpitOverlayName.equals(ol.spr.res.name))
+						.findFirst();
+				if (foundOverlay.isPresent()) {
+					Gob.Overlay gobOverlay = foundOverlay.get();
+					if(((RenderTree.TreeSlot)((ArrayList<?>) gobOverlay.slots).get(0)).children[0].children.length > 2 && ((RenderTree.TreeSlot)((ArrayList<?>) gobOverlay.slots).get(0)).children[0].children[2] != null)
+						return ((RenderTree.TreeSlot)((ArrayList<?>) gobOverlay.slots).get(0)).children[0].children[2].toString().contains("roast");
+				}
 			}
-		}
+		} catch (Exception ignored) {}
 		return false;
 	}
 

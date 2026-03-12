@@ -161,6 +161,8 @@ public class AUtils {
         return gobs;
     }
 
+    /** @deprecated Use {@link InvHelper#findFirstByNameInAllInventories(GameUI, String)} instead. */
+    @Deprecated
     public static WItem findItemByPrefixInAllInventories(GameUI gui, final String resNamePrefix) {
         for(Inventory inventory : gui.getAllInventories()){
             for (Widget wdg = inventory.child; wdg != null; wdg = wdg.next) {
@@ -178,6 +180,8 @@ public class AUtils {
         return null;
     }
 
+    /** @deprecated Use {@link InvHelper#findFirstByName(Inventory, String)} instead. */
+    @Deprecated
     public static WItem findItemInInv(final Inventory inv, final String resName) {
         for (Widget wdg = inv.child; wdg != null; wdg = wdg.next) {
             if (wdg instanceof WItem) {
@@ -193,6 +197,8 @@ public class AUtils {
         return null;
     }
 
+    /** @deprecated Use {@link GobHelper#findByName(GameUI, String, double)} instead. */
+    @Deprecated
     public static ArrayList<Gob> getGobs(String name, GameUI gui) {
         ArrayList<Gob> gobs = new ArrayList<>();
         synchronized (gui.map.glob.oc) {
@@ -209,6 +215,8 @@ public class AUtils {
         return gobs;
     }
 
+    /** @deprecated Use {@link GobHelper#findAllSupports(GameUI)} instead. */
+    @Deprecated
     public static ArrayList<Gob> getAllSupports(GameUI gui) {
         ArrayList<Gob> supports = new ArrayList<>();
         Set<String> types = new HashSet<>(Arrays.asList("gfx/terobjs/ladder", "gfx/terobjs/minesupport", "gfx/terobjs/column", "gfx/terobjs/minebeam"));
@@ -254,32 +262,8 @@ public class AUtils {
         } catch (Loading ignored) {}
     }
 
-    public static List<WItem> getAllItemsFromAllInventoriesAndStacksExcludeBeltAndKeyring(GameUI gui){
-        List<WItem> items = new ArrayList<>();
-        List<Inventory> allInventories = gui.getAllInventories();
-
-        for (Inventory inventory : allInventories) {
-            if (!isBeltOrKeyring(inventory)) {
-                for (WItem item : inventory.getAllItems()) {
-                    if (!item.item.getname().contains("stack of")) {
-                        items.add(item);
-                    }
-                }
-            }
-        }
-
-        items.addAll(gui.getAllContentsWindows());
-        return items;
-    }
-
-    public static boolean isBeltOrKeyring(Inventory inventory) {
-        if (inventory.parent instanceof Window) {
-            String cap = ((Window) inventory.parent).cap;
-            return cap.contains("Belt") || cap.contains("Keyring");
-        }
-        return false;
-    }
-
+    /** @deprecated Use {@link GobHelper#hasOverlay(Gob, String)} instead. */
+    @Deprecated
     public static boolean gobHasOverlay (Gob gob, String overlayResName){
         if (gob != null && !gob.ols.isEmpty()) {
             Optional<Gob.Overlay> foundOverlay = gob.ols.stream()

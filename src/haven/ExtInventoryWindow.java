@@ -32,8 +32,19 @@ public class ExtInventoryWindow extends Window {
 	// Collapsed groups tracking
 	private final Set<String> collapsedGroups = new HashSet<>();
 
-	// Tex cache
+	// Tex cache for rendered text
 	private final Map<String, Tex> texCache = new ConcurrentHashMap<>();
+
+	// Icon Tex cache — keyed by resource name, avoids re-fetching img.tex() every frame
+	private final Map<String, Tex> iconTexCache = new ConcurrentHashMap<>();
+
+	// Static Color constants for quality coloring
+	private static final Color Q_COLOR_LOW = new Color(170, 170, 170);
+	private static final Color Q_COLOR_NORMAL = new Color(255, 255, 255);
+	private static final Color Q_COLOR_DECENT = new Color(100, 200, 100);
+	private static final Color Q_COLOR_GOOD = new Color(100, 150, 255);
+	private static final Color Q_COLOR_EXCELLENT = new Color(200, 100, 255);
+	private static final Color SUMMARY_COLOR = new Color(150, 150, 150);
 
 	// Sort mode for items within groups
 	private enum SortMode {
@@ -89,8 +100,8 @@ public class ExtInventoryWindow extends Window {
 
 		Button invSortBtn = add(new Button(UI.scale(45), "Sort") {
 			public void click() {
-				Inventory inv = getTargetInv();
-				if (inv != null) inv.sortInventory();
+				Inventory inv2 = getTargetInv();
+				if (inv2 != null) inv2.sortInventory();
 			}
 		}, sortBtn.pos("ur").adds(4, 0));
 		invSortBtn.settip("Sort the actual inventory grid");
@@ -135,6 +146,25 @@ public class ExtInventoryWindow extends Window {
 	private Inventory getTargetInv() {
 		if (targetInv != null) return targetInv;
 		return gui.maininv;
+	}
+
+	/**
+	 * Get a cached icon Tex for the given resource, creating it on first access.
+	 */
+	private Tex getIconTex(Resource res) {
+		if (res == null) return null;
+		String resName = res.name;
+		Tex cached = iconTexCache.get(resName);
+		if (cached != null) return cached;
+		try {
+			Resource.Image img = res.layer(Resource.imgc);
+			if (img != null) {
+				Tex tex = img.tex();
+				iconTexCache.put(resName, tex);
+				return tex;
+			}
+		} catch (Exception ignored) {}
+		return null;
 	}
 
 	@Override
@@ -197,11 +227,13 @@ public class ExtInventoryWindow extends Window {
 	}
 
 	private void refreshList() {
-		// Dispose cached Tex objects
+		// Dispose cached Tex objects (rendered text only — icon texes are owned by Resource.Image)
 		for (Tex t : texCache.values()) {
 			try { t.dispose(); } catch (Exception ignored) {}
 		}
 		texCache.clear();
+		// Clear icon cache references (don't dispose — they are owned by Resource.Image)
+		iconTexCache.clear();
 
 		// Clear existing rows
 		Widget nxt;
@@ -325,15 +357,13 @@ public class ExtInventoryWindow extends Window {
 						g.chcolor();
 
 						int x = UI.scale(2);
-						// Group icon
+						// Group icon (cached)
 						if (fgd.iconRes != null) {
-							try {
-								Resource.Image img = fgd.iconRes.layer(Resource.imgc);
-								if (img != null) {
-									g.image(img.tex(), new Coord(x, UI.scale(2)), new Coord(UI.scale(ICON_SZ + 2), UI.scale(ICON_SZ + 2)));
-									x += UI.scale(ICON_SZ + 4);
-								}
-							} catch (Exception ignored) {}
+							Tex iconTex = getIconTex(fgd.iconRes);
+							if (iconTex != null) {
+								g.image(iconTex, new Coord(x, UI.scale(2)), new Coord(UI.scale(ICON_SZ + 2), UI.scale(ICON_SZ + 2)));
+								x += UI.scale(ICON_SZ + 4);
+							}
 						}
 
 						// Header text
@@ -415,14 +445,12 @@ public class ExtInventoryWindow extends Window {
 							}
 
 							int x = UI.scale(4);
-							// Item icon
+							// Item icon (cached)
 							if (frow.iconRes != null) {
-								try {
-									Resource.Image img = frow.iconRes.layer(Resource.imgc);
-									if (img != null) {
-										g.image(img.tex(), new Coord(x, UI.scale(1)), new Coord(UI.scale(ICON_SZ), UI.scale(ICON_SZ)));
-									}
-								} catch (Exception ignored) {}
+								Tex iconTex = getIconTex(frow.iconRes);
+								if (iconTex != null) {
+									g.image(iconTex, new Coord(x, UI.scale(1)), new Coord(UI.scale(ICON_SZ), UI.scale(ICON_SZ)));
+								}
 							}
 							x += UI.scale(ICON_SZ + 3);
 
@@ -442,6 +470,10 @@ public class ExtInventoryWindow extends Window {
 								toggleHighlight(rowName);
 								return true;
 							}
+							if (ev.b == 3) {
+								showRowContextMenu(rowName, ev.c);
+								return true;
+							}
 							return super.mousedown(ev);
 						}
 					};
@@ -456,7 +488,7 @@ public class ExtInventoryWindow extends Window {
 		int totalTypes = 0;
 		for (GroupData gd : sortedGroups) totalTypes += gd.items.size();
 		String summary = filteredCount + " items, " + totalTypes + " types, " + sortedGroups.size() + " groups";
-		Tex summaryTex = Text.renderstroked(summary, new Color(150, 150, 150), Color.BLACK).tex();
+		Tex summaryTex = Text.renderstroked(summary, SUMMARY_COLOR, Color.BLACK).tex();
 		texCache.put("summary", summaryTex);
 		Widget summaryRow = new Widget(new Coord(rowW, UI.scale(ROW_H))) {
 			public void draw(GOut g) {
@@ -469,6 +501,125 @@ public class ExtInventoryWindow extends Window {
 			}
 		};
 		listArea.add(summaryRow, new Coord(0, y));
+	}
+
+	/**
+	 * Show a right-click context menu for an item row.
+	 * Provides "Transfer All" and "Drop All" actions for all items matching the given name.
+	 */
+	private void showRowContextMenu(String sortName, Coord clickPos) {
+		// Remove any existing context menu
+		closeContextMenu();
+
+		int menuW = UI.scale(100);
+		int btnH = UI.scale(20);
+		int menuH = btnH * 2 + UI.scale(4);
+
+		Widget menu = new Widget(new Coord(menuW, menuH)) {
+			public void draw(GOut g) {
+				g.chcolor(30, 30, 40, 240);
+				g.frect(Coord.z, sz);
+				g.chcolor(100, 100, 120, 200);
+				g.rect(Coord.z, sz);
+				g.chcolor();
+				super.draw(g);
+			}
+
+			public boolean mousedown(MouseDownEvent ev) {
+				if (super.mousedown(ev))
+					return true;
+				// Click outside the menu closes it
+				closeContextMenu();
+				return true;
+			}
+		};
+
+		Button transferBtn = new Button(menuW - UI.scale(4), "Transfer All") {
+			public void click() {
+				transferAllByName(sortName);
+				closeContextMenu();
+			}
+		};
+		transferBtn.settip("Transfer all \"" + sortName + "\" items");
+		menu.add(transferBtn, UI.scale(2, 2));
+
+		Button dropBtn = new Button(menuW - UI.scale(4), "Drop All") {
+			public void click() {
+				dropAllByName(sortName);
+				closeContextMenu();
+			}
+		};
+		dropBtn.settip("Drop all \"" + sortName + "\" items");
+		menu.add(dropBtn, UI.scale(2, 2 + btnH));
+
+		// Position the menu near the mouse cursor, within the root widget
+		Coord menuPos = ui.mc.sub(menuW / 2, 0);
+		// Clamp to screen bounds
+		if (menuPos.x < 0) menuPos.x = 0;
+		if (menuPos.y < 0) menuPos.y = 0;
+		Coord rootSz = ui.root.sz;
+		if (menuPos.x + menuW > rootSz.x) menuPos.x = rootSz.x - menuW;
+		if (menuPos.y + menuH > rootSz.y) menuPos.y = rootSz.y - menuH;
+
+		ui.root.add(menu, menuPos);
+		// Grab focus so clicking outside closes it
+		menu.raise();
+		activeContextMenu = menu;
+	}
+
+	private Widget activeContextMenu = null;
+
+	private void closeContextMenu() {
+		if (activeContextMenu != null) {
+			activeContextMenu.destroy();
+			activeContextMenu = null;
+		}
+	}
+
+	/**
+	 * Transfer all items matching the given sortName from the target inventory.
+	 */
+	private void transferAllByName(String sortName) {
+		Inventory inv = getTargetInv();
+		if (inv == null) return;
+		List<WItem> toTransfer = new ArrayList<>();
+		for (Widget wdg = inv.child; wdg != null; wdg = wdg.next) {
+			if (wdg instanceof WItem) {
+				WItem wi = (WItem) wdg;
+				try {
+					if (wi.sortName().equals(sortName)) {
+						toTransfer.add(wi);
+					}
+				} catch (Exception ignored) {}
+			}
+		}
+		for (WItem wi : toTransfer) {
+			wi.item.wdgmsg("transfer", Coord.z);
+		}
+		dirty = true;
+	}
+
+	/**
+	 * Drop all items matching the given sortName from the target inventory.
+	 */
+	private void dropAllByName(String sortName) {
+		Inventory inv = getTargetInv();
+		if (inv == null) return;
+		List<WItem> toDrop = new ArrayList<>();
+		for (Widget wdg = inv.child; wdg != null; wdg = wdg.next) {
+			if (wdg instanceof WItem) {
+				WItem wi = (WItem) wdg;
+				try {
+					if (wi.sortName().equals(sortName)) {
+						toDrop.add(wi);
+					}
+				} catch (Exception ignored) {}
+			}
+		}
+		for (WItem wi : toDrop) {
+			wi.item.wdgmsg("drop", Coord.z);
+		}
+		dirty = true;
 	}
 
 	private void toggleHighlight(String itemName) {
@@ -484,11 +635,11 @@ public class ExtInventoryWindow extends Window {
 	}
 
 	private static Color getQualityColor(double q) {
-		if (q < 10) return new Color(170, 170, 170);
-		if (q < 25) return new Color(255, 255, 255);
-		if (q < 50) return new Color(100, 200, 100);
-		if (q < 100) return new Color(100, 150, 255);
-		return new Color(200, 100, 255);
+		if (q < 10) return Q_COLOR_LOW;
+		if (q < 25) return Q_COLOR_NORMAL;
+		if (q < 50) return Q_COLOR_DECENT;
+		if (q < 100) return Q_COLOR_GOOD;
+		return Q_COLOR_EXCELLENT;
 	}
 
 	private void clearHighlight() {
@@ -501,6 +652,7 @@ public class ExtInventoryWindow extends Window {
 	public void wdgmsg(Widget sender, String msg, Object... args) {
 		if ((sender == this) && msg.equals("close")) {
 			clearHighlight();
+			closeContextMenu();
 			Utils.setprefc("wndc-extInventoryWindow", this.c);
 			gui.extInventoryWindow = null;
 			reqdestroy();
@@ -512,10 +664,12 @@ public class ExtInventoryWindow extends Window {
 	@Override
 	public void reqdestroy() {
 		Utils.setprefc("wndc-extInventoryWindow", this.c);
+		closeContextMenu();
 		for (Tex t : texCache.values()) {
 			try { t.dispose(); } catch (Exception ignored) {}
 		}
 		texCache.clear();
+		iconTexCache.clear();
 		super.reqdestroy();
 	}
 }

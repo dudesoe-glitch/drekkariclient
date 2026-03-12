@@ -17,13 +17,17 @@ public class AggroNearestTarget implements Runnable {
 
     @Override
     public void run() {
+        if (gui.fv == null) {
+            attackClosestAttackable();
+            return;
+        }
         synchronized (gui.fv.lsrel) {
 
             if (gui.fv != null && gui.fv.lsrel.size() > 0) { // If we are in a fight already:
                 // Check type of fight - Are we fighting players or just animals?
                 HashSet<Long> fightgobs = gui.fv.lsrel.stream().map(rel -> rel.gobid).collect(Collectors.toCollection(HashSet::new));
                 HashMap<Long, Gob> allAttackableMap = AUtils.getAllAttackableMap(gui);
-                HashSet<Long> aggrodplayers = fightgobs.stream().filter(id -> allAttackableMap.get(id) != null && isPlayer(allAttackableMap.get(id))).collect(Collectors.toCollection(HashSet::new));
+                HashSet<Long> aggrodplayers = fightgobs.stream().filter(id -> allAttackableMap.get(id) != null && GobHelper.isPlayer(allAttackableMap.get(id))).collect(Collectors.toCollection(HashSet::new));
 
                 Gob player = gui.map.player();
                 if (player == null)
@@ -53,7 +57,7 @@ public class AggroNearestTarget implements Runnable {
         Gob closestEnemy = null;
         OUTER_LOOP: for (Gob gob : allAttackableMap.values()) {
             // If friend, skip it... skip it
-            if (isPlayer(gob) && gob.isFriend())
+            if (GobHelper.isPlayer(gob) && gob.isFriend())
                 continue;
             if (gob.getres().name.equals("gfx/kritter/horse/horse") && gob.occupants.size() > 0){ // ND: Wild horse special case. Tamed horses are never attacked anyway
                 for (Gob occupant : gob.occupants) {
@@ -80,7 +84,7 @@ public class AggroNearestTarget implements Runnable {
         Gob closestEnemy = null;
         for (Gob gob : allAttackableMap.values()) {
             //if gob is an enemy player and not already aggroed
-            if (isPlayer(gob) && !aggrodplayers.contains(gob.id) && !gob.isFriend()) {
+            if (GobHelper.isPlayer(gob) && !aggrodplayers.contains(gob.id) && !gob.isFriend()) {
                 if ((closestEnemy == null || gob.rc.dist(player.rc) < closestEnemy.rc.dist(player.rc))
                         && (gob.knocked == null || (gob.knocked != null && !gob.knocked))) { // ND: Retarded workaround that I need to add, just like in Gob.java
                     closestEnemy = gob;
@@ -102,7 +106,7 @@ public class AggroNearestTarget implements Runnable {
 
         Gob closestEnemy = null;
         for (Gob gob : allAttackableMap.values()) {
-            if (isPlayer(gob) && gob.isFriend()) {
+            if (GobHelper.isPlayer(gob) && gob.isFriend()) {
                 continue;
             }
             //if gob is an enemy player and not already aggroed
@@ -129,7 +133,7 @@ public class AggroNearestTarget implements Runnable {
         // try and find the closest animal or player to attack
         Gob closestEnemy = null;
         OUTER_LOOP: for (Gob gob : allAttackableMap.values()) {
-            if (isPlayer(gob) && gob.isFriend()) {
+            if (GobHelper.isPlayer(gob) && gob.isFriend()) {
                 continue;
             }
             if (gob.getres().name.equals("gfx/kritter/horse/horse") && gob.occupants.size() > 0){ // ND: Wild horse special case. Tamed horses are never attacked anyway
@@ -152,7 +156,4 @@ public class AggroNearestTarget implements Runnable {
         }
     }
 
-    private boolean isPlayer(Gob gob){
-        return gob.getres() != null && gob.getres().name != null && gob.getres().name.equals("gfx/borka/body");
-    }
 }

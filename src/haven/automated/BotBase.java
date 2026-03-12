@@ -190,7 +190,6 @@ public abstract class BotBase extends Window implements Runnable {
 			botThread.interrupt();
 			botThread = null;
 		}
-		this.destroy();
 	}
 
 	@Override

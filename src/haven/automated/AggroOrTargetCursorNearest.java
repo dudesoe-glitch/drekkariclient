@@ -33,7 +33,7 @@ public class AggroOrTargetCursorNearest implements Runnable {
                     Long gobid = Long.valueOf((Integer) inf.clickargs()[1]);
                     Gob clickedGob = gui.map.glob.oc.getgob(gobid);
                     if (clickedGob != null) {
-                        if (isPlayer(clickedGob)) {
+                        if (GobHelper.isPlayer(clickedGob)) {
                             if (!clickedGob.isFriend()) {
                                 Actions.attackGob(gui, clickedGob);
                             }
@@ -83,7 +83,7 @@ public class AggroOrTargetCursorNearest implements Runnable {
                 Gob closestEnemy = null;
                 OUTER_LOOP:
                 for (Gob gob : allAttackableMap.values()) {
-                    if (isPlayer(gob) && gob.isFriend()) {
+                    if (GobHelper.isPlayer(gob) && gob.isFriend()) {
                         continue;
                     }
                     if (gob.getres().name.equals("gfx/kritter/horse/horse") && gob.occupants.size() > 0) { // ND: Wild horse special case. Tamed horses are never attacked anyway
@@ -108,7 +108,4 @@ public class AggroOrTargetCursorNearest implements Runnable {
         }.run();
     }
 
-    private boolean isPlayer(Gob gob){
-        return gob.getres() != null && gob.getres().name != null && gob.getres().name.equals("gfx/borka/body");
-    }
 }

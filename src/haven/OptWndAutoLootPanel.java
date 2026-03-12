@@ -74,9 +74,9 @@ class OptWndAutoLootPanel {
 			}
 		}, leftColumn.pos("bl").adds(0, 2));
 		leftColumn = panel.add(OptWnd.autoLootPouchesCheckBox = new CheckBox("Pouches"){
-			{a = Utils.getprefb("autoLootCloakRobe", false);}
+			{a = Utils.getprefb("autoLootPouches", false);}
 			public void changed(boolean val) {
-				Utils.setprefb("autoLootCloakRobe", val);
+				Utils.setprefb("autoLootPouches", val);
 				OptWnd.autoLootPouchesCheckBox2.set(val);
 			}
 		}, leftColumn.pos("bl").adds(0, 2)).settip("Works for both slots");
@@ -139,9 +139,9 @@ class OptWndAutoLootPanel {
 			}
 		}, rightColumn.pos("bl").adds(0, 2));
 		rightColumn = panel.add(OptWnd.autoLootPouchesCheckBox2 = new CheckBox("Pouches"){
-			{a = Utils.getprefb("autoLootCloakRobe", false);}
+			{a = Utils.getprefb("autoLootPouches", false);}
 			public void changed(boolean val) {
-				Utils.setprefb("autoLootCloakRobe", val);
+				Utils.setprefb("autoLootPouches", val);
 				OptWnd.autoLootPouchesCheckBox.set(val);
 			}
 		}, rightColumn.pos("bl").adds(0, 2)).settip("Works for both slots");

@@ -53,7 +53,8 @@ public class CleanupBot extends BotBase {
 				if (!Actions.waitPf(gui)) Actions.unstuck(gui);
 				if (gob.rc.dist(gui.map.player().rc) < 11 * 5) {
 					Resource res = gob.getres();
-					clearhand();
+					if (res == null) return;
+					Actions.clearhand(gui);
 					if (res.name.contains("/trees/") && !res.name.endsWith("stump") && !res.name.endsWith("log") && !res.name.endsWith("oldtrunk") || res.name.contains("/bushes/")) {
 						Actions.rightClickGobAndSelectOption(gui, gob, 0);
 						gui.map.wdgmsg("click", Coord.z, gob.rc.floor(posres), 3, 0, 0, (int) gob.id, gob.rc.floor(posres), 0, -1);
@@ -77,8 +78,6 @@ public class CleanupBot extends BotBase {
 		}
 	}
 
-	private void clearhand() { if (gui.vhand != null) gui.vhand.item.wdgmsg("drop", Coord.z); Actions.rightClick(gui); }
-
 	private void waitWhileWorking(int timeout) throws InterruptedException {
 		sleep(1500);
 		int hz = 50; int time = 0;
@@ -98,10 +97,11 @@ public class CleanupBot extends BotBase {
 			for (Gob gob : gui.map.glob.oc) {
 				try {
 					Resource res = gob.getres();
+					if (res == null) continue;
 					boolean selected = (res.name.contains("/bumlings/") && chipRocks) || (res.name.endsWith("stump") && destroyStumps)
 						|| ((res.name.contains("/trees/") && !res.name.endsWith("stump")) && !res.name.endsWith("log") && !res.name.endsWith("oldtrunk") && chopTrees)
 						|| (res.name.contains("/bushes/") && chopBushes) || (res.name.endsWith("/stockpile-soil") && destroySoil);
-					if (res != null && selected) {
+					if (selected) {
 						Coord2d plc = gui.map.player().rc; double dist = gob.rc.dist(plc);
 						if (dist > MAX_SEARCH_DIST) continue;
 						if (closestGob == null || dist < closestGob.rc.dist(plc)) closestGob = gob;

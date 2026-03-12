@@ -226,6 +226,32 @@ public class GobHelper {
     }
 
     /**
+     * Check if a gob is a player character (borka body model).
+     * Extracted from the identical isPlayer() methods in all 4 aggro scripts.
+     *
+     * @return true if the gob is a player, false if not or if resource is not loaded
+     */
+    public static boolean isPlayer(Gob gob) {
+        String name = getResName(gob);
+        return name != null && name.equals("gfx/borka/body");
+    }
+
+    /**
+     * Check if a gob has an overlay with the given resource name.
+     * Equivalent to {@code AUtils.gobHasOverlay()} but as a static method on GobHelper.
+     *
+     * @param gob the gob to check
+     * @param overlayName the resource name of the overlay to look for
+     * @return true if the gob has the overlay, false otherwise
+     */
+    public static boolean hasOverlay(Gob gob, String overlayName) {
+        if (gob == null || overlayName == null || gob.ols.isEmpty()) return false;
+        return gob.ols.stream()
+            .anyMatch(ol -> ol != null && ol.spr != null && ol.spr.res != null
+                && overlayName.equals(ol.spr.res.name));
+    }
+
+    /**
      * Check if a gob is a knocked/dead animal.
      * Knocked state is determined by the gob's pose containing "knock", "dead",
      * "waterdead", "banzai", or "carried" (set in Gob.updPose).
@@ -237,5 +263,23 @@ public class GobHelper {
         // Gob.knocked is a Boolean (nullable): null = pose not yet loaded,
         // true = knocked/dead, false = alive
         return gob.knocked != null && gob.knocked;
+    }
+
+    /**
+     * Find all support gobs (ladders, mine supports, columns, mine beams).
+     * Equivalent to {@code AUtils.getAllSupports()} but using GobHelper patterns.
+     *
+     * @param gui the GameUI instance
+     * @return list of support gobs, possibly empty
+     */
+    public static List<Gob> findAllSupports(GameUI gui) {
+        Set<String> supportTypes = new HashSet<>(Arrays.asList(
+            "gfx/terobjs/ladder", "gfx/terobjs/minesupport",
+            "gfx/terobjs/column", "gfx/terobjs/minebeam"
+        ));
+        return findAll(gui, -1, g -> {
+            String name = getResName(g);
+            return name != null && supportTypes.contains(name);
+        });
     }
 }

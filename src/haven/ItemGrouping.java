@@ -9,7 +9,8 @@ public enum ItemGrouping {
 	BY_NAME("By Name"),
 	BY_QUALITY("By Quality"),
 	BY_Q5("Q5 Brackets"),
-	BY_Q10("Q10 Brackets");
+	BY_Q10("Q10 Brackets"),
+	BY_TYPE("By Type");
 
 	public final String label;
 
@@ -45,6 +46,10 @@ public enum ItemGrouping {
 					int bracket = ((int) Math.floor(qual)) / 10 * 10;
 					return "Q" + bracket + "-" + (bracket + 10);
 				}
+				case BY_TYPE: {
+					ItemType type = ItemType.classify(witem.item);
+					return type.label();
+				}
 				default:
 					return "";
 			}
@@ -60,6 +65,13 @@ public enum ItemGrouping {
 	public String groupSortKey(String groupKey) {
 		if (this == BY_NAME) {
 			return groupKey.toLowerCase();
+		}
+		if (this == BY_TYPE) {
+			// Sort by type ordinal to keep consistent ordering
+			for (ItemType t : ItemType.values()) {
+				if (t.label().equals(groupKey)) return String.format("%02d", t.ordinal());
+			}
+			return "99";
 		}
 		// For quality-based groupings, extract numeric prefix for sorting
 		try {
