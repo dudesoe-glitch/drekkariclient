@@ -886,193 +886,134 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 			}
 		} else if (ad[1].equals("Bots")) { // Category: Toggles
 			if (ad[2].equals("OceanScoutBot")) {
-				if (gui.OceanScoutBot == null && gui.oceanScoutBotThread == null) {
+				if (gui.OceanScoutBot == null) {
 					gui.OceanScoutBot = new OceanScoutBot(gui);
 					gui.add(gui.OceanScoutBot, Utils.getprefc("wndc-oceanScoutBotWindow", new Coord(gui.sz.x / 2 - gui.OceanScoutBot.sz.x / 2, gui.sz.y / 2 - gui.OceanScoutBot.sz.y / 2 - 200)));
-					gui.oceanScoutBotThread = new Thread(gui.OceanScoutBot, "Hurricane-OceanScoutBot");
-					gui.oceanScoutBotThread.start();
+					gui.OceanScoutBot.startThread("Hurricane-OceanScoutBot");
 				} else {
-					if (gui.OceanScoutBot != null) {
-						gui.OceanScoutBot.stop = true;
-						gui.OceanScoutBot.stop();
-						gui.OceanScoutBot.reqdestroy();
-						gui.OceanScoutBot = null;
-						gui.oceanScoutBotThread = null;
-					}
+					gui.OceanScoutBot.stop();
+					gui.OceanScoutBot.reqdestroy();
+					gui.OceanScoutBot = null;
 				}
 			} else if (ad[2].equals("TarKilnEmptierBot")) {
-				if (gui.tarKilnCleanerBot == null && gui.tarKilnCleanerThread == null) {
+				if (gui.tarKilnCleanerBot == null) {
 					gui.tarKilnCleanerBot = new TarKilnCleanerBot(gui);
 					gui.add(gui.tarKilnCleanerBot, Utils.getprefc("wndc-tarKilnCleanerBotWindow", new Coord(gui.sz.x/2 - gui.tarKilnCleanerBot.sz.x/2, gui.sz.y/2 - gui.tarKilnCleanerBot.sz.y/2 - 200)));
-					gui.tarKilnCleanerThread = new Thread(gui.tarKilnCleanerBot, "Hurricane-TarKilnEmptierBot");
-					gui.tarKilnCleanerThread.start();
+					gui.tarKilnCleanerBot.startThread("Hurricane-TarKilnEmptierBot");
 				} else {
-					if (gui.tarKilnCleanerBot != null) {
-						gui.tarKilnCleanerBot.stop();
-						gui.tarKilnCleanerBot.reqdestroy();
-						gui.tarKilnCleanerBot = null;
-						gui.tarKilnCleanerThread = null;
-					}
+					gui.tarKilnCleanerBot.stop();
+					gui.tarKilnCleanerBot.reqdestroy();
+					gui.tarKilnCleanerBot = null;
 				}
 			} else if (ad[2].equals("FishingBot")) {
-				if (gui.fishingBot == null && gui.fishingThread == null) {
+				if (gui.fishingBot == null) {
 					gui.fishingBot = new FishingBot(gui);
 					gui.add(gui.fishingBot, Utils.getprefc("wndc-fishingBotWindow", new Coord(gui.sz.x/2 - gui.fishingBot.sz.x/2, gui.sz.y/2 - gui.fishingBot.sz.y/2 - 200)));
-					gui.fishingThread = new Thread(gui.fishingBot, "Hurricane-FishingBot");
-					gui.fishingThread.start();
+					gui.fishingBot.startThread("Hurricane-FishingBot");
 				} else {
-					if (gui.fishingBot != null) {
-						gui.fishingBot.stop();
-						gui.fishingBot.reqdestroy();
-						gui.fishingBot = null;
-						gui.fishingThread = null;
-					}
+					gui.fishingBot.stop();
+					gui.fishingBot.reqdestroy();
+					gui.fishingBot = null;
 				}
 			} else if (ad[2].equals("CleanupBot")) {
-				if (gui.cleanupBot == null && gui.cleanupThread == null) {
+				if (gui.cleanupBot == null) {
 					gui.cleanupBot = new CleanupBot(gui);
 					gui.add(gui.cleanupBot, Utils.getprefc("wndc-cleanupBotWindow", new Coord(gui.sz.x/2 - gui.cleanupBot.sz.x/2, gui.sz.y/2 - gui.cleanupBot.sz.y/2 - 200)));
-					gui.cleanupThread = new Thread(gui.cleanupBot, "Hurricane-CleanupBot");
-					gui.cleanupThread.start();
+					gui.cleanupBot.startThread("Hurricane-CleanupBot");
 				} else {
-					if (gui.cleanupBot != null) {
-                        gui.cleanupBot.stop = true;
-						gui.cleanupBot.stop();
-						gui.cleanupBot.reqdestroy();
-						gui.cleanupBot = null;
-						gui.cleanupThread = null;
-					}
+					gui.cleanupBot.stop();
+					gui.cleanupBot.reqdestroy();
+					gui.cleanupBot = null;
 				}
 			} else if (ad[2].equals("GrubGrubBot")) {
-				if (gui.grubGrubBot == null && gui.grubGrubThread == null) {
+				if (gui.grubGrubBot == null) {
 					gui.grubGrubBot = new GrubGrubBot(gui);
-                    gui.add(gui.grubGrubBot, Utils.getprefc("wndc-grubGrubBotWindow", new Coord(gui.sz.x / 2 - gui.grubGrubBot.sz.x / 2, gui.sz.y / 2 - gui.grubGrubBot.sz.y / 2 - 200)));
-                    gui.grubGrubThread = new Thread(gui.grubGrubBot, "Hurricane-GrubGrubBot");
-					gui.grubGrubThread.start();
+					gui.add(gui.grubGrubBot, Utils.getprefc("wndc-grubGrubBotWindow", new Coord(gui.sz.x / 2 - gui.grubGrubBot.sz.x / 2, gui.sz.y / 2 - gui.grubGrubBot.sz.y / 2 - 200)));
+					gui.grubGrubBot.startThread("Hurricane-GrubGrubBot");
 				} else {
-					if (gui.grubGrubBot != null) {
-						gui.grubGrubBot.stop();
-                        gui.grubGrubBot.reqdestroy();
-						gui.grubGrubBot = null;
-					}
+					gui.grubGrubBot.stop();
+					gui.grubGrubBot.reqdestroy();
+					gui.grubGrubBot = null;
 				}
 			} else if (ad[2].equals("CellarDiggingBot")) {
-				if (gui.cellarDiggingBot == null && gui.cellarDiggingThread == null) {
+				if (gui.cellarDiggingBot == null) {
 					gui.cellarDiggingBot = new CellarDiggingBot(gui);
 					gui.add(gui.cellarDiggingBot, Utils.getprefc("wndc-cellarDiggingBotWindow", new Coord(gui.sz.x/2 - gui.cellarDiggingBot.sz.x/2, gui.sz.y/2 - gui.cellarDiggingBot.sz.y/2 - 200)));
-					gui.cellarDiggingThread = new Thread(gui.cellarDiggingBot, "Hurricane-CellarDiggingBot");
-					gui.cellarDiggingThread.start();
+					gui.cellarDiggingBot.startThread("Hurricane-CellarDiggingBot");
 				} else {
-					if (gui.cellarDiggingBot != null) {
-						gui.cellarDiggingBot.stop();
-						gui.cellarDiggingBot.reqdestroy();
-						gui.cellarDiggingBot = null;
-						gui.cellarDiggingThread = null;
-					}
+					gui.cellarDiggingBot.stop();
+					gui.cellarDiggingBot.reqdestroy();
+					gui.cellarDiggingBot = null;
 				}
 			} else if (ad[2].equals("RoastingSpitBot")) {
-				if (gui.roastingSpitBot == null && gui.roastingSpitThread == null) {
+				if (gui.roastingSpitBot == null) {
 					gui.roastingSpitBot = new RoastingSpitBot(gui);
 					gui.add(gui.roastingSpitBot, Utils.getprefc("wndc-roastingSpitBotWindow", new Coord(gui.sz.x/2 - gui.roastingSpitBot.sz.x/2, gui.sz.y/2 - gui.roastingSpitBot.sz.y/2 - 200)));
-					gui.roastingSpitThread = new Thread(gui.roastingSpitBot, "Hurricane-RoastingSpitBot");
-					gui.roastingSpitThread.start();
+					gui.roastingSpitBot.startThread("Hurricane-RoastingSpitBot");
 				} else {
-					if (gui.roastingSpitBot != null) {
-						gui.roastingSpitBot.stop();
-						gui.roastingSpitBot.reqdestroy();
-						gui.roastingSpitBot = null;
-						gui.roastingSpitThread = null;
-					}
+					gui.roastingSpitBot.stop();
+					gui.roastingSpitBot.reqdestroy();
+					gui.roastingSpitBot = null;
 				}
 			} else if (ad[2].equals("FarmingBot")) {
-				if (gui.farmingBot == null && gui.farmingBotThread == null) {
+				if (gui.farmingBot == null) {
 					gui.farmingBot = new FarmingBot(gui);
 					gui.add(gui.farmingBot, Utils.getprefc("wndc-farmingBotWindow", new Coord(gui.sz.x/2 - gui.farmingBot.sz.x/2, gui.sz.y/2 - gui.farmingBot.sz.y/2 - 200)));
-					gui.farmingBotThread = new Thread(gui.farmingBot, "Hurricane-FarmingBot");
-					gui.farmingBotThread.start();
+					gui.farmingBot.startThread("Hurricane-FarmingBot");
 				} else {
-					if (gui.farmingBot != null) {
-						gui.farmingBot.stop = true;
-						gui.farmingBot.stop();
-						gui.farmingBot.reqdestroy();
-						gui.farmingBot = null;
-						gui.farmingBotThread = null;
-					}
+					gui.farmingBot.stop();
+					gui.farmingBot.reqdestroy();
+					gui.farmingBot = null;
 				}
 			} else if (ad[2].equals("ButcherBot")) {
-				if (gui.butcherBot == null && gui.butcherBotThread == null) {
+				if (gui.butcherBot == null) {
 					gui.butcherBot = new ButcherBot(gui);
 					gui.add(gui.butcherBot, Utils.getprefc("wndc-butcherBotWindow", new Coord(gui.sz.x/2 - gui.butcherBot.sz.x/2, gui.sz.y/2 - gui.butcherBot.sz.y/2 - 200)));
-					gui.butcherBotThread = new Thread(gui.butcherBot, "Hurricane-ButcherBot");
-					gui.butcherBotThread.start();
+					gui.butcherBot.startThread("Hurricane-ButcherBot");
 				} else {
-					if (gui.butcherBot != null) {
-						gui.butcherBot.stop = true;
-						gui.butcherBot.stop();
-						gui.butcherBot.reqdestroy();
-						gui.butcherBot = null;
-						gui.butcherBotThread = null;
-					}
+					gui.butcherBot.stop();
+					gui.butcherBot.reqdestroy();
+					gui.butcherBot = null;
 				}
 			} else if (ad[2].equals("ClayDiggingBot")) {
-				if (gui.clayDiggingBot == null && gui.clayDiggingBotThread == null) {
+				if (gui.clayDiggingBot == null) {
 					gui.clayDiggingBot = new ClayDiggingBot(gui);
 					gui.add(gui.clayDiggingBot, Utils.getprefc("wndc-clayDiggingBotWindow", new Coord(gui.sz.x/2 - gui.clayDiggingBot.sz.x/2, gui.sz.y/2 - gui.clayDiggingBot.sz.y/2 - 200)));
-					gui.clayDiggingBotThread = new Thread(gui.clayDiggingBot, "Hurricane-ClayDiggingBot");
-					gui.clayDiggingBotThread.start();
+					gui.clayDiggingBot.startThread("Hurricane-ClayDiggingBot");
 				} else {
-					if (gui.clayDiggingBot != null) {
-						gui.clayDiggingBot.stop = true;
-						gui.clayDiggingBot.stop();
-						gui.clayDiggingBot.reqdestroy();
-						gui.clayDiggingBot = null;
-						gui.clayDiggingBotThread = null;
-					}
+					gui.clayDiggingBot.stop();
+					gui.clayDiggingBot.reqdestroy();
+					gui.clayDiggingBot = null;
 				}
 			} else if (ad[2].equals("OreSmeltingBot")) {
-				if (gui.oreSmeltingBot == null && gui.oreSmeltingBotThread == null) {
+				if (gui.oreSmeltingBot == null) {
 					gui.oreSmeltingBot = new OreSmeltingBot(gui);
 					gui.add(gui.oreSmeltingBot, Utils.getprefc("wndc-oreSmeltingBotWindow", new Coord(gui.sz.x/2 - gui.oreSmeltingBot.sz.x/2, gui.sz.y/2 - gui.oreSmeltingBot.sz.y/2 - 200)));
-					gui.oreSmeltingBotThread = new Thread(gui.oreSmeltingBot, "Hurricane-OreSmeltingBot");
-					gui.oreSmeltingBotThread.start();
+					gui.oreSmeltingBot.startThread("Hurricane-OreSmeltingBot");
 				} else {
-					if (gui.oreSmeltingBot != null) {
-						gui.oreSmeltingBot.stop = true;
-						gui.oreSmeltingBot.stop();
-						gui.oreSmeltingBot.reqdestroy();
-						gui.oreSmeltingBot = null;
-						gui.oreSmeltingBotThread = null;
-					}
+					gui.oreSmeltingBot.stop();
+					gui.oreSmeltingBot.reqdestroy();
+					gui.oreSmeltingBot = null;
 				}
 			} else if (ad[2].equals("ForagingBot")) {
-				if (gui.foragingBot == null && gui.foragingBotThread == null) {
+				if (gui.foragingBot == null) {
 					gui.foragingBot = new ForagingBot(gui);
 					gui.add(gui.foragingBot, Utils.getprefc("wndc-foragingBotWindow", new Coord(gui.sz.x/2 - gui.foragingBot.sz.x/2, gui.sz.y/2 - gui.foragingBot.sz.y/2 - 200)));
-					gui.foragingBotThread = new Thread(gui.foragingBot, "Hurricane-ForagingBot");
-					gui.foragingBotThread.start();
+					gui.foragingBot.startThread("Hurricane-ForagingBot");
 				} else {
-					if (gui.foragingBot != null) {
-						gui.foragingBot.stop = true;
-						gui.foragingBot.stop();
-						gui.foragingBot.reqdestroy();
-						gui.foragingBot = null;
-						gui.foragingBotThread = null;
-					}
+					gui.foragingBot.stop();
+					gui.foragingBot.reqdestroy();
+					gui.foragingBot = null;
 				}
 			} else if (ad[2].equals("MiningBot")) {
-				if (gui.miningBot == null && gui.miningBotThread == null) {
+				if (gui.miningBot == null) {
 					gui.miningBot = new MiningBot(gui);
 					gui.add(gui.miningBot, Utils.getprefc("wndc-miningBotWindow", new Coord(gui.sz.x/2 - gui.miningBot.sz.x/2, gui.sz.y/2 - gui.miningBot.sz.y/2 - 200)));
-					gui.miningBotThread = new Thread(gui.miningBot, "Hurricane-MiningBot");
-					gui.miningBotThread.start();
+					gui.miningBot.startThread("Hurricane-MiningBot");
 				} else {
-					if (gui.miningBot != null) {
-						gui.miningBot.stop = true;
-						gui.miningBot.stop();
-						gui.miningBot.reqdestroy();
-						gui.miningBot = null;
-						gui.miningBotThread = null;
-					}
+					gui.miningBot.stop();
+					gui.miningBot.reqdestroy();
+					gui.miningBot = null;
 				}
 			}
 		} else if (ad[1].equals("OtherScriptsAndTools")) {
