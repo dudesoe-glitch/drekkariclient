@@ -17,8 +17,12 @@ public class Quality extends QBuff implements GItem.OverlayInfo<Tex> {
     public static boolean show = Utils.getprefb("qtoggle", false);
     public static final BufferedImage qualityWorkaround = Resource.remote().loadwait("ui/tt/q/quality").layer(Resource.imgc, 0).scaled();
 
+    /** Pre-computed effectiveness multiplier: sqrt(q/10). Used for combat/crafting calculations. */
+    public final double multiplier;
+
     public Quality(Owner owner, double q) {
     super(owner, qualityWorkaround, "Quality", q); // ND: workaround suggested by loftar
+    this.multiplier = Math.sqrt(q / 10.0);
     }
 
     public static ItemInfo mkinfo(Owner owner, Object... args) {

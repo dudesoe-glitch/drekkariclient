@@ -199,6 +199,21 @@ public class GobHelper {
     }
 
     /**
+     * Find all gobs with the given resource name, within maxDist of the player.
+     *
+     * @param gui     the GameUI instance
+     * @param resName exact resource name to match (e.g., "gfx/terobjs/trees/birch")
+     * @param maxDist maximum distance from player (in game units), or <= 0 for unlimited
+     * @return list of matching gobs, possibly empty
+     */
+    public static List<Gob> findByName(GameUI gui, String resName, double maxDist) {
+        return findAll(gui, maxDist, g -> {
+            String name = getResName(g);
+            return name != null && name.equals(resName);
+        });
+    }
+
+    /**
      * Get the distance from the player to a gob.
      *
      * @return the distance, or Double.MAX_VALUE if player or gob is null

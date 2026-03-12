@@ -168,7 +168,7 @@ public class FarmingBot extends BotBase {
 					if (res == null) continue;
 					if (!res.name.startsWith(CROP_PREFIX)) continue;
 					if (!Utils.isSpriteKind(gob, "GrowingPlant", "TrellisPlant")) continue;
-					if (!isCropMature(gob)) continue;
+					if (!GobHelper.isMature(gob)) continue;
 
 					double dist = gob.rc.dist(playerPos);
 					if (dist > MAX_SEARCH_DIST) continue;
@@ -180,28 +180,6 @@ public class FarmingBot extends BotBase {
 			}
 		}
 		return closest;
-	}
-
-	private boolean isCropMature(Gob gob) {
-		try {
-			int maxStage = 0;
-			for (FastMesh.MeshRes layer : gob.getres().layers(FastMesh.MeshRes.class)) {
-				if (layer.id / 10 > maxStage) {
-					maxStage = layer.id / 10;
-				}
-			}
-			Drawable dr = gob.getattr(Drawable.class);
-			ResDrawable d = (dr instanceof ResDrawable) ? (ResDrawable) dr : null;
-			if (d == null) return false;
-			Message data = d.sdt.clone();
-			if (data == null) return false;
-			int stage = data.uint8();
-			if (stage > maxStage) stage = maxStage;
-			return stage == maxStage;
-		} catch (Exception e) {
-			if (e instanceof InterruptedException) Thread.currentThread().interrupt();
-			return false;
-		}
 	}
 
 	private WItem findBestSeed(String cropBaseName) {
