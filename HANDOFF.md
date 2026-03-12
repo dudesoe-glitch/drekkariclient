@@ -1,52 +1,60 @@
-# HANDOFF — Session 15 (Minimap Fix, Combat Rotation, Weapon Tuning)
+# HANDOFF — Session 16 (BotBase Migration, Bot Audit, Client Research)
 
 ## Resumption Prompt
-Fixed minimap click-to-move (cross-segment fallback using dloc+player.rc). Created CombatRotationBot (configurable skill sequences with loop/cooldown). Updated all weapon distances with Ring of Brodgar wiki multipliers (BASE_MELEE_DIST * range). Fixed CombatDistanceTool double-destroy bug. Researched Ardennes/Amber clients. Bot audit running. Build clean.
+Migrated 4 remaining Window+Runnable tools to BotBase (CombatDistanceTool, CombatRotationBot, MiningSafetyAssistant, OreAndStoneCounter). Removed 4 Thread fields from GameUI. Fixed bot audit findings across 6 bots (null safety, ui.gui→gui, Loading try-catch). Fixed volatile stop in AutoRepeatFlowerMenuScript and CheckpointManager. Researched 8 H&H custom clients — confirmed Hurricane already has every major feature they offer. Build clean.
 
 ## Goal
-Work through HANDOFF priorities: minimap click fix, combat rotation, weapon tuning, bot audit.
+Work through HANDOFF priorities: bot audit, client research comparison, BotBase migration, cleanup.
 
 ## Completed
 
-### Bug Fixes
-1. **Minimap click-to-move** — Root cause: `mvclick()` silently dropped clicks when `sessloc.seg != loc.seg`. Fix: compute world position from `dloc` (display center) + `player.rc` as fallback. Also relaxed `MapWnd.clickloc` segment check. Backwards-compatible: same-segment clicks unchanged.
-2. **CombatDistanceTool double-destroy** — `stop()` called `this.destroy()` AND `wdgmsg` handler called `reqdestroy()`. Fixed: removed `destroy()` from `stop()`, added null safety for `gui.map`.
+### BotBase Migration (4 tools)
+1. **CombatDistanceTool** → BotBase — fixed non-volatile stop, standardized lifecycle, skip idlePlayer in combat
+2. **CombatRotationBot** → BotBase — mapped activeButton/statusLabel to BotBase fields, skip idlePlayer
+3. **MiningSafetyAssistant** → BotBase — fixed non-volatile stop, standardized lifecycle
+4. **OreAndStoneCounter** → BotBase — fixed non-volatile stop, removed duplicate sleep()/stop()/reqdestroy()
+5. **GameUI** — removed 4 Thread fields (combatDistanceToolThread, combatRotationBotThread, miningSafetyAssistantThread, oreAndStoneCounterThread)
+6. **MenuGrid** — all 4 tools now use startThread() pattern, simplified toggle-off
 
-### New Features
-3. **CombatRotationBot** — Configurable combat skill sequence executor:
-   - Define rotation steps: action bar slot (1-10) + repeat count (up to 8 steps)
-   - Loop rotation and wait-for-cooldown options
-   - Sends moves via Fightsess "use"/"rel" messages with opponent targeting
-   - Persists rotation to preferences
-   - Slot key reference label (1-3=1/2/3, 4=R, 5=F, etc.)
-   - Thread-safe step list (synchronized)
-   - Registered in MenuGrid under OtherScriptsAndTools
+### Bot Audit Fixes (6 bots)
+7. **CellarDiggingBot** — ui.gui.map → gui.map, player null check
+8. **CleanupBot** — cached player in findClosestGob(), null guard
+9. **FishingBot** — ui.gui.getmeter → gui.getmeter, getmeters null/size check
+10. **OceanScoutBot** — ui.gui.map → gui.map throughout, Loading try-catch in isGobCollision/isDangerZone/isVeryDangerZone
+11. **TarKilnCleanerBot** — ui.gui → gui throughout, player null check
+12. **OreSmeltingBot** — gui.vhand null guard before item access
 
-4. **Weapon distance overhaul** — Updated all melee weapon distances using Ring of Brodgar wiki range multipliers:
-   - `BASE_MELEE_DIST = 13.5` × wiki multiplier (1.0-1.6)
-   - Added 10+ new weapons: knives, cleaver, scythe, sling, metal axe, throwing axe, obsidian dagger
-   - One constant to tune all melee weapons at once
+### Volatile Stop Fixes
+13. **AutoRepeatFlowerMenuScript** — `private boolean stop` → `private volatile boolean stop` (scheduler thread writes)
+14. **CheckpointManager** — `final boolean stop = false` → `volatile boolean stop` (was dead code, now functional)
 
-## In Progress
-- **Ardennes/Amber client research** — background agent researching features and repos
-- **Full bot audit** — background agent reviewing all 12+ bots for edge cases
+### Client Research (8 clients compared)
+15. Researched ArdClient, Amber, Purus-Pasta, Paragon, Kami, Minion, Nurgling, Yoink-Pasta
+16. Confirmed Hurricane already has every major feature (farming, mining, fishing, foraging, butchering, clay, ore smelting, tar kiln, trellis, cellar, inventory sort/filter/grouping, quality display, auto-drop, pathfinding, combat tools, alarms, equipment swap, batch crafting, map markers, etc.)
+17. Hurricane has unique features no other client offers (CombatRotationBot, CombatDistanceTool with RoB weapon ranges, BotBase framework, PathQueue with gold lines, ItemType enum, inventory list view, NotepadWindow)
 
 ## Next Priorities
-1. **Test all changes in-game** — 15 sessions of untested features!
-2. **Apply bot audit findings** — fix issues identified by audit
-3. **Review Ardennes/Amber research** — decide what to port
-4. **Tune BASE_MELEE_DIST** — needs in-game calibration (currently 13.5)
-5. **Consider CombatDistanceTool → BotBase migration**
-6. **QoL lessons document** — patterns applicable to future projects
+1. **Test all changes in-game** — 16 sessions of untested features
+2. **Livestock manager UI** — we have animal data overlays (GobQualityInfo, GobFoodWaterInfo) but no table/list view like other clients
+3. **Tune BASE_MELEE_DIST** — needs in-game calibration (currently 13.5)
+4. **Disable animations option** — FPS boost for low-end machines (other clients have this)
+5. **LP/H display in study tooltip** — Curiosity.java has data, could show in curio tooltip
+6. **Consider scripting API** — big effort but ArdClient's PBot was popular
 
 ## Files Modified
 | File | Changes |
 |------|---------|
-| `src/haven/MiniMap.java` | Cross-segment click fallback using dloc + player.rc |
-| `src/haven/MapWnd.java` | Relaxed clickloc segment check |
-| `src/haven/GameUI.java` | Added combatRotationBot + combatRotationBotThread fields |
-| `src/haven/MenuGrid.java` | CombatRotation menu entry + handler |
-| `src/haven/automated/CombatRotationBot.java` | **NEW** — Combat skill rotation bot |
-| `src/haven/automated/CombatDistanceTool.java` | Wiki-based weapon distances, double-destroy fix, null safety |
-| `res/customclient/menugrid/OtherScriptsAndTools/CombatRotation.res` | **NEW** — Menu icon |
-| `Diary/2026-03-12-session15.md` | **NEW** — Session diary |
+| `src/haven/GameUI.java` | Removed 4 Thread fields |
+| `src/haven/MenuGrid.java` | startThread() pattern for 4 tools, simplified toggle-off |
+| `src/haven/CheckpointManager.java` | volatile stop fix |
+| `src/haven/automated/CombatDistanceTool.java` | BotBase migration |
+| `src/haven/automated/CombatRotationBot.java` | BotBase migration |
+| `src/haven/automated/MiningSafetyAssistant.java` | BotBase migration |
+| `src/haven/automated/OreAndStoneCounter.java` | BotBase migration |
+| `src/haven/automated/AutoRepeatFlowerMenuScript.java` | volatile stop fix |
+| `src/haven/automated/CellarDiggingBot.java` | Null safety, ui.gui→gui |
+| `src/haven/automated/CleanupBot.java` | Player null guard in findClosestGob |
+| `src/haven/automated/FishingBot.java` | Null safety, ui.gui→gui |
+| `src/haven/automated/OceanScoutBot.java` | Null safety, ui.gui→gui, Loading try-catch |
+| `src/haven/automated/TarKilnCleanerBot.java` | Null safety, ui.gui→gui |
+| `src/haven/automated/OreSmeltingBot.java` | gui.vhand null guard |
