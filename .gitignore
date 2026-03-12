@@ -6,6 +6,7 @@
 /.idea
 *.iml
 *~
+__pycache__/
 nd-notes.txt
 README_Vanilla-Client
 Play_WithSteam.bat
