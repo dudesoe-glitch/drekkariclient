@@ -167,6 +167,8 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 	public Thread refillWaterContainersThread;
 	public CombatDistanceTool combatDistanceTool;
 	public Thread combatDistanceToolThread;
+	public CombatRotationBot combatRotationBot;
+	public Thread combatRotationBotThread;
 	public Thread harvestNearestDreamcatcherThread;
 	public Thread destroyNearestTrellisPlantScriptThread;
 	public Thread lootNearestKnockedPlayerThread;
@@ -192,6 +194,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 	public OreSmeltingBot oreSmeltingBot;
 	public ForagingBot foragingBot;
 	public MiningBot miningBot;
+	public NotepadWindow notepadWindow;
 
     public static abstract class BeltSlot {
 	public final int idx;

@@ -473,7 +473,14 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 		    } catch(Loading l) {
 			continue;
 		    }
-		    GOut g2 = g.reclip(p.add(1, 1), spr.sz());
+		    Coord sprSz = spr.sz();
+		    Coord btnArea = bgsz.sub(2, 2);
+		    // Center sprites within button area instead of top-left corner
+		    Coord offset = new Coord(
+			Math.max(0, (btnArea.x - sprSz.x) / 2),
+			Math.max(0, (btnArea.y - sprSz.y) / 2)
+		    );
+		    GOut g2 = g.reclip(p.add(1, 1).add(offset), sprSz);
 		    Pagina info = btn.pag;
 		    if(info.tnew != 0) {
 			info.anew = 1;
@@ -794,6 +801,7 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 		makeLocal("customclient/menugrid/OtherScriptsAndTools/SkisScript");
 		makeLocal("customclient/menugrid/OtherScriptsAndTools/RefillWaterContainers");
 		makeLocal("customclient/menugrid/OtherScriptsAndTools/CombatDistanceTool");
+		makeLocal("customclient/menugrid/OtherScriptsAndTools/CombatRotation");
 		makeLocal("customclient/menugrid/OtherScriptsAndTools/RefillCheeseTrays");
 		makeLocal("customclient/menugrid/OtherScriptsAndTools/HarvestNearestDreamcatcher");
 		makeLocal("customclient/menugrid/OtherScriptsAndTools/DestroyNearestTrellisPlantScript");
@@ -807,6 +815,7 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 		makeLocal("customclient/menugrid/OtherScriptsAndTools/QuestHelper");
 		makeLocal("customclient/menugrid/OtherScriptsAndTools/Add4BranchesScript");
 		makeLocal("customclient/menugrid/OtherScriptsAndTools/Add5WoodBlocksScript");
+		makeLocal("customclient/menugrid/OtherScriptsAndTools/Notepad");
 
 		// Category: Quick Switch From Belt
 		makeLocal("customclient/menugrid/QuickSwitchFromBelt/Equip_B12");
@@ -1075,6 +1084,19 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 						gui.combatDistanceToolThread = null;
 					}
 				}
+			} else if (ad[2].equals("CombatRotation")) {
+				if (gui.combatRotationBot == null && gui.combatRotationBotThread == null) {
+					gui.combatRotationBot = new CombatRotationBot(gui);
+					gui.add(gui.combatRotationBot, Utils.getprefc("wndc-combatRotationBotWindow", new Coord(gui.sz.x/2 - gui.combatRotationBot.sz.x/2, gui.sz.y/2 - gui.combatRotationBot.sz.y/2 - 200)));
+					gui.combatRotationBotThread = new Thread(gui.combatRotationBot, "Hurricane-CombatRotation");
+					gui.combatRotationBotThread.start();
+				} else {
+					if (gui.combatRotationBot != null) {
+						gui.combatRotationBot.stop();
+						gui.combatRotationBot = null;
+						gui.combatRotationBotThread = null;
+					}
+				}
 			} else if (ad[2].equals("RefillCheeseTrays")) {
 				gui.runActionThread(new Thread(new FillCheeseTray(gui), "Hurricane-FillCheeseTrays"));
 			} else if (ad[2].equals("HarvestNearestDreamcatcher")) {
@@ -1172,6 +1194,13 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 				gui.runActionThread(new Thread(new AddBranchesToFurnace(gui, 4), "Hurricane-Add4Branches"));
 			} else if (ad[2].equals("Add5WoodBlocksScript")) {
 				gui.runActionThread(new Thread(new AddWoodBlocksToSmokeShed(gui, 5), "Hurricane-Add5WoodBlocks"));
+			} else if (ad[2].equals("Notepad")) {
+				if (gui.notepadWindow == null) {
+					gui.notepadWindow = new NotepadWindow();
+					gui.add(gui.notepadWindow, Utils.getprefc("wndc-notepadWindow", new Coord(gui.sz.x / 2 - 140, gui.sz.y / 2 - 130)));
+				} else {
+					gui.notepadWindow.show(!gui.notepadWindow.visible);
+				}
 			}
 		} else if (ad[1].equals("QuickSwitchFromBelt")) {
 			new Thread(new EquipFromBelt(gui, ad[2]), "Hurricane-EquipFromBelt").start();

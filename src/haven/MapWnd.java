@@ -443,7 +443,7 @@ public class MapWnd extends Window implements Console.Directory {
 		domark = false;
 		return(true);
 	    }
-	    if(!press && (sessloc != null) && (loc.seg == sessloc.seg)) {
+	    if(!press) {
 		mvclick(mv, null, loc, null, button);
 		return(true);
 	    }

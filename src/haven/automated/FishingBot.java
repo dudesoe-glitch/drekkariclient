@@ -286,7 +286,9 @@ public class FishingBot extends BotBase {
 
     private boolean checkVitalsLocal() {
         try {
-            double hp = gui.getmeters("hp").get(1).a;
+            IMeter.Meter hpMeter = gui.getmeters("hp") != null ? gui.getmeters("hp").get(1) : null;
+            if (hpMeter == null) return true;
+            double hp = hpMeter.a;
             if (hp < HP_THRESHOLD) {
                 gui.act("travel", "hearth");
                 try {
@@ -298,13 +300,16 @@ public class FishingBot extends BotBase {
                 deactivate("Fishing Bot: HP IS " + hp + " .. PORTING HOME!");
                 return false;
             }
-            double nrj = ui.gui.getmeter("nrj", 0).a;
+            IMeter.Meter nrjMeter = ui.gui.getmeter("nrj", 0);
+            if (nrjMeter == null) return true;
+            double nrj = nrjMeter.a;
             if (nrj < ENERGY_THRESHOLD) {
                 deactivate("Fishing Bot: Low on energy! Stopping..");
                 return false;
             }
             // Stamina check
-            if (gui.getmeter("stam", 0).a < STAMINA_THRESHOLD) {
+            IMeter.Meter stamMeter = gui.getmeter("stam", 0);
+            if (stamMeter != null && stamMeter.a < STAMINA_THRESHOLD) {
                 try {
                     Actions.drinkTillFull(gui, 0.99, 0.99);
                 } catch (InterruptedException e) {

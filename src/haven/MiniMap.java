@@ -1262,70 +1262,80 @@ public class MiniMap extends Widget {
 
     public void mvclick(MapView mv, Coord mc, Location loc, Gob gob, int button) {
 	if(mc == null) mc = ui.mc;
-	if((sessloc != null) && (sessloc.seg == loc.seg)) {
-	    if(gob == null) {
-			if(ui.modmeta && button == 3){
-				Gob player = ui.gui.map.player();
-				if (player != null && player.rc != null) {
-					Map<String, ChatUI.MultiChat> chats = ui.gui.chat.getMultiChannels();
-					Coord2d clickloc = loc.tc.sub(sessloc.tc).mul(tilesz).add(tilesz.div(2));
-					ChatUI.MultiChat chat = chats.get("Party");
-					if (chat != null) {
-						chat.send("LOC@" + (int)(clickloc.x-player.rc.x) + "x" + (int)(clickloc.y-player.rc.y));
-					}
+	// Compute click world position — prefer sessloc (exact), fallback to dloc + player.rc
+	Coord2d clickWorldPos = null;
+	if(sessloc != null && sessloc.seg == loc.seg) {
+	    clickWorldPos = loc.tc.sub(sessloc.tc).mul(tilesz).add(tilesz.div(2));
+	} else {
+	    // Cross-segment or sessloc unavailable: compute from display center offset + player position
+	    Location dl = this.dloc;
+	    Gob player = (ui.gui != null && ui.gui.map != null) ? ui.gui.map.player() : null;
+	    if(dl != null && dl.seg == loc.seg && player != null && player.rc != null) {
+		Coord2d offset = new Coord2d(loc.tc.sub(dl.tc)).mul(tilesz);
+		clickWorldPos = player.rc.add(offset);
+	    }
+	}
+	if(clickWorldPos == null) return;
+
+	if(gob == null) {
+		if(ui.modmeta && button == 3){
+			Gob player = ui.gui.map.player();
+			if (player != null && player.rc != null) {
+				Map<String, ChatUI.MultiChat> chats = ui.gui.chat.getMultiChannels();
+				ChatUI.MultiChat chat = chats.get("Party");
+				if (chat != null) {
+					chat.send("LOC@" + (int)(clickWorldPos.x-player.rc.x) + "x" + (int)(clickWorldPos.y-player.rc.y));
 				}
 			}
-			if (OptWnd.autoEquipBunnySlippersPlateBootsCheckBox.a) {
-				ui.gui.map.switchToPlateBoots();
-			}
-			if(mv.checkpointManager != null && mv.checkpointManagerThread != null && button == 1){
-				if (!ui.modmeta)
-					mv.checkpointManager.pauseIt();
-			}
-            synchronized (Pathfinder.class) {
-                if (ui.gui.map.pf != null && button == 1) {
-                    ui.gui.map.pfFinalDest = null;
-                    ui.gui.map.pf.terminate = true;
-                    ui.gui.map.pfthread.interrupt();
-                }
-            }
+		}
+		if (OptWnd.autoEquipBunnySlippersPlateBootsCheckBox.a) {
+			ui.gui.map.switchToPlateBoots();
+		}
+		if(mv.checkpointManager != null && mv.checkpointManagerThread != null && button == 1){
+			if (!ui.modmeta)
+				mv.checkpointManager.pauseIt();
+		}
+		synchronized (Pathfinder.class) {
+		    if (ui.gui.map.pf != null && button == 1) {
+			ui.gui.map.pfFinalDest = null;
+			ui.gui.map.pf.terminate = true;
+			ui.gui.map.pfthread.interrupt();
+		    }
+		}
 		boolean useMinimapPF = button == 1 && OptWnd.walkWithPathFinderCheckBox.a && (
 			(ui.modctrl && ui.modshift && !ui.modmeta && !ui.modsuper) ||
 			(OptWnd.pathfindOnMinimapCheckBox != null && OptWnd.pathfindOnMinimapCheckBox.a && !ui.modmeta)
 		);
 		if(useMinimapPF) {
-			Coord2d dest = loc.tc.sub(sessloc.tc).mul(tilesz).add(tilesz.div(2));
-			mv.pfLongDistance(dest.floor());
+			mv.pfLongDistance(clickWorldPos.floor());
 		} else {
-			mv.wdgmsg("click", mc, loc.tc.sub(sessloc.tc).mul(tilesz).add(tilesz.div(2)).floor(posres), button, ui.modflags());
+			mv.wdgmsg("click", mc, clickWorldPos.floor(posres), button, ui.modflags());
 		}
-		} else {
-            if(mv.checkpointManager != null && mv.checkpointManagerThread != null && button == 3){
-                mv.checkpointManager.pauseIt();
-            }
-            synchronized (Pathfinder.class) {
-                if (ui.gui.map.pf != null && button == 3) {
-                    ui.gui.map.pf.terminate = true;
-                    ui.gui.map.pfthread.interrupt();
-                }
-            }
-			if (OptWnd.autoEquipBunnySlippersPlateBootsCheckBox.a) {
-				if (button == 3)
-					ui.gui.map.switchBunnySlippersAndPlateBoots(gob);
-				if (button == 1)
-					ui.gui.map.switchToPlateBoots();
+	} else {
+		if(mv.checkpointManager != null && mv.checkpointManagerThread != null && button == 3){
+		    mv.checkpointManager.pauseIt();
+		}
+		synchronized (Pathfinder.class) {
+		    if (ui.gui.map.pf != null && button == 3) {
+			ui.gui.map.pf.terminate = true;
+			ui.gui.map.pfthread.interrupt();
+		    }
+		}
+		if (OptWnd.autoEquipBunnySlippersPlateBootsCheckBox.a) {
+			if (button == 3)
+				ui.gui.map.switchBunnySlippersAndPlateBoots(gob);
+			if (button == 1)
+				ui.gui.map.switchToPlateBoots();
+		}
+		Object[] args = {mc, clickWorldPos.floor(posres), button, ui.modflags(), 0, (int) gob.id, gob.rc.floor(posres), 0, -1};
+		if (button == 3 && OptWnd.autoSelect1stFlowerMenuCheckBox.a) {
+			mv.wdgmsg("click", args);
+			if (ui.modctrl) {
+				ui.rcvr.rcvmsg(ui.lastWidgetID + 1, "cl", 0, ui.modflags());
 			}
-		Object[] args = {mc, loc.tc.sub(sessloc.tc).mul(tilesz).add(tilesz.div(2)).floor(posres), button, ui.modflags(), 0, (int) gob.id, gob.rc.floor(posres), 0, -1};
-			if (button == 3 && OptWnd.autoSelect1stFlowerMenuCheckBox.a) {
-				mv.wdgmsg("click", args);
-				if (ui.modctrl) {
-					ui.rcvr.rcvmsg(ui.lastWidgetID + 1, "cl", 0, ui.modflags());
-				}
-				return;
-			}
+			return;
+		}
 		mv.wdgmsg("click", args);
-		}
-        // Note: minimap pathfinding is now handled above in the ground-click block
 	}
     }
 

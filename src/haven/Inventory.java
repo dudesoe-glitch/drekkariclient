@@ -41,6 +41,12 @@ public class Inventory extends Widget implements DTarget {
     public String highlightItemName = null;
     public Map<GItem, WItem> wmap = new java.util.concurrent.ConcurrentHashMap<GItem, WItem>();
 	public static Set<String> PLAYER_INVENTORY_NAMES = new HashSet<>(Arrays.asList("Inventory", "Belt", "Equipment", "Character Sheet", "Study"));
+	public static Set<String> PRODUCTION_DEVICE_NAMES = new HashSet<>(Arrays.asList(
+		"Cauldron", "Oven", "Kiln", "Ore Smelter", "Smith's Smelter", "Finery Forge",
+		"Fireplace", "Stack Furnace", "Smoke Shed", "Herbalist Table", "Extraction Press",
+		"Tanning Tub", "Drying Frame", "Cheese Rack", "Pane Mold", "Steelbox",
+		"Smelter", "Garden Pot", "Clay Pot"
+	));
 
 	// Grouping modes for visual inventory organization
 	public enum GroupingMode {
@@ -56,16 +62,6 @@ public class Inventory extends Widget implements DTarget {
 
 	// Collapsed groups tracking (by group key)
 	public final Set<String> collapsedGroups = new HashSet<>();
-
-	// Cached group header hit areas for click detection
-	private final Map<String, Coord[]> groupHeaderAreas = new LinkedHashMap<>();
-
-	// Cached group header Tex objects — invalidated when groups change
-	private final Map<String, Tex> groupHeaderTexCache = new HashMap<>();
-	// Cached icon Tex objects for group header icons — keyed by resource name
-	private final Map<String, Tex> groupHeaderIconCache = new HashMap<>();
-	private GroupingMode lastCachedGroupingMode = null;
-	private int lastCachedChildCount = -1;
 
 	// Cached group key assignments — avoids calling getGroupKey() (which calls sortName()/info()) every frame
 	private Map<WItem, String> cachedGroupKeys = new HashMap<>();
@@ -216,31 +212,7 @@ public class Inventory extends Widget implements DTarget {
 	    refreshGroupKeyCache();
 	    drawGroupOverlays(g);
 	}
-	// Hide collapsed items before drawing children
-	if (groupingMode != GroupingMode.NONE && !collapsedGroups.isEmpty()) {
-	    for (Widget wdg = child; wdg != null; wdg = wdg.next) {
-		if (wdg instanceof WItem) {
-		    WItem wi = (WItem) wdg;
-		    String key = getCachedGroupKey(wi);
-		    if (collapsedGroups.contains(key)) {
-			wi.visible = false;
-		    }
-		}
-	    }
-	}
 	super.draw(g);
-	// Restore visibility after draw
-	if (groupingMode != GroupingMode.NONE && !collapsedGroups.isEmpty()) {
-	    for (Widget wdg = child; wdg != null; wdg = wdg.next) {
-		if (wdg instanceof WItem) {
-		    ((WItem) wdg).visible = true;
-		}
-	    }
-	}
-	// Draw group headers on top of everything
-	if (groupingMode != GroupingMode.NONE) {
-	    drawGroupHeaders(g);
-	}
     }
 
     private void drawGroupOverlays(GOut g) {
@@ -256,144 +228,14 @@ public class Inventory extends Widget implements DTarget {
 		}
 		int ci = groupColorIndex.get(key) % GROUP_COLORS.length;
 		java.awt.Color col = GROUP_COLORS[ci];
-		boolean collapsed = collapsedGroups.contains(key);
-		if (collapsed) {
-		    // Dimmed overlay for collapsed groups
-		    g.chcolor(40, 40, 40, 140);
-		} else {
-		    g.chcolor(col.getRed(), col.getGreen(), col.getBlue(), col.getAlpha());
-		}
+		g.chcolor(col.getRed(), col.getGreen(), col.getBlue(), col.getAlpha());
 		g.frect(wi.c.sub(1, 1), wi.sz.add(2, 2));
 		g.chcolor();
 	    }
 	}
     }
 
-    private void invalidateGroupHeaderTexCache() {
-	for (Tex t : groupHeaderTexCache.values()) {
-	    try { t.dispose(); } catch (Exception ignored) {}
-	}
-	groupHeaderTexCache.clear();
-	// Clear icon cache references (don't dispose — they are owned by Resource.Image)
-	groupHeaderIconCache.clear();
-    }
-
-    private void drawGroupHeaders(GOut g) {
-	// Build group info: first item position + item count + representative icon
-	Map<String, Coord> groupFirstPos = new LinkedHashMap<>();
-	Map<String, Integer> groupCounts = new LinkedHashMap<>();
-	Map<String, WItem> groupRepItem = new LinkedHashMap<>();
-
-	int childCount = 0;
-	for (Widget wdg = child; wdg != null; wdg = wdg.next) {
-	    if (wdg instanceof WItem) {
-		childCount++;
-		WItem wi = (WItem) wdg;
-		String key = getCachedGroupKey(wi);
-		groupCounts.merge(key, 1, Integer::sum);
-		if (!groupFirstPos.containsKey(key)) {
-		    groupFirstPos.put(key, wi.c.sub(1, 1));
-		    groupRepItem.put(key, wi);
-		} else {
-		    // Track topmost-leftmost position
-		    Coord cur = groupFirstPos.get(key);
-		    if (wi.c.y < cur.y || (wi.c.y == cur.y && wi.c.x < cur.x)) {
-			groupFirstPos.put(key, wi.c.sub(1, 1));
-			groupRepItem.put(key, wi);
-		    }
-		}
-	    }
-	}
-
-	// Invalidate header Tex cache if grouping mode or item count changed
-	if (lastCachedGroupingMode != groupingMode || lastCachedChildCount != childCount) {
-	    invalidateGroupHeaderTexCache();
-	    lastCachedGroupingMode = groupingMode;
-	    lastCachedChildCount = childCount;
-	}
-
-	groupHeaderAreas.clear();
-	int headerH = UI.scale(12);
-
-	for (Map.Entry<String, Coord> entry : groupFirstPos.entrySet()) {
-	    String key = entry.getKey();
-	    Coord pos = entry.getValue();
-	    int count = groupCounts.getOrDefault(key, 0);
-	    boolean collapsed = collapsedGroups.contains(key);
-
-	    // Build cache key that includes collapse state and count
-	    String cacheKey = key + "|" + collapsed + "|" + count;
-
-	    // Draw header background
-	    String label = collapsed ? "\u25B6 " + key + " (" + count + ")" : "\u25BC " + key + " (" + count + ")";
-	    Tex labelTex = groupHeaderTexCache.get(cacheKey);
-	    if (labelTex == null) {
-		try {
-		    labelTex = Text.renderstroked(label, java.awt.Color.WHITE, java.awt.Color.BLACK, Text.num12boldFnd).tex();
-		    groupHeaderTexCache.put(cacheKey, labelTex);
-		} catch (Exception e) {
-		    continue;
-		}
-	    }
-
-	    // Draw small item icon next to label
-	    int iconSz = UI.scale(11);
-	    Coord headerPos = new Coord(pos.x, pos.y - headerH);
-	    Coord headerSz = new Coord(labelTex.sz().x + iconSz + UI.scale(4), headerH);
-
-	    // Semi-transparent header background
-	    g.chcolor(0, 0, 0, 160);
-	    g.frect(headerPos, headerSz);
-	    g.chcolor();
-
-	    // Draw representative item icon (cached)
-	    WItem rep = groupRepItem.get(key);
-	    if (rep != null) {
-		try {
-		    Resource res = rep.item.resource();
-		    if (res != null) {
-			String resName = res.name;
-			Tex iconTex = groupHeaderIconCache.get(resName);
-			if (iconTex == null) {
-			    Resource.Image img = res.layer(Resource.imgc);
-			    if (img != null) {
-				iconTex = img.tex();
-				groupHeaderIconCache.put(resName, iconTex);
-			    }
-			}
-			if (iconTex != null) {
-			    g.image(iconTex, headerPos.add(1, 0), new Coord(iconSz, iconSz));
-			}
-		    }
-		} catch (Exception ignored) {}
-	    }
-
-	    // Draw label text
-	    g.image(labelTex, headerPos.add(iconSz + UI.scale(3), 0));
-
-	    // Store header area for click detection
-	    groupHeaderAreas.put(key, new Coord[]{headerPos, headerSz});
-	}
-    }
-
     public boolean mousedown(MouseDownEvent ev) {
-	if (groupingMode != GroupingMode.NONE && ev.b == 1) {
-	    Coord mc = ev.c;
-	    for (Map.Entry<String, Coord[]> entry : groupHeaderAreas.entrySet()) {
-		Coord pos = entry.getValue()[0];
-		Coord sz = entry.getValue()[1];
-		if (mc.x >= pos.x && mc.x <= pos.x + sz.x &&
-		    mc.y >= pos.y && mc.y <= pos.y + sz.y) {
-		    String key = entry.getKey();
-		    if (collapsedGroups.contains(key)) {
-			collapsedGroups.remove(key);
-		    } else {
-			collapsedGroups.add(key);
-		    }
-		    return true;
-		}
-	    }
-	}
 	return super.mousedown(ev);
     }
 	
@@ -414,28 +256,41 @@ public class Inventory extends Widget implements DTarget {
 	Window w = getparent(Window.class);
 	if (w == null || w.cap == null) return;
 	if (PLAYER_INVENTORY_NAMES.contains(w.cap)) return;
+	if (PRODUCTION_DEVICE_NAMES.contains(w.cap)) return;
 
 	isContainerInventory = true;
 	int toolbarH = UI.scale(22);
 	int btnY = sz.y + UI.scale(2);
+	int invWidth = isz.x * sqsz.x;
 
-	Button sortBtn = add(new Button(UI.scale(40), "Sort") {
+	// Use compact button sizes that fit small containers
+	int sortW = UI.scale(36);
+	int grpW = UI.scale(38);
+	int extW = UI.scale(30);
+	int gap = UI.scale(2);
+	int totalBtnW = sortW + grpW + extW + gap * 2;
+	// If buttons don't fit, shrink group button
+	if (totalBtnW > invWidth) {
+	    grpW = Math.max(UI.scale(24), invWidth - sortW - extW - gap * 2);
+	}
+
+	Button sortBtn = add(new Button(sortW, "Sort") {
 	    public void click() {
 		sortInventory();
 	    }
 	}, new Coord(UI.scale(1), btnY));
-	sortBtn.settip("Sort items by type, then quality (Ctrl+Shift+S)");
+	sortBtn.settip("Sort items by type, then quality");
 
-	containerGroupBtn = add(new Button(UI.scale(65), groupingMode.label) {
+	containerGroupBtn = add(new Button(grpW, "Grp") {
 	    public void click() {
 		groupingMode = groupingMode.next();
 		collapsedGroups.clear();
-		this.change(groupingMode.label);
+		this.settip(groupingMode.label);
 	    }
-	}, sortBtn.pos("ur").adds(4, 0));
-	containerGroupBtn.settip("Cycle grouping mode");
+	}, sortBtn.pos("ur").adds(gap, 0));
+	containerGroupBtn.settip(groupingMode.label);
 
-	Button extBtn = add(new Button(UI.scale(35), "Ext") {
+	Button extBtn = add(new Button(extW, "Ext") {
 	    public void click() {
 		GameUI gui = getparent(GameUI.class);
 		if (gui == null) return;
@@ -448,7 +303,7 @@ public class Inventory extends Widget implements DTarget {
 		gui.add(gui.extInventoryWindow, Utils.getprefc("wndc-extInventoryWindow",
 		    new Coord(gui.sz.x / 2 + 150, gui.sz.y / 2 - 250)));
 	    }
-	}, containerGroupBtn.pos("ur").adds(4, 0));
+	}, containerGroupBtn.pos("ur").adds(gap, 0));
 	extBtn.settip("Open Extended Inventory for this container");
 
 	// Resize inventory to include toolbar
@@ -778,15 +633,16 @@ public class Inventory extends Widget implements DTarget {
 	}
 
 	private void doSort(GameUI gui) throws InterruptedException {
-		// Collect all items, separate 1x1 from multi-slot
-		List<WItem> sortable = new ArrayList<>();
-		boolean[][] blocked = new boolean[isz.x][isz.y];
+		// Collect all items: multi-slot first (need more space), then 1x1
+		List<WItem> multiSlot = new ArrayList<>();
+		List<WItem> singleSlot = new ArrayList<>();
+		boolean[][] masked = new boolean[isz.x][isz.y];
 
 		// Mark sqmask-blocked cells
 		if (sqmask != null) {
 			for (int i = 0; i < isz.x * isz.y; i++) {
 				if (sqmask[i])
-					blocked[i % isz.x][i / isz.x] = true;
+					masked[i % isz.x][i / isz.x] = true;
 			}
 		}
 
@@ -794,119 +650,135 @@ public class Inventory extends Widget implements DTarget {
 			if (wdg instanceof WItem) {
 				WItem wi = (WItem) wdg;
 				Coord gridSz = wi.sz.div(sqsz);
-				if (gridSz.x == 1 && gridSz.y == 1) {
-					sortable.add(wi);
-				} else {
-					// Mark multi-slot items as blocked
-					Coord gridPos = wi.c.sub(1, 1).div(sqsz);
-					for (int dx = 0; dx < gridSz.x; dx++) {
-						for (int dy = 0; dy < gridSz.y; dy++) {
-							int gx = gridPos.x + dx, gy = gridPos.y + dy;
-							if (gx >= 0 && gx < isz.x && gy >= 0 && gy < isz.y)
-								blocked[gx][gy] = true;
-						}
-					}
-				}
+				if (gridSz.x == 1 && gridSz.y == 1)
+					singleSlot.add(wi);
+				else
+					multiSlot.add(wi);
 			}
 		}
 
-		if (sortable.isEmpty()) return;
+		if (singleSlot.isEmpty() && multiSlot.isEmpty()) return;
 
-		// Sort items using grouping-mode-aware comparator
+		// Sort both lists
 		Comparator<WItem> comparator = (groupingMode == GroupingMode.BY_QUALITY)
 			? ITEM_COMPARATOR_QUALITY_BRACKET
 			: ITEM_COMPARATOR_DESC;
-		sortable.sort(comparator);
+		singleSlot.sort(comparator);
+		multiSlot.sort(comparator);
 
-		// Build target positions: scan left-to-right, top-to-bottom, skip blocked
-		List<Coord> targets = new ArrayList<>();
-		for (int y = 0; y < isz.y; y++) {
-			for (int x = 0; x < isz.x; x++) {
-				if (!blocked[x][y]) {
-					targets.add(new Coord(x, y));
-				}
+		// Phase 1: Place multi-slot items first (they need contiguous space)
+		// Build occupancy grid from masked cells only
+		boolean[][] occupied = new boolean[isz.x][isz.y];
+		for (int x = 0; x < isz.x; x++)
+			for (int y = 0; y < isz.y; y++)
+				occupied[x][y] = masked[x][y];
+
+		for (WItem wi : multiSlot) {
+			Coord gridSz = wi.sz.div(sqsz);
+			Coord targetSlot = findFreeSlot(occupied, gridSz.x, gridSz.y);
+			if (targetSlot == null) continue; // No room, leave in place
+			Coord currentSlot = wi.c.sub(1, 1).div(sqsz);
+			if (!currentSlot.equals(targetSlot)) {
+				// Pick up and place
+				wi.item.wdgmsg("take", Coord.z);
+				if (!waitForCursor(gui, true)) return;
+				wdgmsg("drop", targetSlot);
+				Thread.sleep(10);
+				waitForCursor(gui, false);
 			}
+			// Mark occupied
+			for (int dx = 0; dx < gridSz.x; dx++)
+				for (int dy = 0; dy < gridSz.y; dy++) {
+					int gx = targetSlot.x + dx, gy = targetSlot.y + dy;
+					if (gx < isz.x && gy < isz.y) occupied[gx][gy] = true;
+				}
 		}
 
-		// Build current position map and target assignment
+		// Phase 2: Swap-chain sort 1x1 items into remaining free slots
+		List<Coord> targets = new ArrayList<>();
+		for (int y = 0; y < isz.y; y++)
+			for (int x = 0; x < isz.x; x++)
+				if (!occupied[x][y]) targets.add(new Coord(x, y));
+
+		// Refresh single-slot list (positions may have shifted)
+		singleSlot.clear();
+		for (Widget wdg = child; wdg != null; wdg = wdg.next) {
+			if (wdg instanceof WItem) {
+				Coord gridSz = ((WItem) wdg).sz.div(sqsz);
+				if (gridSz.x == 1 && gridSz.y == 1) singleSlot.add((WItem) wdg);
+			}
+		}
+		singleSlot.sort(comparator);
+
 		Map<WItem, Coord> currentPos = new HashMap<>();
 		Map<Coord, WItem> posToItem = new HashMap<>();
-		for (WItem wi : sortable) {
+		for (WItem wi : singleSlot) {
 			Coord gp = wi.c.sub(1, 1).div(sqsz);
 			currentPos.put(wi, gp);
 			posToItem.put(gp, wi);
 		}
 
-		// Assign targets: sortable[i] should go to targets[i]
 		Map<WItem, Coord> targetPos = new HashMap<>();
-		for (int i = 0; i < sortable.size() && i < targets.size(); i++) {
-			targetPos.put(sortable.get(i), targets.get(i));
-		}
+		for (int i = 0; i < singleSlot.size() && i < targets.size(); i++)
+			targetPos.put(singleSlot.get(i), targets.get(i));
 
-		// Swap-chain sort: move items to their target positions
 		Set<WItem> placed = new HashSet<>();
-		for (int i = 0; i < sortable.size() && i < targets.size(); i++) {
-			WItem item = sortable.get(i);
+		for (int i = 0; i < singleSlot.size() && i < targets.size(); i++) {
+			WItem item = singleSlot.get(i);
 			if (placed.contains(item)) continue;
 			Coord target = targetPos.get(item);
 			Coord current = currentPos.get(item);
-			if (current.equals(target)) {
-				placed.add(item);
-				continue;
-			}
+			if (current.equals(target)) { placed.add(item); continue; }
 
-			// Start chain: pick up this item
 			item.item.wdgmsg("take", Coord.z);
 			if (!waitForCursor(gui, true)) return;
-			Thread.sleep(30);
 
-			// Follow the chain
 			WItem carrying = item;
 			while (carrying != null && !placed.contains(carrying)) {
 				Coord dropTarget = targetPos.get(carrying);
 				placed.add(carrying);
-
-				// Check what's at the drop target
 				WItem displaced = posToItem.get(dropTarget);
-
-				// Drop at target
 				wdgmsg("drop", dropTarget);
-				Thread.sleep(30);
-
-				// Update tracking
+				Thread.sleep(10);
 				posToItem.remove(currentPos.get(carrying));
 				currentPos.put(carrying, dropTarget);
 				posToItem.put(dropTarget, carrying);
 
 				if (displaced != null && !placed.contains(displaced)) {
-					// The displaced item is now on cursor
 					if (!waitForCursor(gui, true)) return;
 					carrying = displaced;
 				} else {
-					// Chain ended, cursor should be empty
 					waitForCursor(gui, false);
 					carrying = null;
 				}
 			}
 
-			// Safety: if cursor still has item, drop it back into inventory
 			if (gui.vhand != null) {
 				Coord freeSlot = isRoom(1, 1);
-				if (freeSlot != null) {
-					wdgmsg("drop", freeSlot);
-				} else {
-					gui.vhand.item.wdgmsg("drop", Coord.z);
-				}
+				if (freeSlot != null) wdgmsg("drop", freeSlot);
+				else gui.vhand.item.wdgmsg("drop", Coord.z);
 				waitForCursor(gui, false);
 			}
 		}
 	}
 
+	private Coord findFreeSlot(boolean[][] occupied, int w, int h) {
+		for (int y = 0; y <= isz.y - h; y++)
+			for (int x = 0; x <= isz.x - w; x++) {
+				boolean fits = true;
+				for (int dx = 0; dx < w && fits; dx++)
+					for (int dy = 0; dy < h && fits; dy++)
+						if (occupied[x + dx][y + dy]) fits = false;
+				if (fits) return new Coord(x, y);
+			}
+		return null;
+	}
+
 	private boolean waitForCursor(GameUI gui, boolean wantItem) throws InterruptedException {
-		for (int i = 0; i < 200; i++) {
+		for (int i = 0; i < 150; i++) {
 			if (wantItem && (gui.vhand != null || !gui.hand.isEmpty())) return true;
 			if (!wantItem && gui.vhand == null && gui.hand.isEmpty()) return true;
-			Thread.sleep(5);
+			Thread.sleep(3);
 		}
 		return false;
 	}

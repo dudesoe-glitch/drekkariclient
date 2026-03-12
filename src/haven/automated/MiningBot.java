@@ -1,6 +1,9 @@
 package haven.automated;
 
 import haven.*;
+import haven.automated.GobHelper;
+
+import java.util.List;
 
 import static haven.OCache.posres;
 
@@ -8,11 +11,13 @@ public class MiningBot extends BotBase {
 	private Label targetLabel;
 	private Coord2d targetPos;
 	public boolean settingTarget;
+	private boolean safeMining;
 
 	public MiningBot(GameUI gui) {
-		super(gui, UI.scale(250, 120), "Mining Bot");
+		super(gui, UI.scale(250, 150), "Mining Bot");
 		this.targetPos = null;
 		this.settingTarget = false;
+		this.safeMining = Utils.getprefb("miningBot_safeMining", false);
 
 		statusLabel = new Label("Idle");
 		add(statusLabel, UI.scale(10, 10));
@@ -28,6 +33,10 @@ public class MiningBot extends BotBase {
 
 		targetLabel = new Label("Target: not set");
 		add(targetLabel, UI.scale(10, 58));
+
+		add(new CheckBox("Safe Mining (support radius)") {{ a = safeMining; }
+			public void set(boolean val) { safeMining = val; a = val; Utils.setprefb("miningBot_safeMining", val); }
+		}, UI.scale(10, 78));
 
 		activeButton = new Button(UI.scale(80), "Start") {
 			@Override
@@ -48,7 +57,7 @@ public class MiningBot extends BotBase {
 				}
 			}
 		};
-		add(activeButton, UI.scale(80, 75));
+		add(activeButton, UI.scale(80, 105));
 	}
 
 	@Override
@@ -57,6 +66,12 @@ public class MiningBot extends BotBase {
 		Gob player = gui.map.player();
 		if (player == null) { Thread.sleep(500); return; }
 		if (!checkVitals()) return;
+
+		if (safeMining && !isInSupportRange(targetPos)) {
+			setStatus("Target outside support range!");
+			deactivate();
+			return;
+		}
 
 		if (gui.prog != null) {
 			setStatus("Mining...");
@@ -79,6 +94,23 @@ public class MiningBot extends BotBase {
 			Thread.sleep(200);
 		}
 		Thread.sleep(500);
+	}
+
+	private boolean isInSupportRange(Coord2d pos) {
+		List<Gob> supports = GobHelper.findAllSupports(gui);
+		for (Gob support : supports) {
+			try {
+				String res = support.getres().name;
+				double dist = support.rc.dist(pos);
+				if ((res.equals("gfx/terobjs/ladder") || res.equals("gfx/terobjs/minesupport")) && dist <= 100)
+					return true;
+				if (res.equals("gfx/terobjs/column") && dist <= 125)
+					return true;
+				if (res.equals("gfx/terobjs/minebeam") && dist <= 150)
+					return true;
+			} catch (Loading ignored) {}
+		}
+		return false;
 	}
 
 	public void setTarget(Coord2d mc) {
