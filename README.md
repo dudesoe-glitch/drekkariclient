@@ -85,6 +85,7 @@ Or just run `Play.bat` from a release.
 
 ## Credits
 
-Built on top of the official Haven & Hearth client source.
-- Official source: `git://sh.seatribe.se/hafen-client`
+Forked from [Hurricane](https://github.com/Nightdawg/Hurricane) by Nightdawg — the foundation this client is built on.
+
+- Official Haven & Hearth client source: `git://sh.seatribe.se/hafen-client`
 - Web map support: [Cediner's hnh-map-vuetify](https://github.com/Cediner/hnh-map-vuetify)
