@@ -23,13 +23,16 @@ public class DestroyNearestTrellisPlantScript implements Runnable {
 
     @Override
     public void run() {
+        Gob player = gui.map.player();
+        if (player == null)
+            return;
         Gob plant = null;
         synchronized (gui.map.glob.oc) {
             for (Gob gob : gui.map.glob.oc) {
                 try {
                     Resource res = gob.getres();
                     if (res != null && plants.contains(res.name)) {
-                        Coord2d plc = gui.map.player().rc;
+                        Coord2d plc = player.rc;
                         if ((plant == null || gob.rc.dist(plc) < plant.rc.dist(plc)))
                             plant = gob;
                     }

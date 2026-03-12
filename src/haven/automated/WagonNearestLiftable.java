@@ -244,15 +244,13 @@ public class WagonNearestLiftable implements Runnable {
                 gui.map.wdgmsg("click", Coord.z, vehicle.rc.floor(posres), 3, 0, 0, (int) vehicle.id, vehicle.rc.floor(posres), 0, -1);
             }
 
-            return;
-        
         } catch (InterruptedException e) {
             gui.error(e.getMessage());
-        }
-
-        if (gui.wagonNearestLiftableThread != null) {
-            gui.wagonNearestLiftableThread.interrupt();
-            gui.wagonNearestLiftableThread = null;
+        } finally {
+            if (gui.wagonNearestLiftableThread != null) {
+                gui.wagonNearestLiftableThread.interrupt();
+                gui.wagonNearestLiftableThread = null;
+            }
         }
     }
 }

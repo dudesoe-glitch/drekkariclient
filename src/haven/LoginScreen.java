@@ -231,7 +231,7 @@ public class LoginScreen extends Widget {
 		}
 	};
 	Config.githubLatestVersion = "Loading...";
-	GitHubVersionFetcher.fetchLatestVersion("Nightdawg", "Hurricane", new GitHubVersionFetcher.VersionCallback() {
+	GitHubVersionFetcher.fetchLatestVersion("dudesoe-glitch", "drekkariclient", new GitHubVersionFetcher.VersionCallback() {
 		@Override
 		public void onVersionFetched(String version) {
 			Config.githubLatestVersion = version; // Update immediately upon response

@@ -85,19 +85,15 @@ public class EnterNearestVehicle implements Runnable {
             } else if (vehicleType == 2) {
                 FlowerMenu.setNextSelection("Giddyup!");
                 gui.map.wdgmsg("click", Coord.z, vehicle.rc.floor(posres), 3, 0, 0, (int) vehicle.id, vehicle.rc.floor(posres), 0, -1);
-                return;
             } else if (vehicleType == 3) {
                 FlowerMenu.setNextSelection("Ski off");
                 gui.map.wdgmsg("click", Coord.z, vehicle.rc.floor(posres), 3, 0, 0, (int) vehicle.id, vehicle.rc.floor(posres), 0, -1);
-                return;
             } else if (vehicleType == 4) {
                 FlowerMenu.setNextSelection("Into the blue yonder!");
                 gui.map.wdgmsg("click", Coord.z, vehicle.rc.floor(posres), 3, 0, 0, (int) vehicle.id, vehicle.rc.floor(posres), 0, -1);
-                return;
             } else if (vehicleType == 5) {
                 FlowerMenu.setNextSelection("Ride");
                 gui.map.wdgmsg("click", Coord.z, vehicle.rc.floor(posres), 3, 0, 0, (int) vehicle.id, vehicle.rc.floor(posres), 0, -1);
-                return;
             } else {
                 gui.map.wdgmsg("click",Coord.z, vehicle.rc.floor(posres), 3, 0, 0, (int) vehicle.id, vehicle.rc.floor(posres), 0, -1);
             }

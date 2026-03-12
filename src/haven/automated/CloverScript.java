@@ -18,6 +18,9 @@ public class CloverScript implements Runnable {
 
     @Override
     public void run() {
+        Gob player = gui.map.player();
+        if (player == null)
+            return;
         synchronized (gui.map.glob.oc) {
             for (Gob gob : gui.map.glob.oc) {
                 Resource res = null;
@@ -27,11 +30,11 @@ public class CloverScript implements Runnable {
                 }
                 if (res != null) {
                     if (((res.name.equals("gfx/kritter/horse/horse")) || (res.name.equals("gfx/kritter/goat/wildgoat")) || (res.name.equals("gfx/kritter/boar/boar")) || (res.name.equals("gfx/kritter/reindeer/reindeer")))) {
-                        double distFromPlayer = gob.rc.dist(gui.map.player().rc);
+                        double distFromPlayer = gob.rc.dist(player.rc);
                         if (distFromPlayer < maxDistance) {
                             if (animal == null)
                                 animal = gob;
-                            else if (gob.rc.dist(gui.map.player().rc) < animal.rc.dist(gui.map.player().rc))
+                            else if (gob.rc.dist(player.rc) < animal.rc.dist(player.rc))
                                 animal = gob;
                         }
                     } else if (res.name.equals("gfx/kritter/cattle/cattle")) { // ND: Special case for Aurochs
@@ -42,11 +45,11 @@ public class CloverScript implements Runnable {
                                     if (c.comp.cmod.size() > 0) {
                                         for (Composited.MD item : c.comp.cmod) {
                                             if (item.mod.get().basename().equals("aurochs")){
-                                                double distFromPlayer = gob.rc.dist(gui.map.player().rc);
+                                                double distFromPlayer = gob.rc.dist(player.rc);
                                                 if (distFromPlayer < maxDistance) {
                                                     if (animal == null)
                                                         animal = gob;
-                                                    else if (gob.rc.dist(gui.map.player().rc) < animal.rc.dist(gui.map.player().rc))
+                                                    else if (gob.rc.dist(player.rc) < animal.rc.dist(player.rc))
                                                         animal = gob;
                                                 }
                                             }
@@ -63,11 +66,11 @@ public class CloverScript implements Runnable {
                                     if (c.comp.cmod.size() > 0) {
                                         for (Composited.MD item : c.comp.cmod) {
                                             if (item.mod.get().basename().equals("mouflon")){
-                                                double distFromPlayer = gob.rc.dist(gui.map.player().rc);
+                                                double distFromPlayer = gob.rc.dist(player.rc);
                                                 if (distFromPlayer < maxDistance) {
                                                     if (animal == null)
                                                         animal = gob;
-                                                    else if (gob.rc.dist(gui.map.player().rc) < animal.rc.dist(gui.map.player().rc))
+                                                    else if (gob.rc.dist(player.rc) < animal.rc.dist(player.rc))
                                                         animal = gob;
                                                 }
                                             }

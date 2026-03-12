@@ -99,6 +99,9 @@ public class AutoRepeatFlowerMenuScript implements Runnable{
         }
         option = null;
         FlowerMenu.setNextSelection(null);
+        if (!scheduler.isShutdown()) {
+            scheduler.shutdownNow();
+        }
         if (gui.autoRepeatFlowerMenuScriptThread != null) {
             gui.autoRepeatFlowerMenuScriptThread.interrupt();
             gui.autoRepeatFlowerMenuScriptThread = null;

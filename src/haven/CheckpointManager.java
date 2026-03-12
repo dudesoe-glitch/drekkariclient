@@ -455,9 +455,9 @@ public class CheckpointManager extends Window implements Runnable {
             initialCoords.set(initialCoords.size() - 1, initialCoords.get(0));
 
             double minX = Double.MAX_VALUE;
-            double maxX = Double.MIN_VALUE;
+            double maxX = -Double.MAX_VALUE;
             double minY = Double.MAX_VALUE;
-            double maxY = Double.MIN_VALUE;
+            double maxY = -Double.MAX_VALUE;
 
             for (Coord coord : initialCoords) {
                 minX = Math.min(minX, coord.x);
@@ -605,7 +605,8 @@ public class CheckpointManager extends Window implements Runnable {
             try {
                 Thread.sleep(delayMs);
             } catch (InterruptedException e) {
-                throw new RuntimeException(e);
+                stop = true;
+                return;
             }
         }
     }

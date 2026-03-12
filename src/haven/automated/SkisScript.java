@@ -34,7 +34,7 @@ public class SkisScript implements Runnable {
                     try {
                         Resource res = gob.getres();
                         if (res != null && (res.name.startsWith("gfx/terobjs/vehicle/skis-wilderness"))) {
-                            Coord2d plc = gui.map.player().rc;
+                            Coord2d plc = player.rc;
                             if ((gobSkis == null || gob.rc.dist(plc) < gobSkis.rc.dist(plc)))
                                 gobSkis = gob;
                         }
@@ -45,7 +45,7 @@ public class SkisScript implements Runnable {
 
             if (gobSkis == null)
                 return;
-            if (gobSkis.rc.dist(gui.map.player().rc) < 11*5) {
+            if (gobSkis.rc.dist(player.rc) < 11*5) {
                     FlowerMenu.setNextSelection("Pick up");
                     gui.map.wdgmsg("click", Coord.z, gobSkis.rc.floor(posres), 3, 0, 0, (int) gobSkis.id, gobSkis.rc.floor(posres), 0, -1);
             }
@@ -115,7 +115,7 @@ public class SkisScript implements Runnable {
                         try {
                             Resource res = gob.getres();
                             if (res != null && (res.name.startsWith("gfx/terobjs/vehicle/skis-wilderness"))) {
-                                Coord2d plc = gui.map.player().rc;
+                                Coord2d plc = player.rc;
                                 if ((gobSkis == null || gob.rc.dist(plc) < gobSkis.rc.dist(plc)))
                                     gobSkis = gob;
                             }
@@ -134,7 +134,7 @@ public class SkisScript implements Runnable {
                         }
                     }
                     if (peekrbuf != null && peekrbuf == 0) { // ND: peekrbuf 0 means not-moving skis. Not necessarily empty.
-                        if (gobSkis.rc.dist(gui.map.player().rc) < 11 * 6) {
+                        if (gobSkis.rc.dist(player.rc) < 11 * 6) {
                             moutableSkis = true;
                             FlowerMenu.setNextSelection("Ski off");
                             gui.map.wdgmsg("click", Coord.z, gobSkis.rc.floor(posres), 3, 0, 0, (int) gobSkis.id, gobSkis.rc.floor(posres), 0, -1);

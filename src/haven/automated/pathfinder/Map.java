@@ -141,13 +141,39 @@ public class Map {
         }
     }
 
+    private static final HitBoxes.CollisionBoxSecondary[] DEFAULT_FALLBACK_HITBOX = new HitBoxes.CollisionBoxSecondary[]{
+        new HitBoxes.CollisionBoxSecondary(new Coord(-3, -3), new Coord(3, 3), new Coord(3, -3), new Coord(-3, 3))
+    };
+
     public void analyzeGobHitBoxes(Gob gob) {
         if (gob.getres() == null) {
             return;
         }
 
-        if (HitBoxes.collisionBoxMap.get(gob.getres().name) != null) {
-            HitBoxes.CollisionBoxSecondary[] collisionBoxSecondaries = HitBoxes.collisionBoxMap.get(gob.getres().name);
+        HitBoxes.CollisionBoxSecondary[] collisionBoxSecondaries = HitBoxes.collisionBoxMap.get(gob.getres().name);
+        if (collisionBoxSecondaries == null) {
+            try {
+                HitBoxes.addHitBox(gob);
+            } catch (Loading ignored) {
+            }
+            collisionBoxSecondaries = HitBoxes.collisionBoxMap.get(gob.getres().name);
+        }
+        if (collisionBoxSecondaries == null) {
+            String resName = gob.getres().name;
+            if (resName.startsWith("gfx/borka/")) {
+                return;
+            }
+            for (String passable : new String[]{"gfx/terobjs/herbs", "gfx/terobjs/items", "gfx/terobjs/plants", "gfx/terobjs/clue", "gfx/terobjs/boostspeed", "gfx/kritter/jellyfish"}) {
+                if (resName.contains(passable) && !resName.contains("trellis")) {
+                    return;
+                }
+            }
+            if (resName.startsWith("gfx/kritter/")) {
+                return;
+            }
+            collisionBoxSecondaries = DEFAULT_FALLBACK_HITBOX;
+        }
+        if (collisionBoxSecondaries != null) {
             if (gob.getres().name.contains("/pow")) {
                 Resource res = gob.getres();
                 ResDrawable rd = gob.getattr(ResDrawable.class);
