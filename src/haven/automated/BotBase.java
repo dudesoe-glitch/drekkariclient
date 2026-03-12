@@ -127,7 +127,7 @@ public abstract class BotBase extends Window implements Runnable {
 			try {
 				if (gui.getmeter("stam", 0).a < STAMINA_THRESHOLD) {
 					setStatus("Drinking...");
-					AUtils.drinkTillFull(gui, 0.99, 0.99);
+					Actions.drinkTillFull(gui, 0.99, 0.99);
 				}
 			} catch (InterruptedException e) { throw e; }
 		}

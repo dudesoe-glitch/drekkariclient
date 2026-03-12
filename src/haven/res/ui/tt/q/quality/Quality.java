@@ -29,6 +29,36 @@ public class Quality extends QBuff implements GItem.OverlayInfo<Tex> {
 	return(new Quality(owner, ((Number)args[1]).doubleValue()));
     }
 
+    /**
+     * Resolve the effective quality value to display, taking into account
+     * the user's chosen aggregation mode (Default / Mean / Average / Min / Max).
+     * Falls back to raw quality when aggregation is not applicable.
+     */
+    private double resolveDisplayQuality(double rawQ) {
+        int mode = OptWnd.qualityAggMode;
+        if (mode == 0) return rawQ;
+        if (owner instanceof GItem) {
+            QualityList ql = ((GItem) owner).getQualityList();
+            if (ql != null && !ql.isEmpty()) {
+                QualityList.SingleType type = switch (mode) {
+                    case 1 -> QualityList.SingleType.Mean;
+                    case 2 -> QualityList.SingleType.Average;
+                    case 3 -> QualityList.SingleType.Min;
+                    case 4 -> QualityList.SingleType.Max;
+                    default -> null;
+                };
+                if (type != null) return ql.get(type);
+            }
+        }
+        return rawQ;
+    }
+
+    private TexI renderQualityTex(double displayQ, Color color) {
+        return new TexI(PUtils.strokeImg(OptWnd.roundedQualityCheckBox.a
+                ? GItem.NumberInfo.numrenderStroked((int) Math.round(displayQ), color, true)
+                : GItem.NumberInfo.numrenderStrokedDecimal(displayQ, color, true)));
+    }
+
     public Tex overlay() {
         boolean irrelevantQuality = false; // ND: Use this to show the quality of some containers as "Empty", rather than their actual quality.
         Color qualityColor;
@@ -47,25 +77,27 @@ public class Quality extends QBuff implements GItem.OverlayInfo<Tex> {
                 if (info instanceof Contents) {
                     for (ItemInfo info2 : ((Contents) info).sub) {
                         if (info2 instanceof QBuff) {
+                            double contentQ = resolveDisplayQuality(((QBuff) info2).q);
                             if ((((Contents) info).content != null) && (((Contents) info).content.name != null)) {
                                 String liquidName = ((Contents) info).content.name;
                                 if (liquidColorsMap.keySet().stream().anyMatch(liquidName::matches)){
-                                    return (new TexI(PUtils.strokeImg(OptWnd.roundedQualityCheckBox.a ? GItem.NumberInfo.numrenderStroked((int) Math.round(((QBuff) info2).q), liquidColorsMap.get(liquidName), true)
-                                            : GItem.NumberInfo.numrenderStrokedDecimal(((QBuff) info2).q, liquidColorsMap.get(liquidName), true) )));
+                                    return renderQualityTex(contentQ, liquidColorsMap.get(liquidName));
                                 }
                             }
-                            return (new TexI(PUtils.strokeImg(OptWnd.roundedQualityCheckBox.a ? GItem.NumberInfo.numrenderStroked((int) Math.round(((QBuff) info2).q), Color.WHITE, true)
-                                    : GItem.NumberInfo.numrenderStrokedDecimal(((QBuff) info2).q, Color.WHITE, true))));
+                            return renderQualityTex(contentQ, Color.WHITE);
                         }
                     }
                 }
             }
         } catch (Exception ignored) {
         }
-        if (!irrelevantQuality)
-            return (new TexI(PUtils.strokeImg(OptWnd.roundedQualityCheckBox.a ? GItem.NumberInfo.numrenderStroked((int) Math.round(q), qualityColor, true)
-                    : GItem.NumberInfo.numrenderStrokedDecimal(q, qualityColor, true))));
-        else
+        if (!irrelevantQuality) {
+            double displayQ = resolveDisplayQuality(q);
+            if(OptWnd.customQualityColorsCheckBox.a){
+                qualityColor = findHighestTextEntryValueLessThanQ(displayQ);
+            }
+            return renderQualityTex(displayQ, qualityColor);
+        } else
             return (new TexI(PUtils.strokeImg(GItem.NumberInfo.textrenderStroked("Empty", new Color(106, 106, 106, 255), true))));
     }
 

@@ -127,8 +127,8 @@ public class ButcherBot extends BotBase {
 		setStatus("Walking to " + animalName);
 
 		gui.map.pfLeftClick(animal.rc.floor().add(2, 0), null);
-		if (!AUtils.waitPf(gui)) {
-			AUtils.unstuck(gui);
+		if (!Actions.waitPf(gui)) {
+			Actions.unstuck(gui);
 			Thread.sleep(1000);
 			return;
 		}

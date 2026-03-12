@@ -184,7 +184,7 @@ public class RoastingSpitBot extends BotBase {
 	public void putItemOnRoast(GItem item) {
 		item.wdgmsg("take", Coord.z);
 		sleep(500);
-		if (AUtils.rightClickGobOverlayWithItem(this.gui, fireplace, roastingSpitOverlayName)) {
+		if (Actions.rightClickGobOverlayWithItem(this.gui, fireplace, roastingSpitOverlayName)) {
 			sleep(2000);
 		} else {
 			gui.error("Roasting Spit Bot: The Roasting Spit is gone!");
@@ -195,14 +195,14 @@ public class RoastingSpitBot extends BotBase {
 	}
 
 	public void startRoasting() {
-		AUtils.rightClickGobOverlayAndSelectOption(this.gui, fireplace, 0, roastingSpitOverlayName);
+		Actions.rightClickGobOverlayAndSelectOption(this.gui, fireplace, 0, roastingSpitOverlayName);
 		sleep(2000);
 		try { waitProgBarRoastingSpit(gui); } catch (InterruptedException ignored) { Thread.currentThread().interrupt(); }
 	}
 
 	public void carve() {
 		if (isCooked()) {
-			AUtils.rightClickGobOverlayAndSelectOption(this.gui, fireplace, 1, roastingSpitOverlayName);
+			Actions.rightClickGobOverlayAndSelectOption(this.gui, fireplace, 1, roastingSpitOverlayName);
 			while (gui.prog != null) sleep(1000);
 		}
 	}

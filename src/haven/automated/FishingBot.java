@@ -393,7 +393,7 @@ public class FishingBot extends BotBase {
             // Stamina check
             if (gui.getmeter("stam", 0).a < STAMINA_THRESHOLD) {
                 try {
-                    AUtils.drinkTillFull(gui, 0.99, 0.99);
+                    Actions.drinkTillFull(gui, 0.99, 0.99);
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                     return false;

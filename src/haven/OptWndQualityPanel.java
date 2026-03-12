@@ -25,6 +25,23 @@ class OptWndQualityPanel {
 				Utils.setprefb("showItemCategoryBadges", val);
 			}
 		}, prev.pos("bl").adds(0, 2));
+
+		prev = panel.add(new Label("Quality Display Mode:"), prev.pos("bl").adds(0, 10));
+		final Widget p = panel;
+		RadioGroup qualityAggGrp = new RadioGroup(panel) {
+			public void changed(int btn, String lbl) {
+				OptWnd.qualityAggMode = btn;
+				Utils.setprefi("qualityAggMode", btn);
+				if (p.ui != null && p.ui.gui != null) p.ui.gui.reloadAllItemOverlays();
+			}
+		};
+		prev = qualityAggGrp.add("Default", prev.pos("bl").adds(0, 2));
+		prev = qualityAggGrp.add("Mean (RMS)", prev.pos("bl").adds(0, 2));
+		prev = qualityAggGrp.add("Average", prev.pos("bl").adds(0, 2));
+		prev = qualityAggGrp.add("Min", prev.pos("bl").adds(0, 2));
+		prev = qualityAggGrp.add("Max", prev.pos("bl").adds(0, 2));
+		qualityAggGrp.check(Utils.getprefi("qualityAggMode", 0));
+
 		prev = panel.add(OptWnd.roundedQualityCheckBox = new CheckBox("Rounded Quality Number"){
 			{a = (Utils.getprefb("roundedQuality", true));}
 			public void changed(boolean val) {
