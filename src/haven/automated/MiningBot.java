@@ -8,8 +8,8 @@ import static haven.OCache.posres;
 
 public class MiningBot extends Window implements Runnable {
     private final GameUI gui;
-    public boolean stop;
-    private boolean active;
+    public volatile boolean stop;
+    private volatile boolean active;
     private Button activeButton;
     private Label statusLabel;
     private Label targetLabel;
@@ -52,7 +52,9 @@ public class MiningBot extends Window implements Runnable {
                     this.change("Stop");
                     statusLabel.settext("Running...");
                 } else {
-                    ui.gui.map.wdgmsg("click", Coord.z, ui.gui.map.player().rc.floor(posres), 1, 0);
+                    Gob player = ui.gui.map.player();
+                    if (player != null)
+                        ui.gui.map.wdgmsg("click", Coord.z, player.rc.floor(posres), 1, 0);
                     this.change("Start");
                     statusLabel.settext("Stopped");
                 }
@@ -84,7 +86,7 @@ public class MiningBot extends Window implements Runnable {
                     continue;
                 }
                 // Energy check
-                if (gui.getmeter("nrj", 0).a < 0.02) {
+                if (gui.getmeter("nrj", 0).a < 0.25) {
                     gui.error("Mining Bot: Low on energy, stopping.");
                     active = false;
                     activeButton.change("Start");
@@ -98,7 +100,7 @@ public class MiningBot extends Window implements Runnable {
                     AUtils.drinkTillFull(gui, 0.99, 0.99);
                 }
                 // Inventory full check
-                if (gui.maininv.getFreeSpace() < 1) {
+                if (gui.maininv.getFreeSpace() < 2) {
                     gui.error("Mining Bot: Inventory full, pausing.");
                     active = false;
                     activeButton.change("Start");

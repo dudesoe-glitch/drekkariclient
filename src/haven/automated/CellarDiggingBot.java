@@ -10,9 +10,10 @@ import static haven.OCache.posres;
 import static java.lang.Thread.sleep;
 
 public class CellarDiggingBot extends Window implements Runnable {
+    private static final double MAX_SEARCH_DIST = 550.0; // ~50 tiles
     private final GameUI gui;
-    private boolean stop;
-    private boolean active;
+    private volatile boolean stop;
+    private volatile boolean active;
     private final Button activeButton;
 
     public CellarDiggingBot(GameUI gui) {
@@ -46,6 +47,14 @@ public class CellarDiggingBot extends Window implements Runnable {
                     if (gui.getmeter("stam", 0).a < 0.40) {
                         try { AUtils.drinkTillFull(gui, 0.99, 0.99); } catch (InterruptedException ignored) { Thread.currentThread().interrupt(); return; }
                         sleep(200);
+                        continue;
+                    }
+                    // Inventory full check
+                    if (gui.maininv.getFreeSpace() < 2) {
+                        gui.error("Cellar Digging Bot: Inventory full, stopping.");
+                        active = false;
+                        activeButton.change("Start");
+                        sleep(2000);
                         continue;
                     }
 
@@ -100,14 +109,19 @@ public class CellarDiggingBot extends Window implements Runnable {
 
     private Gob findCellarGob() {
         Gob found = null;
+        Gob player = gui.map.player();
+        if (player == null) return null;
+        Coord2d playerPos = player.rc;
         synchronized (gui.map.glob.oc) {
             for (Gob g : gui.map.glob.oc) {
                 try {
                     Resource r = g.getres();
                     if (r == null) continue;
                     if ("gfx/terobjs/arch/cellardoor".equals(r.name)) {
-                        found = g;
-                        break;
+                        double dist = g.rc.dist(playerPos);
+                        if (dist > MAX_SEARCH_DIST) continue;
+                        if (found == null || dist < found.rc.dist(playerPos))
+                            found = g;
                     }
                 } catch (Loading | NullPointerException ignored) {}
             }
@@ -174,7 +188,9 @@ public class CellarDiggingBot extends Window implements Runnable {
                 try {
                     Resource r = g.getres();
                     if (r == null || !r.name.contains("/bumlings/")) continue;
-                    if (best == null || g.rc.dist(me) < best.rc.dist(me)) best = g;
+                    double dist = g.rc.dist(me);
+                    if (dist > MAX_SEARCH_DIST) continue;
+                    if (best == null || dist < best.rc.dist(me)) best = g;
                 } catch (Loading | NullPointerException ignored) {}
             }
         }
@@ -224,8 +240,11 @@ public class CellarDiggingBot extends Window implements Runnable {
     }
 
     private void haltActions() {
-        ui.gui.map.wdgmsg("click", Coord.z, ui.gui.map.player().rc.floor(posres), 1, 0);
+        Gob player = ui.gui.map.player();
+        if (player != null)
+            ui.gui.map.wdgmsg("click", Coord.z, player.rc.floor(posres), 1, 0);
         if (ui.gui.map.pfthread != null) ui.gui.map.pfthread.interrupt();
+        if (gui.cellarDiggingThread != null) gui.cellarDiggingThread.interrupt();
     }
 
     @Override

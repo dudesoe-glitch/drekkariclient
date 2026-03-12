@@ -889,7 +889,7 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 				if (gui.OceanScoutBot == null && gui.oceanScoutBotThread == null) {
 					gui.OceanScoutBot = new OceanScoutBot(gui);
 					gui.add(gui.OceanScoutBot, Utils.getprefc("wndc-oceanScoutBotWindow", new Coord(gui.sz.x / 2 - gui.OceanScoutBot.sz.x / 2, gui.sz.y / 2 - gui.OceanScoutBot.sz.y / 2 - 200)));
-					gui.oceanScoutBotThread = new Thread(gui.OceanScoutBot, "OceanScoutBot");
+					gui.oceanScoutBotThread = new Thread(gui.OceanScoutBot, "Hurricane-OceanScoutBot");
 					gui.oceanScoutBotThread.start();
 				} else {
 					if (gui.OceanScoutBot != null) {
@@ -904,7 +904,7 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 				if (gui.tarKilnCleanerBot == null && gui.tarKilnCleanerThread == null) {
 					gui.tarKilnCleanerBot = new TarKilnCleanerBot(gui);
 					gui.add(gui.tarKilnCleanerBot, Utils.getprefc("wndc-tarKilnCleanerBotWindow", new Coord(gui.sz.x/2 - gui.tarKilnCleanerBot.sz.x/2, gui.sz.y/2 - gui.tarKilnCleanerBot.sz.y/2 - 200)));
-					gui.tarKilnCleanerThread = new Thread(gui.tarKilnCleanerBot, "TarKilnEmptierBot");
+					gui.tarKilnCleanerThread = new Thread(gui.tarKilnCleanerBot, "Hurricane-TarKilnEmptierBot");
 					gui.tarKilnCleanerThread.start();
 				} else {
 					if (gui.tarKilnCleanerBot != null) {
@@ -918,7 +918,7 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 				if (gui.fishingBot == null && gui.fishingThread == null) {
 					gui.fishingBot = new FishingBot(gui);
 					gui.add(gui.fishingBot, Utils.getprefc("wndc-fishingBotWindow", new Coord(gui.sz.x/2 - gui.fishingBot.sz.x/2, gui.sz.y/2 - gui.fishingBot.sz.y/2 - 200)));
-					gui.fishingThread = new Thread(gui.fishingBot, "FishingBot");
+					gui.fishingThread = new Thread(gui.fishingBot, "Hurricane-FishingBot");
 					gui.fishingThread.start();
 				} else {
 					if (gui.fishingBot != null) {
@@ -932,7 +932,7 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 				if (gui.cleanupBot == null && gui.cleanupThread == null) {
 					gui.cleanupBot = new CleanupBot(gui);
 					gui.add(gui.cleanupBot, Utils.getprefc("wndc-cleanupBotWindow", new Coord(gui.sz.x/2 - gui.cleanupBot.sz.x/2, gui.sz.y/2 - gui.cleanupBot.sz.y/2 - 200)));
-					gui.cleanupThread = new Thread(gui.cleanupBot, "CleanupBot");
+					gui.cleanupThread = new Thread(gui.cleanupBot, "Hurricane-CleanupBot");
 					gui.cleanupThread.start();
 				} else {
 					if (gui.cleanupBot != null) {
@@ -947,7 +947,7 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 				if (gui.grubGrubBot == null && gui.grubGrubThread == null) {
 					gui.grubGrubBot = new GrubGrubBot(gui);
                     gui.add(gui.grubGrubBot, Utils.getprefc("wndc-grubGrubBotWindow", new Coord(gui.sz.x / 2 - gui.grubGrubBot.sz.x / 2, gui.sz.y / 2 - gui.grubGrubBot.sz.y / 2 - 200)));
-                    gui.grubGrubThread = new Thread(gui.grubGrubBot, "GrubGrubBot");
+                    gui.grubGrubThread = new Thread(gui.grubGrubBot, "Hurricane-GrubGrubBot");
 					gui.grubGrubThread.start();
 				} else {
 					if (gui.grubGrubBot != null) {
@@ -960,7 +960,7 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 				if (gui.cellarDiggingBot == null && gui.cellarDiggingThread == null) {
 					gui.cellarDiggingBot = new CellarDiggingBot(gui);
 					gui.add(gui.cellarDiggingBot, Utils.getprefc("wndc-cellarDiggingBotWindow", new Coord(gui.sz.x/2 - gui.cellarDiggingBot.sz.x/2, gui.sz.y/2 - gui.cellarDiggingBot.sz.y/2 - 200)));
-					gui.cellarDiggingThread = new Thread(gui.cellarDiggingBot, "CellarDiggingBot");
+					gui.cellarDiggingThread = new Thread(gui.cellarDiggingBot, "Hurricane-CellarDiggingBot");
 					gui.cellarDiggingThread.start();
 				} else {
 					if (gui.cellarDiggingBot != null) {
@@ -974,7 +974,7 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 				if (gui.roastingSpitBot == null && gui.roastingSpitThread == null) {
 					gui.roastingSpitBot = new RoastingSpitBot(gui);
 					gui.add(gui.roastingSpitBot, Utils.getprefc("wndc-roastingSpitBotWindow", new Coord(gui.sz.x/2 - gui.roastingSpitBot.sz.x/2, gui.sz.y/2 - gui.roastingSpitBot.sz.y/2 - 200)));
-					gui.roastingSpitThread = new Thread(gui.roastingSpitBot, "roastingSpitBot");
+					gui.roastingSpitThread = new Thread(gui.roastingSpitBot, "Hurricane-RoastingSpitBot");
 					gui.roastingSpitThread.start();
 				} else {
 					if (gui.roastingSpitBot != null) {
@@ -988,7 +988,7 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 				if (gui.farmingBot == null && gui.farmingBotThread == null) {
 					gui.farmingBot = new FarmingBot(gui);
 					gui.add(gui.farmingBot, Utils.getprefc("wndc-farmingBotWindow", new Coord(gui.sz.x/2 - gui.farmingBot.sz.x/2, gui.sz.y/2 - gui.farmingBot.sz.y/2 - 200)));
-					gui.farmingBotThread = new Thread(gui.farmingBot, "FarmingBot");
+					gui.farmingBotThread = new Thread(gui.farmingBot, "Hurricane-FarmingBot");
 					gui.farmingBotThread.start();
 				} else {
 					if (gui.farmingBot != null) {
@@ -1003,7 +1003,7 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 				if (gui.butcherBot == null && gui.butcherBotThread == null) {
 					gui.butcherBot = new ButcherBot(gui);
 					gui.add(gui.butcherBot, Utils.getprefc("wndc-butcherBotWindow", new Coord(gui.sz.x/2 - gui.butcherBot.sz.x/2, gui.sz.y/2 - gui.butcherBot.sz.y/2 - 200)));
-					gui.butcherBotThread = new Thread(gui.butcherBot, "ButcherBot");
+					gui.butcherBotThread = new Thread(gui.butcherBot, "Hurricane-ButcherBot");
 					gui.butcherBotThread.start();
 				} else {
 					if (gui.butcherBot != null) {
@@ -1018,7 +1018,7 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 				if (gui.clayDiggingBot == null && gui.clayDiggingBotThread == null) {
 					gui.clayDiggingBot = new ClayDiggingBot(gui);
 					gui.add(gui.clayDiggingBot, Utils.getprefc("wndc-clayDiggingBotWindow", new Coord(gui.sz.x/2 - gui.clayDiggingBot.sz.x/2, gui.sz.y/2 - gui.clayDiggingBot.sz.y/2 - 200)));
-					gui.clayDiggingBotThread = new Thread(gui.clayDiggingBot, "ClayDiggingBot");
+					gui.clayDiggingBotThread = new Thread(gui.clayDiggingBot, "Hurricane-ClayDiggingBot");
 					gui.clayDiggingBotThread.start();
 				} else {
 					if (gui.clayDiggingBot != null) {
@@ -1033,7 +1033,7 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 				if (gui.oreSmeltingBot == null && gui.oreSmeltingBotThread == null) {
 					gui.oreSmeltingBot = new OreSmeltingBot(gui);
 					gui.add(gui.oreSmeltingBot, Utils.getprefc("wndc-oreSmeltingBotWindow", new Coord(gui.sz.x/2 - gui.oreSmeltingBot.sz.x/2, gui.sz.y/2 - gui.oreSmeltingBot.sz.y/2 - 200)));
-					gui.oreSmeltingBotThread = new Thread(gui.oreSmeltingBot, "OreSmeltingBot");
+					gui.oreSmeltingBotThread = new Thread(gui.oreSmeltingBot, "Hurricane-OreSmeltingBot");
 					gui.oreSmeltingBotThread.start();
 				} else {
 					if (gui.oreSmeltingBot != null) {
@@ -1048,7 +1048,7 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 				if (gui.foragingBot == null && gui.foragingBotThread == null) {
 					gui.foragingBot = new ForagingBot(gui);
 					gui.add(gui.foragingBot, Utils.getprefc("wndc-foragingBotWindow", new Coord(gui.sz.x/2 - gui.foragingBot.sz.x/2, gui.sz.y/2 - gui.foragingBot.sz.y/2 - 200)));
-					gui.foragingBotThread = new Thread(gui.foragingBot, "ForagingBot");
+					gui.foragingBotThread = new Thread(gui.foragingBot, "Hurricane-ForagingBot");
 					gui.foragingBotThread.start();
 				} else {
 					if (gui.foragingBot != null) {
@@ -1063,7 +1063,7 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 				if (gui.miningBot == null && gui.miningBotThread == null) {
 					gui.miningBot = new MiningBot(gui);
 					gui.add(gui.miningBot, Utils.getprefc("wndc-miningBotWindow", new Coord(gui.sz.x/2 - gui.miningBot.sz.x/2, gui.sz.y/2 - gui.miningBot.sz.y/2 - 200)));
-					gui.miningBotThread = new Thread(gui.miningBot, "MiningBot");
+					gui.miningBotThread = new Thread(gui.miningBot, "Hurricane-MiningBot");
 					gui.miningBotThread.start();
 				} else {
 					if (gui.miningBot != null) {
@@ -1077,54 +1077,54 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 			}
 		} else if (ad[1].equals("OtherScriptsAndTools")) {
 			if (ad[2].equals("Add9CoalScript")) {
-				gui.runActionThread(new Thread(new AddCoalToSmelter(gui, 9), "Add9Coal"));
+				gui.runActionThread(new Thread(new AddCoalToSmelter(gui, 9), "Hurricane-Add9Coal"));
 			} else if (ad[2].equals("Add12CoalScript")) {
-				gui.runActionThread(new Thread(new AddCoalToSmelter(gui, 12), "Add12Coal"));
+				gui.runActionThread(new Thread(new AddCoalToSmelter(gui, 12), "Hurricane-Add12Coal"));
 			} else if (ad[2].equals("CloverScript")) {
 				if (gui.cloverScriptThread == null) {
-					gui.cloverScriptThread = new Thread(new CloverScript(gui), "CloverScript");
+					gui.cloverScriptThread = new Thread(new CloverScript(gui), "Hurricane-CloverScript");
 					gui.cloverScriptThread.start();
 				} else {
 					gui.cloverScriptThread.interrupt();
 					gui.cloverScriptThread = null;
-					gui.cloverScriptThread = new Thread(new CloverScript(gui), "CloverScript");
+					gui.cloverScriptThread = new Thread(new CloverScript(gui), "Hurricane-CloverScript");
 					gui.cloverScriptThread.start();
 				}
 			} else if (ad[2].equals("CoracleScript")) {
 				if (gui.coracleScriptThread == null) {
-					gui.coracleScriptThread = new Thread(new CoracleScript(gui), "CoracleScript");
+					gui.coracleScriptThread = new Thread(new CoracleScript(gui), "Hurricane-CoracleScript");
 					gui.coracleScriptThread.start();
 				} else {
 					gui.coracleScriptThread.interrupt();
 					gui.coracleScriptThread = null;
-					gui.coracleScriptThread = new Thread(new CoracleScript(gui), "CoracleScript");
+					gui.coracleScriptThread = new Thread(new CoracleScript(gui), "Hurricane-CoracleScript");
 					gui.coracleScriptThread.start();
 				}
 			} else if (ad[2].equals("SkisScript")) {
 				if (gui.skisScriptThread == null) {
-					gui.skisScriptThread = new Thread(new SkisScript(gui), "SkisScript");
+					gui.skisScriptThread = new Thread(new SkisScript(gui), "Hurricane-SkisScript");
 					gui.skisScriptThread.start();
 				} else {
 					gui.skisScriptThread.interrupt();
 					gui.skisScriptThread = null;
-					gui.skisScriptThread = new Thread(new SkisScript(gui), "SkisScript");
+					gui.skisScriptThread = new Thread(new SkisScript(gui), "Hurricane-SkisScript");
 					gui.skisScriptThread.start();
 				}
 			} else if (ad[2].equals("RefillWaterContainers")) {
 				if (gui.refillWaterContainersThread == null) {
-					gui.refillWaterContainersThread = new Thread(new RefillWaterContainers(gui), "RefillWaterContainers");
+					gui.refillWaterContainersThread = new Thread(new RefillWaterContainers(gui), "Hurricane-RefillWaterContainers");
 					gui.refillWaterContainersThread.start();
 				} else {
 					gui.refillWaterContainersThread.interrupt();
 					gui.refillWaterContainersThread = null;
-					gui.refillWaterContainersThread = new Thread(new RefillWaterContainers(gui), "RefillWaterContainers");
+					gui.refillWaterContainersThread = new Thread(new RefillWaterContainers(gui), "Hurricane-RefillWaterContainers");
 					gui.refillWaterContainersThread.start();
 				}
 			} else if (ad[2].equals("CombatDistanceTool")) {
 				if (gui.combatDistanceTool == null && gui.combatDistanceToolThread == null) {
 					gui.combatDistanceTool = new CombatDistanceTool(gui);
 					gui.add(gui.combatDistanceTool, Utils.getprefc("wndc-combatDistanceToolWindow", new Coord(gui.sz.x/2 - gui.combatDistanceTool.sz.x/2, gui.sz.y/2 - gui.combatDistanceTool.sz.y/2 - 200)));
-					gui.combatDistanceToolThread = new Thread(gui.combatDistanceTool, "CombatDistanceTool");
+					gui.combatDistanceToolThread = new Thread(gui.combatDistanceTool, "Hurricane-CombatDistanceTool");
 					gui.combatDistanceToolThread.start();
 				} else {
 					if (gui.combatDistanceTool != null) {
@@ -1135,32 +1135,32 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 					}
 				}
 			} else if (ad[2].equals("RefillCheeseTrays")) {
-				gui.runActionThread(new Thread(new FillCheeseTray(gui), "FillCheeseTrays"));
+				gui.runActionThread(new Thread(new FillCheeseTray(gui), "Hurricane-FillCheeseTrays"));
 			} else if (ad[2].equals("HarvestNearestDreamcatcher")) {
 				if (gui.harvestNearestDreamcatcherThread == null) {
-					gui.harvestNearestDreamcatcherThread = new Thread(new HarvestNearestDreamcatcher(gui), "HarvestNearestDreamcatcher");
+					gui.harvestNearestDreamcatcherThread = new Thread(new HarvestNearestDreamcatcher(gui), "Hurricane-HarvestNearestDreamcatcher");
 					gui.harvestNearestDreamcatcherThread.start();
 				} else {
 					gui.harvestNearestDreamcatcherThread.interrupt();
 					gui.harvestNearestDreamcatcherThread = null;
-					gui.harvestNearestDreamcatcherThread = new Thread(new HarvestNearestDreamcatcher(gui), "HarvestNearestDreamcatcher");
+					gui.harvestNearestDreamcatcherThread = new Thread(new HarvestNearestDreamcatcher(gui), "Hurricane-HarvestNearestDreamcatcher");
 					gui.harvestNearestDreamcatcherThread.start();
 				}
 			} else if (ad[2].equals("DestroyNearestTrellisPlantScript")) {
 				if (gui.destroyNearestTrellisPlantScriptThread == null) {
-					gui.destroyNearestTrellisPlantScriptThread = new Thread(new DestroyNearestTrellisPlantScript(gui), "DestroyNearestTrellisPlantScript");
+					gui.destroyNearestTrellisPlantScriptThread = new Thread(new DestroyNearestTrellisPlantScript(gui), "Hurricane-DestroyNearestTrellisPlantScript");
 					gui.destroyNearestTrellisPlantScriptThread.start();
 				} else {
 					gui.destroyNearestTrellisPlantScriptThread.interrupt();
 					gui.destroyNearestTrellisPlantScriptThread = null;
-					gui.destroyNearestTrellisPlantScriptThread = new Thread(new DestroyNearestTrellisPlantScript(gui), "DestroyNearestTrellisPlantScript");
+					gui.destroyNearestTrellisPlantScriptThread = new Thread(new DestroyNearestTrellisPlantScript(gui), "Hurricane-DestroyNearestTrellisPlantScript");
 					gui.destroyNearestTrellisPlantScriptThread.start();
 				}
 			} else if (ad[2].equals("MiningSafetyAssistant")) {
 				if (gui.miningSafetyAssistantWindow == null && gui.miningSafetyAssistantThread == null) {
 					gui.miningSafetyAssistantWindow = new MiningSafetyAssistant(gui);
 					gui.miningSafetyAssistantWindow = gui.add(gui.miningSafetyAssistantWindow, Utils.getprefc("wndc-miningSafetyAssistantWindow", new Coord(gui.sz.x/2 - ui.gui.miningSafetyAssistantWindow.sz.x/2, gui.sz.y/2 - gui.miningSafetyAssistantWindow.sz.y/2 - 200)));
-					gui.miningSafetyAssistantThread = new Thread(gui.miningSafetyAssistantWindow, "miningSafetyAssistantThread");
+					gui.miningSafetyAssistantThread = new Thread(gui.miningSafetyAssistantWindow, "Hurricane-MiningSafetyAssistant");
 					gui.miningSafetyAssistantThread.start();
 				} else if (gui.miningSafetyAssistantWindow != null) {
 					gui.miningSafetyAssistantThread.interrupt();
@@ -1180,7 +1180,7 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 				if (gui.oreAndStoneCounter == null && gui.oreAndStoneCounterThread == null) {
 					gui.oreAndStoneCounter = new OreAndStoneCounter(gui);
 					gui.add(gui.oreAndStoneCounter, Utils.getprefc("wndc-oreAndStoneCounterWindow", new Coord(gui.sz.x/2 - gui.oreAndStoneCounter.sz.x/2, gui.sz.y/2 - gui.oreAndStoneCounter.sz.y/2 - 200)));
-					gui.oreAndStoneCounterThread = new Thread(gui.oreAndStoneCounter, "OreAndStoneCounter");
+					gui.oreAndStoneCounterThread = new Thread(gui.oreAndStoneCounter, "Hurricane-OreAndStoneCounter");
 					gui.oreAndStoneCounterThread.start();
 				} else {
 					if (gui.oreAndStoneCounter != null) {
@@ -1228,12 +1228,12 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 					gui.questhelper.active = true;
 				}
 			} else if (ad[2].equals("Add4BranchesScript")) {
-				gui.runActionThread(new Thread(new AddBranchesToFurnace(gui, 4), "Add4Branches"));
+				gui.runActionThread(new Thread(new AddBranchesToFurnace(gui, 4), "Hurricane-Add4Branches"));
 			} else if (ad[2].equals("Add5WoodBlocksScript")) {
-				gui.runActionThread(new Thread(new AddWoodBlocksToSmokeShed(gui, 5), "Add5WoodBlocks"));
+				gui.runActionThread(new Thread(new AddWoodBlocksToSmokeShed(gui, 5), "Hurricane-Add5WoodBlocks"));
 			}
 		} else if (ad[1].equals("QuickSwitchFromBelt")) {
-			new Thread(new EquipFromBelt(gui, ad[2]), "EquipFromBelt").start();
+			new Thread(new EquipFromBelt(gui, ad[2]), "Hurricane-EquipFromBelt").start();
 		} else if (ad[1].equals("CombatDecks")) {
 			gui.changeCombatDeck(Integer.parseInt(ad[2])-1);
 		}

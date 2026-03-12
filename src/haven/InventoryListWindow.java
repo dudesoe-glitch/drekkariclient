@@ -2,6 +2,7 @@ package haven;
 
 import java.awt.Color;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Item list view showing inventory contents in a summarized text format.
@@ -12,9 +13,17 @@ public class InventoryListWindow extends Window {
 	private final GameUI gui;
 	private final Scrollport scroll;
 	private final Widget listArea;
-	private double lastRefresh = 0;
-	private static final double REFRESH_INTERVAL = 0.5; // seconds
+	private double lastCheckTime = 0;
+	private static final double CHECK_INTERVAL = 0.5; // seconds between fingerprint checks
 	private String highlightedName = null;
+
+	// Dirty-flag refresh: only rebuild when inventory contents actually changed
+	private boolean dirty = true;
+	private int lastFingerprint = 0;
+
+	// Tex cache for row labels — invalidated on refreshList()
+	private final Map<String, Tex> texCache = new ConcurrentHashMap<>();
+	private Tex summaryTex = null;
 
 	// Sort modes for the list
 	public enum ListSort {
@@ -50,16 +59,60 @@ public class InventoryListWindow extends Window {
 		refreshList();
 	}
 
+	public void markDirty() {
+		dirty = true;
+	}
+
+	/**
+	 * Compute a lightweight fingerprint of the inventory contents.
+	 * Uses item count + sum of per-item hash codes (name + quality).
+	 * Only triggers a rebuild if the fingerprint actually changed.
+	 */
+	private int computeFingerprint() {
+		if (gui.maininv == null) return 0;
+		int hash = 0;
+		int count = 0;
+		for (Widget wdg = gui.maininv.child; wdg != null; wdg = wdg.next) {
+			if (wdg instanceof WItem) {
+				WItem wi = (WItem) wdg;
+				count++;
+				try {
+					hash += wi.sortName().hashCode();
+					hash += Double.hashCode(wi.quality());
+				} catch (Exception ignored) {}
+			}
+		}
+		return hash * 31 + count;
+	}
+
 	public void tick(double dt) {
 		super.tick(dt);
-		lastRefresh += dt;
-		if (lastRefresh >= REFRESH_INTERVAL) {
-			lastRefresh = 0;
-			refreshList();
+		lastCheckTime += dt;
+		if (lastCheckTime >= CHECK_INTERVAL) {
+			lastCheckTime = 0;
+			int fp = computeFingerprint();
+			if (fp != lastFingerprint) {
+				lastFingerprint = fp;
+				dirty = true;
+			}
+			if (dirty) {
+				dirty = false;
+				refreshList();
+			}
 		}
 	}
 
 	private void refreshList() {
+		// Dispose cached Tex objects
+		for (Tex t : texCache.values()) {
+			try { t.dispose(); } catch (Exception ignored) {}
+		}
+		texCache.clear();
+		if (summaryTex != null) {
+			try { summaryTex.dispose(); } catch (Exception ignored) {}
+			summaryTex = null;
+		}
+
 		// Clear existing rows
 		Widget nxt;
 		for (Widget w = listArea.child; w != null; w = nxt) {
@@ -136,6 +189,8 @@ public class InventoryListWindow extends Window {
 
 			final String itemName = name;
 			final int rowY = y;
+			// Cache key includes text content so Tex is reused across frames
+			final String cacheKey = text;
 			Widget row = new Widget(new Coord(UI.scale(210), rowH)) {
 				public void draw(GOut g) {
 					if (isHighlighted) {
@@ -143,7 +198,11 @@ public class InventoryListWindow extends Window {
 						g.frect(Coord.z, sz);
 					}
 					g.chcolor(qColor);
-					Tex tex = Text.renderstroked(text, qColor, Color.BLACK).tex();
+					Tex tex = texCache.get(cacheKey);
+					if (tex == null) {
+						tex = Text.renderstroked(text, qColor, Color.BLACK).tex();
+						texCache.put(cacheKey, tex);
+					}
 					int iconSz = UI.scale(14);
 					int textX = iconSz + UI.scale(3);
 					Resource itemRes = itemResources.get(itemName);
@@ -156,7 +215,6 @@ public class InventoryListWindow extends Window {
 						} catch (Exception ignored) {}
 					}
 					g.image(tex, new Coord(textX, 1));
-					tex.dispose();
 					g.chcolor();
 				}
 
@@ -186,13 +244,14 @@ public class InventoryListWindow extends Window {
 			int totalCount = allItems.size();
 			int typeCount = sorted.size();
 			String summary = totalCount + " items, " + typeCount + " types";
+			summaryTex = Text.renderstroked(summary, new Color(150, 150, 150), Color.BLACK).tex();
 			Widget summaryRow = new Widget(new Coord(UI.scale(210), rowH)) {
 				public void draw(GOut g) {
-					g.chcolor(150, 150, 150, 255);
-					Tex tex = Text.renderstroked(summary, new Color(150, 150, 150), Color.BLACK).tex();
-					g.image(tex, new Coord(UI.scale(2), 1));
-					tex.dispose();
-					g.chcolor();
+					if (summaryTex != null) {
+						g.chcolor(150, 150, 150, 255);
+						g.image(summaryTex, new Coord(UI.scale(2), 1));
+						g.chcolor();
+					}
 				}
 			};
 			listArea.add(summaryRow, new Coord(0, y));
@@ -228,6 +287,15 @@ public class InventoryListWindow extends Window {
 	@Override
 	public void reqdestroy() {
 		Utils.setprefc("wndc-inventoryListWindow", this.c);
+		// Dispose all cached Tex objects
+		for (Tex t : texCache.values()) {
+			try { t.dispose(); } catch (Exception ignored) {}
+		}
+		texCache.clear();
+		if (summaryTex != null) {
+			try { summaryTex.dispose(); } catch (Exception ignored) {}
+			summaryTex = null;
+		}
 		super.reqdestroy();
 	}
 }

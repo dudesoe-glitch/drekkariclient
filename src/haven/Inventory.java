@@ -60,6 +60,16 @@ public class Inventory extends Widget implements DTarget {
 	// Cached group header hit areas for click detection
 	private final Map<String, Coord[]> groupHeaderAreas = new LinkedHashMap<>();
 
+	// Cached group header Tex objects — invalidated when groups change
+	private final Map<String, Tex> groupHeaderTexCache = new HashMap<>();
+	private GroupingMode lastCachedGroupingMode = null;
+	private int lastCachedChildCount = -1;
+
+	// Cached group key assignments — avoids calling getGroupKey() (which calls sortName()/info()) every frame
+	private Map<WItem, String> cachedGroupKeys = new HashMap<>();
+	private int lastGroupKeyCacheChildCount = -1;
+	private GroupingMode lastGroupKeyCacheMode = null;
+
 	// Subtle tint colors for distinguishing groups
 	private static final java.awt.Color[] GROUP_COLORS = {
 		new java.awt.Color(50, 120, 50, 55),
@@ -109,6 +119,37 @@ public class Inventory extends Widget implements DTarget {
 			}
 		} catch (Exception e) {
 			return "?";
+		}
+	}
+
+	/**
+	 * Returns cached group key for the given WItem.
+	 * The cache is rebuilt when child count or grouping mode changes.
+	 */
+	private String getCachedGroupKey(WItem wi) {
+		String key = cachedGroupKeys.get(wi);
+		return (key != null) ? key : getGroupKey(wi);
+	}
+
+	/**
+	 * Refreshes the group key cache if the child count or grouping mode changed.
+	 * Called once per frame in draw() before any group rendering.
+	 */
+	private void refreshGroupKeyCache() {
+		int childCount = 0;
+		for (Widget wdg = child; wdg != null; wdg = wdg.next) {
+			if (wdg instanceof WItem) childCount++;
+		}
+		if (childCount != lastGroupKeyCacheChildCount || groupingMode != lastGroupKeyCacheMode) {
+			cachedGroupKeys = new HashMap<>();
+			for (Widget wdg = child; wdg != null; wdg = wdg.next) {
+				if (wdg instanceof WItem) {
+					WItem wi = (WItem) wdg;
+					cachedGroupKeys.put(wi, getGroupKey(wi));
+				}
+			}
+			lastGroupKeyCacheChildCount = childCount;
+			lastGroupKeyCacheMode = groupingMode;
 		}
 	}
 
@@ -165,6 +206,7 @@ public class Inventory extends Widget implements DTarget {
 	    }
 	}
 	if (groupingMode != GroupingMode.NONE) {
+	    refreshGroupKeyCache();
 	    drawGroupOverlays(g);
 	}
 	// Hide collapsed items before drawing children
@@ -172,7 +214,7 @@ public class Inventory extends Widget implements DTarget {
 	    for (Widget wdg = child; wdg != null; wdg = wdg.next) {
 		if (wdg instanceof WItem) {
 		    WItem wi = (WItem) wdg;
-		    String key = getGroupKey(wi);
+		    String key = getCachedGroupKey(wi);
 		    if (collapsedGroups.contains(key)) {
 			wi.visible = false;
 		    }
@@ -201,7 +243,7 @@ public class Inventory extends Widget implements DTarget {
 	for (Widget wdg = child; wdg != null; wdg = wdg.next) {
 	    if (wdg instanceof WItem) {
 		WItem wi = (WItem) wdg;
-		String key = getGroupKey(wi);
+		String key = getCachedGroupKey(wi);
 		if (!groupColorIndex.containsKey(key)) {
 		    groupColorIndex.put(key, nextColor++);
 		}
@@ -220,16 +262,25 @@ public class Inventory extends Widget implements DTarget {
 	}
     }
 
+    private void invalidateGroupHeaderTexCache() {
+	for (Tex t : groupHeaderTexCache.values()) {
+	    try { t.dispose(); } catch (Exception ignored) {}
+	}
+	groupHeaderTexCache.clear();
+    }
+
     private void drawGroupHeaders(GOut g) {
 	// Build group info: first item position + item count + representative icon
 	Map<String, Coord> groupFirstPos = new LinkedHashMap<>();
 	Map<String, Integer> groupCounts = new LinkedHashMap<>();
 	Map<String, WItem> groupRepItem = new LinkedHashMap<>();
 
+	int childCount = 0;
 	for (Widget wdg = child; wdg != null; wdg = wdg.next) {
 	    if (wdg instanceof WItem) {
+		childCount++;
 		WItem wi = (WItem) wdg;
-		String key = getGroupKey(wi);
+		String key = getCachedGroupKey(wi);
 		groupCounts.merge(key, 1, Integer::sum);
 		if (!groupFirstPos.containsKey(key)) {
 		    groupFirstPos.put(key, wi.c.sub(1, 1));
@@ -245,6 +296,13 @@ public class Inventory extends Widget implements DTarget {
 	    }
 	}
 
+	// Invalidate header Tex cache if grouping mode or item count changed
+	if (lastCachedGroupingMode != groupingMode || lastCachedChildCount != childCount) {
+	    invalidateGroupHeaderTexCache();
+	    lastCachedGroupingMode = groupingMode;
+	    lastCachedChildCount = childCount;
+	}
+
 	groupHeaderAreas.clear();
 	int headerH = UI.scale(12);
 
@@ -254,13 +312,19 @@ public class Inventory extends Widget implements DTarget {
 	    int count = groupCounts.getOrDefault(key, 0);
 	    boolean collapsed = collapsedGroups.contains(key);
 
+	    // Build cache key that includes collapse state and count
+	    String cacheKey = key + "|" + collapsed + "|" + count;
+
 	    // Draw header background
 	    String label = collapsed ? "\u25B6 " + key + " (" + count + ")" : "\u25BC " + key + " (" + count + ")";
-	    Tex labelTex;
-	    try {
-		labelTex = Text.renderstroked(label, java.awt.Color.WHITE, java.awt.Color.BLACK, Text.num12boldFnd).tex();
-	    } catch (Exception e) {
-		continue;
+	    Tex labelTex = groupHeaderTexCache.get(cacheKey);
+	    if (labelTex == null) {
+		try {
+		    labelTex = Text.renderstroked(label, java.awt.Color.WHITE, java.awt.Color.BLACK, Text.num12boldFnd).tex();
+		    groupHeaderTexCache.put(cacheKey, labelTex);
+		} catch (Exception e) {
+		    continue;
+		}
 	    }
 
 	    // Draw small item icon next to label
@@ -289,7 +353,6 @@ public class Inventory extends Widget implements DTarget {
 
 	    // Draw label text
 	    g.image(labelTex, headerPos.add(iconSz + UI.scale(3), 0));
-	    labelTex.dispose();
 
 	    // Store header area for click detection
 	    groupHeaderAreas.put(key, new Coord[]{headerPos, headerSz});

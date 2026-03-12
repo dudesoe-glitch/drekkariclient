@@ -14,9 +14,9 @@ import static haven.OCache.posres;
 
 public class RoastingSpitBot extends Window implements Runnable {
     Button startbutton;
-    private boolean active = false;
+    private volatile boolean active = false;
     private final GameUI gui;
-    private boolean stop;
+    private volatile boolean stop;
     private Gob fireplace = null;
     private final String[] spitroastableItems = { // ND: Incomplete list
             "gfx/invobjs/rabbit-clean",
@@ -113,6 +113,7 @@ public class RoastingSpitBot extends Window implements Runnable {
     }
 
     public void stop() {
+        stop = true;
         if (ui.gui.map.pfthread != null) {
             ui.gui.map.pfthread.interrupt();
         }
@@ -120,7 +121,6 @@ public class RoastingSpitBot extends Window implements Runnable {
             gui.roastingSpitThread.interrupt();
             gui.roastingSpitThread = null;
         }
-        stop = true;
     }
 
     public boolean isSpitroastableItem(String input) {
@@ -177,46 +177,57 @@ public class RoastingSpitBot extends Window implements Runnable {
 
     @Override
     public void run() {
-        while (!stop) {
-            sleep(10);
-            if (active && fireplace != null) {
-                try {
-                    if (!passiveMode) {
-                        List<WItem> invItems = AUtils.getAllItemsFromAllInventoriesAndStacksExcludeBeltAndKeyring(this.gui);
-                        List<GItem> foundSpitroastableItems = findSpitroastableItems(invItems);
-                        if (!foundSpitroastableItems.isEmpty() && !readyToRoast() && !isCooked()) {
-                            GItem spitroastableItem = foundSpitroastableItems.get(0);
-                            sleep(1000);
-                            putItemOnRoast(spitroastableItem);
-                            startRoasting();
-                            carve();
-                        } else if (readyToRoast()) {
-                            sleep(1000);
-                            startRoasting();
-                            carve();
-                        } else if (isCooked()) {
-                            sleep(1000);
-                            carve();
+        try {
+            while (!stop) {
+                sleep(10);
+                if (active && fireplace != null) {
+                    try {
+                        if (!passiveMode) {
+                            List<WItem> invItems = AUtils.getAllItemsFromAllInventoriesAndStacksExcludeBeltAndKeyring(this.gui);
+                            List<GItem> foundSpitroastableItems = findSpitroastableItems(invItems);
+                            if (!foundSpitroastableItems.isEmpty() && !readyToRoast() && !isCooked()) {
+                                GItem spitroastableItem = foundSpitroastableItems.get(0);
+                                sleep(1000);
+                                putItemOnRoast(spitroastableItem);
+                                startRoasting();
+                                carve();
+                            } else if (readyToRoast()) {
+                                sleep(1000);
+                                startRoasting();
+                                carve();
+                            } else if (isCooked()) {
+                                sleep(1000);
+                                carve();
+                            } else {
+                                gui.msg("Roasting Spit Bot: Done cooking!", Color.WHITE);
+                                active = false;
+                                startbutton.change("Start");
+                            }
                         } else {
-                            gui.msg("Roasting Spit Bot: Done cooking!", Color.WHITE);
-                            active = false;
-                            startbutton.change("Start");
+                            if (readyToRoast() && !isCooked()) {
+                                startRoasting();
+                            } else if (isCooked()) {
+                                sleep(1000);
+                                Gob player = ui.gui.map.player();
+                                if (player != null)
+                                    ui.gui.map.wdgmsg("click", Coord.z, player.rc.floor(posres), 1, 0);
+                            }
                         }
-                    } else {
-                        if (readyToRoast() && !isCooked()) {
-                            startRoasting();
-                        } else if (isCooked()) {
-                            sleep(1000);
-                            ui.gui.map.wdgmsg("click", Coord.z, ui.gui.map.player().rc.floor(posres), 1, 0);
+                    } catch (Exception e) {
+                        if (e instanceof InterruptedException) {
+                            Thread.currentThread().interrupt();
+                            return;
                         }
+                        gui.error("Roasting Spit Bot: Something went wrong, resetting...");
+                        active = false;
+                        startbutton.change("Start");
+                        fireplace = null;
                     }
-                } catch (Exception e) {
-                    gui.error("Roasting Spit Bot: Something went wrong, resetting...");
-                    active = false;
-                    startbutton.change("Start");
-                    fireplace = null;
                 }
             }
+        } catch (Exception e) {
+            if (e instanceof InterruptedException)
+                Thread.currentThread().interrupt();
         }
     }
 

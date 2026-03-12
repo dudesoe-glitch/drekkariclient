@@ -34,7 +34,7 @@ import java.sql.*;
 import java.sql.Connection;
 import java.util.Arrays;
 import java.util.Map;
-import java.util.TreeMap;
+import java.util.concurrent.ConcurrentSkipListMap;
 
 import static java.lang.Math.PI;
 
@@ -56,7 +56,7 @@ public class FlowerMenu extends Widget {
 	public static String lastChosenResource = null;
 	public final String[] options;
 	private static final String DATABASE = "jdbc:sqlite:static_data.db";
-	public static Map<String, Boolean> autoSelectMap = new TreeMap<>();
+	public static Map<String, Boolean> autoSelectMap = new ConcurrentSkipListMap<>();
 
     @RName("sm")
     public static class $_ implements Factory {
@@ -346,7 +346,7 @@ public class FlowerMenu extends Widget {
 		} else {
 			if(GameUI.flowerMenuAutoSelect){
 				for (String option : options) {
-					if (autoSelectMap.get(option)) {
+					if (Boolean.TRUE.equals(autoSelectMap.get(option))) {
 						choose(getPetalFromName(option));
 					}
 				}

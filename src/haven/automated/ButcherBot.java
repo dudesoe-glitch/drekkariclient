@@ -7,9 +7,10 @@ import java.util.*;
 import static haven.OCache.posres;
 
 public class ButcherBot extends Window implements Runnable {
+    private static final double MAX_SEARCH_DIST = 550.0; // ~50 tiles
     private final GameUI gui;
-    public boolean stop;
-    private boolean active;
+    public volatile boolean stop;
+    private volatile boolean active;
     private Button activeButton;
     private Label statusLabel;
 
@@ -144,7 +145,9 @@ public class ButcherBot extends Window implements Runnable {
                     this.change("Stop");
                     statusLabel.settext("Running...");
                 } else {
-                    ui.gui.map.wdgmsg("click", Coord.z, ui.gui.map.player().rc.floor(posres), 1, 0);
+                    Gob player = ui.gui.map.player();
+                    if (player != null)
+                        ui.gui.map.wdgmsg("click", Coord.z, player.rc.floor(posres), 1, 0);
                     this.change("Start");
                     statusLabel.settext("Stopped");
                 }
@@ -178,6 +181,15 @@ public class ButcherBot extends Window implements Runnable {
                     if (gui.getmeter("stam", 0).a < 0.40) {
                         statusLabel.settext("Drinking...");
                         AUtils.drinkTillFull(gui, 0.99, 0.99);
+                    }
+                    // Inventory full check
+                    if (gui.maininv.getFreeSpace() < 2) {
+                        gui.error("Butcher Bot: Inventory full, stopping.");
+                        active = false;
+                        activeButton.change("Start");
+                        statusLabel.settext("Inventory full");
+                        Thread.sleep(2000);
+                        continue;
                     }
 
                     // Check if already working (progress bar active)
@@ -261,6 +273,7 @@ public class ButcherBot extends Window implements Runnable {
         int elapsed = 0;
         int hz = 100;
         while (gui.prog != null && gui.prog.prog != -1 && elapsed < timeout) {
+            if (stop || !active) break;
             elapsed += hz;
             Thread.sleep(hz);
         }
@@ -268,7 +281,9 @@ public class ButcherBot extends Window implements Runnable {
 
     private Gob findNearestKnockedAnimal() {
         Gob closest = null;
-        Coord2d playerPos = gui.map.player().rc;
+        Gob player = gui.map.player();
+        if (player == null) return null;
+        Coord2d playerPos = player.rc;
 
         synchronized (gui.map.glob.oc) {
             for (Gob gob : gui.map.glob.oc) {
@@ -282,7 +297,9 @@ public class ButcherBot extends Window implements Runnable {
                     // Check if this animal type is enabled
                     if (!isAnimalEnabled(res.name)) continue;
 
-                    if (closest == null || gob.rc.dist(playerPos) < closest.rc.dist(playerPos)) {
+                    double dist = gob.rc.dist(playerPos);
+                    if (dist > MAX_SEARCH_DIST) continue;
+                    if (closest == null || dist < closest.rc.dist(playerPos)) {
                         closest = gob;
                     }
                 } catch (Loading | NullPointerException ignored) {
@@ -313,7 +330,9 @@ public class ButcherBot extends Window implements Runnable {
     }
 
     public void stop() {
-        ui.gui.map.wdgmsg("click", Coord.z, ui.gui.map.player().rc.floor(posres), 1, 0);
+        Gob player = ui.gui.map.player();
+        if (player != null)
+            ui.gui.map.wdgmsg("click", Coord.z, player.rc.floor(posres), 1, 0);
         if (ui.gui.map.pfthread != null) {
             ui.gui.map.pfthread.interrupt();
         }
