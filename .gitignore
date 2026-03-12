@@ -4,7 +4,10 @@
 /local-boot.properties
 /build.properties
 /.idea
+*.iml
 *~
+nd-notes.txt
+/docs/plans/
 
 # Claude Code project files
 /.claude/
