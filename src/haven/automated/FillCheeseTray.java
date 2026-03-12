@@ -12,13 +12,13 @@ public class FillCheeseTray implements Runnable {
     @Override
     public void run() {
         WItem curd;
-        while ((curd = AUtils.findItemByPrefixInAllInventories(gui, "gfx/invobjs/curd")) != null || this.gui.vhand != null) {
+        while ((curd = InvHelper.findFirstByNameInAllInventories(gui, "gfx/invobjs/curd")) != null || this.gui.vhand != null) {
             WItem tray = null;
             for (Widget w = this.gui.lchild; w != null && tray == null; w = w.prev) {
                 if (w instanceof Window) {
                     for (Widget inv = w.lchild; inv != null; inv = inv.prev) {
                         if (inv instanceof Inventory) {
-                            tray = AUtils.findItemInInv((Inventory) inv, "gfx/invobjs/cheesetray");
+                            tray = InvHelper.findFirstByName((Inventory) inv, "gfx/invobjs/cheesetray");
                             if (tray != null) {
                                 break;
                             }

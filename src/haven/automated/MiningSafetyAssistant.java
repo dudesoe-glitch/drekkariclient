@@ -8,6 +8,7 @@ import haven.*;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import static haven.OCache.posres;
@@ -24,8 +25,8 @@ public class MiningSafetyAssistant extends Window implements Runnable {
     public static CheckBox enableMineSweeperCheckBox;
     public OldDropBox<Integer> sweeperDurationDropbox;
 
-    ArrayList<Gob> supports = new ArrayList<>();
-    ArrayList<Gob> looseRocks = new ArrayList<>();
+    List<Gob> supports = new ArrayList<>();
+    List<Gob> looseRocks = new ArrayList<>();
     private int counter = 0;
 
     public MiningSafetyAssistant(GameUI gui) {
@@ -223,7 +224,7 @@ public class MiningSafetyAssistant extends Window implements Runnable {
     public void run() {
         while (!stop) {
             if (counter == 0 && (stopUnsafeMiningCheckBox.a || stopMiningFiftyCheckBox.a || stopMiningTwentyFiveCheckBox.a)) {
-                supports = AUtils.getAllSupports(gui);
+                supports = GobHelper.findAllSupports(gui);
             }
             if(gui.map.player() != null){
                 if (stopUnsafeMiningCheckBox.a && (gui.map.player().getPoses().contains("pickan") || gui.map.player().getPoses().contains("gfx/borka/choppan"))) {
@@ -256,7 +257,7 @@ public class MiningSafetyAssistant extends Window implements Runnable {
                     Gob player = gui.map.player();
                     Coord2d minedTile = new Coord2d(player.rc.x + (Math.cos(player.a) * 13.75), player.rc.y + Math.sin(player.a) * 13.75);
                     if (counter == 0) {
-                        looseRocks = AUtils.getGobs("gfx/terobjs/looserock", gui);
+                        looseRocks = new ArrayList<>(GobHelper.findByName(gui, "gfx/terobjs/looserock", -1));
                     }
                     for (Gob looseRock : looseRocks) {
                         if (looseRock.rc.dist(minedTile) <= 125) {
@@ -343,7 +344,7 @@ public class MiningSafetyAssistant extends Window implements Runnable {
                 tiles.add(new Coord2d(northWestCoord.x + (x * 11) + 5.5, northWestCoord.y + (y * 11) + 5.5));
             }
         }
-        ArrayList<Gob> supportsStatic = AUtils.getAllSupports(gui);
+        List<Gob> supportsStatic = GobHelper.findAllSupports(gui);
         for (Coord2d tile : tiles) {
             int inRange = 0;
             for (Gob support : supportsStatic) {

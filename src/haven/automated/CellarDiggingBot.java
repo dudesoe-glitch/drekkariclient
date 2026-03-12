@@ -70,7 +70,7 @@ public class CellarDiggingBot extends BotBase {
 	private void tryEnterCellar(Gob cell) throws InterruptedException {
 		gui.map.pfLeftClick(cell.rc.floor().add(12, 0), null);
 		if (!Actions.waitPf(gui)) Actions.unstuck(gui);
-		clearhand();
+		Actions.clearhand(gui);
 		Actions.rightClickGobAndSelectOption(gui, cell, 0);
 		gui.map.wdgmsg("click", Coord.z, cell.rc.floor(posres), 3, 0, 0, (int) cell.id, cell.rc.floor(posres), 0, -1);
 		Coord playerCoord = ui.gui.map.player().rc.floor(posres);
@@ -85,7 +85,7 @@ public class CellarDiggingBot extends BotBase {
 		if (!bumlingExists(bumling) || !active || stop) return;
 		if (bumling.rc.dist(gui.map.player().rc) > 11 * 5) { gui.map.pfLeftClick(bumling.rc.floor().add(10, 0), null); if (!Actions.waitPf(gui)) Actions.unstuck(gui); }
 		if (!bumlingExists(bumling) || !active || stop) return;
-		clearhand();
+		Actions.clearhand(gui);
 		Actions.rightClickGobAndSelectOption(gui, bumling, 0);
 		gui.map.wdgmsg("click", Coord.z, bumling.rc.floor(posres), 3, 0, 0, (int) bumling.id, bumling.rc.floor(posres), 0, -1);
 		int idleTicks = 0;
@@ -114,8 +114,6 @@ public class CellarDiggingBot extends BotBase {
 		synchronized (gui.map.glob.oc) { for (Gob g : gui.map.glob.oc) if (g.id == b.id) return true; }
 		return false;
 	}
-
-	private void clearhand() { if (gui.vhand != null) gui.vhand.item.wdgmsg("drop", Coord.z); Actions.rightClick(gui); }
 
 	@Override protected String windowPrefKey() { return "wndc-cellarDiggingBotWindow"; }
 	@Override protected void onCleanup() { gui.cellarDiggingBot = null; }

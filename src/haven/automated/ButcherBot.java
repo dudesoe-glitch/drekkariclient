@@ -164,7 +164,7 @@ public class ButcherBot extends BotBase {
 				try {
 					Resource res = gob.getres();
 					if (res == null) continue;
-					if (!gob.getPoses().contains("knock")) continue;
+					if (!GobHelper.isKnocked(gob)) continue;
 					if (!isAnimalEnabled(res.name)) continue;
 					double dist = gob.rc.dist(playerPos);
 					if (dist > MAX_SEARCH_DIST) continue;

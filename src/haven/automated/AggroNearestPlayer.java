@@ -17,12 +17,16 @@ public class AggroNearestPlayer implements Runnable {
 
     @Override
     public void run() {
+        if (gui.fv == null) {
+            attackClosestAttackablePlayer();
+            return;
+        }
         synchronized (gui.fv.lsrel) {
 
             if (gui.fv != null && gui.fv.lsrel.size() > 0) { // If we are in a fight already:
                 HashSet<Long> fightgobs = gui.fv.lsrel.stream().map(rel -> rel.gobid).collect(Collectors.toCollection(HashSet::new));
                 HashMap<Long, Gob> allAttackablePlayersMap = AUtils.getAllAttackablePlayersMap(gui);
-                HashSet<Long> aggrodplayers = fightgobs.stream().filter(id -> allAttackablePlayersMap.get(id) != null && isPlayer(allAttackablePlayersMap.get(id))).collect(Collectors.toCollection(HashSet::new));
+                HashSet<Long> aggrodplayers = fightgobs.stream().filter(id -> allAttackablePlayersMap.get(id) != null && GobHelper.isPlayer(allAttackablePlayersMap.get(id))).collect(Collectors.toCollection(HashSet::new));
 
                 Gob player = gui.map.player();
                 if (player == null)
@@ -47,7 +51,7 @@ public class AggroNearestPlayer implements Runnable {
         Gob closestEnemy = null;
         for (Gob gob : allAttackableMap.values()) {
             //if gob is an enemy player and not already aggroed
-            if (isPlayer(gob) && !aggrodplayers.contains(gob.id) && !gob.isFriend()) {
+            if (GobHelper.isPlayer(gob) && !aggrodplayers.contains(gob.id) && !gob.isFriend()) {
                 if ((closestEnemy == null || gob.rc.dist(player.rc) < closestEnemy.rc.dist(player.rc))
                         && (gob.knocked == null || (gob.knocked != null && !gob.knocked))) {
                     closestEnemy = gob;
@@ -69,7 +73,7 @@ public class AggroNearestPlayer implements Runnable {
 
         Gob closestEnemy = null;
         for (Gob gob : allAttackableMap.values()) {
-            if (isPlayer(gob) && gob.isFriend()) {
+            if (GobHelper.isPlayer(gob) && gob.isFriend()) {
                 continue;
             }
             //if gob is an enemy player and not already aggroed
@@ -85,7 +89,4 @@ public class AggroNearestPlayer implements Runnable {
         }
     }
 
-    private boolean isPlayer(Gob gob){
-        return gob.getres() != null && gob.getres().name != null && gob.getres().name.equals("gfx/borka/body");
-    }
 }

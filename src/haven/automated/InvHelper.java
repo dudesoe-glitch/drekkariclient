@@ -192,6 +192,32 @@ public class InvHelper {
         return items;
     }
 
+    /**
+     * Find the first item whose resource name starts with the given prefix,
+     * searching across all open inventories.
+     * Equivalent to {@code AUtils.findItemByPrefixInAllInventories()} but using InvHelper patterns.
+     *
+     * @param gui    the GameUI instance
+     * @param prefix the resource name prefix to match (e.g., "gfx/invobjs/curd")
+     * @return the first matching WItem, or null if none found
+     */
+    public static WItem findFirstByNameInAllInventories(GameUI gui, String prefix) {
+        if (gui == null || prefix == null) return null;
+        for (Inventory inventory : gui.getAllInventories()) {
+            for (Widget wdg = inventory.child; wdg != null; wdg = wdg.next) {
+                if (wdg instanceof WItem) {
+                    WItem wi = (WItem) wdg;
+                    try {
+                        if (wi.item.getres().name.startsWith(prefix)) {
+                            return wi;
+                        }
+                    } catch (Loading ignored) {}
+                }
+            }
+        }
+        return null;
+    }
+
     /** Transfer item to another inventory (Shift+Click behavior). */
     public static void transferToPlayer(GItem item) {
         if (item == null) return;

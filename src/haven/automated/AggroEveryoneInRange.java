@@ -18,11 +18,19 @@ public class AggroEveryoneInRange implements Runnable {
 
     @Override
     public void run() {
+        if (gui.fv == null) {
+            HashMap<Long, Gob> allAttackableMap = AUtils.getAllAttackableMap(gui);
+            Gob player = gui.map.player();
+            if (player == null)
+                return;
+            aggroAllNonFriendlyPlayers(allAttackableMap, player);
+            return;
+        }
         synchronized (gui.fv.lsrel) {
             if (gui.fv != null && gui.fv.lsrel.size() > 0) {
                 HashSet<Long> fightgobs = gui.fv.lsrel.stream().map(rel -> rel.gobid).collect(Collectors.toCollection(HashSet::new));
                 HashMap<Long, Gob> allAttackableMap = AUtils.getAllAttackableMap(gui);
-                HashSet<Long> aggrodplayers = fightgobs.stream().filter(id -> allAttackableMap.get(id) != null && isPlayer(allAttackableMap.get(id))).collect(Collectors.toCollection(HashSet::new));
+                HashSet<Long> aggrodplayers = fightgobs.stream().filter(id -> allAttackableMap.get(id) != null && GobHelper.isPlayer(allAttackableMap.get(id))).collect(Collectors.toCollection(HashSet::new));
 
                 Gob player = gui.map.player();
                 if (player == null)
@@ -41,7 +49,7 @@ public class AggroEveryoneInRange implements Runnable {
 
     private void aggroAllNonFriendlyAndNotAttackedPlayers(HashMap<Long, Gob> allAttackableMap, HashSet<Long> aggrodplayers, Gob player) {
         for (Gob gob : allAttackableMap.values()) {
-            if (isPlayer(gob) && !aggrodplayers.contains(gob.id) && !gob.isFriend() && !gob.getPoses().contains("knock")) {
+            if (GobHelper.isPlayer(gob) && !aggrodplayers.contains(gob.id) && !gob.isFriend() && !gob.getPoses().contains("knock")) {
                 if (gob.rc.dist(player.rc) < 195) {
                     Actions.attackGob(gui, gob);
                 }
@@ -53,7 +61,7 @@ public class AggroEveryoneInRange implements Runnable {
 
     private void aggroAllNonFriendlyPlayers(HashMap<Long, Gob> allAttackableMap, Gob player) {
         for (Gob gob : allAttackableMap.values()) {
-            if (isPlayer(gob) && !gob.isFriend()&& !gob.getPoses().contains("knock")) {
+            if (GobHelper.isPlayer(gob) && !gob.isFriend()&& !gob.getPoses().contains("knock")) {
                 if (gob.rc.dist(player.rc) < 195) {
                     Actions.attackGob(gui, gob);
                 }
@@ -61,10 +69,6 @@ public class AggroEveryoneInRange implements Runnable {
             Integer ping = GameUI.getPingValue();
             sleep(ping != null ? ping : 20);
         }
-    }
-
-    private boolean isPlayer(Gob gob) {
-        return gob.getres() != null && gob.getres().name != null && gob.getres().name.equals("gfx/borka/body");
     }
 
     private void sleep(int duration) {
