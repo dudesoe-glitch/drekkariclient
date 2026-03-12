@@ -20,7 +20,7 @@ public class CheckpointManager extends Window implements Runnable {
     private static final String DATABASE = "jdbc:sqlite:saved_routes.db";
     private static final int delayMs = 250;
     private final GameUI gui;
-    private final boolean stop = false;
+    private volatile boolean stop = false;
     private boolean paused = true;
     private final Label estimatedArrivalTime;
     public CheckpointList checkpointList;

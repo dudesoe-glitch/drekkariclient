@@ -166,19 +166,15 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 	public Thread skisScriptThread;
 	public Thread refillWaterContainersThread;
 	public CombatDistanceTool combatDistanceTool;
-	public Thread combatDistanceToolThread;
 	public CombatRotationBot combatRotationBot;
-	public Thread combatRotationBotThread;
 	public Thread harvestNearestDreamcatcherThread;
 	public Thread destroyNearestTrellisPlantScriptThread;
 	public Thread lootNearestKnockedPlayerThread;
 
 	// Tool Threads
 	public MiningSafetyAssistant miningSafetyAssistantWindow;
-	public Thread miningSafetyAssistantThread;
 	public PointerTriangulation pointerTriangulation;
 	public OreAndStoneCounter oreAndStoneCounter;
-	public Thread oreAndStoneCounterThread;
 
 	// Bot Instances (threads managed by BotBase.botThread)
 	public OceanScoutBot OceanScoutBot;

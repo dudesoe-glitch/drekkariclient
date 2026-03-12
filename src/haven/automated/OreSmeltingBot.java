@@ -167,6 +167,7 @@ public class OreSmeltingBot extends BotBase {
 				GItem item = witem.item;
 				item.wdgmsg("take", new Coord(item.sz.x / 2, item.sz.y / 2));
 				if (!waitForHand(true)) continue;
+				if (gui.vhand == null) continue;
 				GItem handItem = gui.vhand.item;
 				gui.map.wdgmsg("itemact", Coord.z, smelter.rc.floor(posres), 1, 0, (int) smelter.id, smelter.rc.floor(posres), 0, -1);
 				Thread.sleep(300);

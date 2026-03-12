@@ -73,8 +73,9 @@ public class CellarDiggingBot extends BotBase {
 		Actions.clearhand(gui);
 		Actions.rightClickGobAndSelectOption(gui, cell, 0);
 		gui.map.wdgmsg("click", Coord.z, cell.rc.floor(posres), 3, 0, 0, (int) cell.id, cell.rc.floor(posres), 0, -1);
-		Coord playerCoord = ui.gui.map.player().rc.floor(posres);
-		ui.gui.map.wdgmsg("click", Coord.z, playerCoord, 3, 0);
+		Gob p = gui.map.player(); if (p == null) return;
+		Coord playerCoord = p.rc.floor(posres);
+		gui.map.wdgmsg("click", Coord.z, playerCoord, 3, 0);
 	}
 
 	private void chipAllBoulders() throws InterruptedException {
@@ -106,7 +107,7 @@ public class CellarDiggingBot extends BotBase {
 	}
 
 	private boolean isMiningOrRunning() {
-		try { return gui.map.player().getPoses().contains("pickan") || (ui.gui.map.pfthread != null && ui.gui.map.pfthread.isAlive()) || (gui.prog != null && gui.prog.prog != -1); } catch (Exception ignored) {} return false;
+		try { return gui.map.player().getPoses().contains("pickan") || (gui.map.pfthread != null && gui.map.pfthread.isAlive()) || (gui.prog != null && gui.prog.prog != -1); } catch (Exception ignored) {} return false;
 	}
 
 	private boolean bumlingExists(Gob b) {

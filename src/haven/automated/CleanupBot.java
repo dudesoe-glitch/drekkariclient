@@ -93,6 +93,9 @@ public class CleanupBot extends BotBase {
 
 	private Gob findClosestGob() {
 		Gob closestGob = null;
+		Gob player = gui.map.player();
+		if (player == null) return null;
+		Coord2d plc = player.rc;
 		synchronized (gui.map.glob.oc) {
 			for (Gob gob : gui.map.glob.oc) {
 				try {
@@ -102,7 +105,7 @@ public class CleanupBot extends BotBase {
 						|| ((res.name.contains("/trees/") && !res.name.endsWith("stump")) && !res.name.endsWith("log") && !res.name.endsWith("oldtrunk") && chopTrees)
 						|| (res.name.contains("/bushes/") && chopBushes) || (res.name.endsWith("/stockpile-soil") && destroySoil);
 					if (selected) {
-						Coord2d plc = gui.map.player().rc; double dist = gob.rc.dist(plc);
+						double dist = gob.rc.dist(plc);
 						if (dist > MAX_SEARCH_DIST) continue;
 						if (closestGob == null || dist < closestGob.rc.dist(plc)) closestGob = gob;
 					}

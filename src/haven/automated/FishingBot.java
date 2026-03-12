@@ -286,7 +286,8 @@ public class FishingBot extends BotBase {
 
     private boolean checkVitalsLocal() {
         try {
-            IMeter.Meter hpMeter = gui.getmeters("hp") != null ? gui.getmeters("hp").get(1) : null;
+            java.util.List<IMeter.Meter> hpMeters = gui.getmeters("hp");
+            IMeter.Meter hpMeter = (hpMeters != null && hpMeters.size() > 1) ? hpMeters.get(1) : null;
             if (hpMeter == null) return true;
             double hp = hpMeter.a;
             if (hp < HP_THRESHOLD) {
@@ -300,7 +301,7 @@ public class FishingBot extends BotBase {
                 deactivate("Fishing Bot: HP IS " + hp + " .. PORTING HOME!");
                 return false;
             }
-            IMeter.Meter nrjMeter = ui.gui.getmeter("nrj", 0);
+            IMeter.Meter nrjMeter = gui.getmeter("nrj", 0);
             if (nrjMeter == null) return true;
             double nrj = nrjMeter.a;
             if (nrj < ENERGY_THRESHOLD) {

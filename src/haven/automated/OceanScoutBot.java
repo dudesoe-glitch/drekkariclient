@@ -46,28 +46,30 @@ public class OceanScoutBot extends BotBase {
 			while (!stop) {
 				if (!active) { Thread.sleep(200); continue; }
 				if (successLocs > 20) {
+					Gob pl = gui.map.player(); if (pl == null) { Thread.sleep(200); continue; }
 					Coord2d groundTile = findRandomGroundTile();
-					Coord2d groundVector = groundTile.sub(ui.gui.map.player().rc);
+					Coord2d groundVector = groundTile.sub(pl.rc);
 					groundVector = groundVector.div(groundVector.abs()).mul(44);
-					ui.gui.map.wdgmsg("click", Coord.z, ui.gui.map.player().rc.add(groundVector).floor(posres), 1, 0);
+					gui.map.wdgmsg("click", Coord.z, pl.rc.add(groundVector).floor(posres), 1, 0);
 					Thread.sleep(300);
 				}
 				nearbyGobs = getNearbyGobs();
 				Coord loc = getNextLoc();
 				if (loc != null) {
 					ang -= clockwiseDirection * Math.PI / 2;
-					ui.gui.map.wdgmsg("click", Coord.z, new Coord2d(loc.x, loc.y).floor(posres), 1, 0);
+					gui.map.wdgmsg("click", Coord.z, new Coord2d(loc.x, loc.y).floor(posres), 1, 0);
 				} else {
-					Coord2d pcCoord = ui.gui.map.player().rc;
-					Coord2d dangerMob = isVeryDangerZone(ui.gui.map.player().rc.floor());
+					Gob pl2 = gui.map.player(); if (pl2 == null) { Thread.sleep(200); continue; }
+					Coord2d pcCoord = pl2.rc;
+					Coord2d dangerMob = isVeryDangerZone(pcCoord.floor());
 					if (dangerMob != null) {
 						Coord2d addCoord = pcCoord.sub(dangerMob);
-						ui.gui.map.wdgmsg("click", Coord.z, pcCoord.add(addCoord.div(addCoord.abs()).mul(11 * 2)).floor(posres), 1, 0);
+						gui.map.wdgmsg("click", Coord.z, pcCoord.add(addCoord.div(addCoord.abs()).mul(11 * 2)).floor(posres), 1, 0);
 					} else {
 						Coord2d gocoord = findRandomWaterTile();
-						Coord2d groundVector = gocoord.sub(ui.gui.map.player().rc);
+						Coord2d groundVector = gocoord.sub(pl2.rc);
 						groundVector = groundVector.div(groundVector.abs()).mul(44);
-						ui.gui.map.wdgmsg("click", Coord.z, ui.gui.map.player().rc.add(groundVector).floor(posres), 1, 0);
+						gui.map.wdgmsg("click", Coord.z, pl2.rc.add(groundVector).floor(posres), 1, 0);
 					}
 					Thread.sleep(300);
 				}
@@ -112,9 +114,9 @@ public class OceanScoutBot extends BotBase {
 		return false;
 	}
 
-	private boolean isGobCollision(Coord t) { for (Gob gob : nearbyGobs) { if (gob != null && gob.getres() != null && Pathfinder.isInsideBoundBox(gob.rc.floor(), gob.a, gob.getres().name, t)) return true; } return false; }
-	private boolean isDangerZone(Coord t) { for (Gob gob : nearbyGobs) { if (gob.getres() != null && (gob.getres().name.endsWith("/walrus") || gob.getres().name.endsWith("/orca")) && t.dist(gob.rc.floor()) < 11 * 14) return true; } return false; }
-	private Coord2d isVeryDangerZone(Coord t) { for (Gob gob : nearbyGobs) { if (gob.getres() != null && (gob.getres().name.endsWith("/walrus") || gob.getres().name.endsWith("/orca")) && t.dist(gob.rc.floor()) < 11 * 11) return gob.rc; } return null; }
+	private boolean isGobCollision(Coord t) { for (Gob gob : nearbyGobs) { try { if (gob != null && gob.getres() != null && Pathfinder.isInsideBoundBox(gob.rc.floor(), gob.a, gob.getres().name, t)) return true; } catch (Loading ignored) {} } return false; }
+	private boolean isDangerZone(Coord t) { for (Gob gob : nearbyGobs) { try { if (gob.getres() != null && (gob.getres().name.endsWith("/walrus") || gob.getres().name.endsWith("/orca")) && t.dist(gob.rc.floor()) < 11 * 14) return true; } catch (Loading ignored) {} } return false; }
+	private Coord2d isVeryDangerZone(Coord t) { for (Gob gob : nearbyGobs) { try { if (gob.getres() != null && (gob.getres().name.endsWith("/walrus") || gob.getres().name.endsWith("/orca")) && t.dist(gob.rc.floor()) < 11 * 11) return gob.rc; } catch (Loading ignored) {} } return null; }
 
 	private boolean isWater(Coord t) {
 		try { int dt = mcache.gettile(new Coord(t.x / 11, t.y / 11)); Resource res = mcache.tilesetr(dt); return res != null && res.name.equals("gfx/tiles/odeep"); } catch (Loading e) { return false; }

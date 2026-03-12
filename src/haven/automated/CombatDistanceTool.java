@@ -3,17 +3,15 @@ package haven.automated;
 import haven.*;
 import haven.Button;
 import haven.Label;
-import haven.Window;
 
 import java.awt.*;
 import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 import static haven.OCache.posres;
 
-public class CombatDistanceTool extends Window implements Runnable {
+public class CombatDistanceTool extends BotBase {
     public static final Map<String, Double> animalDistances = Map.ofEntries(
             Map.entry("gfx/kritter/adder/adder", 17.1),
             Map.entry("gfx/kritter/ant/ant", 15.2),
@@ -84,9 +82,6 @@ public class CombatDistanceTool extends Window implements Runnable {
         weaponDistances.put("sling", 40.0);
     }
 
-    private final GameUI gui;
-    public boolean stop;
-
     private final Label currentDistanceLabel;
     private TextEntry distanceEntry;
 
@@ -101,13 +96,15 @@ public class CombatDistanceTool extends Window implements Runnable {
     }
 
     public CombatDistanceTool(GameUI gui) {
-        super(new Coord(240, 120), "Combat Distancing Tool", true);
-        this.gui = gui;
-        this.stop = false;
+        super(gui, new Coord(240, 120), "Combat Distancing Tool", true);
         this.value = "";
         this.autoRespace = Utils.getprefb("combatDist_autoRespace", false);
         this.autoWeaponDetect = Utils.getprefb("combatDist_autoWeapon", false);
         this.autoReattack = Utils.getprefb("combatDist_autoReattack", false);
+        checkHP = false;
+        checkEnergy = false;
+        checkStamina = false;
+        checkInventory = false;
 
         Widget prev;
 
@@ -155,58 +152,87 @@ public class CombatDistanceTool extends Window implements Runnable {
     }
 
     @Override
+    protected String windowPrefKey() {
+        return "wndc-combatDistanceToolWindow";
+    }
+
+    @Override
+    protected void onCleanup() {
+        gui.combatDistanceTool = null;
+    }
+
+    /** Skip idlePlayer — we're in combat. */
+    @Override
+    public void stop() {
+        stop = true;
+        try {
+            if (gui.map != null && gui.map.pfthread != null) {
+                gui.map.pfthread.interrupt();
+            }
+        } catch (Exception ignored) {}
+        if (botThread != null) {
+            botThread.interrupt();
+            botThread = null;
+        }
+    }
+
+    @Override
     public void run() {
-        while (!stop) {
-            try {
-                Fightview fv = gui.fv;
-                if (fv != null && fv.current != null) {
-                    double dist = getDistance(fv.current.gobid);
-                    if (dist < 0) {
-                        currentDistanceLabel.settext("No target");
-                    } else {
-                        DecimalFormat df = new DecimalFormat("#.##");
-                        String result = df.format(dist);
-                        currentDistanceLabel.settext("Current dist: " + result + " units.");
-                    }
-
-                    // Auto-detect weapon distance
-                    if (autoWeaponDetect) {
-                        double weaponDist = detectWeaponDistance();
-                        if (weaponDist > 0) {
-                            value = String.valueOf(weaponDist);
-                            distanceEntry.settext(value);
+        try {
+            while (!stop) {
+                try {
+                    Fightview fv = gui.fv;
+                    if (fv != null && fv.current != null) {
+                        double dist = getDistance(fv.current.gobid);
+                        if (dist < 0) {
+                            currentDistanceLabel.settext("No target");
+                        } else {
+                            DecimalFormat df = new DecimalFormat("#.##");
+                            String result = df.format(dist);
+                            currentDistanceLabel.settext("Current dist: " + result + " units.");
                         }
-                    }
 
-                    // Auto-respace: continuously maintain set distance
-                    if (autoRespace && System.currentTimeMillis() - lastRespaceTime > 600) {
-                        try {
-                            double targetDist = Double.parseDouble(value);
-                            if (dist > 0 && Math.abs(dist - targetDist) > 3.0) {
-                                moveToDistance(targetDist);
-                                lastRespaceTime = System.currentTimeMillis();
+                        // Auto-detect weapon distance
+                        if (autoWeaponDetect) {
+                            double weaponDist = detectWeaponDistance();
+                            if (weaponDist > 0) {
+                                value = String.valueOf(weaponDist);
+                                distanceEntry.settext(value);
                             }
-                        } catch (NumberFormatException ignored) {}
-                    }
-                } else {
-                    currentDistanceLabel.settext("Current dist: No target");
+                        }
 
-                    // Auto-re-attack: if we had targets that were peaced, re-engage
-                    if (autoReattack && fv != null) {
-                        for (Fightview.Relation rel : fv.lsrel) {
-                            if (rel.gobid != 0 && fv.current == null) {
-                                Gob gob = gui.map.glob.oc.getgob(rel.gobid);
-                                if (gob != null) {
-                                    gui.fv.wdgmsg("bump", (int) rel.gobid);
-                                    break;
+                        // Auto-respace: continuously maintain set distance
+                        if (autoRespace && System.currentTimeMillis() - lastRespaceTime > 600) {
+                            try {
+                                double targetDist = Double.parseDouble(value);
+                                if (dist > 0 && Math.abs(dist - targetDist) > 3.0) {
+                                    moveToDistance(targetDist);
+                                    lastRespaceTime = System.currentTimeMillis();
+                                }
+                            } catch (NumberFormatException ignored) {}
+                        }
+                    } else {
+                        currentDistanceLabel.settext("Current dist: No target");
+
+                        // Auto-re-attack: if we had targets that were peaced, re-engage
+                        if (autoReattack && fv != null) {
+                            for (Fightview.Relation rel : fv.lsrel) {
+                                if (rel.gobid != 0 && fv.current == null) {
+                                    Gob gob = gui.map.glob.oc.getgob(rel.gobid);
+                                    if (gob != null) {
+                                        gui.fv.wdgmsg("bump", (int) rel.gobid);
+                                        break;
+                                    }
                                 }
                             }
                         }
                     }
-                }
-            } catch (Exception ignored) {}
+                } catch (Exception ignored) {}
 
-            sleep(500);
+                Thread.sleep(500);
+            }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
         }
     }
 
@@ -309,39 +335,5 @@ public class CombatDistanceTool extends Window implements Runnable {
             }
         }
         return -1;
-    }
-
-    private void sleep(int duration) {
-        try {
-            Thread.sleep(duration);
-        } catch (InterruptedException ignored) {
-            Thread.currentThread().interrupt();
-        }
-    }
-
-    @Override
-    public void wdgmsg(Widget sender, String msg, Object... args) {
-        if ((sender == this) && (Objects.equals(msg, "close"))) {
-            stop();
-            reqdestroy();
-            gui.combatDistanceTool = null;
-            gui.combatDistanceToolThread = null;
-        } else
-            super.wdgmsg(sender, msg, args);
-    }
-
-    public void stop() {
-        stop = true;
-        try {
-            if (gui.map != null && gui.map.pfthread != null) {
-                gui.map.pfthread.interrupt();
-            }
-        } catch (Exception ignored) {}
-    }
-
-    @Override
-    public void reqdestroy() {
-        Utils.setprefc("wndc-combatDistanceToolWindow", this.c);
-        super.reqdestroy();
     }
 }
