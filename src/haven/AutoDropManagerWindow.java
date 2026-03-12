@@ -58,8 +58,8 @@ public class AutoDropManagerWindow extends Window {
         add(new Label("Q <"), prev.pos("ur").adds(0, 0).x(UI.scale(134)));
         add(autoDropStonesQualityTextEntry = new TextEntry(UI.scale(36), Utils.getpref("autoDropStonesQuality", "30")){
             protected void changed() {
-                Utils.setpref("autoDropStonesQuality", this.buf.line());
                 this.settext(this.text().replaceAll("[^\\d]", ""));
+                Utils.setpref("autoDropStonesQuality", this.buf.line());
                 super.changed();
             }
         }, prev.pos("ur").adds(6, -2).x(UI.scale(156)));
@@ -72,8 +72,8 @@ public class AutoDropManagerWindow extends Window {
         add(new Label("Q <"), prev.pos("ur").adds(0, 0).x(UI.scale(134)));
         add(autoDropCoalsQualityTextEntry = new TextEntry(UI.scale(36), Utils.getpref("autoDropCoalsQuality", "30")){
             protected void changed() {
-                Utils.setpref("autoDropCoalsQuality", this.buf.line());
                 this.settext(this.text().replaceAll("[^\\d]", ""));
+                Utils.setpref("autoDropCoalsQuality", this.buf.line());
                 super.changed();
             }
         }, prev.pos("ur").adds(6, -2).x(UI.scale(156)));
@@ -86,8 +86,8 @@ public class AutoDropManagerWindow extends Window {
         add(new Label("Q <"), prev.pos("ur").adds(0, 0).x(UI.scale(134)));
         add(autoDropOresQualityTextEntry = new TextEntry(UI.scale(36), Utils.getpref("autoDropOresQuality", "30")){
             protected void changed() {
-                Utils.setpref("autoDropOresQuality", this.buf.line());
                 this.settext(this.text().replaceAll("[^\\d]", ""));
+                Utils.setpref("autoDropOresQuality", this.buf.line());
                 super.changed();
             }
         }, prev.pos("ur").adds(6, -2).x(UI.scale(156)));
@@ -100,8 +100,8 @@ public class AutoDropManagerWindow extends Window {
         add(new Label("Q <"), prev.pos("ur").adds(0, 0).x(UI.scale(134)));
         add(autoDropPreciousOresQualityTextEntry = new TextEntry(UI.scale(36), Utils.getpref("autoDropPreciousOresQuality", "999")){
             protected void changed() {
-                Utils.setpref("autoDropPreciousOresQuality", this.buf.line());
                 this.settext(this.text().replaceAll("[^\\d]", ""));
+                Utils.setpref("autoDropPreciousOresQuality", this.buf.line());
                 super.changed();
             }
         }, prev.pos("ur").adds(6, -2).x(UI.scale(156)));
@@ -114,8 +114,8 @@ public class AutoDropManagerWindow extends Window {
         add(new Label("Q <"), prev.pos("ur").adds(0, 0).x(UI.scale(134)));
         add(autoDropMinedCuriosQualityTextEntry = new TextEntry(UI.scale(36), Utils.getpref("autoDropMinedCuriosQuality", "30")){
             protected void changed() {
-                Utils.setpref("autoDropMinedCuriosQuality", this.buf.line());
                 this.settext(this.text().replaceAll("[^\\d]", ""));
+                Utils.setpref("autoDropMinedCuriosQuality", this.buf.line());
                 super.changed();
             }
         }, prev.pos("ur").adds(6, -2).x(UI.scale(156)));
@@ -128,8 +128,8 @@ public class AutoDropManagerWindow extends Window {
         add(new Label("Q <"), prev.pos("ur").adds(0, 0).x(UI.scale(134)));
         add(autoDropQuarryartzQualityTextEntry = new TextEntry(UI.scale(36), Utils.getpref("autoDropQuarryartzQuality", "30")){
             protected void changed() {
-                Utils.setpref("autoDropQuarryartzQuality", this.buf.line());
                 this.settext(this.text().replaceAll("[^\\d]", ""));
+                Utils.setpref("autoDropQuarryartzQuality", this.buf.line());
                 super.changed();
             }
         }, prev.pos("ur").adds(6, -2).x(UI.scale(156)));

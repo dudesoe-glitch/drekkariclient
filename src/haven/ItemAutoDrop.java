@@ -36,7 +36,7 @@ public class ItemAutoDrop {
     }
 
     public static void addItem(String baseName, int threshold) {
-        itemThresholds.put(baseName, threshold);
+        itemThresholds.put(baseName, Math.max(1, threshold));
         save();
     }
 
@@ -47,7 +47,7 @@ public class ItemAutoDrop {
 
     public static void updateThreshold(String baseName, int threshold) {
         if (itemThresholds.containsKey(baseName)) {
-            itemThresholds.put(baseName, threshold);
+            itemThresholds.put(baseName, Math.max(1, threshold));
             save();
         }
     }

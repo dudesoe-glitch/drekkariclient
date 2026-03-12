@@ -816,6 +816,7 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 		makeLocal("customclient/menugrid/OtherScriptsAndTools/Add4BranchesScript");
 		makeLocal("customclient/menugrid/OtherScriptsAndTools/Add5WoodBlocksScript");
 		makeLocal("customclient/menugrid/OtherScriptsAndTools/Notepad");
+		makeLocal("customclient/menugrid/OtherScriptsAndTools/LivestockManager");
 
 		// Category: Quick Switch From Belt
 		makeLocal("customclient/menugrid/QuickSwitchFromBelt/Equip_B12");
@@ -1187,6 +1188,13 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 					gui.add(gui.notepadWindow, Utils.getprefc("wndc-notepadWindow", new Coord(gui.sz.x / 2 - 140, gui.sz.y / 2 - 130)));
 				} else {
 					gui.notepadWindow.show(!gui.notepadWindow.visible);
+				}
+			} else if (ad[2].equals("LivestockManager")) {
+				if (gui.livestockManager == null) {
+					gui.livestockManager = new LivestockManager(gui);
+					gui.add(gui.livestockManager, Utils.getprefc("wndc-livestockManager", new Coord(gui.sz.x / 2 - 220, gui.sz.y / 2 - 160)));
+				} else {
+					gui.livestockManager.show(!gui.livestockManager.visible);
 				}
 			}
 		} else if (ad[1].equals("QuickSwitchFromBelt")) {

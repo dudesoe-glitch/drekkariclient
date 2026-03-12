@@ -191,6 +191,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 	public ForagingBot foragingBot;
 	public MiningBot miningBot;
 	public NotepadWindow notepadWindow;
+	public LivestockManager livestockManager;
 
     public static abstract class BeltSlot {
 	public final int idx;
