@@ -171,16 +171,16 @@ public class Map {
             } else {
                 for (HitBoxes.CollisionBoxSecondary collisionBox : collisionBoxSecondaries) {
                     if (!collisionBox.hitAble) {
-                        return;
+                        continue;
                     } else {
                         if (collisionBox.coords == null || collisionBox.coords.length < 3) {
-                            return;
+                            continue;
                         }
 
                         double minX = Double.MAX_VALUE;
                         double minY = Double.MAX_VALUE;
-                        double maxX = Double.MIN_VALUE;
-                        double maxY = Double.MIN_VALUE;
+                        double maxX = -Double.MAX_VALUE;
+                        double maxY = -Double.MAX_VALUE;
 
                         for (Coord2d coord : collisionBox.coords) {
                             minX = Math.min(minX, coord.x);
@@ -587,7 +587,7 @@ public class Map {
     // Search 8 directions at increasing radii for a free cell
     public Pair<Integer, Integer> getFreeLocation() {
         int[][] dirs = {{1,0},{-1,0},{0,1},{0,-1},{1,1},{1,-1},{-1,1},{-1,-1}};
-        for (int radius = 3; radius <= 12; radius += 3) {
+        for (int radius = 3; radius <= 33; radius += 3) {
             for (int[] d : dirs) {
                 int x = origin + d[0] * radius;
                 int y = origin + d[1] * radius;

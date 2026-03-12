@@ -17,8 +17,8 @@ public class Pathfinder implements Runnable {
     private MCache map;
     private MapView mv;
     private Coord dest;
-    public boolean terminate = false;
-    public boolean moveinterupted = false;
+    public volatile boolean terminate = false;
+    public volatile boolean moveinterupted = false;
     private int meshid;
     private int clickb;
     private Gob gob;
@@ -67,10 +67,21 @@ public class Pathfinder implements Runnable {
 
     @Override
     public void run() {
-        do {
-            moveinterupted = false;
-            pathfind(mv.player().rc.floor());
-        } while (moveinterupted && !terminate);
+        try {
+            do {
+                moveinterupted = false;
+                Gob player = mv.player();
+                if (player == null) { terminate = true; break; }
+                pathfind(player.rc.floor());
+            } while (moveinterupted && !terminate);
+        } catch (Loading e) {
+            System.err.println("Pathfinder: map/resource not loaded, aborting. " + e.getMessage());
+            terminate = true;
+        } catch (Exception e) {
+            System.err.println("Pathfinder error: " + e.getMessage());
+            e.printStackTrace();
+            terminate = true;
+        }
         notifyListeners();
     }
 
@@ -262,8 +273,8 @@ public class Pathfinder implements Runnable {
                     if (collisionBox.coords.length > 3) {
                         double minX = Double.MAX_VALUE;
                         double minY = Double.MAX_VALUE;
-                        double maxX = Double.MIN_VALUE;
-                        double maxY = Double.MIN_VALUE;
+                        double maxX = -Double.MAX_VALUE;
+                        double maxY = -Double.MAX_VALUE;
 
                         for (Coord2d coord : collisionBox.coords) {
                             minX = Math.min(minX, coord.x);
@@ -284,8 +295,8 @@ public class Pathfinder implements Runnable {
                     if (collisionBox.coords.length == 3) {
                         double minX = Double.MAX_VALUE;
                         double minY = Double.MAX_VALUE;
-                        double maxX = Double.MIN_VALUE;
-                        double maxY = Double.MIN_VALUE;
+                        double maxX = -Double.MAX_VALUE;
+                        double maxY = -Double.MAX_VALUE;
 
                         for (Coord2d coord : collisionBox.coords) {
                             if (coord.x < minX) {

@@ -586,6 +586,33 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 	}
 	@Override
 	public void destroy() {
+		// Stop all bot windows (BotBase.dispose() also handles this, but be explicit)
+		BotBase[] bots = {
+			combatDistanceTool, combatRotationBot, miningSafetyAssistantWindow,
+			oreAndStoneCounter, OceanScoutBot, tarKilnCleanerBot, cleanupBot,
+			grubGrubBot, cellarDiggingBot, roastingSpitBot, fishingBot,
+			farmingBot, butcherBot, clayDiggingBot, oreSmeltingBot,
+			foragingBot, miningBot
+		};
+		for (BotBase bot : bots) {
+			if (bot != null) {
+				try { bot.stop(); } catch (Exception ignored) {}
+			}
+		}
+		// Interrupt all script threads
+		Thread[] scripts = {
+			autoRepeatFlowerMenuScriptThread, interactWithNearestObjectThread,
+			enterNearestVehicleThread, wagonNearestLiftableThread,
+			cloverScriptThread, coracleScriptThread, skisScriptThread,
+			refillWaterContainersThread, harvestNearestDreamcatcherThread,
+			destroyNearestTrellisPlantScriptThread, lootNearestKnockedPlayerThread,
+			keyboundActionThread
+		};
+		for (Thread t : scripts) {
+			if (t != null && t.isAlive()) {
+				try { t.interrupt(); } catch (Exception ignored) {}
+			}
+		}
 		super.destroy();
 		ui.clearGUI(this);
 	}

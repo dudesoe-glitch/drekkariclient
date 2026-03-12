@@ -50,7 +50,7 @@ public class Inventory extends Widget implements DTarget {
 
 	// Grouping modes for visual inventory organization
 	public enum GroupingMode {
-		NONE("No Groups"), BY_NAME("By Name"), BY_QUALITY("By Quality");
+		NONE("No Groups"), BY_NAME("By Name");
 		public final String label;
 		GroupingMode(String label) { this.label = label; }
 		public GroupingMode next() {
@@ -82,39 +82,12 @@ public class Inventory extends Widget implements DTarget {
 		new java.awt.Color(50, 80, 100, 55),
 	};
 
-	// Quality bracket comparator: groups by quality range, then name, then quality
-	public static final Comparator<WItem> ITEM_COMPARATOR_QUALITY_BRACKET = Comparator
-			.comparing((WItem w) -> getQualityBracket(w.quality()))
-			.thenComparing(WItem::sortName)
-			.thenComparing(w -> w.item.resname())
-			.thenComparing(WItem::quality, Comparator.reverseOrder());
-
-	private static int getQualityBracket(double q) {
-		if (q < 10) return 0;
-		if (q < 25) return 1;
-		if (q < 50) return 2;
-		if (q < 100) return 3;
-		return 4;
-	}
-
-	private static String getQualityBracketLabel(double q) {
-		if (q < 10) return "Q 0-10";
-		if (q < 25) return "Q 10-25";
-		if (q < 50) return "Q 25-50";
-		if (q < 100) return "Q 50-100";
-		return "Q 100+";
-	}
 
 	private String getGroupKey(WItem wi) {
 		try {
-			switch (groupingMode) {
-				case BY_NAME:
-					return wi.sortName();
-				case BY_QUALITY:
-					return getQualityBracketLabel(wi.quality());
-				default:
-					return "";
-			}
+			if (groupingMode == GroupingMode.BY_NAME)
+				return wi.sortName();
+			return "";
 		} catch (Exception e) {
 			return "?";
 		}
@@ -257,6 +230,9 @@ public class Inventory extends Widget implements DTarget {
 	if (w == null || w.cap == null) return;
 	if (PLAYER_INVENTORY_NAMES.contains(w.cap)) return;
 	if (PRODUCTION_DEVICE_NAMES.contains(w.cap)) return;
+
+	// Skip toolbar for very small inventories (e.g., symbels on tables)
+	if (isz.x * isz.y <= 4) return;
 
 	isContainerInventory = true;
 	int toolbarH = UI.scale(22);
@@ -598,7 +574,14 @@ public class Inventory extends Widget implements DTarget {
 	}
 
 	private volatile boolean sorting = false;
-	private Thread sortThread;
+	private volatile Thread sortThread;
+
+	// Multi-slot comparator: largest area first, then name, then quality
+	private static final Comparator<WItem> MULTI_SLOT_COMPARATOR = Comparator
+			.comparing((WItem w) -> w.sz.div(sqsz).x * w.sz.div(sqsz).y, Comparator.reverseOrder())
+			.thenComparing(WItem::sortName)
+			.thenComparing(w -> w.item.resname())
+			.thenComparing(WItem::quality, Comparator.reverseOrder());
 
 	public boolean keydown(KeyDownEvent ev) {
 		if (ev.awt.getKeyCode() == KeyEvent.VK_S && ui.modshift && ui.modctrl) {
@@ -625,6 +608,19 @@ public class Inventory extends Widget implements DTarget {
 			} catch (Exception e) {
 				gui.error("Sort failed: " + e.getMessage());
 			} finally {
+				// Always clean up cursor if an item is stranded
+				try {
+					if (gui.vhand != null) {
+						Coord freeSlot = isRoom(1, 1);
+						if (freeSlot != null) {
+							wdgmsg("drop", freeSlot);
+							waitForCursor(gui, false);
+						} else {
+							gui.error("Sort: no room, dropping item to ground.");
+							gui.vhand.item.wdgmsg("drop", Coord.z);
+						}
+					}
+				} catch (Exception ignored) {}
 				sorting = false;
 				sortThread = null;
 			}
@@ -633,7 +629,87 @@ public class Inventory extends Widget implements DTarget {
 	}
 
 	private void doSort(GameUI gui) throws InterruptedException {
-		// Collect all items: multi-slot first (need more space), then 1x1
+		if (isContainerInventory) {
+			doSortContainer(gui);
+		} else {
+			doSortPlayerInventory(gui);
+		}
+	}
+
+	/**
+	 * Sort a container by transferring all items to player inventory,
+	 * then placing them back in sorted order. This avoids all the
+	 * swap-chain complexity and handles mixed-size items cleanly.
+	 */
+	private void doSortContainer(GameUI gui) throws InterruptedException {
+		Inventory playerInv = gui.maininv;
+		if (playerInv == null) return;
+
+		// Snapshot all items in this container
+		List<WItem> allItems = new ArrayList<>(wmap.values());
+		if (allItems.isEmpty()) return;
+
+		// Record what items existed (by resource name + quality) for placing back
+		List<ItemRecord> records = new ArrayList<>();
+		for (WItem wi : allItems) {
+			try {
+				records.add(new ItemRecord(wi));
+			} catch (Loading e) {
+				// Item not loaded, skip
+			}
+		}
+
+		// Phase 1: Transfer all items from container to player inventory
+		for (WItem wi : allItems) {
+			if (!wmap.containsValue(wi)) continue;
+			wi.item.wdgmsg("transfer", Coord.z);
+			Thread.sleep(5);
+		}
+		// Wait for transfers to complete
+		Thread.sleep(100);
+
+		// Sort records: multi-slot (largest first) then single-slot, all by name then quality
+		records.sort(Comparator
+			.comparing((ItemRecord r) -> r.area, Comparator.reverseOrder())
+			.thenComparing(r -> r.name)
+			.thenComparing(r -> r.resname)
+			.thenComparing(r -> r.quality, Comparator.reverseOrder()));
+
+		// Phase 2: Place items back from player inventory in sorted order
+		// Build occupancy grid
+		boolean[][] occupied = new boolean[isz.x][isz.y];
+		if (sqmask != null) {
+			for (int i = 0; i < isz.x * isz.y; i++) {
+				if (sqmask[i])
+					occupied[i % isz.x][i / isz.x] = true;
+			}
+		}
+
+		for (ItemRecord rec : records) {
+			// Find this item in player inventory
+			WItem found = findItemInInventory(playerInv, rec);
+			if (found == null) continue;
+
+			Coord gridSz = found.sz.div(sqsz);
+			Coord targetSlot = findFreeSlot(occupied, gridSz.x, gridSz.y);
+			if (targetSlot == null) continue; // No room left
+
+			// Pick up from player inventory and drop into container
+			found.item.wdgmsg("take", Coord.z);
+			if (!waitForCursor(gui, true)) return;
+			wdgmsg("drop", targetSlot);
+			Thread.sleep(5);
+			if (!waitForCursorEmpty(gui)) return;
+
+			markOccupied(occupied, targetSlot, gridSz);
+		}
+	}
+
+	/**
+	 * Sort player inventory using swap-chain approach (no external staging area).
+	 */
+	private void doSortPlayerInventory(GameUI gui) throws InterruptedException {
+		// Snapshot items from ConcurrentHashMap for thread safety
 		List<WItem> multiSlot = new ArrayList<>();
 		List<WItem> singleSlot = new ArrayList<>();
 		boolean[][] masked = new boolean[isz.x][isz.y];
@@ -646,28 +722,25 @@ public class Inventory extends Widget implements DTarget {
 			}
 		}
 
-		for (Widget wdg = child; wdg != null; wdg = wdg.next) {
-			if (wdg instanceof WItem) {
-				WItem wi = (WItem) wdg;
+		for (WItem wi : new ArrayList<>(wmap.values())) {
+			try {
 				Coord gridSz = wi.sz.div(sqsz);
 				if (gridSz.x == 1 && gridSz.y == 1)
 					singleSlot.add(wi);
 				else
 					multiSlot.add(wi);
+			} catch (Loading e) {
+				singleSlot.add(wi);
 			}
 		}
 
 		if (singleSlot.isEmpty() && multiSlot.isEmpty()) return;
 
-		// Sort both lists
-		Comparator<WItem> comparator = (groupingMode == GroupingMode.BY_QUALITY)
-			? ITEM_COMPARATOR_QUALITY_BRACKET
-			: ITEM_COMPARATOR_DESC;
-		singleSlot.sort(comparator);
-		multiSlot.sort(comparator);
+		// Sort: multi-slot by area (largest first) then name/quality
+		multiSlot.sort(MULTI_SLOT_COMPARATOR);
+		singleSlot.sort(ITEM_COMPARATOR_DESC);
 
 		// Phase 1: Place multi-slot items first (they need contiguous space)
-		// Build occupancy grid from masked cells only
 		boolean[][] occupied = new boolean[isz.x][isz.y];
 		for (int x = 0; x < isz.x; x++)
 			for (int y = 0; y < isz.y; y++)
@@ -675,26 +748,26 @@ public class Inventory extends Widget implements DTarget {
 
 		for (WItem wi : multiSlot) {
 			Coord gridSz = wi.sz.div(sqsz);
-			Coord targetSlot = findFreeSlot(occupied, gridSz.x, gridSz.y);
-			if (targetSlot == null) continue; // No room, leave in place
 			Coord currentSlot = wi.c.sub(1, 1).div(sqsz);
+			Coord targetSlot = findFreeSlot(occupied, gridSz.x, gridSz.y);
+
+			if (targetSlot == null) {
+				markOccupied(occupied, currentSlot, gridSz);
+				continue;
+			}
+
 			if (!currentSlot.equals(targetSlot)) {
-				// Pick up and place
+				if (!wmap.containsValue(wi)) continue;
 				wi.item.wdgmsg("take", Coord.z);
 				if (!waitForCursor(gui, true)) return;
 				wdgmsg("drop", targetSlot);
-				Thread.sleep(10);
-				waitForCursor(gui, false);
+				Thread.sleep(5);
+				if (!waitForCursorEmpty(gui)) return;
 			}
-			// Mark occupied
-			for (int dx = 0; dx < gridSz.x; dx++)
-				for (int dy = 0; dy < gridSz.y; dy++) {
-					int gx = targetSlot.x + dx, gy = targetSlot.y + dy;
-					if (gx < isz.x && gy < isz.y) occupied[gx][gy] = true;
-				}
+			markOccupied(occupied, targetSlot, gridSz);
 		}
 
-		// Phase 2: Swap-chain sort 1x1 items into remaining free slots
+		// Phase 2: Swap-chain sort 1x1 items
 		List<Coord> targets = new ArrayList<>();
 		for (int y = 0; y < isz.y; y++)
 			for (int x = 0; x < isz.x; x++)
@@ -702,13 +775,15 @@ public class Inventory extends Widget implements DTarget {
 
 		// Refresh single-slot list (positions may have shifted)
 		singleSlot.clear();
-		for (Widget wdg = child; wdg != null; wdg = wdg.next) {
-			if (wdg instanceof WItem) {
-				Coord gridSz = ((WItem) wdg).sz.div(sqsz);
-				if (gridSz.x == 1 && gridSz.y == 1) singleSlot.add((WItem) wdg);
+		for (WItem wi : new ArrayList<>(wmap.values())) {
+			try {
+				Coord gridSz = wi.sz.div(sqsz);
+				if (gridSz.x == 1 && gridSz.y == 1) singleSlot.add(wi);
+			} catch (Loading e) {
+				singleSlot.add(wi);
 			}
 		}
-		singleSlot.sort(comparator);
+		singleSlot.sort(ITEM_COMPARATOR_DESC);
 
 		Map<WItem, Coord> currentPos = new HashMap<>();
 		Map<Coord, WItem> posToItem = new HashMap<>();
@@ -729,6 +804,7 @@ public class Inventory extends Widget implements DTarget {
 			Coord target = targetPos.get(item);
 			Coord current = currentPos.get(item);
 			if (current.equals(target)) { placed.add(item); continue; }
+			if (!wmap.containsValue(item)) { placed.add(item); continue; }
 
 			item.item.wdgmsg("take", Coord.z);
 			if (!waitForCursor(gui, true)) return;
@@ -736,10 +812,11 @@ public class Inventory extends Widget implements DTarget {
 			WItem carrying = item;
 			while (carrying != null && !placed.contains(carrying)) {
 				Coord dropTarget = targetPos.get(carrying);
+				if (dropTarget == null) break;
 				placed.add(carrying);
 				WItem displaced = posToItem.get(dropTarget);
 				wdgmsg("drop", dropTarget);
-				Thread.sleep(10);
+				Thread.sleep(5);
 				posToItem.remove(currentPos.get(carrying));
 				currentPos.put(carrying, dropTarget);
 				posToItem.put(dropTarget, carrying);
@@ -748,18 +825,65 @@ public class Inventory extends Widget implements DTarget {
 					if (!waitForCursor(gui, true)) return;
 					carrying = displaced;
 				} else {
-					waitForCursor(gui, false);
+					waitForCursorEmpty(gui);
 					carrying = null;
 				}
 			}
 
 			if (gui.vhand != null) {
 				Coord freeSlot = isRoom(1, 1);
-				if (freeSlot != null) wdgmsg("drop", freeSlot);
-				else gui.vhand.item.wdgmsg("drop", Coord.z);
-				waitForCursor(gui, false);
+				if (freeSlot != null) {
+					wdgmsg("drop", freeSlot);
+					waitForCursorEmpty(gui);
+				} else {
+					gui.error("Sort: no room, dropping item to ground.");
+					gui.vhand.item.wdgmsg("drop", Coord.z);
+					waitForCursorEmpty(gui);
+				}
 			}
 		}
+	}
+
+	/** Record of an item's identity for matching after transfer. */
+	private static class ItemRecord {
+		final String name;
+		final String resname;
+		final double quality;
+		final int area; // grid slots occupied
+
+		ItemRecord(WItem wi) {
+			this.name = wi.sortName();
+			this.resname = wi.item.resname();
+			this.quality = wi.quality();
+			Coord gridSz = wi.sz.div(sqsz);
+			this.area = gridSz.x * gridSz.y;
+		}
+	}
+
+	/** Find an item in the given inventory matching the record. */
+	private WItem findItemInInventory(Inventory inv, ItemRecord rec) {
+		WItem best = null;
+		double bestDiff = Double.MAX_VALUE;
+		for (WItem wi : new ArrayList<>(inv.wmap.values())) {
+			try {
+				if (wi.sortName().equals(rec.name) && wi.item.resname().equals(rec.resname)) {
+					double diff = Math.abs(wi.quality() - rec.quality);
+					if (diff < bestDiff) {
+						bestDiff = diff;
+						best = wi;
+					}
+				}
+			} catch (Loading e) { /* skip */ }
+		}
+		return best;
+	}
+
+	private void markOccupied(boolean[][] occupied, Coord slot, Coord gridSz) {
+		for (int dx = 0; dx < gridSz.x; dx++)
+			for (int dy = 0; dy < gridSz.y; dy++) {
+				int gx = slot.x + dx, gy = slot.y + dy;
+				if (gx < isz.x && gy < isz.y) occupied[gx][gy] = true;
+			}
 	}
 
 	private Coord findFreeSlot(boolean[][] occupied, int w, int h) {
@@ -774,11 +898,36 @@ public class Inventory extends Widget implements DTarget {
 		return null;
 	}
 
+	/**
+	 * Waits for an item to appear on cursor, or for cursor to become empty.
+	 * Timeout: ~1000ms (200 x 5ms).
+	 */
 	private boolean waitForCursor(GameUI gui, boolean wantItem) throws InterruptedException {
-		for (int i = 0; i < 150; i++) {
+		for (int i = 0; i < 200; i++) {
 			if (wantItem && (gui.vhand != null || !gui.hand.isEmpty())) return true;
 			if (!wantItem && gui.vhand == null && gui.hand.isEmpty()) return true;
-			Thread.sleep(3);
+			Thread.sleep(5);
+		}
+		return false;
+	}
+
+	/**
+	 * Wait for cursor to become empty. If a displaced item is on cursor,
+	 * drop it in a free slot first.
+	 */
+	private boolean waitForCursorEmpty(GameUI gui) throws InterruptedException {
+		if (waitForCursor(gui, false)) return true;
+		// Cursor still has item — try to drop displaced item somewhere
+		if (gui.vhand != null) {
+			Coord freeSlot = isRoom(1, 1);
+			if (freeSlot != null) {
+				wdgmsg("drop", freeSlot);
+				return waitForCursor(gui, false);
+			} else {
+				gui.error("Sort: no room, dropping item to ground.");
+				gui.vhand.item.wdgmsg("drop", Coord.z);
+				return waitForCursor(gui, false);
+			}
 		}
 		return false;
 	}
