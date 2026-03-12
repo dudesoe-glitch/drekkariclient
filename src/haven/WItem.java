@@ -72,6 +72,8 @@ public class WItem extends Widget implements DTarget {
 	public static Color orangeDurability = new Color(255, 153, 0, 180);
 	public static Color yellowDurability = new Color(255, 234, 0, 180);
 	public static Color greenDurability = new Color(0, 255, 4, 180);
+	private static final Color armorTextColor = new Color(120, 180, 255);
+	private static final Color durabilityTextColor = new Color(180, 230, 230);
 	public final AttrCache<Pair<Double, Color>> wear = new AttrCache<>(this::info, AttrCache.cache(info->{
 		Pair<Integer, Integer> wear = ItemInfo.getWear(info);
 		if(wear == null) return (null);
@@ -79,18 +81,24 @@ public class WItem extends Widget implements DTarget {
 		return new Pair<>(bar, Utils.blendcol(bar, redDurability, orangeDurability, yellowDurability, greenDurability));
 	}));
 
-	public enum ItemCategory {
-		FOOD(new Color(50, 200, 50, 200)),
-		ARMOR(new Color(80, 130, 255, 200)),
-		CURIOSITY(new Color(200, 100, 255, 200)),
-		TOOL(new Color(255, 200, 50, 200)),
-		CONTAINER(new Color(0, 180, 180, 200)),
-		SEED(new Color(139, 90, 43, 200)),
-		MATERIAL(new Color(200, 120, 30, 200)),
-		NONE(null);
-		public final Color color;
-		ItemCategory(Color c) { this.color = c; }
-	}
+	public final AttrCache<Tex> armorText = new AttrCache<>(this::info, AttrCache.cache(info -> {
+		for (ItemInfo inf : info) {
+			if (inf instanceof haven.res.ui.tt.armor.Armor) {
+				haven.res.ui.tt.armor.Armor a = (haven.res.ui.tt.armor.Armor) inf;
+				String txt = a.hard + "/" + a.soft;
+				return new TexI(PUtils.strokeImg(quantityFoundry.renderstroked2(txt, armorTextColor, Color.BLACK)));
+			}
+		}
+		return null;
+	}));
+
+	public final AttrCache<Tex> durabilityNum = new AttrCache<>(this::info, AttrCache.cache(info -> {
+		Pair<Integer, Integer> w = ItemInfo.getWear(info);
+		if (w == null) return null;
+		int remaining = w.b - w.a;
+		return new TexI(PUtils.strokeImg(quantityFoundry.renderstroked2(Integer.toString(remaining), durabilityTextColor, Color.BLACK)));
+	}));
+
 
     public WItem(GItem item) {
 	super(sqsz);
@@ -325,12 +333,12 @@ public class WItem extends Widget implements DTarget {
 		}
 		drawDurabilityBars(g, sz);
 		if (OptWnd.showItemCategoryBadgesCheckBox != null && OptWnd.showItemCategoryBadgesCheckBox.a) {
-			ItemCategory cat = itemCategory.get();
-			if (cat != null && cat.color != null) {
+			ItemType cat = itemCategory.get();
+			if (cat != null && cat != ItemType.UNKNOWN) {
 				int bx = UI.scale(8), by = sz.y - UI.scale(5), br = UI.scale(4);
 				g.chcolor(0, 0, 0, 180);
 				g.fcircle(bx, by, br + UI.scale(1), 10);
-				g.chcolor(cat.color);
+				g.chcolor(cat.color());
 				g.fcircle(bx, by, br, 10);
 				g.chcolor();
 			}
@@ -564,58 +572,9 @@ public class WItem extends Widget implements DTarget {
 		});
 	});
 
-	private static final java.util.Set<String> TOOL_BASENAMES = new java.util.HashSet<>(java.util.Arrays.asList(
-		"axe", "stoneaxe", "boneaxe", "metalaxe",
-		"pickaxe", "shovel", "woodenshovel", "tinkershovel", "metalshovel",
-		"saw", "hammer", "sledgehammer", "smithshammer",
-		"scythe", "sickle", "trowel",
-		"smokren", "fryingpan", "crucible",
-		"chisel", "needle", "sewing-needle", "spindle", "loom",
-		"fishing-pole", "net", "hookline",
-		"tinderbox", "firestarter",
-		"rope", "leash", "bucket"
-	));
-
-	private static final java.util.Set<String> CONTAINER_BASENAMES = new java.util.HashSet<>(java.util.Arrays.asList(
-		"flask", "waterskin", "waterflask", "kuksa", "tankard", "mug", "cup",
-		"barrel", "trough", "cauldron", "pot"
-	));
-
-	public final AttrCache<ItemCategory> itemCategory = new AttrCache<>(this::info, info -> {
-		// Priority 1-3: Info-based categories (FOOD > ARMOR > CURIOSITY)
-		for (ItemInfo inf : info) {
-			if (inf instanceof haven.resutil.FoodInfo) return () -> ItemCategory.FOOD;
-			if (inf instanceof haven.res.ui.tt.armor.Armor) return () -> ItemCategory.ARMOR;
-			if (inf instanceof haven.resutil.Curiosity) return () -> ItemCategory.CURIOSITY;
-		}
-		// Priority 4-7: Resource-name-based categories (TOOL > CONTAINER > SEED > MATERIAL)
-		try {
-			String resname = WItem.this.item.resname();
-			String basename = resname.substring(resname.lastIndexOf('/') + 1);
-			// TOOL check (includes /tools/ path and known basenames)
-			if (resname.contains("/tools/") || TOOL_BASENAMES.contains(basename)) {
-				return () -> ItemCategory.TOOL;
-			}
-			// CONTAINER check
-			if (CONTAINER_BASENAMES.contains(basename)) {
-				return () -> ItemCategory.CONTAINER;
-			}
-			// SEED check
-			if (resname.contains("gfx/invobjs/seed-") || resname.contains("gfx/invobjs/seeds/")) {
-				return () -> ItemCategory.SEED;
-			}
-			// MATERIAL check
-			if (resname.contains("gfx/invobjs/bar-") || resname.contains("gfx/invobjs/nugget-") ||
-				resname.contains("gfx/invobjs/ore-") || resname.contains("gfx/invobjs/fur-") ||
-				basename.equals("brick") || basename.equals("board") || basename.equals("stone") ||
-				basename.equals("coal") || basename.equals("branch") || basename.equals("log") ||
-				basename.equals("leather") || basename.equals("string") || basename.equals("cloth") ||
-				basename.equals("yarn") || basename.equals("wool") || basename.equals("hide") ||
-				basename.equals("bone")) {
-				return () -> ItemCategory.MATERIAL;
-			}
-		} catch (Exception ignored) {}
-		return () -> ItemCategory.NONE;
+	public final AttrCache<ItemType> itemCategory = new AttrCache<>(this::info, info -> {
+		final ItemType type = ItemType.classify(WItem.this.item);
+		return () -> type;
 	});
 
 	private void drawwellmined(GOut g) {
@@ -636,6 +595,13 @@ public class WItem extends Widget implements DTarget {
 			tex = PUtils.strokeTex(quantityFoundry.renderstroked2(Integer.toString(item.num), quantityColor, Color.BLACK));
 		} else {
 			tex = chainattr(heurnum);
+		}
+
+		if (tex == null && OptWnd.showArmorValuesCheckBox != null && OptWnd.showArmorValuesCheckBox.a) {
+			tex = armorText.get();
+		}
+		if (tex == null && OptWnd.showDurabilityNumberCheckBox != null && OptWnd.showDurabilityNumberCheckBox.a) {
+			tex = durabilityNum.get();
 		}
 
 		if(tex != null) {

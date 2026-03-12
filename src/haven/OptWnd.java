@@ -431,6 +431,8 @@ public class OptWnd extends Window {
 
 	public static CheckBox showQualityDisplayCheckBox;
 	public static CheckBox showItemCategoryBadgesCheckBox;
+	public static CheckBox showArmorValuesCheckBox;
+	public static CheckBox showDurabilityNumberCheckBox;
 	public static CheckBox roundedQualityCheckBox;
 	public static CheckBox customQualityColorsCheckBox;
 	public static int qualityAggMode = Utils.getprefi("qualityAggMode", 0);
