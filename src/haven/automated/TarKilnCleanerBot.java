@@ -30,14 +30,15 @@ public class TarKilnCleanerBot extends BotBase {
 
 			List<Gob> tarKilns = GobHelper.findByName(gui, "gfx/terobjs/tarkiln", 550.0);
 			Gob closest = null;
+			Gob player = gui.map.player(); if (player == null) return;
 			for (Gob tarKiln : tarKilns) {
-				if (closest == null || tarKiln.rc.dist(gui.map.player().rc) < closest.rc.dist(gui.map.player().rc)) {
+				if (closest == null || tarKiln.rc.dist(player.rc) < closest.rc.dist(player.rc)) {
 					ResDrawable resDrawable = tarKiln.getattr(ResDrawable.class);
 					if (resDrawable != null && (resDrawable.sdt.checkrbuf(0) == 10 || resDrawable.sdt.checkrbuf(0) == 42)) closest = tarKiln;
 				}
 			}
 
-			if (closest == null) { active = false; activeBox.set(false); ui.gui.error("No full tar kilns nearby."); return; }
+			if (closest == null) { active = false; activeBox.set(false); gui.error("No full tar kilns nearby."); return; }
 
 			if (gui.prog == null) {
 				int[][] options = {{33, 0}, {-33, 0}, {0, 33}, {0, -33}};
@@ -57,7 +58,7 @@ public class TarKilnCleanerBot extends BotBase {
 	}
 
 	private void dropCoal() {
-		for (WItem wItem : ui.gui.maininv.getAllItems()) {
+		for (WItem wItem : gui.maininv.getAllItems()) {
 			try { GItem gitem = wItem.item; if (gitem.getname().contains("Coal")) gitem.wdgmsg("drop", new Coord(wItem.item.sz.x / 2, wItem.item.sz.y / 2)); } catch (Loading ignored) {}
 		}
 	}

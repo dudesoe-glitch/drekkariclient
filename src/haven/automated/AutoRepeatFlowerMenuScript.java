@@ -12,7 +12,7 @@ public class AutoRepeatFlowerMenuScript implements Runnable{
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
     public static String option;
     private GameUI gui;
-    private boolean stop = false;
+    private volatile boolean stop = false;
     private int ping;
     private final String name;
     private List<GItem> items;

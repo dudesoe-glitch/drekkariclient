@@ -3,13 +3,11 @@ package haven.automated;
 import haven.*;
 import haven.Button;
 import haven.Label;
-import haven.Window;
 
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
 import static haven.OCache.posres;
 
@@ -21,11 +19,7 @@ import static haven.OCache.posres;
  * Moves are executed by sending "use"/"rel" messages through the Fightsess widget,
  * respecting cooldowns tracked via Fightsess.Action.ct.
  */
-public class CombatRotationBot extends Window implements Runnable {
-	private final GameUI gui;
-	public volatile boolean stop;
-	private volatile boolean active;
-
+public class CombatRotationBot extends BotBase {
 	// Rotation steps: each is {slotIndex (0-9), repeatCount}. Synchronized for thread safety.
 	private final List<int[]> steps = Collections.synchronizedList(new ArrayList<>());
 	private int currentStep = 0;
@@ -38,8 +32,6 @@ public class CombatRotationBot extends Window implements Runnable {
 	private final Label[] stepLabels;
 	private final TextEntry slotEntry;
 	private final TextEntry countEntry;
-	private final Label statusLabel;
-	private Button startButton;
 
 	private static final int MAX_DISPLAY_STEPS = 8;
 	private static final int STEP_HEIGHT = 16;
@@ -48,10 +40,11 @@ public class CombatRotationBot extends Window implements Runnable {
 	private static final Color NORMAL_COLOR = Color.WHITE;
 
 	public CombatRotationBot(GameUI gui) {
-		super(UI.scale(new Coord(250, 310)), "Combat Rotation", true);
-		this.gui = gui;
-		this.stop = false;
-		this.active = false;
+		super(gui, UI.scale(new Coord(250, 310)), "Combat Rotation", true);
+		checkHP = false;
+		checkEnergy = false;
+		checkStamina = false;
+		checkInventory = false;
 
 		loadRotation();
 
@@ -127,7 +120,7 @@ public class CombatRotationBot extends Window implements Runnable {
 		y += UI.scale(24);
 
 		// Start/Stop
-		startButton = add(new Button(UI.scale(60), "Start") {
+		activeButton = add(new Button(UI.scale(60), "Start") {
 			public void click() {
 				if (active) {
 					active = false;
@@ -143,6 +136,27 @@ public class CombatRotationBot extends Window implements Runnable {
 
 		statusLabel = add(new Label("Idle"), UI.scale(70, y + 3));
 		pack();
+	}
+
+	@Override
+	protected String windowPrefKey() {
+		return "wndc-combatRotationBotWindow";
+	}
+
+	@Override
+	protected void onCleanup() {
+		gui.combatRotationBot = null;
+	}
+
+	/** Skip idlePlayer — we're in combat. */
+	@Override
+	public void stop() {
+		stop = true;
+		active = false;
+		if (botThread != null) {
+			botThread.interrupt();
+			botThread = null;
+		}
 	}
 
 	private void refreshStepLabels() {
@@ -227,26 +241,26 @@ public class CombatRotationBot extends Window implements Runnable {
 
 	@Override
 	public void run() {
-		while (!stop) {
-			try {
+		try {
+			while (!stop) {
 				refreshStepLabels();
 
 				if (!active || steps.isEmpty()) {
-					statusLabel.settext(active ? "No steps" : "Idle");
+					setStatus(active ? "No steps" : "Idle");
 					Thread.sleep(200);
 					continue;
 				}
 
 				// Check combat state
 				if (gui.fv == null || gui.fv.current == null) {
-					statusLabel.settext("Waiting for combat...");
+					setStatus("Waiting for combat...");
 					Thread.sleep(300);
 					continue;
 				}
 
 				Fightsess fs = gui.fs;
 				if (fs == null) {
-					statusLabel.settext("No combat session");
+					setStatus("No combat session");
 					Thread.sleep(300);
 					continue;
 				}
@@ -256,9 +270,8 @@ public class CombatRotationBot extends Window implements Runnable {
 						currentStep = 0;
 						currentRepeat = 0;
 					} else {
-						statusLabel.settext("Rotation complete");
-						active = false;
-						startButton.change("Start");
+						setStatus("Rotation complete");
+						deactivate();
 						continue;
 					}
 				}
@@ -269,7 +282,7 @@ public class CombatRotationBot extends Window implements Runnable {
 				int repeats = step[1];
 				String name = getActionName(slot);
 
-				statusLabel.settext(name + " (" + (currentRepeat + 1) + "/" + repeats + ")");
+				setStatus(name + " (" + (currentRepeat + 1) + "/" + repeats + ")");
 
 				// Wait for cooldown
 				if (waitForCooldowns && slot < fs.actions.length && fs.actions[slot] != null) {
@@ -293,16 +306,11 @@ public class CombatRotationBot extends Window implements Runnable {
 
 				// Brief delay between moves
 				Thread.sleep(100);
-
-			} catch (InterruptedException e) {
-				Thread.currentThread().interrupt();
-				break;
-			} catch (Exception e) {
-				try { Thread.sleep(300); } catch (InterruptedException ie) {
-					Thread.currentThread().interrupt();
-					break;
-				}
 			}
+		} catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
+		} catch (Exception e) {
+			// Unexpected error — stop gracefully
 		}
 	}
 
@@ -362,32 +370,5 @@ public class CombatRotationBot extends Window implements Runnable {
 				} catch (NumberFormatException ignored) {}
 			}
 		}
-	}
-
-	// --- Lifecycle ---
-
-	@Override
-	public void wdgmsg(Widget sender, String msg, Object... args) {
-		if (sender == this && Objects.equals(msg, "close")) {
-			stop();
-			if (gui.combatRotationBot != null) {
-				gui.combatRotationBot = null;
-				gui.combatRotationBotThread = null;
-			}
-		} else {
-			super.wdgmsg(sender, msg, args);
-		}
-	}
-
-	public void stop() {
-		stop = true;
-		active = false;
-		this.reqdestroy();
-	}
-
-	@Override
-	public void reqdestroy() {
-		Utils.setprefc("wndc-combatRotationBotWindow", this.c);
-		super.reqdestroy();
 	}
 }
