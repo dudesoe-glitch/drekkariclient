@@ -7,6 +7,11 @@
 *.iml
 *~
 nd-notes.txt
+README_Vanilla-Client
+Play_WithSteam.bat
+steam_appid.txt
+steamicon.png
+workshop-client.properties
 /docs/plans/
 
 # Claude Code project files
