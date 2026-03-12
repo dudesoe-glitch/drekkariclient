@@ -10,12 +10,14 @@ import static haven.OCache.posres;
 public class FarmingBot extends Window implements Runnable {
 	private final GameUI gui;
 	public volatile boolean stop;
-	private boolean active;
+	private volatile boolean active;
 	private Button activeButton;
 	private Label statusLabel;
 	private CheckBox harvestCheckBox;
 	private CheckBox replantCheckBox;
 	private CheckBox useBestSeedCheckBox;
+
+	private static final double MAX_SEARCH_DIST = 550.0; // ~50 tiles
 
 	// Crop resource name prefix
 	private static final String CROP_PREFIX = "gfx/terobjs/plants/";
@@ -45,6 +47,7 @@ public class FarmingBot extends Window implements Runnable {
 		put("hops", "gfx/invobjs/seed-hops");
 		put("pepper", "gfx/invobjs/seed-pepper");
 		put("tea", "gfx/invobjs/seed-tea");
+		put("cucumber", "gfx/invobjs/seed-cucumber");
 	}};
 
 	public FarmingBot(GameUI gui) {
@@ -77,7 +80,9 @@ public class FarmingBot extends Window implements Runnable {
 				if (active) {
 					this.change("Stop");
 				} else {
-					ui.gui.map.wdgmsg("click", Coord.z, ui.gui.map.player().rc.floor(posres), 1, 0);
+					Gob player = ui.gui.map.player();
+					if (player != null)
+						ui.gui.map.wdgmsg("click", Coord.z, player.rc.floor(posres), 1, 0);
 					this.change("Start");
 				}
 			}
@@ -90,31 +95,57 @@ public class FarmingBot extends Window implements Runnable {
 		try {
 			while (!stop) {
 				if (active) {
+					Gob player = gui.map.player();
+					if (player == null) {
+						Thread.sleep(500);
+						continue;
+					}
+
+					// HP check
+					if (gui.getmeters("hp").get(1).a < 0.02) {
+						setStatus("Low HP! Hearthing...");
+						gui.act("travel", "hearth");
+						Thread.sleep(8000);
+						continue;
+					}
+					// Energy check
+					if (ui.gui.getmeter("nrj", 0).a < 0.25) {
+						gui.error("Farming Bot: Low on energy, stopping.");
+						stopBot();
+						Thread.sleep(2000);
+						continue;
+					}
+					// Stamina check
 					if (gui.getmeter("stam", 0).a < 0.40) {
 						setStatus("Drinking...");
 						try {
 							AUtils.drinkTillFull(gui, 0.99, 0.99);
 						} catch (InterruptedException e) {
+							Thread.currentThread().interrupt();
 							return;
 						}
-					} else if (ui.gui.getmeter("nrj", 0).a < 0.25) {
-						gui.error("Farming Bot: Low on energy, stopping.");
+					}
+					// Inventory full check
+					if (gui.maininv.getFreeSpace() < 2) {
+						gui.error("Farming Bot: Inventory full, stopping.");
 						stopBot();
+						Thread.sleep(2000);
+						continue;
+					}
+
+					Gob crop = findMatureCrop();
+					if (crop != null) {
+						processCrop(crop);
 					} else {
-						Gob crop = findMatureCrop();
-						if (crop != null) {
-							processCrop(crop);
-						} else {
-							setStatus("No mature crops found.");
-							active = false;
-							activeButton.change("Start");
-						}
+						setStatus("No mature crops found.");
+						active = false;
+						activeButton.change("Start");
 					}
 				}
 				Thread.sleep(1000);
 			}
 		} catch (InterruptedException e) {
-			// Bot interrupted, exit cleanly
+			Thread.currentThread().interrupt();
 		}
 	}
 
@@ -206,7 +237,9 @@ public class FarmingBot extends Window implements Runnable {
 
 					if (!isCropMature(gob)) continue;
 
-					if (closest == null || gob.rc.dist(playerPos) < closest.rc.dist(playerPos)) {
+					double dist = gob.rc.dist(playerPos);
+					if (dist > MAX_SEARCH_DIST) continue;
+					if (closest == null || dist < closest.rc.dist(playerPos)) {
 						closest = gob;
 					}
 				} catch (Loading | NullPointerException ignored) {
@@ -302,7 +335,9 @@ public class FarmingBot extends Window implements Runnable {
 	}
 
 	public void stop() {
-		ui.gui.map.wdgmsg("click", Coord.z, ui.gui.map.player().rc.floor(posres), 1, 0);
+		Gob player = ui.gui.map.player();
+		if (player != null)
+			ui.gui.map.wdgmsg("click", Coord.z, player.rc.floor(posres), 1, 0);
 		if (ui.gui.map.pfthread != null) {
 			ui.gui.map.pfthread.interrupt();
 		}

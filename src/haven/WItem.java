@@ -57,6 +57,8 @@ public class WItem extends Widget implements DTarget {
 	private boolean holdingShift = false;
 	private boolean searchItemColorShiftUp = true;
 	private int searchItemColorValue = 0;
+	private static String lastFilterString = "";
+	private static ItemFilter cachedFilter = null;
 	public static final Text.Foundry quantityFoundry = new Text.Foundry(Text.dfont, 10);
 	private static final Color quantityColor = new Color(255, 255, 255, 255);
 	public static final Coord TEXT_PADD_BOT = new Coord(1, 2);
@@ -82,6 +84,9 @@ public class WItem extends Widget implements DTarget {
 		ARMOR(new Color(80, 130, 255, 200)),
 		CURIOSITY(new Color(200, 100, 255, 200)),
 		TOOL(new Color(255, 200, 50, 200)),
+		CONTAINER(new Color(0, 180, 180, 200)),
+		SEED(new Color(139, 90, 43, 200)),
+		MATERIAL(new Color(200, 120, 30, 200)),
 		NONE(null);
 		public final Color color;
 		ItemCategory(Color c) { this.color = c; }
@@ -243,8 +248,11 @@ public class WItem extends Widget implements DTarget {
 		g.usestate(rstate.get());
 		String searchKeyword = InventorySearchWindow.inventorySearchString;
 		if (searchKeyword.length() > 1) {
-			ItemFilter filter = ItemFilter.parse(searchKeyword);
-			if (filter != null && filter.matches(this)) {
+			if (!searchKeyword.equals(lastFilterString)) {
+				lastFilterString = searchKeyword;
+				cachedFilter = ItemFilter.parse(searchKeyword);
+			}
+			if (cachedFilter != null && cachedFilter.matches(this)) {
 				int fps = GLPanel.Loop.fps > 0 ? GLPanel.Loop.fps : 1;
 				int colorShiftSpeed = 800/fps;
 				if (searchItemColorShiftUp) {
@@ -309,8 +317,11 @@ public class WItem extends Widget implements DTarget {
 		if (OptWnd.showItemCategoryBadgesCheckBox != null && OptWnd.showItemCategoryBadgesCheckBox.a) {
 			ItemCategory cat = itemCategory.get();
 			if (cat != null && cat.color != null) {
+				int bx = UI.scale(8), by = sz.y - UI.scale(5), br = UI.scale(4);
+				g.chcolor(0, 0, 0, 180);
+				g.fcircle(bx, by, br + UI.scale(1), 10);
 				g.chcolor(cat.color);
-				g.fcircle(UI.scale(8), sz.y - UI.scale(5), UI.scale(3), 8);
+				g.fcircle(bx, by, br, 10);
 				g.chcolor();
 			}
 		}
@@ -544,26 +555,54 @@ public class WItem extends Widget implements DTarget {
 	});
 
 	private static final java.util.Set<String> TOOL_BASENAMES = new java.util.HashSet<>(java.util.Arrays.asList(
-		"pickaxe", "shovel", "woodenshovel", "tinkershovel", "metalshovel",
 		"axe", "stoneaxe", "boneaxe", "metalaxe",
-		"saw", "scythe", "sledgehammer", "hammer", "sewing-needle",
-		"firestarter", "smithshammer", "fryingpan", "crucible"
+		"pickaxe", "shovel", "woodenshovel", "tinkershovel", "metalshovel",
+		"saw", "hammer", "sledgehammer", "smithshammer",
+		"scythe", "sickle", "trowel",
+		"smokren", "fryingpan", "crucible",
+		"chisel", "needle", "sewing-needle", "spindle", "loom",
+		"fishing-pole", "net", "hookline",
+		"tinderbox", "firestarter",
+		"rope", "leash", "bucket"
+	));
+
+	private static final java.util.Set<String> CONTAINER_BASENAMES = new java.util.HashSet<>(java.util.Arrays.asList(
+		"flask", "waterskin", "waterflask", "kuksa", "tankard", "mug", "cup",
+		"barrel", "trough", "cauldron", "pot"
 	));
 
 	public final AttrCache<ItemCategory> itemCategory = new AttrCache<>(this::info, info -> {
+		// Priority 1-3: Info-based categories (FOOD > ARMOR > CURIOSITY)
 		for (ItemInfo inf : info) {
 			if (inf instanceof haven.resutil.FoodInfo) return () -> ItemCategory.FOOD;
 			if (inf instanceof haven.res.ui.tt.armor.Armor) return () -> ItemCategory.ARMOR;
 			if (inf instanceof haven.resutil.Curiosity) return () -> ItemCategory.CURIOSITY;
 		}
+		// Priority 4-7: Resource-name-based categories (TOOL > CONTAINER > SEED > MATERIAL)
 		try {
 			String resname = WItem.this.item.resname();
-			if (resname.contains("/tools/")) {
+			String basename = resname.substring(resname.lastIndexOf('/') + 1);
+			// TOOL check (includes /tools/ path and known basenames)
+			if (resname.contains("/tools/") || TOOL_BASENAMES.contains(basename)) {
 				return () -> ItemCategory.TOOL;
 			}
-			String basename = resname.substring(resname.lastIndexOf('/') + 1);
-			if (TOOL_BASENAMES.contains(basename)) {
-				return () -> ItemCategory.TOOL;
+			// CONTAINER check
+			if (CONTAINER_BASENAMES.contains(basename)) {
+				return () -> ItemCategory.CONTAINER;
+			}
+			// SEED check
+			if (resname.contains("gfx/invobjs/seed-") || resname.contains("gfx/invobjs/seeds/")) {
+				return () -> ItemCategory.SEED;
+			}
+			// MATERIAL check
+			if (resname.contains("gfx/invobjs/bar-") || resname.contains("gfx/invobjs/nugget-") ||
+				resname.contains("gfx/invobjs/ore-") || resname.contains("gfx/invobjs/fur-") ||
+				basename.equals("brick") || basename.equals("board") || basename.equals("stone") ||
+				basename.equals("coal") || basename.equals("branch") || basename.equals("log") ||
+				basename.equals("leather") || basename.equals("string") || basename.equals("cloth") ||
+				basename.equals("yarn") || basename.equals("wool") || basename.equals("hide") ||
+				basename.equals("bone")) {
+				return () -> ItemCategory.MATERIAL;
 			}
 		} catch (Exception ignored) {}
 		return () -> ItemCategory.NONE;

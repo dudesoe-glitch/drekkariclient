@@ -7,8 +7,8 @@ import java.util.Objects;
 public class GrubGrubBot extends Window implements Runnable {
     public static boolean transferTicks = false;
     private final GameUI gui;
-    private boolean stop = false;
-    private boolean active = false;
+    private volatile boolean stop = false;
+    private volatile boolean active = false;
 
     public GrubGrubBot(GameUI gui) {
         super(UI.scale(UI.scale(254, 96)), "Grub-Grub Bot");
@@ -38,6 +38,18 @@ public class GrubGrubBot extends Window implements Runnable {
                 if (!active) {
                     Thread.sleep(200);
                     continue;
+                }
+                // Energy check
+                try {
+                    if (gui.getmeter("nrj", 0).a < 0.25) {
+                        gui.error("Grub Grub Bot: Low on energy, stopping.");
+                        GrubGrubBot.transferTicks = false;
+                        active = false;
+                        Thread.sleep(2000);
+                        continue;
+                    }
+                } catch (Exception e) {
+                    if (e instanceof InterruptedException) { Thread.currentThread().interrupt(); return; }
                 }
                 int totalTicks = gui.maininv.getItemsPartial("Tick").size();
                 if (totalTicks >= 2 ) {

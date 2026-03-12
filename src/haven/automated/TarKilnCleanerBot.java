@@ -11,9 +11,9 @@ public class TarKilnCleanerBot extends Window implements Runnable {
     private final CheckBox activeBox;
     private GameUI gui;
 
-    private boolean stop;
+    private volatile boolean stop;
     private int phase = 1;
-    private boolean active;
+    private volatile boolean active;
 
     public TarKilnCleanerBot(GameUI gui) {
         super(UI.scale(150, 50), "Tar Kiln Emptier");
@@ -53,7 +53,7 @@ public class TarKilnCleanerBot extends Window implements Runnable {
                         for (Gob tarKiln : tarKilns) {
                             if (closest == null || tarKiln.rc.dist(gui.map.player().rc) < closest.rc.dist(gui.map.player().rc)) {
                                 ResDrawable resDrawable = tarKiln.getattr(ResDrawable.class);
-                                if(resDrawable.sdt.checkrbuf(0) == 10 || resDrawable.sdt.checkrbuf(0) == 42){
+                                if(resDrawable != null && (resDrawable.sdt.checkrbuf(0) == 10 || resDrawable.sdt.checkrbuf(0) == 42)){
                                     closest = tarKiln;
                                 }
                             }
@@ -96,10 +96,12 @@ public class TarKilnCleanerBot extends Window implements Runnable {
 
     private void dropCoal() {
         for (WItem wItem : ui.gui.maininv.getAllItems()) {
-            GItem gitem = wItem.item;
-            if (gitem.getname().contains("Coal")) {
-                gitem.wdgmsg("drop", new Coord(wItem.item.sz.x / 2, wItem.item.sz.y / 2));
-            }
+            try {
+                GItem gitem = wItem.item;
+                if (gitem.getname().contains("Coal")) {
+                    gitem.wdgmsg("drop", new Coord(wItem.item.sz.x / 2, wItem.item.sz.y / 2));
+                }
+            } catch (Loading ignored) {}
         }
     }
 
@@ -116,9 +118,15 @@ public class TarKilnCleanerBot extends Window implements Runnable {
     }
 
     public void stop() {
-        ui.gui.map.wdgmsg("click", Coord.z, ui.gui.map.player().rc.floor(posres), 1, 0);
+        Gob player = ui.gui.map.player();
+        if (player != null)
+            ui.gui.map.wdgmsg("click", Coord.z, player.rc.floor(posres), 1, 0);
         if (ui.gui.map.pfthread != null) {
             ui.gui.map.pfthread.interrupt();
+        }
+        if (gui.tarKilnCleanerThread != null) {
+            gui.tarKilnCleanerThread.interrupt();
+            gui.tarKilnCleanerThread = null;
         }
         this.destroy();
     }

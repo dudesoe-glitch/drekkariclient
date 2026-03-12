@@ -17,8 +17,8 @@ import static haven.OCache.posres;
 public class FishingBot extends Window implements Runnable {
     private final GameUI gui;
 
-    private boolean stop;
-    private boolean active;
+    private volatile boolean stop;
+    private volatile boolean active;
     private Integer fishActionId = null;
 
     private final Button startButton;
@@ -128,6 +128,7 @@ public class FishingBot extends Window implements Runnable {
         }, UI.scale(210, 175));
 
         findFishActionId();
+        this.c = Utils.getprefc("wndc-fishingBotWindow", this.c);
     }
 
     private int contentAnalysis(WItem item) {
@@ -328,19 +329,23 @@ public class FishingBot extends Window implements Runnable {
 
     @Override
     public void run() {
-
-        while (!stop) {
-            if (!checkVitals()) {
-                sleep(1000);
-                continue;
-            }
-            if (active) {
-                if (gui.maininv.getFreeSpace() < 3) {
-                    deactivate("Fishing Bot: Full inventory! Stopping..");
+        try {
+            while (!stop) {
+                if (!checkVitals()) {
+                    sleep(1000);
+                    continue;
                 }
-                prepareFishingPole();
+                if (active) {
+                    if (gui.maininv.getFreeSpace() < 2) {
+                        deactivate("Fishing Bot: Full inventory! Stopping..");
+                    }
+                    prepareFishingPole();
+                }
+                sleep(500);
             }
-            sleep(500);
+        } catch (Exception e) {
+            if (e instanceof InterruptedException)
+                Thread.currentThread().interrupt();
         }
     }
 
@@ -389,6 +394,15 @@ public class FishingBot extends Window implements Runnable {
             if (nrj < 0.25) {
                 deactivate("Fishing Bot: Low on energy! Stopping..");
                 return false;
+            }
+            // Stamina check
+            if (gui.getmeter("stam", 0).a < 0.40) {
+                try {
+                    AUtils.drinkTillFull(gui, 0.99, 0.99);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    return false;
+                }
             }
             return true;
         } catch (Exception e) {
@@ -469,11 +483,23 @@ public class FishingBot extends Window implements Runnable {
     }
 
     public void stop() {
-        gui.map.wdgmsg("click", Coord.z, gui.map.player().rc.floor(posres), 1, 0);
+        Gob player = gui.map.player();
+        if (player != null)
+            gui.map.wdgmsg("click", Coord.z, player.rc.floor(posres), 1, 0);
         if (gui.map.pfthread != null) {
             gui.map.pfthread.interrupt();
         }
+        if (gui.fishingThread != null) {
+            gui.fishingThread.interrupt();
+            gui.fishingThread = null;
+        }
         this.destroy();
+    }
+
+    @Override
+    public void reqdestroy() {
+        Utils.setprefc("wndc-fishingBotWindow", this.c);
+        super.reqdestroy();
     }
 
     private List<FishWindowRow> returnFishWindow() {

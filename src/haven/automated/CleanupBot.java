@@ -8,9 +8,10 @@ import static haven.OCache.posres;
 import static java.lang.Thread.sleep;
 
 public class CleanupBot extends Window implements Runnable {
+    private static final double MAX_SEARCH_DIST = 550.0; // ~50 tiles
     private GameUI gui;
     private boolean chopBushes;
-    public boolean stop;
+    public volatile boolean stop;
     private boolean chopTrees;
     private boolean chipRocks;
     private boolean destroyStumps;
@@ -20,7 +21,7 @@ public class CleanupBot extends Window implements Runnable {
     private CheckBox stumpcheckBox;
     private CheckBox rockcheckBox;
     private CheckBox soilcheckBox;
-    private boolean active;
+    private volatile boolean active;
     private Button activeButton;
 
 
@@ -99,7 +100,9 @@ public class CleanupBot extends Window implements Runnable {
                 if (active) {
                     this.change("Stop");
                 } else {
-                    ui.gui.map.wdgmsg("click", Coord.z, ui.gui.map.player().rc.floor(posres), 1, 0);
+                    Gob player = ui.gui.map.player();
+                    if (player != null)
+                        ui.gui.map.wdgmsg("click", Coord.z, player.rc.floor(posres), 1, 0);
                     this.change("Start");
                 }
             }
@@ -149,7 +152,8 @@ public class CleanupBot extends Window implements Runnable {
     }
 
     private void destroyGob(Gob gob) throws InterruptedException {
-        if(gui.prog != null && gui.map.player().getPoses().contains("pickan") || gui.map.player().getPoses().contains("treechop") || gui.map.player().getPoses().contains("chopping") || gui.map.player().getPoses().contains("shoveldig") || gui.map.player().getPoses().contains("drinkan")){
+        Gob player = gui.map.player();
+        if(player != null && gui.prog != null && (player.getPoses().contains("pickan") || player.getPoses().contains("treechop") || player.getPoses().contains("chopping") || player.getPoses().contains("shoveldig") || player.getPoses().contains("drinkan"))){
             waitWhileWorking(2000);
         } else {
             if (gob != null) {
@@ -229,7 +233,9 @@ public class CleanupBot extends Window implements Runnable {
                                     || (res.name.endsWith("/stockpile-soil") && destroySoil);
                     if (res != null && selected) {
                         Coord2d plc = gui.map.player().rc;
-                        if ((closestGob == null || gob.rc.dist(plc) < closestGob.rc.dist(plc)))
+                        double dist = gob.rc.dist(plc);
+                        if (dist > MAX_SEARCH_DIST) continue;
+                        if ((closestGob == null || dist < closestGob.rc.dist(plc)))
                             closestGob = gob;
                     }
                 } catch (Loading | NullPointerException ignored) {
@@ -252,7 +258,9 @@ public class CleanupBot extends Window implements Runnable {
     }
 
     public void stop() {
-        ui.gui.map.wdgmsg("click", Coord.z, ui.gui.map.player().rc.floor(posres), 1, 0);
+        Gob player = ui.gui.map.player();
+        if (player != null)
+            ui.gui.map.wdgmsg("click", Coord.z, player.rc.floor(posres), 1, 0);
         if (ui.gui.map.pfthread != null) {
             ui.gui.map.pfthread.interrupt();
         }

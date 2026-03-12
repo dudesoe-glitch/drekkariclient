@@ -13,7 +13,7 @@ import static haven.OCache.posres;
 public class OceanScoutBot extends Window implements Runnable {
     private int checkClock;
     private GameUI gui;
-    public boolean stop;
+    public volatile boolean stop;
     private MCache mcache;
     private int clockwiseDirection = 1;
     private double ang = 0;
@@ -21,7 +21,7 @@ public class OceanScoutBot extends Window implements Runnable {
     private ArrayList<Gob> nearbyGobs = new ArrayList<>();
     private Random random = new Random();
     private int successLocs;
-    private boolean active = false;
+    private volatile boolean active = false;
 
     public OceanScoutBot(GameUI gui) {
         super(UI.scale(UI.scale(274, 96)), "Ocean Scouting Bot");
@@ -51,7 +51,9 @@ public class OceanScoutBot extends Window implements Runnable {
                 if (active){
                     this.change("Stop");
                 } else {
-                    ui.gui.map.wdgmsg("click", Coord.z, ui.gui.map.player().rc.floor(posres), 1, 0);
+                    Gob player = ui.gui.map.player();
+                    if (player != null)
+                        ui.gui.map.wdgmsg("click", Coord.z, player.rc.floor(posres), 1, 0);
                     this.change("Start");
                 }
             }
@@ -255,7 +257,9 @@ public class OceanScoutBot extends Window implements Runnable {
     }
 
     public void stop() {
-        ui.gui.map.wdgmsg("click", Coord.z, ui.gui.map.player().rc.floor(posres), 1, 0);
+        Gob player = ui.gui.map.player();
+        if (player != null)
+            ui.gui.map.wdgmsg("click", Coord.z, player.rc.floor(posres), 1, 0);
         if (gui.map.pfthread != null) {
             gui.map.pfthread.interrupt();
         }
