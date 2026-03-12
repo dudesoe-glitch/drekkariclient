@@ -70,6 +70,7 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
 	private Collection<DelayedB> delayedB = new LinkedList<DelayedB>();
 	public CheckpointManager checkpointManager;
 	public Thread checkpointManagerThread;
+	public final PathQueue pathQueue = new PathQueue(this);
 	public Pathfinder pf;
 	public Thread pfthread;
 	Coord pfFinalDest;
@@ -1969,6 +1970,28 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
 			} catch (Exception ignored) {
 			}
 		}
+	// Draw queued path waypoints
+	if (OptWnd.enableQueuedMovementCheckBox.a && !pathQueue.isEmpty()) {
+		try {
+			List<Coord2d[]> segments = pathQueue.getSegments();
+			for (Coord2d[] seg : segments) {
+				Coord startScreen = screenxf(new Coord3f((float)seg[0].x, (float)seg[0].y, glob.map.getzp(seg[0]).z)).round2();
+				Coord endScreen = screenxf(new Coord3f((float)seg[1].x, (float)seg[1].y, glob.map.getzp(seg[1]).z)).round2();
+				g.chcolor(new Color(0, 0, 0, 180));
+				g.line(startScreen, endScreen, 3);
+				g.chcolor(new Color(255, 200, 0, 200));
+				g.line(startScreen, endScreen, 2);
+			}
+			// Draw waypoint dots
+			for (Coord2d[] seg : segments) {
+				Coord endScreen = screenxf(new Coord3f((float)seg[1].x, (float)seg[1].y, glob.map.getzp(seg[1]).z)).round2();
+				g.chcolor(new Color(255, 200, 0, 230));
+				g.fellipse(endScreen, new Coord(4, 4));
+				g.chcolor(Color.BLACK);
+				g.fellipse(endScreen, new Coord(2, 2));
+			}
+		} catch (Exception ignored) {}
+	}
 	if (OptWnd.drawYourCurrentPathCheckBox.a) {
 		try {
 			MapView mapView = ui.gui.map;
@@ -2473,7 +2496,12 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
 		}
 		if (OptWnd.walkWithPathFinderCheckBox.a && clickb == 1 && ui.modctrl && ui.modshift && !ui.modmeta && !ui.modsuper) {
 			pfLeftClick(mc.floor(), null);
+		} else if (OptWnd.enableQueuedMovementCheckBox.a && clickb == 1 && ui.modshift && !ui.modctrl && !ui.modmeta && !ui.modsuper && inf == null) {
+			pathQueue.add(mc);
 		} else {
+			if (clickb == 1 && inf == null) {
+				pathQueue.clear(); // Regular click clears the queue
+			}
 			wdgmsg("click", args);
 		}
 	}

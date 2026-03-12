@@ -856,19 +856,28 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	if(prev != null)
 	    prev.dispose();
 
-	if(ac == Moving.class && a == null) {
-		if (occupiedGobID != null){
-			Gob OccupiedGob = glob.oc.getgob(occupiedGobID);
-			if (OccupiedGob != null){
-				synchronized (OccupiedGob.occupants) {
-					OccupiedGob.occupants.remove(this);
+	if(ac == Moving.class) {
+		if (a == null) {
+			if (occupiedGobID != null){
+				Gob OccupiedGob = glob.oc.getgob(occupiedGobID);
+				if (OccupiedGob != null){
+					synchronized (OccupiedGob.occupants) {
+						OccupiedGob.occupants.remove(this);
+					}
+					occupiedGobID = null;
 				}
-				occupiedGobID = null;
 			}
+			if (isMe != null && isMe)
+				glob.sess.ui.gui.map.gobPathLastClick = null;
+			gobSpeed = 0;
 		}
-		if (isMe != null && isMe)
-			glob.sess.ui.gui.map.gobPathLastClick = null;
-		gobSpeed = 0;
+		// Notify PathQueue of movement changes for the player gob
+		if (isMe != null && isMe) {
+			try {
+				PathQueue pq = glob.sess.ui.gui.map.pathQueue;
+				if (pq != null) pq.movementChange(prev, a);
+			} catch (Exception ignored) {}
+		}
 	}
 	if (a instanceof Moving) {
 		if (gobChaseVector != null) {

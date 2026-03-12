@@ -159,6 +159,39 @@ public class InvHelper {
         return null;
     }
 
+    /**
+     * Get all items from all open inventories and item stacks, excluding Belt and Keyring.
+     * Skips "stack of" container items (their contents are collected separately from
+     * ContentsWindows). This is a cleaner equivalent of
+     * {@code AUtils.getAllItemsFromAllInventoriesAndStacksExcludeBeltAndKeyring()}.
+     *
+     * @param gui the GameUI instance
+     * @return list of all WItems, possibly empty
+     */
+    public static List<WItem> getAllItemsExcludeBeltKeyring(GameUI gui) {
+        List<WItem> items = new ArrayList<>();
+        if (gui == null) return items;
+
+        for (Inventory inventory : gui.getAllInventories()) {
+            if (inventory.parent instanceof Window) {
+                String cap = ((Window) inventory.parent).cap;
+                if (cap != null && (cap.contains("Belt") || cap.contains("Keyring"))) {
+                    continue;
+                }
+            }
+            for (WItem item : inventory.getAllItems()) {
+                try {
+                    if (!item.item.getname().contains("stack of")) {
+                        items.add(item);
+                    }
+                } catch (Loading ignored) {}
+            }
+        }
+
+        items.addAll(gui.getAllContentsWindows());
+        return items;
+    }
+
     /** Transfer item to another inventory (Shift+Click behavior). */
     public static void transferToPlayer(GItem item) {
         if (item == null) return;
