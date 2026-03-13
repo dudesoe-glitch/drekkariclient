@@ -83,6 +83,19 @@ public class MiningBot extends BotBase {
 			return;
 		}
 
+		// Pathfind if far from target
+		double dist = player.rc.dist(targetPos);
+		if (dist > 33) {
+			setStatus("Walking to target...");
+			gui.map.pfLeftClick(targetPos.floor(), null);
+			if (!Actions.waitPf(gui)) {
+				Actions.unstuck(gui);
+				return;
+			}
+			player = gui.map.player();
+			if (player == null) return;
+		}
+
 		setStatus("Mining...");
 		gui.map.wdgmsg("click", Coord.z, targetPos.floor(posres), 1, 0);
 		Thread.sleep(50);

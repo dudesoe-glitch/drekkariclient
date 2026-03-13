@@ -84,6 +84,7 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 	GobReadyForHarvestInfo readyForHarvestInfo;
 	GobFoodWaterInfo foodWaterInfo;
 	GobBeeskepHarvestInfo beeskepHarvestInfo;
+	GobDFrameInfo dframeInfo;
 	public boolean isHidden;
 	private final GobCustomSizeAndRotation customSizeAndRotation = new GobCustomSizeAndRotation();
 	public double gobSpeed = 0;
@@ -1307,6 +1308,10 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 				beeskepHarvestInfo = new GobBeeskepHarvestInfo(this);
 				setattr(GobBeeskepHarvestInfo.class, beeskepHarvestInfo);
 			}
+			if (res.name.equals("gfx/terobjs/dframe") && dframeInfo == null) {
+				dframeInfo = new GobDFrameInfo(this);
+				setattr(GobDFrameInfo.class, dframeInfo);
+			}
 		}
 		updateCustomIcons();
 		updateCritterAuras();
@@ -1879,6 +1884,8 @@ public class Gob implements RenderTree.Node, Sprite.Owner, Skeleton.ModOwner, Eq
 					if (OptWnd.showWorkstationProgressReadyForUseCheckBox.a) setGobStateHighlight(OptWnd.showWorkstationProgressReadyForUseColorOptionWidget.currentColor);
 					else delattr(GobStateHighlight.class);
 				}
+				// Refresh drying frame contents overlay when items change
+				if (dframeInfo != null) dframeInfo.invalidate();
 			}
 			if (resName.equals("gfx/terobjs/cheeserack")) {
 				if (olsSize == 3) {

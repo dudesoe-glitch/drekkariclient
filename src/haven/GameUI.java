@@ -190,6 +190,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 	public OreSmeltingBot oreSmeltingBot;
 	public ForagingBot foragingBot;
 	public MiningBot miningBot;
+	public StockpileBot stockpileBot;
 	public NotepadWindow notepadWindow;
 	public LivestockManager livestockManager;
 
@@ -593,7 +594,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 			oreAndStoneCounter, OceanScoutBot, tarKilnCleanerBot, cleanupBot,
 			grubGrubBot, cellarDiggingBot, roastingSpitBot, fishingBot,
 			farmingBot, butcherBot, clayDiggingBot, oreSmeltingBot,
-			foragingBot, miningBot
+			foragingBot, miningBot, stockpileBot
 		};
 		for (BotBase bot : bots) {
 			if (bot != null) {

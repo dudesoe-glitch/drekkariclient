@@ -792,6 +792,7 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 		makeLocal("customclient/menugrid/Bots/OreSmeltingBot");
 		makeLocal("customclient/menugrid/Bots/ForagingBot");
 		makeLocal("customclient/menugrid/Bots/MiningBot");
+		makeLocal("customclient/menugrid/Bots/StockpileBot");
 
 		// Category: Other Scripts & Tools
 		makeLocal("customclient/menugrid/OtherScriptsAndTools/Add9CoalScript");
@@ -1023,6 +1024,16 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 					gui.miningBot.stop();
 					gui.miningBot.reqdestroy();
 					gui.miningBot = null;
+				}
+			} else if (ad[2].equals("StockpileBot")) {
+				if (gui.stockpileBot == null) {
+					gui.stockpileBot = new StockpileBot(gui);
+					gui.add(gui.stockpileBot, Utils.getprefc("wndc-stockpileBotWindow", new Coord(gui.sz.x/2 - gui.stockpileBot.sz.x/2, gui.sz.y/2 - gui.stockpileBot.sz.y/2 - 200)));
+					gui.stockpileBot.startThread("Hurricane-StockpileBot");
+				} else {
+					gui.stockpileBot.stop();
+					gui.stockpileBot.reqdestroy();
+					gui.stockpileBot = null;
 				}
 			}
 		} else if (ad[1].equals("OtherScriptsAndTools")) {
