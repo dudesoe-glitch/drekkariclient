@@ -368,6 +368,14 @@ public class WItem extends Widget implements DTarget {
     public boolean mousedown(MouseDownEvent ev) {
 	boolean inv = parent instanceof Inventory;
 	if(ev.b == 1) {
+		if (ui.modmeta && ui.modshift && !ui.modctrl && inv) {
+			try {
+				String resName = item.resname();
+				Thread t = new Thread(new haven.automated.TransferAllFromContainersScript(ui.gui, resName), "TransferAllFromContainers");
+				t.start();
+			} catch (Loading ignored) {}
+			return true;
+		}
 		if (OptWnd.useImprovedInventoryTransferControlsCheckBox.a && ui.modmeta && !ui.modctrl) {
 			if (inv) {
 				wdgmsg("transfer-ordered", item, false);

@@ -519,6 +519,7 @@ public class OptWnd extends Window {
 	public static CheckBox preventUsingRawHideWhenRidingCheckBox;
 	public static CheckBox autoDrinkingCheckBox;
 	public static TextEntry autoDrinkingThresholdTextEntry;
+	public static CheckBox autoSortContainersCheckBox;
 	public static CheckBox enableQueuedMovementCheckBox;
     public static CheckBox walkWithPathFinderCheckBox;
     public static CheckBox drawPathfinderRouteCheckBox;

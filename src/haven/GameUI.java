@@ -2064,6 +2064,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
     public static KeyBinding kb_nearestTarget =  KeyBinding.get("nearestTarget", KeyMatch.forcode(KeyEvent.VK_SPACE, 0));
     public static KeyBinding kb_leaderTarget = KeyBinding.get("leaderTarget", KeyMatch.nil);
     public static KeyBinding kb_blt = KeyBinding.get("blt", KeyMatch.forchar('R', KeyMatch.M));
+    public static KeyBinding kb_closeAllContainers = KeyBinding.get("closeAllContainersKB", KeyMatch.nil);
 
 	// Equipment Quick-Swap from Belt
 	public static KeyBinding kb_equipB12 = KeyBinding.get("equipB12KB", KeyMatch.nil);
@@ -2337,6 +2338,9 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
             }
         }
         return(true);
+	} else if(kb_closeAllContainers.key().match(ev)) {
+		closeAllContainerWindows();
+		return(true);
 	// Equipment Quick-Swap hotkeys
 	} else if(kb_equipB12.key().match(ev)) {
 		new Thread(new haven.automated.EquipFromBelt(this, "Equip_B12"), "EquipFromBelt").start();
@@ -2776,6 +2780,27 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 			}
 		}
 		return windows;
+	}
+
+	public void closeAllContainerWindows() {
+		int closed = 0;
+		for (Window w : getAllWindows()) {
+			if (w.cap == null) continue;
+			if (Inventory.PLAYER_INVENTORY_NAMES.contains(w.cap)) continue;
+			if (w instanceof MapWnd) continue;
+			if (w instanceof haven.automated.BotBase) continue;
+			// Check if window contains an Inventory (i.e., it's a container)
+			boolean hasInv = false;
+			for (Widget wdg = w.lchild; wdg != null; wdg = wdg.prev) {
+				if (wdg instanceof Inventory) { hasInv = true; break; }
+			}
+			if (hasInv) {
+				w.wdgmsg("close");
+				closed++;
+			}
+		}
+		if (closed > 0)
+			errorsilent("Closed " + closed + " container(s).");
 	}
 
 	public Equipory getequipory() {
@@ -3406,7 +3431,6 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 	}
 
 	public boolean drink(double threshold) {
-		// TODO add trigger to stop drinking tea while > 90% energy
 		IMeter.Meter stam = getmeter("stam", 0);
 		IMeter.Meter nrj = getmeter("nrj", 0);
 		if (stam == null || stam.a > threshold) {
@@ -3444,17 +3468,24 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 			return false;
 		}
 		ui.lcc = Coord.z;
+		boolean energyHigh = nrj != null && nrj.a >= 0.90;
 		if (fv != null && fv.current != null) {
 			if (watercontainer != null) {
 				Actions.clickWItemAndSelectOption(this, watercontainer, 0);
-			} else {
+			} else if (!energyHigh && teacontainer != null) {
 				Actions.clickWItemAndSelectOption(this, teacontainer, 0);
+			} else {
+				return false;
 			}
 		} else {
-			if ((nrj != null && nrj.a < 0.85 && teacontainer != null) || watercontainer == null) {
+			if (!energyHigh && nrj != null && nrj.a < 0.85 && teacontainer != null) {
+				Actions.clickWItemAndSelectOption(this, teacontainer, 0);
+			} else if (watercontainer != null) {
+				Actions.clickWItemAndSelectOption(this, watercontainer, 0);
+			} else if (!energyHigh && teacontainer != null) {
 				Actions.clickWItemAndSelectOption(this, teacontainer, 0);
 			} else {
-				Actions.clickWItemAndSelectOption(this, watercontainer, 0);
+				return false;
 			}
 		}
 		return true;

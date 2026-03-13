@@ -242,6 +242,18 @@ class OptWndGameplayAutomationPanel {
 		}, prev.pos("bl").adds(0, 12));
 		OptWnd.enableQueuedMovementCheckBox.tooltip = OptWndTooltips.enableQueuedMovement;
 
+		prev = panel.add(OptWnd.autoSortContainersCheckBox = new CheckBox("Auto-Sort Containers on Open"){
+			{a = Utils.getprefb("autoSortContainers", false);}
+			public void set(boolean val) {
+				Utils.setprefb("autoSortContainers", val);
+				a = val;
+				if (ui != null && ui.gui != null) {
+					ui.gui.optionInfoMsg("Auto-Sort Containers on Open is now " + (val ? "ENABLED" : "DISABLED") + ".", (val ? OptWnd.msgGreen : OptWnd.msgRed), Audio.resclip(val ? Toggle.sfxon : Toggle.sfxoff));
+				}
+			}
+		}, prev.pos("bl").adds(0, 12));
+		OptWnd.autoSortContainersCheckBox.settip("Automatically sort items when opening a container inventory.");
+
 		prev = panel.add(OptWnd.walkWithPathFinderCheckBox = new CheckBox("Walk with Pathfinder (Ctrl+Shift+Click)"){
 			{a = Utils.getprefb("walkWithPathfinder", false);}
 			public void set(boolean val) {

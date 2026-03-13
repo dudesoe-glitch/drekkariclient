@@ -2507,7 +2507,8 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
 		}
 		if (OptWnd.walkWithPathFinderCheckBox.a && clickb == 1 && ui.modctrl && ui.modshift && !ui.modmeta && !ui.modsuper) {
 			pfLeftClick(mc.floor(), null);
-		} else if (OptWnd.enableQueuedMovementCheckBox.a && clickb == 1 && ui.modshift && !ui.modctrl && !ui.modmeta && !ui.modsuper && inf == null) {
+		} else if (OptWnd.enableQueuedMovementCheckBox.a && clickb == 1 && ui.modshift && !ui.modctrl && !ui.modmeta && !ui.modsuper && inf == null
+				&& ui.checkCursorImage("gfx/hud/curs/arw") && ui.gui.vhand == null) {
 			pathQueue.add(mc);
 		} else {
 			if (clickb == 1 && inf == null) {

@@ -79,7 +79,7 @@ public class MiniMap extends Widget {
     protected DisplayGrid[] display;
     protected Area dgext, dtext;
     protected Segment dseg;
-    protected int dlvl, dmag;
+    protected int dlvl;
     protected Location dloc;
 	public boolean compact;
 	private static final Color BIOME_BG = new Color(0, 0, 0, 110);
@@ -648,14 +648,6 @@ public class MiniMap extends Widget {
 	return(new Coord(Math.round(c.x * sf), Math.round(c.y * sf)));
     }
 
-    private Coord scalec(Coord c) {
-        int f = dlvl - dmag;
-        if(f < 0)
-            return(c.div(1 << -f));
-        else
-            return(c.mul(1 << f));
-    }
-
     public Coord st2c(Coord tc) {
 	return(UI.scale(tc.add(sessloc.tc).sub(dloc.tc).div(zoomlevel)).add(sz.div(2)));
     }
@@ -1215,7 +1207,7 @@ public class MiniMap extends Widget {
 	    if((grid != null) && (grid.dc != null)) {
 		DataGrid dgrid = grid.gref.get();
 		if(dgrid != null) {
-		    Coord gc = c.sub(grid.dc).div(1 << dmag);
+		    Coord gc = c.sub(grid.dc);
 		    gc = Area.sized(cmaps).closest(gc); /* XXX: This should not be necessary. */
 		    TileInfo tile = dgrid.tilesets[dgrid.gettile(gc)];
 		    if(tile != null) {

@@ -191,6 +191,7 @@ class OptWndBindingPanel {
 		y = cont.adda(new Label("Quick Actions"), cont.sz.x / 2, y + UI.scale(10), 0.5, 0.0).pos("bl").adds(0, 5).y;
 		y = addbtnImproved(cont, "Toggle Nearest Gate", "Open/close the nearest gate within 3 tiles", new Color(255, 200, 100, 255), GameUI.kb_toggleGate, y);
 		y = addbtnImproved(cont, "Pickup Nearest Item", "Pick up the nearest ground item within 2 tiles", new Color(255, 200, 100, 255), GameUI.kb_pickupNearest, y);
+		y = addbtnImproved(cont, "Close All Containers", "Close all open container windows at once", new Color(255, 200, 100, 255), GameUI.kb_closeAllContainers, y);
 
 		prev = panel.adda(new OptWnd.PointBind(UI.scale(200)), scroll.pos("bl").adds(0, 10).x(scroll.sz.x / 2), 0.5, 0.0);
 		prev = panel.adda(optWnd.new PButton(UI.scale(200), "Back", 27, back, "Options            "), prev.pos("bl").adds(0, 10).x(scroll.sz.x / 2), 0.5, 0.0);

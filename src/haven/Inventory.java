@@ -287,6 +287,10 @@ public class Inventory extends Widget implements DTarget {
 	resize(sz.add(0, toolbarH));
 	// Resize parent window to fit new content
 	w.resize(w.contentsz());
+	// Auto-sort on open if enabled
+	if (OptWnd.autoSortContainersCheckBox != null && OptWnd.autoSortContainersCheckBox.a) {
+	    sortInventory(false);
+	}
     }
 
     public boolean mousewheel(MouseWheelEvent ev) {
