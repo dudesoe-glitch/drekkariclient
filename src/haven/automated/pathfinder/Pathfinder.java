@@ -189,6 +189,7 @@ public class Pathfinder implements Runnable {
         }
 
         Iterator<Edge> it = path.iterator();
+        boolean firstSegment = true;
         while (it.hasNext() && !moveinterupted && !terminate) {
             Edge e = it.next();
             mc = new Coord2d(src.x + e.dest.x - Map.origin, src.y + e.dest.y - Map.origin).floor(posres);
@@ -202,16 +203,20 @@ public class Pathfinder implements Runnable {
             else
                 mv.wdgmsg("click", Coord.z, mc, 1, 0);
 
-            // wait for gob to start moving
-            long moveWaitStart = System.currentTimeMillis();
-            while (!player.isMoving() && !terminate) {
-                try {
-                    Thread.sleep(50);
-                } catch (InterruptedException e1) {
-                    return;
+            // Only wait for movement to start on the first segment.
+            // Subsequent segments are pre-clicked while still moving — no need to wait.
+            if (firstSegment) {
+                long moveWaitStart = System.currentTimeMillis();
+                while (!player.isMoving() && !terminate) {
+                    try {
+                        Thread.sleep(50);
+                    } catch (InterruptedException e1) {
+                        return;
+                    }
+                    if (System.currentTimeMillis() - moveWaitStart > RESPONSE_TIMEOUT)
+                        return;
                 }
-                if (System.currentTimeMillis() - moveWaitStart > RESPONSE_TIMEOUT)
-                    return;
+                firstSegment = false;
             }
 
             Coord2d destWorld = mc.mul(posres);
@@ -233,9 +238,9 @@ public class Pathfinder implements Runnable {
                 long overrun = actual - estimate;
                 avgOverrun = (avgOverrun + overrun) / 2;
             } else {
-                // Intermediate segment: pre-click next waypoint before arriving
+                // Intermediate segment: pre-click next waypoint 30% before arriving
                 // This creates smooth chained movement instead of stop-and-go
-                long lead = Math.max(200, (long) (estimate * 0.20));
+                long lead = Math.max(150, (long) (estimate * 0.30));
                 long wait = Math.max(0, estimate - lead);
                 if (wait > 0) {
                     try { Thread.sleep(wait); } catch (InterruptedException e1) { return; }
