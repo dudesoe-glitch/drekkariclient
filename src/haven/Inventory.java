@@ -651,92 +651,166 @@ public class Inventory extends Widget implements DTarget {
 	}
 
 	/**
-	 * Full sort: clears target areas for multi-slot items, places them first,
-	 * then swap-chain sorts all 1x1 items. Items with contents (buckets with
-	 * liquid) are immovable during clearing but sorted with the 1x1 swap-chain.
-	 * If the container is too full to clear internally, overflows to player inv.
+	 * Full sort: plan-then-execute approach.
+	 * Phase 1: Compute target positions for ALL items (multi-slot first, then 1x1).
+	 * Phase 2: Move multi-slot items to targets, clearing blockers intelligently.
+	 * Phase 3: Swap-chain sort 1x1 items.
 	 */
 	private void doFullSort(GameUI gui) throws InterruptedException {
-		// Snapshot player inventory to detect overflow items later
 		Inventory playerInv = gui.maininv;
 		Set<WItem> originalPlayerItems = (playerInv != null)
 				? new HashSet<>(playerInv.wmap.values()) : Collections.emptySet();
 
-		// Identify immovable items (buckets with liquid) — don't displace for multi-slot clearing
+		// === Phase 1: Classify items ===
 		Set<WItem> immovable = new HashSet<>();
-		for (WItem wi : new ArrayList<>(wmap.values())) {
-			try {
-				if (hasContents(wi)) immovable.add(wi);
-			} catch (Loading e) { immovable.add(wi); }
-		}
-
-		// Collect multi-slot items (excluding immovable)
 		List<WItem> multiSlot = new ArrayList<>();
+
 		for (WItem wi : new ArrayList<>(wmap.values())) {
-			if (immovable.contains(wi)) continue;
 			try {
+				if (hasContents(wi)) { immovable.add(wi); continue; }
 				Coord gridSz = wi.sz.div(sqsz);
 				if (gridSz.x > 1 || gridSz.y > 1)
 					multiSlot.add(wi);
-			} catch (Loading e) {}
+			} catch (Loading e) { immovable.add(wi); }
 		}
 
-		if (!multiSlot.isEmpty()) {
-			multiSlot.sort(MULTI_SLOT_COMPARATOR);
+		if (multiSlot.isEmpty()) {
+			doQuickSort(gui);
+			return;
+		}
 
-			// Track which multi-slot items have been placed at their target
-			Set<WItem> placedMultiSlot = new HashSet<>();
+		multiSlot.sort(MULTI_SLOT_COMPARATOR);
 
-			// Clear target areas and place multi-slot items
-			for (WItem wi : multiSlot) {
-				if (!wmap.containsValue(wi)) continue;
-				Coord gridSz = wi.sz.div(sqsz);
-				Coord currentSlot = wi.c.sub(1, 1).div(sqsz);
+		// === Phase 1b: Plan target positions for all multi-slot items ===
+		// Build fixed occupancy: sqmask + immovable items only
+		boolean[][] planned = new boolean[isz.x][isz.y];
+		if (sqmask != null) {
+			for (int i = 0; i < isz.x * isz.y; i++)
+				if (sqmask[i]) planned[i % isz.x][i / isz.x] = true;
+		}
+		for (WItem wi : immovable) {
+			if (!wmap.containsValue(wi)) continue;
+			Coord slot = wi.c.sub(1, 1).div(sqsz);
+			Coord gridSz = wi.sz.div(sqsz);
+			markOccupied(planned, slot, gridSz);
+		}
 
-				// Build fresh occupancy from actual inventory state each iteration
-				// Only mark sqmask, immovable, and already-placed multi-slot items
-				// (1x1 items are deliberately excluded — clearTargetArea will move them)
-				boolean[][] occupied = buildMultiSlotOccupancy(immovable, placedMultiSlot, wi);
-				Coord targetSlot = findFreeSlot(occupied, gridSz.x, gridSz.y);
+		// Assign target positions for each multi-slot item (largest first)
+		Map<WItem, Coord> multiTargets = new LinkedHashMap<>();
+		for (WItem wi : multiSlot) {
+			Coord gridSz = wi.sz.div(sqsz);
+			Coord target = findFreeSlot(planned, gridSz.x, gridSz.y);
+			if (target != null) {
+				multiTargets.put(wi, target);
+				markOccupied(planned, target, gridSz);
+			} else {
+				// Can't fit — keep at current position
+				Coord current = wi.c.sub(1, 1).div(sqsz);
+				multiTargets.put(wi, current);
+				markOccupied(planned, current, gridSz);
+			}
+		}
 
-				if (targetSlot == null) {
-					placedMultiSlot.add(wi); // treat as placed-in-current-position
+		// === Phase 2: Execute multi-slot moves ===
+		// Process items whose targets are already clear first (no displacement needed)
+		List<WItem> moveOrder = new ArrayList<>(multiSlot);
+		moveOrder.sort((a, b) -> {
+			Coord tA = multiTargets.get(a), tB = multiTargets.get(b);
+			Coord curA = a.c.sub(1, 1).div(sqsz), curB = b.c.sub(1, 1).div(sqsz);
+			boolean aAtTarget = curA.equals(tA);
+			boolean bAtTarget = curB.equals(tB);
+			if (aAtTarget != bAtTarget) return aAtTarget ? -1 : 1; // already-at-target first
+			boolean aFree = isAreaClear(tA, a.sz.div(sqsz), a);
+			boolean bFree = isAreaClear(tB, b.sz.div(sqsz), b);
+			if (aFree != bFree) return aFree ? -1 : 1; // clear-target first
+			return 0;
+		});
+
+		for (WItem wi : moveOrder) {
+			if (!wmap.containsValue(wi)) continue;
+			Coord gridSz = wi.sz.div(sqsz);
+			Coord currentSlot = wi.c.sub(1, 1).div(sqsz);
+			Coord targetSlot = multiTargets.get(wi);
+			if (targetSlot == null || currentSlot.equals(targetSlot)) continue;
+
+			// Clear the target area — move blocking items intelligently
+			clearTargetAreaPlanned(gui, targetSlot, gridSz, wi, immovable, multiTargets);
+
+			if (!isAreaClear(targetSlot, gridSz, wi)) continue;
+
+			wi.item.wdgmsg("take", Coord.z);
+			if (!waitForCursor(gui, true)) continue;
+			wdgmsg("drop", targetSlot);
+			Thread.sleep(5);
+			if (!waitForCursorEmpty(gui)) continue;
+		}
+
+		// Transfer any overflow items back from player inventory
+		if (playerInv != null) {
+			Thread.sleep(50);
+			for (WItem wi : new ArrayList<>(playerInv.wmap.values())) {
+				if (originalPlayerItems.contains(wi)) continue;
+				if (!playerInv.wmap.containsValue(wi)) continue;
+				wi.item.wdgmsg("transfer", Coord.z);
+				Thread.sleep(5);
+			}
+			Thread.sleep(50);
+		}
+
+		// === Phase 3: Swap-chain sort all 1x1 items ===
+		doQuickSort(gui);
+	}
+
+	/**
+	 * Clear blocking items from target area using planned positions.
+	 * If a blocker has a planned target that's currently free, move it there directly.
+	 * Otherwise, move to any free slot or overflow to player inventory.
+	 */
+	private void clearTargetAreaPlanned(GameUI gui, Coord target, Coord targetSize,
+										WItem self, Set<WItem> immovable,
+										Map<WItem, Coord> multiTargets) throws InterruptedException {
+		Set<WItem> moved = new HashSet<>();
+		for (int dy = 0; dy < targetSize.y; dy++) {
+			for (int dx = 0; dx < targetSize.x; dx++) {
+				WItem blocking = getItemAtSlot(new Coord(target.x + dx, target.y + dy));
+				if (blocking == null || blocking == self) continue;
+				if (immovable.contains(blocking) || moved.contains(blocking)) continue;
+				if (!wmap.containsValue(blocking)) continue;
+				moved.add(blocking);
+
+				Coord blockGridSz = blocking.sz.div(sqsz);
+
+				// Strategy 1: If the blocker has a planned multi-slot target that's free, move it there
+				Coord blockerTarget = multiTargets.get(blocking);
+				if (blockerTarget != null && isAreaClear(blockerTarget, blockGridSz, blocking)) {
+					blocking.item.wdgmsg("take", Coord.z);
+					if (!waitForCursor(gui, true)) continue;
+					wdgmsg("drop", blockerTarget);
+					Thread.sleep(5);
+					waitForCursorEmpty(gui);
 					continue;
 				}
 
-				if (!currentSlot.equals(targetSlot)) {
-					clearTargetArea(gui, targetSlot, gridSz, wi, immovable);
-
-					// Verify area was actually cleared (both inventories might be full)
-					if (!isAreaClear(targetSlot, gridSz, wi)) {
-						placedMultiSlot.add(wi);
-						continue;
-					}
-
-					wi.item.wdgmsg("take", Coord.z);
-					if (!waitForCursor(gui, true)) { placedMultiSlot.add(wi); continue; }
-					wdgmsg("drop", targetSlot);
-					Thread.sleep(3);
-					if (!waitForCursorEmpty(gui)) continue;
+				// Strategy 2: Move within container to any free slot outside the target zone
+				Coord freeSlot = findFreeSlotOutside(target, targetSize, blockGridSz.x, blockGridSz.y);
+				if (freeSlot != null) {
+					blocking.item.wdgmsg("take", Coord.z);
+					if (!waitForCursor(gui, true)) continue;
+					wdgmsg("drop", freeSlot);
+					Thread.sleep(5);
+					waitForCursorEmpty(gui);
+					continue;
 				}
-				placedMultiSlot.add(wi);
-			}
 
-			// Transfer any overflow items back from player inventory
-			if (playerInv != null) {
-				Thread.sleep(50);
-				for (WItem wi : new ArrayList<>(playerInv.wmap.values())) {
-					if (originalPlayerItems.contains(wi)) continue;
-					if (!playerInv.wmap.containsValue(wi)) continue;
-					wi.item.wdgmsg("transfer", Coord.z);
-					Thread.sleep(3);
+				// Strategy 3: Overflow to player inventory
+				GameUI g = getparent(GameUI.class);
+				if (g != null && g.maininv != null
+						&& g.maininv.isRoom(blockGridSz.x, blockGridSz.y) != null) {
+					blocking.item.wdgmsg("transfer", Coord.z);
+					Thread.sleep(10);
 				}
-				Thread.sleep(50);
 			}
 		}
-
-		// Now swap-chain sort all 1x1 items (multi-slot items are fixed in place)
-		doQuickSort(gui);
 	}
 
 	/**
@@ -840,46 +914,6 @@ public class Inventory extends Widget implements DTarget {
 		}
 	}
 
-	/**
-	 * Clear blocking items from the target area by moving them to free slots
-	 * within this inventory. If the container is full, overflows to player
-	 * inventory via transfer. If both are full, the item stays put.
-	 */
-	private void clearTargetArea(GameUI gui, Coord target, Coord targetSize,
-								 WItem self, Set<WItem> immovable) throws InterruptedException {
-		Set<WItem> moved = new HashSet<>();
-		for (int dy = 0; dy < targetSize.y; dy++) {
-			for (int dx = 0; dx < targetSize.x; dx++) {
-				WItem blocking = getItemAtSlot(new Coord(target.x + dx, target.y + dy));
-				if (blocking == null || blocking == self) continue;
-				if (immovable.contains(blocking) || moved.contains(blocking)) continue;
-				if (!wmap.containsValue(blocking)) continue;
-				moved.add(blocking);
-
-				Coord blockGridSz = blocking.sz.div(sqsz);
-
-				// Try to move within container first
-				Coord freeSlot = findFreeSlotOutside(target, targetSize, blockGridSz.x, blockGridSz.y);
-				if (freeSlot != null) {
-					blocking.item.wdgmsg("take", Coord.z);
-					if (!waitForCursor(gui, true)) continue;
-					wdgmsg("drop", freeSlot);
-					Thread.sleep(3);
-					waitForCursorEmpty(gui);
-				} else {
-					// Container full — check if player inventory has room before transferring
-					GameUI g = getparent(GameUI.class);
-					if (g != null && g.maininv != null
-							&& g.maininv.isRoom(blockGridSz.x, blockGridSz.y) != null) {
-						blocking.item.wdgmsg("transfer", Coord.z);
-						Thread.sleep(5);
-					}
-					// else: both full — item stays, skip this cell
-				}
-			}
-		}
-	}
-
 	/** Check if all cells in the target area are free (ignoring self). */
 	private boolean isAreaClear(Coord target, Coord size, WItem self) {
 		for (int dy = 0; dy < size.y; dy++)
@@ -928,32 +962,6 @@ public class Inventory extends Widget implements DTarget {
 					occ[gx][gy] = true;
 			}
 		return findFreeSlot(occ, w, h);
-	}
-
-	/**
-	 * Build a fresh occupancy map for multi-slot placement.
-	 * Marks: sqmask cells, immovable items, already-placed multi-slot items.
-	 * Excludes: 1x1 items (clearTargetArea will move them) and the item being placed.
-	 */
-	private boolean[][] buildMultiSlotOccupancy(Set<WItem> immovable, Set<WItem> placedMultiSlot, WItem self) {
-		boolean[][] occupied = new boolean[isz.x][isz.y];
-		if (sqmask != null) {
-			for (int i = 0; i < isz.x * isz.y; i++)
-				if (sqmask[i]) occupied[i % isz.x][i / isz.x] = true;
-		}
-		for (WItem wi : immovable) {
-			if (!wmap.containsValue(wi)) continue;
-			Coord slot = wi.c.sub(1, 1).div(sqsz);
-			Coord gridSz = wi.sz.div(sqsz);
-			markOccupied(occupied, slot, gridSz);
-		}
-		for (WItem wi : placedMultiSlot) {
-			if (!wmap.containsValue(wi) || wi == self) continue;
-			Coord slot = wi.c.sub(1, 1).div(sqsz);
-			Coord gridSz = wi.sz.div(sqsz);
-			markOccupied(occupied, slot, gridSz);
-		}
-		return occupied;
 	}
 
 	/** Check if an item has contents (liquid, stacked items, etc.) */
