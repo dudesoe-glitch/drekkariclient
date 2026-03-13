@@ -33,6 +33,8 @@ import java.util.regex.Pattern;
  * - "type:food"       — item type (food/armor/curio/tool/seed/container/material/weapon)
  * - "!name"           — exclude items matching name (negation)
  * - Combine with space: "turnip q>10 fep>5" — all conditions must match (AND)
+ * - Combine with |: "turnip | carrot" — any group can match (OR)
+ * - Mixed: "turnip q>10 | carrot q>5" — (turnip AND q>10) OR (carrot AND q>5)
  */
 public class ItemFilter {
 	private static final Pattern QUALITY_CMP = Pattern.compile("q\\s*([><=!]+)\\s*([\\d.]+)");
@@ -54,6 +56,7 @@ public class ItemFilter {
 	};
 
 	private final List<Predicate> predicates;
+	private final List<ItemFilter> orGroups;
 	private final String raw;
 
 	@FunctionalInterface
@@ -61,12 +64,34 @@ public class ItemFilter {
 		boolean test(GItem item, String itemName);
 	}
 
-	private ItemFilter(String query, List<Predicate> predicates) {
+	private ItemFilter(String query, List<Predicate> predicates, List<ItemFilter> orGroups) {
 		this.raw = query;
 		this.predicates = predicates;
+		this.orGroups = orGroups;
 	}
 
 	public static ItemFilter parse(String query) {
+		if (query == null || query.trim().isEmpty()) {
+			return null;
+		}
+
+		// Split by | for OR groups
+		if (query.contains("|")) {
+			String[] parts = query.split("\\|");
+			List<ItemFilter> groups = new ArrayList<>();
+			for (String part : parts) {
+				ItemFilter f = parseSingle(part.trim());
+				if (f != null) groups.add(f);
+			}
+			if (groups.isEmpty()) return null;
+			if (groups.size() == 1) return groups.get(0);
+			return new ItemFilter(query, null, groups);
+		}
+
+		return parseSingle(query);
+	}
+
+	private static ItemFilter parseSingle(String query) {
 		if (query == null || query.trim().isEmpty()) {
 			return null;
 		}
@@ -200,11 +225,17 @@ public class ItemFilter {
 			return null;
 		}
 
-		return new ItemFilter(query, predicates);
+		return new ItemFilter(query, predicates, null);
 	}
 
 	public boolean matches(GItem item) {
-		if (predicates.isEmpty()) return true;
+		if (orGroups != null) {
+			for (ItemFilter group : orGroups) {
+				if (group.matches(item)) return true;
+			}
+			return false;
+		}
+		if (predicates == null || predicates.isEmpty()) return true;
 		String name;
 		try {
 			name = item.getname().toLowerCase();
@@ -222,6 +253,11 @@ public class ItemFilter {
 	}
 
 	public boolean hasNameFilter() {
+		if (orGroups != null) {
+			for (ItemFilter g : orGroups)
+				if (g.hasNameFilter()) return true;
+			return false;
+		}
 		String remaining = raw.trim();
 		for (Pattern p : ALL_PATTERNS)
 			remaining = p.matcher(remaining).replaceAll("").trim();
@@ -229,6 +265,17 @@ public class ItemFilter {
 	}
 
 	public String getNamePart() {
+		if (orGroups != null) {
+			StringBuilder sb = new StringBuilder();
+			for (ItemFilter g : orGroups) {
+				String part = g.getNamePart();
+				if (!part.isEmpty()) {
+					if (sb.length() > 0) sb.append(" | ");
+					sb.append(part);
+				}
+			}
+			return sb.toString();
+		}
 		String remaining = raw.trim();
 		for (Pattern p : ALL_PATTERNS)
 			remaining = p.matcher(remaining).replaceAll("").trim();

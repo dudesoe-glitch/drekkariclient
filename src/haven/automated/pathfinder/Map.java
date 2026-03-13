@@ -581,22 +581,15 @@ public class Map {
             System.out.println("Vertices Sanitization: " + (double) (System.nanoTime() - start) / 1000000.0 + " ms.");
 
         // clear area around starting position in case char is on the bounding box boundary
-        if (map[origin][origin - 1] == CELL_BLK)
-            map[origin][origin - 1] = CELL_FREE;
-        if (map[origin - 1][origin - 1] == CELL_BLK)
-            map[origin - 1][origin - 1] = CELL_FREE;
-        if (map[origin + 1][origin - 1] == CELL_BLK)
-            map[origin + 1][origin - 1] = CELL_FREE;
-        if (map[origin - 1][origin] == CELL_BLK)
-            map[origin - 1][origin] = CELL_FREE;
-        if (map[origin + 1][origin] == CELL_BLK)
-            map[origin + 1][origin] = CELL_FREE;
-        if (map[origin - 1][origin + 1] == CELL_BLK)
-            map[origin - 1][origin + 1] = CELL_FREE;
-        if (map[origin][origin + 1] == CELL_BLK)
-            map[origin][origin + 1] = CELL_FREE;
-        if (map[origin + 1][origin + 1] == CELL_BLK)
-            map[origin + 1][origin + 1] = CELL_FREE;
+        // Must scale with plbbox — mounted horse (plbbox=6) needs larger clearance than on foot (plbbox=3)
+        int clearRadius = plbbox + 1;
+        for (int cx = -clearRadius; cx <= clearRadius; cx++) {
+            for (int cy = -clearRadius; cy <= clearRadius; cy++) {
+                int mx = origin + cx, my = origin + cy;
+                if (mx >= 0 && mx < sz && my >= 0 && my < sz && map[mx][my] == CELL_BLK)
+                    map[mx][my] = CELL_FREE;
+            }
+        }
 
 
         // test if direct path is clear

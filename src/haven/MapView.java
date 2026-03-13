@@ -2454,6 +2454,17 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
 					if(checkpointManager != null && checkpointManagerThread != null){
 						checkpointManager.pauseIt();
 					}
+					// Pathfind to distant gobs before interacting
+					if (OptWnd.pathfindOnRightClickCheckBox != null && OptWnd.pathfindOnRightClickCheckBox.a
+							&& !ui.modctrl && !ui.modshift) {
+						Gob player = player();
+						if (player != null && gob.rc.dist(player.rc) > 33) {
+							int meshid = (args.length > 8) ? (Integer) args[8] : -1;
+							int mflags = (Integer) args[3];
+							pfRightClick(gob, meshid, clickb, mflags, null);
+							return;
+						}
+					}
                     synchronized (Pathfinder.class) {
                         if (pf != null) {
                             pf.terminate = true;

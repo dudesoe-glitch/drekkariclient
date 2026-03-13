@@ -277,6 +277,17 @@ class OptWndGameplayAutomationPanel {
 			}
 		}, prev.pos("bl").adds(12, 2));
 		OptWnd.terrainWeightedPathfindingCheckBox.tooltip = RichText.render("When enabled, the pathfinder prefers roads and avoids swamps/bogs.\nRoads cost less, dense terrain costs more.", UI.scale(300));
+		prev = panel.add(OptWnd.pathfindOnRightClickCheckBox = new CheckBox("Pathfind on Right-Click Interaction"){
+			{a = Utils.getprefb("pathfindOnRightClick", false);}
+			public void set(boolean val) {
+				Utils.setprefb("pathfindOnRightClick", val);
+				a = val;
+				if (ui != null && ui.gui != null) {
+					ui.gui.optionInfoMsg("Pathfind on Right-Click is now " + (val ? "ENABLED" : "DISABLED") + ".", (val ? OptWnd.msgGreen : OptWnd.msgRed), Audio.resclip(val ? Toggle.sfxon : Toggle.sfxoff));
+				}
+			}
+		}, prev.pos("bl").adds(0, 2));
+		OptWnd.pathfindOnRightClickCheckBox.tooltip = RichText.render("When enabled, right-clicking a distant object will pathfind to it\nbefore interacting, instead of walking in a straight line.", UI.scale(300));
 
 		Widget backButton;
 		panel.add(backButton = optWnd.new PButton(UI.scale(200), "Back", 27, back, "Advanced Settings"), prev.pos("bl").adds(0, 18));

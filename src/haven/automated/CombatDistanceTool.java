@@ -146,8 +146,25 @@ public class CombatDistanceTool extends BotBase {
         }, UI.scale(0, y));
         y += UI.scale(20);
 
+        add(new Button(UI.scale(80), "Rotation...") {
+            @Override
+            public void click() {
+                if (gui.combatRotationBot == null) {
+                    gui.combatRotationBot = new CombatRotationBot(gui);
+                    gui.add(gui.combatRotationBot, Utils.getprefc("wndc-combatRotationBotWindow",
+                        new Coord(gui.sz.x / 2 - gui.combatRotationBot.sz.x / 2,
+                                  gui.sz.y / 2 - gui.combatRotationBot.sz.y / 2 - 200)));
+                    gui.combatRotationBot.startThread("Hurricane-CombatRotation");
+                } else {
+                    gui.combatRotationBot.stop();
+                    gui.combatRotationBot.reqdestroy();
+                    gui.combatRotationBot = null;
+                }
+            }
+        }, UI.scale(130, y));
+
         currentDistanceLabel = new Label("Current dist: No target");
-        add(currentDistanceLabel, UI.scale(new Coord(0, y)));
+        add(currentDistanceLabel, UI.scale(new Coord(0, y + 22)));
         pack();
     }
 

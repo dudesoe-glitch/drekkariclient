@@ -525,6 +525,7 @@ public class OptWnd extends Window {
     public static CheckBox pathfindOnMinimapCheckBox;
     public static CheckBox continuousPathfindingCheckBox;
     public static CheckBox terrainWeightedPathfindingCheckBox;
+    public static CheckBox pathfindOnRightClickCheckBox;
 
 	public class GameplayAutomationSettingsPanel extends Panel {
 		public GameplayAutomationSettingsPanel(Panel back) {

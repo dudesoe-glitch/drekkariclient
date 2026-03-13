@@ -91,7 +91,7 @@ public class Pathfinder implements Runnable {
 
         // Adjust hitbox for mounted players (horses have larger collision)
         if (player != null && player.occupiedGobID != null) {
-            Map.setPlayerBBox(6); // ~double hitbox for horse
+            Map.setPlayerBBox(4); // slightly wider hitbox for horse
         } else {
             Map.setPlayerBBox(3); // default player hitbox
         }
@@ -104,6 +104,10 @@ public class Pathfinder implements Runnable {
                 if (gob.isPlgob(this.mv.ui.gui))
                     continue;
                 if (this.gob != null && this.gob.id == gob.id)
+                    continue;
+                // Skip the horse/mount gob when player is mounted — otherwise
+                // the mount's hitbox blocks the player's own starting position
+                if (player != null && player.occupiedGobID != null && gob.id == player.occupiedGobID)
                     continue;
                 if (gob.getres() != null && isInsideBoundBox(gob.rc.floor(), gob.a, gob.getres().name, player.rc.floor())) {
                     HitBoxes.CollisionBoxSecondary[] collisionBoxes = HitBoxes.collisionBoxMap.get(gob.getres().name);

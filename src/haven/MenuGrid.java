@@ -801,7 +801,6 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 		makeLocal("customclient/menugrid/OtherScriptsAndTools/SkisScript");
 		makeLocal("customclient/menugrid/OtherScriptsAndTools/RefillWaterContainers");
 		makeLocal("customclient/menugrid/OtherScriptsAndTools/CombatDistanceTool");
-		makeLocal("customclient/menugrid/OtherScriptsAndTools/CombatRotation");
 		makeLocal("customclient/menugrid/OtherScriptsAndTools/RefillCheeseTrays");
 		makeLocal("customclient/menugrid/OtherScriptsAndTools/HarvestNearestDreamcatcher");
 		makeLocal("customclient/menugrid/OtherScriptsAndTools/DestroyNearestTrellisPlantScript");
@@ -1080,16 +1079,6 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 					gui.combatDistanceTool.stop();
 					gui.combatDistanceTool.reqdestroy();
 					gui.combatDistanceTool = null;
-				}
-			} else if (ad[2].equals("CombatRotation")) {
-				if (gui.combatRotationBot == null) {
-					gui.combatRotationBot = new CombatRotationBot(gui);
-					gui.add(gui.combatRotationBot, Utils.getprefc("wndc-combatRotationBotWindow", new Coord(gui.sz.x/2 - gui.combatRotationBot.sz.x/2, gui.sz.y/2 - gui.combatRotationBot.sz.y/2 - 200)));
-					gui.combatRotationBot.startThread("Hurricane-CombatRotation");
-				} else {
-					gui.combatRotationBot.stop();
-					gui.combatRotationBot.reqdestroy();
-					gui.combatRotationBot = null;
 				}
 			} else if (ad[2].equals("RefillCheeseTrays")) {
 				gui.runActionThread(new Thread(new FillCheeseTray(gui), "Hurricane-FillCheeseTrays"));
