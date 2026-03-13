@@ -49,7 +49,7 @@ public class RoastingSpitBot extends BotBase {
 						try { res = gob.getres(); } catch (Loading l) {}
 						if (res != null) {
 							if (res.name.equals("gfx/terobjs/pow")) {
-								if (AUtils.gobHasOverlay(gob, roastingSpitOverlayName)){
+								if (GobHelper.hasOverlay(gob, roastingSpitOverlayName)){
 									if (distFromPlayer < maxDistance && (theObject == null || distFromPlayer < theObject.rc.dist(plc))) {
 										theObject = gob;
 									}

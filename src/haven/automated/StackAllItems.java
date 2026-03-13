@@ -21,9 +21,22 @@ public class StackAllItems implements Runnable {
         this.inventory = inventory;
     }
 
+    /** Check if an item is a quantity item (seeds, flour, coins, etc.) rather than a stackable item. */
+    private static boolean isQuantityItem(WItem wItem) {
+        try {
+            String name = wItem.item.getname();
+            // Items already in a "stack of" are stackable, not quantity items
+            if (name.endsWith(", stack of")) return false;
+            for (ItemInfo info : wItem.info()) {
+                if (info instanceof GItem.Amount)
+                    return true;
+            }
+        } catch (Loading ignored) {}
+        return false;
+    }
+
     @Override
     public void run() {
-        // TODO: ND: Gotta make this crap ignore "quantity" items, like Seeds, Flour, Coins, etc.
         try {
             if (gui.vhand != null) {
                 gui.errorsilent("Can't stack items with an occupied cursor!");
@@ -35,9 +48,11 @@ public class StackAllItems implements Runnable {
             for (WItem wItem : inventory.getAllItems()) {
                 String name = wItem.item.getname(); // ND: Matias was using the res name, but stuff like different types of meat use the same res path
 
-                // ND: If you try to click while the script is running, you MIGHT drop the last item you have on your cursor on the floor.
-                // The only valuable "double" item you can hold in your inventory is usually just a pair of rings. I can't think of anything else right now.
+                // Skip rings (valuable doubles the user may not want merged)
                 if (name.contains("Ring")) continue;
+
+                // Skip quantity items (seeds, flour, coins, etc.) — these combine differently
+                if (isQuantityItem(wItem)) continue;
 
 
                 if (name.endsWith(stackOfSuffixForRemoval)) { // ND: remove the ", stack of" part, so stacks and unstacked items are considered the same item type

@@ -5,6 +5,7 @@ import haven.res.ui.croster.CattleId;
 import haven.res.ui.croster.Entry;
 
 import java.awt.*;
+import java.lang.reflect.Field;
 import java.util.*;
 import java.util.List;
 
@@ -114,6 +115,7 @@ public class LivestockManager extends Window {
 							quality = entry.q;
 							if (entry.name != null && !entry.name.isEmpty())
 								customName = entry.name;
+							info = extractBreedingInfo(entry);
 						}
 					} catch (Exception ignored) {}
 				}
@@ -139,6 +141,7 @@ public class LivestockManager extends Window {
 			case 2: cmp = Comparator.comparingDouble(e -> e.quality); break;
 			case 3: cmp = Comparator.comparingDouble(e -> e.distance); break;
 			case 4: cmp = Comparator.comparing(e -> e.status); break;
+			case 5: cmp = Comparator.comparing(e -> e.info); break;
 			default: cmp = Comparator.comparingDouble(e -> e.distance); break;
 		}
 		if (!sortAsc) cmp = cmp.reversed();
@@ -166,6 +169,61 @@ public class LivestockManager extends Window {
 		return raw.substring(0, 1).toUpperCase() + raw.substring(1);
 	}
 
+	/**
+	 * Extract breeding info from Entry subclass via reflection.
+	 * Entry subclasses (loaded from .res) typically have boolean fields:
+	 * sex (true=male), dead, preg (pregnant), lact (lactating), child (young).
+	 */
+	private static String extractBreedingInfo(Entry entry) {
+		StringBuilder sb = new StringBuilder();
+		try {
+			Class<?> cls = entry.getClass();
+			// Sex
+			Boolean sex = getBoolField(cls, entry, "sex");
+			if (sex != null)
+				sb.append(sex ? "\u2642" : "\u2640"); // male/female symbols
+			// Growth
+			Boolean isChild = getBoolField(cls, entry, "child");
+			if (isChild != null && isChild)
+				sb.append(sb.length() > 0 ? " " : "").append("Young");
+			// Dead
+			Boolean dead = getBoolField(cls, entry, "dead");
+			if (dead != null && dead)
+				sb.append(sb.length() > 0 ? " " : "").append("Dead");
+			// Pregnant
+			Boolean preg = getBoolField(cls, entry, "preg");
+			if (preg != null && preg)
+				sb.append(sb.length() > 0 ? " " : "").append("Preg");
+			// Lactating
+			Boolean lact = getBoolField(cls, entry, "lact");
+			if (lact != null && lact)
+				sb.append(sb.length() > 0 ? " " : "").append("Lact");
+			// Ownership
+			Integer owned = getIntField(cls, entry, "owned");
+			if (owned != null && owned > 0)
+				sb.append(sb.length() > 0 ? " " : "").append(owned == 3 ? "Mine" : "Other");
+		} catch (Exception ignored) {}
+		return sb.toString();
+	}
+
+	private static Boolean getBoolField(Class<?> cls, Object obj, String name) {
+		try {
+			Field f = cls.getField(name);
+			return f.getBoolean(obj);
+		} catch (Exception e) {
+			return null;
+		}
+	}
+
+	private static Integer getIntField(Class<?> cls, Object obj, String name) {
+		try {
+			Field f = cls.getField(name);
+			return f.getInt(obj);
+		} catch (Exception e) {
+			return null;
+		}
+	}
+
 	@Override
 	public void tick(double dt) {
 		super.tick(dt);
@@ -190,6 +248,7 @@ public class LivestockManager extends Window {
 		drawHeader(g, tablePos, "Q", COL_QUALITY_X, 2);
 		drawHeader(g, tablePos, "Dist", COL_DIST_X, 3);
 		drawHeader(g, tablePos, "Status", COL_STATUS_X, 4);
+		drawHeader(g, tablePos, "Info", COL_INFO_X, 5);
 
 		// Table background
 		Coord bodyPos = tablePos.add(0, ROW_H);
@@ -219,6 +278,12 @@ public class LivestockManager extends Window {
 			drawCell(g, bodyPos, String.format("%.0f", e.distance / 11.0), COL_DIST_X, yOff, Color.LIGHT_GRAY);
 			Color statusColor = e.knocked ? Color.RED : (e.hp < 1.0f ? Color.YELLOW : new Color(100, 220, 100));
 			drawCell(g, bodyPos, e.status, COL_STATUS_X, yOff, statusColor);
+			if (!e.info.isEmpty()) {
+				Color infoColor = e.info.contains("Preg") ? new Color(255, 180, 220) :
+						e.info.contains("Lact") ? new Color(180, 220, 255) :
+						new Color(200, 200, 200);
+				drawCell(g, bodyPos, e.info, COL_INFO_X, yOff, infoColor);
+			}
 		}
 
 		// Scrollbar
@@ -288,10 +353,12 @@ public class LivestockManager extends Window {
 	@Override
 	public boolean mousedown(MouseDownEvent ev) {
 		Coord tablePos = UI.scale(new Coord(10, 26));
+		// Header click — sort
 		if (ev.c.y >= tablePos.y && ev.c.y < tablePos.y + ROW_H) {
 			int x = ev.c.x - tablePos.x;
 			int clickedCol = -1;
-			if (x >= COL_STATUS_X) clickedCol = 4;
+			if (x >= COL_INFO_X) clickedCol = 5;
+			else if (x >= COL_STATUS_X) clickedCol = 4;
 			else if (x >= COL_DIST_X) clickedCol = 3;
 			else if (x >= COL_QUALITY_X) clickedCol = 2;
 			else if (x >= COL_TYPE_X) clickedCol = 1;
@@ -308,7 +375,40 @@ public class LivestockManager extends Window {
 				return true;
 			}
 		}
+		// Body click — left=navigate, right=interact
+		Coord bodyPos = tablePos.add(0, ROW_H);
+		if ((ev.b == 1 || ev.b == 3) && ev.c.y >= bodyPos.y && ev.c.y < bodyPos.y + TABLE_H) {
+			int row = scrollOffset + (ev.c.y - bodyPos.y) / ROW_H;
+			if (row >= 0 && row < animals.size()) {
+				if (ev.b == 1)
+					navigateToAnimal(animals.get(row));
+				else
+					interactWithAnimal(animals.get(row));
+				return true;
+			}
+		}
 		return super.mousedown(ev);
+	}
+
+	private void navigateToAnimal(AnimalEntry entry) {
+		if (gui == null || gui.map == null) return;
+		Gob gob = gui.map.glob.oc.getgob(entry.gobId);
+		if (gob == null) {
+			gui.errorsilent("Animal no longer visible");
+			return;
+		}
+		gui.map.pfLeftClick(gob.rc.floor().add(2, 0), null);
+	}
+
+	private void interactWithAnimal(AnimalEntry entry) {
+		if (gui == null || gui.map == null) return;
+		Gob gob = gui.map.glob.oc.getgob(entry.gobId);
+		if (gob == null) {
+			gui.errorsilent("Animal no longer visible");
+			return;
+		}
+		// Right-click interaction: pathfind to animal and interact
+		gui.map.pfRightClick(gob, 0, 3, 0, null);
 	}
 
 	@Override

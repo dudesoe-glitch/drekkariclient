@@ -3,6 +3,8 @@ package haven;
 import org.json.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.io.IOException;
+import java.nio.file.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,19 +31,127 @@ public class NotepadWindow extends Window {
 	private static final int MAX_NOTES = 50;
 
 	private static final Text.Foundry fnd = new Text.Foundry(Text.sans, 11).aa(true);
-	private static final String PREF_KEY = "notepad_notes_v2";
+	private static final String PREF_KEY_OLD_V2 = "notepad_notes_v2";
 	private static final String PREF_KEY_OLD = "notepad_text";
 
 	private TextEntry titleEntry;
 	private TextEntry inputEntry;
+	private final String chrid;
 
-	public NotepadWindow() {
+	public NotepadWindow(String chrid) {
 		super(Coord.z, "Notepad");
+		this.chrid = chrid;
 		loadNotes();
 		if (notes.isEmpty())
 			notes.add(new Note("Note 1"));
 		buildUI();
 	}
+
+	// === File-based persistence ===
+
+	private static Path getNotepadDir() {
+		try {
+			String appdata = System.getenv("APPDATA");
+			if (appdata != null) {
+				Path dir = Utils.path(appdata).resolve("Haven and Hearth").resolve("notepad");
+				if (!Files.exists(dir))
+					Files.createDirectories(dir);
+				return dir;
+			}
+			String home = System.getProperty("user.home", null);
+			if (home != null) {
+				Path dir = Utils.path(home).resolve(".haven").resolve("notepad");
+				if (!Files.exists(dir))
+					Files.createDirectories(dir);
+				return dir;
+			}
+		} catch (Exception e) {
+			System.err.println("Notepad: Could not create save directory: " + e.getMessage());
+		}
+		return null;
+	}
+
+	private Path getSaveFile() {
+		Path dir = getNotepadDir();
+		if (dir == null) return null;
+		String filename = (chrid != null && !chrid.isEmpty()) ? chrid + ".json" : "shared.json";
+		return dir.resolve(filename);
+	}
+
+	private void saveNotes() {
+		commitTitle();
+		JSONArray arr = new JSONArray();
+		for (Note note : notes) {
+			JSONObject obj = new JSONObject();
+			obj.put("title", note.title);
+			JSONArray lines = new JSONArray();
+			for (String line : note.lines)
+				lines.put(line);
+			obj.put("lines", lines);
+			arr.put(obj);
+		}
+		Path file = getSaveFile();
+		if (file != null) {
+			try {
+				Files.writeString(file, arr.toString(2));
+				return;
+			} catch (IOException e) {
+				System.err.println("Notepad: Failed to save: " + e.getMessage());
+			}
+		}
+	}
+
+	private void loadNotes() {
+		// Try file-based storage first
+		Path file = getSaveFile();
+		if (file != null && Files.exists(file)) {
+			try {
+				String json = Files.readString(file);
+				if (parseNotesJson(json)) return;
+			} catch (IOException ignored) {}
+		}
+		// Migrate from old Java Preferences storage
+		String prefKey = (chrid != null && !chrid.isEmpty())
+				? PREF_KEY_OLD_V2 + "_" + chrid : PREF_KEY_OLD_V2;
+		String saved = Utils.getpref(prefKey, "");
+		if (!saved.isEmpty()) {
+			if (parseNotesJson(saved)) return;
+		}
+		// Try global pref key
+		if (!prefKey.equals(PREF_KEY_OLD_V2)) {
+			String global = Utils.getpref(PREF_KEY_OLD_V2, "");
+			if (!global.isEmpty()) {
+				if (parseNotesJson(global)) return;
+			}
+		}
+		// Migrate from old single-note format
+		String old = Utils.getpref(PREF_KEY_OLD, "");
+		if (!old.isEmpty()) {
+			Note note = new Note("Note 1");
+			for (String line : old.split("\n", -1))
+				note.lines.add(line);
+			notes.add(note);
+		}
+	}
+
+	private boolean parseNotesJson(String json) {
+		try {
+			JSONArray arr = new JSONArray(json);
+			for (int i = 0; i < arr.length(); i++) {
+				JSONObject obj = arr.getJSONObject(i);
+				Note note = new Note(obj.getString("title"));
+				JSONArray lines = obj.getJSONArray("lines");
+				for (int j = 0; j < lines.length(); j++)
+					note.lines.add(lines.getString(j));
+				notes.add(note);
+			}
+			return !notes.isEmpty();
+		} catch (Exception e) {
+			return false;
+		}
+	}
+
+	// === UI ===
 
 	private void buildUI() {
 		int contentX = PAD + LIST_W + GAP;
@@ -307,49 +417,6 @@ public class NotepadWindow extends Window {
 		if (note.lines.size() > contentVisLines)
 			contentScroll = note.lines.size() - contentVisLines;
 		saveNotes();
-	}
-
-	// === Persistence ===
-
-	private void saveNotes() {
-		commitTitle();
-		JSONArray arr = new JSONArray();
-		for (Note note : notes) {
-			JSONObject obj = new JSONObject();
-			obj.put("title", note.title);
-			JSONArray lines = new JSONArray();
-			for (String line : note.lines)
-				lines.put(line);
-			obj.put("lines", lines);
-			arr.put(obj);
-		}
-		Utils.setpref(PREF_KEY, arr.toString());
-	}
-
-	private void loadNotes() {
-		String saved = Utils.getpref(PREF_KEY, "");
-		if (!saved.isEmpty()) {
-			try {
-				JSONArray arr = new JSONArray(saved);
-				for (int i = 0; i < arr.length(); i++) {
-					JSONObject obj = arr.getJSONObject(i);
-					Note note = new Note(obj.getString("title"));
-					JSONArray lines = obj.getJSONArray("lines");
-					for (int j = 0; j < lines.length(); j++)
-						note.lines.add(lines.getString(j));
-					notes.add(note);
-				}
-				return;
-			} catch (Exception ignored) {}
-		}
-		// Migrate from old single-note format
-		String old = Utils.getpref(PREF_KEY_OLD, "");
-		if (!old.isEmpty()) {
-			Note note = new Note("Note 1");
-			for (String line : old.split("\n", -1))
-				note.lines.add(line);
-			notes.add(note);
-		}
 	}
 
 	// === Expression evaluator ===

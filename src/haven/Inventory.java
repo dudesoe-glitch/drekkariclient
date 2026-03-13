@@ -697,6 +697,7 @@ public class Inventory extends Widget implements DTarget {
 
 		// Assign target positions for each multi-slot item (largest first)
 		Map<WItem, Coord> multiTargets = new LinkedHashMap<>();
+		int noFitCount = 0;
 		for (WItem wi : multiSlot) {
 			Coord gridSz = wi.sz.div(sqsz);
 			Coord target = findFreeSlot(planned, gridSz.x, gridSz.y);
@@ -705,6 +706,7 @@ public class Inventory extends Widget implements DTarget {
 				markOccupied(planned, target, gridSz);
 			} else {
 				// Can't fit — keep at current position
+				noFitCount++;
 				Coord current = wi.c.sub(1, 1).div(sqsz);
 				multiTargets.put(wi, current);
 				markOccupied(planned, current, gridSz);
@@ -726,6 +728,7 @@ public class Inventory extends Widget implements DTarget {
 			return 0;
 		});
 
+		int blockedCount = 0;
 		for (WItem wi : moveOrder) {
 			if (!wmap.containsValue(wi)) continue;
 			Coord gridSz = wi.sz.div(sqsz);
@@ -736,7 +739,10 @@ public class Inventory extends Widget implements DTarget {
 			// Clear the target area — move blocking items intelligently
 			clearTargetAreaPlanned(gui, targetSlot, gridSz, wi, immovable, multiTargets);
 
-			if (!isAreaClear(targetSlot, gridSz, wi)) continue;
+			if (!isAreaClear(targetSlot, gridSz, wi)) {
+				blockedCount++;
+				continue;
+			}
 
 			wi.item.wdgmsg("take", Coord.z);
 			if (!waitForCursor(gui, true)) continue;
@@ -759,6 +765,11 @@ public class Inventory extends Widget implements DTarget {
 
 		// === Phase 3: Swap-chain sort all 1x1 items ===
 		doQuickSort(gui);
+
+		// Report issues
+		int totalIssues = noFitCount + blockedCount;
+		if (totalIssues > 0)
+			gui.errorsilent("Sort: " + totalIssues + " item(s) couldn't be rearranged (not enough space)");
 	}
 
 	/**

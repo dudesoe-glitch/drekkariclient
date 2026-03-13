@@ -161,78 +161,6 @@ public class AUtils {
         return gobs;
     }
 
-    /** @deprecated Use {@link InvHelper#findFirstByNameInAllInventories(GameUI, String)} instead. */
-    @Deprecated
-    public static WItem findItemByPrefixInAllInventories(GameUI gui, final String resNamePrefix) {
-        for(Inventory inventory : gui.getAllInventories()){
-            for (Widget wdg = inventory.child; wdg != null; wdg = wdg.next) {
-                if (wdg instanceof WItem) {
-                    final WItem witm = (WItem)wdg;
-                    try {
-                        if (witm.item.getres().name.startsWith(resNamePrefix)) {
-                            return witm;
-                        }
-                    }
-                    catch (Loading ignored) {}
-                }
-            }
-        }
-        return null;
-    }
-
-    /** @deprecated Use {@link InvHelper#findFirstByName(Inventory, String)} instead. */
-    @Deprecated
-    public static WItem findItemInInv(final Inventory inv, final String resName) {
-        for (Widget wdg = inv.child; wdg != null; wdg = wdg.next) {
-            if (wdg instanceof WItem) {
-                final WItem witm = (WItem)wdg;
-                try {
-                    if (witm.item.getres().name.equals(resName)) {
-                        return witm;
-                    }
-                }
-                catch (Loading ignored) {}
-            }
-        }
-        return null;
-    }
-
-    /** @deprecated Use {@link GobHelper#findByName(GameUI, String, double)} instead. */
-    @Deprecated
-    public static ArrayList<Gob> getGobs(String name, GameUI gui) {
-        ArrayList<Gob> gobs = new ArrayList<>();
-        synchronized (gui.map.glob.oc) {
-            for (Gob gob : gui.map.glob.oc) {
-                try {
-                    Resource res = gob.getres();
-                    if (res != null && res.name.equals(name)) {
-                        gobs.add(gob);
-                    }
-                } catch (Loading l) {
-                }
-            }
-        }
-        return gobs;
-    }
-
-    /** @deprecated Use {@link GobHelper#findAllSupports(GameUI)} instead. */
-    @Deprecated
-    public static ArrayList<Gob> getAllSupports(GameUI gui) {
-        ArrayList<Gob> supports = new ArrayList<>();
-        Set<String> types = new HashSet<>(Arrays.asList("gfx/terobjs/ladder", "gfx/terobjs/minesupport", "gfx/terobjs/column", "gfx/terobjs/minebeam"));
-        synchronized (gui.map.glob.oc) {
-            for (Gob gob : gui.map.glob.oc) {
-                try {
-                    Resource res = gob.getres();
-                    if (res != null && types.contains(res.name)) {
-                        supports.add(gob);
-                    }
-                } catch (Loading ignored) {}
-            }
-        }
-        return supports;
-    }
-
     public static void getGridHeightAvg(GameUI gui){
         try {
             Coord playerCoord = gui.map.player().rc.floor(tilesz);
@@ -260,21 +188,6 @@ public class AUtils {
             }
             gui.msg(message.toString(), Color.WHITE);
         } catch (Loading ignored) {}
-    }
-
-    /** @deprecated Use {@link GobHelper#hasOverlay(Gob, String)} instead. */
-    @Deprecated
-    public static boolean gobHasOverlay (Gob gob, String overlayResName){
-        if (gob != null && !gob.ols.isEmpty()) {
-            Optional<Gob.Overlay> foundOverlay = gob.ols.stream()
-                    .filter(ol -> ol != null && ol.spr != null && ol.spr.res != null && overlayResName.equals(ol.spr.res.name))
-                    .map(ol -> (Gob.Overlay) ol)
-                    .findFirst();
-            if (foundOverlay.isPresent()) {
-                return true;
-            }
-        }
-        return false;
     }
 
 }

@@ -1173,7 +1173,7 @@ public class MenuGrid extends Widget implements KeyBinding.Bindable {
 				gui.runActionThread(new Thread(new AddWoodBlocksToSmokeShed(gui, 5), "Hurricane-Add5WoodBlocks"));
 			} else if (ad[2].equals("Notepad")) {
 				if (gui.notepadWindow == null) {
-					gui.notepadWindow = new NotepadWindow();
+					gui.notepadWindow = new NotepadWindow(gui.chrid);
 					gui.add(gui.notepadWindow, Utils.getprefc("wndc-notepadWindow", new Coord(gui.sz.x / 2 - 140, gui.sz.y / 2 - 130)));
 				} else {
 					gui.notepadWindow.show(!gui.notepadWindow.visible);
