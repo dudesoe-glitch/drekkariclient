@@ -21,7 +21,7 @@ public class CheckpointManager extends Window implements Runnable {
     private static final int delayMs = 250;
     private final GameUI gui;
     private volatile boolean stop = false;
-    private boolean paused = true;
+    private volatile boolean paused = true;
     private final Label estimatedArrivalTime;
     public CheckpointList checkpointList;
     private int notMovingCounter = 0;
@@ -57,7 +57,7 @@ public class CheckpointManager extends Window implements Runnable {
         super(UI.scale(350, 200), "Queued Movement - Checkpoint Route");
         this.gui = gui;
         if(gui.map.player() != null){
-            this.lastPlayerCoord = gui.map.player().rc;
+            this.lastPlayerCoord = new Coord2d(gui.map.player().rc.x, gui.map.player().rc.y);
         } else {
             this.lastPlayerCoord = new Coord2d(0,0);
         }
@@ -584,7 +584,8 @@ public class CheckpointManager extends Window implements Runnable {
                     }
                 } catch (Exception ignored) {
                 }
-                setLastPlayerCoord(gui.map.player().rc);
+                Gob plcp = gui.map.player();
+                if (plcp != null) setLastPlayerCoord(new Coord2d(plcp.rc.x, plcp.rc.y));
             } else {
                 notMovingCounter = 0;
                 if (!estimatedArrivalTime.text.equals("")) {

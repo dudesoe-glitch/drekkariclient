@@ -9,7 +9,7 @@ import static haven.OCache.posres;
 
 public class MiningBot extends BotBase {
 	private Label targetLabel;
-	private Coord2d targetPos;
+	private volatile Coord2d targetPos;
 	public volatile boolean settingTarget;
 	private volatile boolean safeMining;
 

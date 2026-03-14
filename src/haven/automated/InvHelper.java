@@ -24,7 +24,8 @@ public class InvHelper {
             if (wdg instanceof WItem) {
                 WItem wi = (WItem) wdg;
                 try {
-                    if (wi.item.getres().name.equals(resName)) {
+                    Resource res = wi.item.getres();
+                    if (res != null && res.name.equals(resName)) {
                         return wi;
                     }
                 } catch (Loading ignored) {}
@@ -40,7 +41,8 @@ public class InvHelper {
             if (wdg instanceof WItem) {
                 WItem wi = (WItem) wdg;
                 try {
-                    if (wi.item.getres().name.contains(partial)) {
+                    Resource res = wi.item.getres();
+                    if (res != null && res.name.contains(partial)) {
                         return wi;
                     }
                 } catch (Loading ignored) {}
@@ -57,7 +59,8 @@ public class InvHelper {
             if (wdg instanceof WItem) {
                 WItem wi = (WItem) wdg;
                 try {
-                    if (wi.item.getres().name.equals(resName)) {
+                    Resource res = wi.item.getres();
+                    if (res != null && res.name.equals(resName)) {
                         result.add(wi);
                     }
                 } catch (Loading ignored) {}
@@ -74,7 +77,8 @@ public class InvHelper {
             if (wdg instanceof WItem) {
                 WItem wi = (WItem) wdg;
                 try {
-                    if (wi.item.getres().name.contains(partial)) {
+                    Resource res = wi.item.getres();
+                    if (res != null && res.name.contains(partial)) {
                         result.add(wi);
                     }
                 } catch (Loading ignored) {}
@@ -200,7 +204,8 @@ public class InvHelper {
                 if (wdg instanceof WItem) {
                     WItem wi = (WItem) wdg;
                     try {
-                        if (wi.item.getres().name.startsWith(prefix)) {
+                        Resource res = wi.item.getres();
+                        if (res != null && res.name.startsWith(prefix)) {
                             return wi;
                         }
                     } catch (Loading ignored) {}

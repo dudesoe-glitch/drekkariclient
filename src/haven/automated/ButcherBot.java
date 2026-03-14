@@ -3,6 +3,7 @@ package haven.automated;
 import haven.*;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static haven.OCache.posres;
 
@@ -11,7 +12,7 @@ public class ButcherBot extends BotBase {
 	private volatile boolean doLivestock;
 	private volatile boolean doPredators;
 	private volatile boolean doSmallGame;
-	private final Set<Long> blacklisted = new HashSet<>();
+	private final Set<Long> blacklisted = ConcurrentHashMap.newKeySet();
 
 	private static final Set<String> LARGE_GAME = new HashSet<>(Arrays.asList(
 		"gfx/kritter/boar/boar", "gfx/kritter/moose/moose", "gfx/kritter/reddeer/reddeer",

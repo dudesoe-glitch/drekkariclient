@@ -68,7 +68,8 @@ public class Actions {
     }
 
     public static boolean waitPf(GameUI gui) throws InterruptedException {
-        if(gui.map.pfthread == null){
+        Thread pf = gui.map.pfthread;
+        if (pf == null) {
             return false;
         }
         int time = 0;
@@ -76,7 +77,10 @@ public class Actions {
         Thread.sleep(50);
         Gob player = gui.map.player();
         if (player == null) return false;
-        while (gui.map.pfthread.isAlive() || player.getv() > 0) {
+        while (true) {
+            pf = gui.map.pfthread;
+            boolean pfAlive = pf != null && pf.isAlive();
+            if (!pfAlive && player.getv() <= 0) break;
             time += 70;
             Thread.sleep(70);
             player = gui.map.player();
@@ -85,7 +89,7 @@ public class Actions {
                 time = 0;
                 moved = true;
             }
-            if (time > 2000 && moved == false) {
+            if (time > 2000 && !moved) {
                 // Pathfinding timed out without movement — trigger unstuck
                 return false;
             } else if (time > 20000) {

@@ -3,6 +3,7 @@ package haven.automated;
 import haven.*;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static haven.OCache.posres;
 
@@ -12,7 +13,7 @@ public class FarmingBot extends BotBase {
 	private CheckBox useBestSeedCheckBox;
 	private boolean frozenWarningShown = false;
 	private int plantFailCount = 0;
-	private final Set<Long> blacklistedCrops = new HashSet<>();
+	private final Set<Long> blacklistedCrops = ConcurrentHashMap.newKeySet();
 
 	private static final String CROP_PREFIX = "gfx/terobjs/plants/";
 	private static final String SEED_PREFIX = "gfx/invobjs/seed-";
@@ -317,7 +318,7 @@ public class FarmingBot extends BotBase {
 		// Harvest
 		setStatus("Harvesting " + cropBaseName + (scythe ? " (scythe)..." : "..."));
 		FlowerMenu.setNextSelection("Harvest");
-		gui.map.wdgmsg("click", Coord.z, crop.rc.floor(posres), 3, 0, 0, (int) crop.id, crop.rc.floor(posres), 0, -1);
+		gui.map.wdgmsg("click", Coord.z, cropPos.floor(posres), 3, 0, 0, (int) crop.id, cropPos.floor(posres), 0, -1);
 		Thread.sleep(50);
 		Actions.waitProgBar(gui);
 
