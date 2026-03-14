@@ -61,6 +61,8 @@ public class OreSmeltingBot extends BotBase {
 	private static final String[] FUEL_STOCKPILE_NAMES = {"coal", "charcoal", "blackcoal"};
 	private static final double MAX_INTERACT_DIST = 11 * 5;
 	private static final int TRANSFER_DELAY = 200;
+	private static final int SMELTER_ORE_CAPACITY = 25;
+	private static final int MOD_SHIFT = 1; // Shift modifier for Shift+Right-Click
 
 	public OreSmeltingBot(GameUI gui) {
 		super(gui, UI.scale(250, 300), "Ore Smelting Bot");
@@ -254,7 +256,7 @@ public class OreSmeltingBot extends BotBase {
 	 */
 	private int transferItemsToContainer(boolean ore) throws InterruptedException {
 		int loaded = 0;
-		int maxItems = ore ? 999 : fuelPerLoad;
+		int maxItems = ore ? SMELTER_ORE_CAPACITY : fuelPerLoad;
 		for (int i = 0; i < maxItems && active && !stop; i++) {
 			WItem item = ore ? findOreInInventory() : findFuelInInventory();
 			if (item == null) break;
@@ -285,78 +287,70 @@ public class OreSmeltingBot extends BotBase {
 	}
 
 	/**
-	 * Grab items from a nearby stockpile.
+	 * Grab items from a nearby stockpile using Shift+Right-Click.
+	 * Stockpiles don't open as inventory windows — Shift+Right-Click draws items
+	 * into the player's inventory until full (per Ring of Brodgar wiki).
 	 * Phase 1: Try name-matched stockpiles (e.g. stockpile-leadglance for lead ore).
-	 * Phase 2: Try any stockpile and check its contents (handles generic "ore" stockpiles).
+	 * Phase 2: Try any stockpile nearby (for generic "ore" stockpiles).
 	 */
 	private boolean grabFromStockpile(boolean ore) throws InterruptedException {
 		// Phase 1: find by resource name
 		Gob stockpile = findStockpileByName(ore);
 		if (stockpile != null) {
-			int grabbed = openAndGrabFromStockpile(stockpile, ore);
-			if (grabbed > 0) return true;
+			if (shiftRightClickStockpile(stockpile, ore)) return true;
 		}
 
-		// Phase 2: find any stockpile and check contents
-		setStatus("Scanning stockpiles for " + (ore ? "ore" : "fuel") + "...");
+		// Phase 2: try all nearby stockpiles
+		setStatus("Scanning all stockpiles for " + (ore ? "ore" : "fuel") + "...");
 		List<Gob> allStockpiles = findAllNearbyStockpiles();
 		for (Gob sp : allStockpiles) {
 			if (stop || !active) break;
-			int grabbed = openAndGrabFromStockpile(sp, ore);
-			if (grabbed > 0) return true;
+			if (shiftRightClickStockpile(sp, ore)) return true;
 		}
 		return false;
 	}
 
-	/** Walk to a stockpile, open it, and grab matching items. Returns count grabbed. */
-	private int openAndGrabFromStockpile(Gob stockpile, boolean ore) throws InterruptedException {
+	/**
+	 * Walk to a stockpile and Shift+Right-Click to draw items into inventory.
+	 * Waits for inventory count to increase to confirm items were grabbed.
+	 */
+	private boolean shiftRightClickStockpile(Gob stockpile, boolean ore) throws InterruptedException {
 		String spName = "stockpile";
 		try { Resource r = stockpile.getres(); if (r != null) spName = r.name.substring(r.name.lastIndexOf('/') + 1); } catch (Loading ignored) {}
 		setStatus("Walking to " + spName + "...");
 		gui.map.pfLeftClick(stockpile.rc.floor().add(2, 0), null);
-		if (!Actions.waitPf(gui)) { Actions.unstuck(gui); return 0; }
+		if (!Actions.waitPf(gui)) { Actions.unstuck(gui); return false; }
 
 		Gob player = gui.map.player();
-		if (player == null) return 0;
-		if (new Coord2d(stockpile.rc.x, stockpile.rc.y).dist(new Coord2d(player.rc.x, player.rc.y)) > MAX_INTERACT_DIST) return 0;
+		if (player == null) return false;
+		if (new Coord2d(stockpile.rc.x, stockpile.rc.y).dist(new Coord2d(player.rc.x, player.rc.y)) > MAX_INTERACT_DIST) return false;
 
 		if (gui.vhand != null) { gui.vhand.item.wdgmsg("drop", Coord.z); Actions.waitForEmptyHand(gui, 1000, ""); }
 
-		// Right-click stockpile to open it
+		// Shift+Right-Click stockpile to draw items into inventory
+		int beforeCount = countInventoryItems();
 		Coord2d spPos = new Coord2d(stockpile.rc.x, stockpile.rc.y);
-		gui.map.wdgmsg("click", Coord.z, spPos.floor(posres), 3, 0, 0, (int) stockpile.id, spPos.floor(posres), 0, -1);
-		Inventory spInv = waitForContainerWindow("Stockpile", 5000);
-		if (spInv == null) return 0;
+		gui.map.wdgmsg("click", Coord.z, spPos.floor(posres), 3, MOD_SHIFT, 0,
+			(int) stockpile.id, spPos.floor(posres), 0, -1);
 
-		// Check contents — only grab items that match what we need
-		setStatus("Checking stockpile contents...");
-		int grabbed = 0;
-		for (WItem item : new ArrayList<>(spInv.getAllItems())) {
-			if (stop || !active) break;
-			if (gui.maininv.getFreeSpace() < 2) break;
-			try {
-				boolean matches;
-				if (ore) {
-					matches = isOreEnabled(item.item.resource().basename());
-				} else {
-					String name = item.item.getname();
-					matches = false;
-					if (name != null) {
-						for (String fuelName : FUEL_NAMES) {
-							if (name.contains(fuelName)) { matches = true; break; }
-						}
-					}
-				}
-				if (matches) {
-					item.item.wdgmsg("transfer", Coord.z);
-					grabbed++;
-					Thread.sleep(TRANSFER_DELAY);
-				}
-			} catch (Loading ignored) {}
+		// Wait for items to appear in inventory (stockpile transfer takes time)
+		int waited = 0;
+		while (waited < 5000) {
+			Thread.sleep(200);
+			waited += 200;
+			int currentCount = countInventoryItems();
+			if (currentCount > beforeCount) {
+				// Items are arriving — wait a bit more for all to transfer
+				Thread.sleep(1000);
+				int grabbed = countInventoryItems() - beforeCount;
+				setStatus("Grabbed " + grabbed + " items from " + spName);
+				// Verify we got the right type
+				WItem check = ore ? findOreInInventory() : findFuelInInventory();
+				return check != null;
+			}
+			if (stop || !active) return false;
 		}
-		if (grabbed > 0) setStatus("Grabbed " + grabbed + " " + (ore ? "ore" : "fuel") + " from stockpile");
-		Thread.sleep(200);
-		return grabbed;
+		return false;
 	}
 
 	/** Find nearest stockpile by resource name matching. */
