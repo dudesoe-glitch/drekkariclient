@@ -3,12 +3,20 @@ package haven.automated;
 import haven.*;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static haven.OCache.posres;
 
 public class ForagingBot extends BotBase {
 	private CheckBox alsoPickGroundItemsCB;
+	private CheckBox wanderCB;
+	private TextEntry filterEntry;
 	private volatile boolean alsoPickGroundItems;
+	private volatile boolean wanderWhenEmpty;
+	private volatile String herbFilter = "";
+	private final Set<Long> blacklisted = ConcurrentHashMap.newKeySet();
+	private Coord2d lastWanderPos;
+	private final Random random = new Random();
 
 	private static final Set<String> PICKABLE_ITEMS = new HashSet<>(Arrays.asList(
 		"adder", "arrow", "bat", "swan", "goshawk", "precioussnowflake",
@@ -17,12 +25,32 @@ public class ForagingBot extends BotBase {
 		"gemstone", "boarspear"
 	));
 
-	public ForagingBot(GameUI gui) {
-		super(gui, UI.scale(250, 100), "Foraging Bot");
-		this.alsoPickGroundItems = Utils.getprefb("foragingBotPickGround", false);
+	private static final int PATHFIND_OFFSET = 12; // Larger offset for horse compatibility
 
+	public ForagingBot(GameUI gui) {
+		super(gui, UI.scale(250, 150), "Foraging Bot");
+		this.alsoPickGroundItems = Utils.getprefb("foragingBotPickGround", false);
+		this.wanderWhenEmpty = Utils.getprefb("foragingBotWander", false);
+		this.herbFilter = Utils.getpref("foragingBotFilter", "");
+
+		int y = 10;
 		statusLabel = new Label("Idle");
-		add(statusLabel, UI.scale(10, 10));
+		add(statusLabel, UI.scale(10, y));
+		y += 20;
+
+		add(new Label("Filter (comma-sep):"), UI.scale(10, y));
+		filterEntry = new TextEntry(UI.scale(120), herbFilter) {
+			@Override
+			public boolean keydown(KeyDownEvent ev) {
+				boolean ret = super.keydown(ev);
+				herbFilter = text().trim();
+				Utils.setpref("foragingBotFilter", herbFilter);
+				return ret;
+			}
+		};
+		filterEntry.tooltip = RichText.render("Comma-separated herb names to pick.\nEmpty = pick all herbs.\nExample: nettle,tansy,clover", UI.scale(300));
+		add(filterEntry, UI.scale(120, y - 2));
+		y += 22;
 
 		alsoPickGroundItemsCB = new CheckBox("Also pick ground items") {
 			@Override
@@ -32,13 +60,28 @@ public class ForagingBot extends BotBase {
 			}
 		};
 		alsoPickGroundItemsCB.a = alsoPickGroundItems;
-		add(alsoPickGroundItemsCB, UI.scale(10, 30));
+		add(alsoPickGroundItemsCB, UI.scale(10, y));
+		y += 20;
+
+		wanderCB = new CheckBox("Wander when empty") {
+			@Override
+			public void changed(boolean val) {
+				wanderWhenEmpty = val;
+				Utils.setprefb("foragingBotWander", val);
+			}
+		};
+		wanderCB.a = wanderWhenEmpty;
+		wanderCB.tooltip = RichText.render("Walk in a random direction when no forageables are nearby,\nthen re-scan. Avoids backtracking.", UI.scale(300));
+		add(wanderCB, UI.scale(10, y));
+		y += 25;
 
 		activeButton = new Button(UI.scale(80), "Start") {
 			@Override
 			public void click() {
 				active = !active;
 				if (active) {
+					blacklisted.clear();
+					lastWanderPos = null;
 					this.change("Stop");
 					statusLabel.settext("Running...");
 				} else {
@@ -48,7 +91,7 @@ public class ForagingBot extends BotBase {
 				}
 			}
 		};
-		add(activeButton, UI.scale(80, 55));
+		add(activeButton, UI.scale(80, y));
 	}
 
 	@Override
@@ -57,7 +100,8 @@ public class ForagingBot extends BotBase {
 		if (player == null) { Thread.sleep(200); return; }
 		if (!checkVitals()) return;
 
-		if (gui.prog != null) {
+		GameUI.Progress p = gui.prog;
+		if (p != null) {
 			setStatus("Working...");
 			Actions.waitProgBar(gui);
 			if (stop) return;
@@ -66,8 +110,12 @@ public class ForagingBot extends BotBase {
 
 		Gob herb = findNearestForageable();
 		if (herb == null) {
-			setStatus("No forageables found");
-			deactivate();
+			if (wanderWhenEmpty) {
+				wander();
+			} else {
+				setStatus("No forageables found");
+				deactivate();
+			}
 			return;
 		}
 
@@ -80,8 +128,9 @@ public class ForagingBot extends BotBase {
 
 		setStatus("Walking to forageable...");
 		Coord2d herbPos = new Coord2d(herb.rc.x, herb.rc.y);
-		gui.map.pfLeftClick(herbPos.floor().add(2, 0), null);
+		gui.map.pfLeftClick(herbPos.floor().add(PATHFIND_OFFSET, 0), null);
 		if (!Actions.waitPf(gui)) {
+			blacklisted.add(herb.id);
 			Actions.unstuck(gui);
 			return;
 		}
@@ -90,7 +139,8 @@ public class ForagingBot extends BotBase {
 		player = gui.map.player();
 		if (player == null) { Thread.sleep(200); return; }
 		if (herbPos.dist(new Coord2d(player.rc.x, player.rc.y)) > 11 * 5) {
-			setStatus("Too far, retrying...");
+			blacklisted.add(herb.id);
+			setStatus("Too far, skipping...");
 			return;
 		}
 
@@ -111,21 +161,26 @@ public class ForagingBot extends BotBase {
 		long herbId = herb.id;
 		int waited = 0;
 		while (waited < 10000 && !stop && active) {
-			// Progress bar active — wait for it
-			GameUI.Progress p = gui.prog;
-			if (p != null && p.prog >= 0) {
+			GameUI.Progress pg = gui.prog;
+			if (pg != null && pg.prog >= 0) {
 				Actions.waitProgBar(gui);
 				break;
 			}
-			// Herb gone — pick succeeded
 			if (gui.map.glob.oc.getgob(herbId) == null) break;
-			// Item appeared on cursor — pick succeeded
 			if (gui.vhand != null) break;
 			Thread.sleep(50);
 			waited += 50;
 		}
 		FlowerMenu.setNextSelection(null);
+
+		// If herb still exists after timeout, blacklist it (couldn't pick — maybe collision)
+		if (gui.map.glob.oc.getgob(herbId) != null && waited >= 10000) {
+			blacklisted.add(herbId);
+		}
 		if (stop) return;
+
+		// Record position for wander anti-backtracking
+		lastWanderPos = new Coord2d(player.rc.x, player.rc.y);
 
 		vh = gui.vhand;
 		if (vh != null) {
@@ -134,21 +189,63 @@ public class ForagingBot extends BotBase {
 		}
 	}
 
+	/** Walk in a random direction to find new forageables. Avoids backtracking. */
+	private void wander() throws InterruptedException {
+		Gob player = gui.map.player();
+		if (player == null) return;
+		Coord2d playerPos = new Coord2d(player.rc.x, player.rc.y);
+
+		// Pick a random direction, biased away from where we came from
+		double angle;
+		if (lastWanderPos != null) {
+			// Move away from last position
+			double backAngle = Math.atan2(lastWanderPos.y - playerPos.y, lastWanderPos.x - playerPos.x);
+			angle = backAngle + Math.PI + (random.nextDouble() - 0.5) * Math.PI; // ~opposite direction with spread
+		} else {
+			angle = random.nextDouble() * 2 * Math.PI;
+		}
+
+		double wanderDist = 11 * (8 + random.nextInt(7)); // 8-15 tiles
+		Coord2d wanderTarget = new Coord2d(
+			playerPos.x + Math.cos(angle) * wanderDist,
+			playerPos.y + Math.sin(angle) * wanderDist
+		);
+
+		setStatus("Wandering...");
+		lastWanderPos = playerPos;
+		gui.map.pfLeftClick(wanderTarget.floor(), null);
+		Actions.waitPf(gui);
+		Thread.sleep(500);
+	}
+
 	private Gob findNearestForageable() {
 		Gob closest = null;
 		double closestDist = Double.MAX_VALUE;
 		Gob player = gui.map.player();
 		if (player == null) return null;
 		Coord2d playerPos = new Coord2d(player.rc.x, player.rc.y);
+		String[] filters = parseFilter();
 
 		synchronized (gui.map.glob.oc) {
 			for (Gob gob : gui.map.glob.oc) {
 				try {
+					if (blacklisted.contains(gob.id)) continue;
 					Resource res = gob.getres();
 					if (res == null) continue;
 					boolean isHerb = res.name.startsWith("gfx/terobjs/herbs");
 					boolean isPickable = alsoPickGroundItems && PICKABLE_ITEMS.contains(res.basename());
 					if (!isHerb && !isPickable) continue;
+
+					// Apply herb filter if set
+					if (isHerb && filters != null) {
+						String basename = res.basename();
+						boolean matched = false;
+						for (String f : filters) {
+							if (basename.contains(f)) { matched = true; break; }
+						}
+						if (!matched) continue;
+					}
+
 					double dist = gob.rc.dist(playerPos);
 					if (dist > MAX_SEARCH_DIST) continue;
 					if (dist < closestDist) {
@@ -159,6 +256,19 @@ public class ForagingBot extends BotBase {
 			}
 		}
 		return closest;
+	}
+
+	/** Parse comma-separated filter into trimmed lowercase terms. Returns null if empty/blank. */
+	private String[] parseFilter() {
+		String f = herbFilter;
+		if (f == null || f.trim().isEmpty()) return null;
+		String[] parts = f.split(",");
+		List<String> result = new ArrayList<>();
+		for (String part : parts) {
+			String trimmed = part.trim().toLowerCase();
+			if (!trimmed.isEmpty()) result.add(trimmed);
+		}
+		return result.isEmpty() ? null : result.toArray(new String[0]);
 	}
 
 	@Override

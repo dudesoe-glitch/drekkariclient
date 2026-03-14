@@ -3225,18 +3225,17 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
 	public void pfDone(final Pathfinder thread) {
 		if (haven.automated.pathfinder.Map.DEBUG_TIMINGS)
 			System.out.println("-= PF DONE =-");
-		if (thread.terminate && pfFinalDest == null) {
-			// Silently fail — "No path found" notification was disruptive
-		}
-		if(pfFinalDest != null && !thread.terminate) {
+		if (pfFinalDest != null) {
 			Gob player = player();
-			if(player != null) {
+			if (player != null) {
 				double dist = pfFinalDest.dist(player.rc.floor());
-				if(dist > 11 * 5) {
+				if (dist > 11 * 5) {
 					// Not close enough — schedule next hop after brief delay
+					// Continue even if pathfinder terminated (destination was out of map bounds)
+					// The pathfinder still moved the player closer before terminating
 					Coord dest = pfFinalDest;
 					new Thread(() -> {
-						try { Thread.sleep(50); } catch(InterruptedException e) { Thread.currentThread().interrupt(); return; }
+						try { Thread.sleep(200); } catch (InterruptedException e) { Thread.currentThread().interrupt(); return; }
 						pfLongDistance(dest);
 					}, "PF-LongDistance").start();
 				} else {

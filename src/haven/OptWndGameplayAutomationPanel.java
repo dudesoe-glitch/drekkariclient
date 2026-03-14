@@ -290,7 +290,7 @@ class OptWndGameplayAutomationPanel {
 		}, prev.pos("bl").adds(12, 2));
 		OptWnd.terrainWeightedPathfindingCheckBox.tooltip = RichText.render("When enabled, the pathfinder prefers roads and avoids swamps/bogs.\nRoads cost less, dense terrain costs more.", UI.scale(300));
 		prev = panel.add(OptWnd.pathfindOnRightClickCheckBox = new CheckBox("Pathfind on Right-Click Interaction"){
-			{a = Utils.getprefb("pathfindOnRightClick", false);}
+			{a = Utils.getprefb("pathfindOnRightClick", true);}
 			public void set(boolean val) {
 				Utils.setprefb("pathfindOnRightClick", val);
 				a = val;

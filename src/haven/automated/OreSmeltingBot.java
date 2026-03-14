@@ -4,6 +4,7 @@ import haven.*;
 
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static haven.OCache.posres;
 
@@ -18,9 +19,14 @@ public class OreSmeltingBot extends BotBase {
 	private volatile boolean doLeadOre;
 
 	private volatile boolean doCollectOutput;
+	private volatile boolean doGrabFromStockpiles;
 	private volatile int fuelPerLoad;
 
+	// Track smelters that are already lit/processing to skip them
+	private final Set<Long> processedSmelters = ConcurrentHashMap.newKeySet();
+
 	private static final String SMELTER_RES = "gfx/terobjs/smelter";
+	private static final String STOCKPILE_PREFIX = "gfx/terobjs/stockpile-";
 
 	// Ore basenames grouped by output metal — matched via resource().basename()
 	private static final Set<String> COPPER_ORES = new HashSet<>(Arrays.asList(
@@ -40,13 +46,24 @@ public class OreSmeltingBot extends BotBase {
 		"leadglance", "galena"
 	));
 
+	// All ore basenames combined for stockpile matching
+	private static final Set<String> ALL_ORE_BASENAMES = new HashSet<>();
+	static {
+		ALL_ORE_BASENAMES.addAll(COPPER_ORES);
+		ALL_ORE_BASENAMES.addAll(TIN_ORES);
+		ALL_ORE_BASENAMES.addAll(IRON_ORES);
+		ALL_ORE_BASENAMES.addAll(GOLD_ORES);
+		ALL_ORE_BASENAMES.addAll(SILVER_ORES);
+		ALL_ORE_BASENAMES.addAll(LEAD_ORES);
+	}
+
 	private static final String[] FUEL_NAMES = {"Coal", "Black Coal", "Charcoal"};
+	private static final String[] FUEL_STOCKPILE_NAMES = {"coal", "charcoal", "blackcoal"};
 	private static final double MAX_INTERACT_DIST = 11 * 5;
-	private static final int HAND_TIMEOUT = 2000;
-	private static final int HAND_DELAY = 8;
+	private static final int TRANSFER_DELAY = 200;
 
 	public OreSmeltingBot(GameUI gui) {
-		super(gui, UI.scale(250, 260), "Ore Smelting Bot");
+		super(gui, UI.scale(250, 300), "Ore Smelting Bot");
 
 		doCopperOre = Utils.getprefb("oreSmeltingBot_copper", true);
 		doTinOre = Utils.getprefb("oreSmeltingBot_tin", true);
@@ -55,6 +72,7 @@ public class OreSmeltingBot extends BotBase {
 		doSilverOre = Utils.getprefb("oreSmeltingBot_silver", false);
 		doLeadOre = Utils.getprefb("oreSmeltingBot_lead", false);
 		doCollectOutput = Utils.getprefb("oreSmeltingBot_collect", true);
+		doGrabFromStockpiles = Utils.getprefb("oreSmeltingBot_stockpiles", false);
 		fuelPerLoad = Utils.getprefi("oreSmeltingBot_fuelCount", 12);
 
 		int y = 10;
@@ -68,6 +86,8 @@ public class OreSmeltingBot extends BotBase {
 		add(new CheckBox("Lead") {{ a = doLeadOre; } public void set(boolean val) { doLeadOre = val; a = val; Utils.setprefb("oreSmeltingBot_lead", val); }}, UI.scale(130, y));
 		y += 25;
 		add(new CheckBox("Collect output bars") {{ a = doCollectOutput; } public void set(boolean val) { doCollectOutput = val; a = val; Utils.setprefb("oreSmeltingBot_collect", val); }}, UI.scale(10, y));
+		y += 20;
+		add(new CheckBox("Grab from stockpiles") {{ a = doGrabFromStockpiles; } public void set(boolean val) { doGrabFromStockpiles = val; a = val; Utils.setprefb("oreSmeltingBot_stockpiles", val); }}, UI.scale(10, y));
 		y += 25;
 
 		Label fuelLabel = new Label("Fuel per smelter:");
@@ -95,8 +115,15 @@ public class OreSmeltingBot extends BotBase {
 			@Override
 			public void click() {
 				active = !active;
-				if (active) { this.change("Stop"); statusLabel.settext("Running..."); }
-				else { idlePlayer(); this.change("Start"); statusLabel.settext("Stopped"); }
+				if (active) {
+					processedSmelters.clear();
+					this.change("Stop");
+					statusLabel.settext("Running...");
+				} else {
+					idlePlayer();
+					this.change("Start");
+					statusLabel.settext("Stopped");
+				}
 			}
 		};
 		add(activeButton, UI.scale(80, y));
@@ -106,21 +133,50 @@ public class OreSmeltingBot extends BotBase {
 	protected void tick() throws InterruptedException {
 		if (!hasAnyOreSelected()) { Thread.sleep(500); return; }
 		if (!checkVitals()) return;
-		if (gui.prog != null) { setStatus("Working..."); waitForProgressBar(10000); return; }
+		GameUI.Progress p = gui.prog;
+		if (p != null) { setStatus("Working..."); waitForProgressBar(10000); return; }
 
-		Gob smelter = findNearestSmelter();
-		if (smelter == null) { setStatus("No smelters found nearby"); smelterCountLabel.settext(""); deactivate(); return; }
-		smelterCountLabel.settext("Smelters nearby: " + countSmelters());
-		if (gui.vhand != null) { gui.vhand.item.wdgmsg("drop", Coord.z); Actions.waitForEmptyHand(gui, 1000, ""); }
-
-		WItem oreItem = findOreInInventory();
-		if (oreItem == null) {
-			if (doCollectOutput) { setStatus("No ore found. Collecting output..."); collectOutputFromSmelter(smelter); }
-			else { setStatus("No ore in inventory"); deactivate(); }
+		Gob smelter = findNearestUnprocessedSmelter();
+		if (smelter == null) {
+			setStatus("No available smelters nearby (" + processedSmelters.size() + " done)");
+			smelterCountLabel.settext("");
+			deactivate();
 			return;
 		}
-		WItem fuelItem = findFuelInInventory();
-		if (fuelItem == null) { setStatus("No fuel (Coal/Charcoal) in inventory"); deactivate(); return; }
+		smelterCountLabel.settext("Smelters: " + countSmelters() + " total, " + processedSmelters.size() + " done");
+		if (gui.vhand != null) { gui.vhand.item.wdgmsg("drop", Coord.z); Actions.waitForEmptyHand(gui, 1000, ""); }
+
+		// Check if we have ore — if not, try stockpiles
+		if (findOreInInventory() == null) {
+			if (doGrabFromStockpiles) {
+				setStatus("Fetching ore from stockpile...");
+				if (!grabFromStockpile(true)) {
+					setStatus("No ore stockpiles found");
+					deactivate();
+					return;
+				}
+			} else {
+				if (doCollectOutput) { setStatus("No ore. Collecting output..."); collectOutputFromSmelter(smelter); }
+				else { setStatus("No ore in inventory"); deactivate(); }
+				return;
+			}
+		}
+
+		// Check if we have fuel — if not, try stockpiles
+		if (findFuelInInventory() == null) {
+			if (doGrabFromStockpiles) {
+				setStatus("Fetching fuel from stockpile...");
+				if (!grabFromStockpile(false)) {
+					setStatus("No fuel stockpiles found");
+					deactivate();
+					return;
+				}
+			} else {
+				setStatus("No fuel (Coal/Charcoal) in inventory");
+				deactivate();
+				return;
+			}
+		}
 
 		processSmelter(smelter);
 	}
@@ -131,7 +187,10 @@ public class OreSmeltingBot extends BotBase {
 		if (!Actions.waitPf(gui)) { Actions.unstuck(gui); return; }
 		Gob player = gui.map.player();
 		if (player == null) return;
-		if (new Coord2d(smelter.rc.x, smelter.rc.y).dist(new Coord2d(player.rc.x, player.rc.y)) > MAX_INTERACT_DIST) { setStatus("Too far from smelter, retrying..."); return; }
+		if (new Coord2d(smelter.rc.x, smelter.rc.y).dist(new Coord2d(player.rc.x, player.rc.y)) > MAX_INTERACT_DIST) {
+			setStatus("Too far from smelter, retrying...");
+			return;
+		}
 
 		// Clear hand before interacting
 		if (gui.vhand != null) { gui.vhand.item.wdgmsg("drop", Coord.z); Actions.waitForEmptyHand(gui, 1000, ""); }
@@ -141,21 +200,20 @@ public class OreSmeltingBot extends BotBase {
 		Coord2d smelterPos = new Coord2d(smelter.rc.x, smelter.rc.y);
 		gui.map.wdgmsg("click", Coord.z, smelterPos.floor(posres), 3, 0, 0, (int) smelter.id, smelterPos.floor(posres), 0, -1);
 
-		// Wait for smelter inventory window to open
-		Inventory smelterInv = waitForSmelterWindow(5000);
+		Inventory smelterInv = waitForContainerWindow("Smelter", 5000);
 		if (smelterInv == null) { setStatus("Could not open smelter"); return; }
 
-		// Load ore via shift-click (transfer)
+		// Load ore via shift-click (transfer) — wait for each item to actually move
 		setStatus("Loading ore...");
-		int oreLoaded = transferOreToSmelter();
-		if (oreLoaded == 0) { setStatus("Failed to load ore"); return; }
-		setStatus("Loaded " + oreLoaded + " ore"); Thread.sleep(200);
+		int oreLoaded = transferItemsToContainer(true);
+		setStatus("Loaded " + oreLoaded + " ore");
+		Thread.sleep(200);
 
 		// Load fuel via shift-click (transfer)
 		setStatus("Loading fuel...");
-		int fuelLoaded = transferFuelToSmelter();
-		if (fuelLoaded == 0) { setStatus("Failed to load fuel"); return; }
-		setStatus("Loaded " + fuelLoaded + " fuel"); Thread.sleep(200);
+		int fuelLoaded = transferItemsToContainer(false);
+		setStatus("Loaded " + fuelLoaded + " fuel");
+		Thread.sleep(200);
 
 		// Light smelter
 		setStatus("Lighting smelter...");
@@ -164,34 +222,21 @@ public class OreSmeltingBot extends BotBase {
 		waitForProgressBar(5000);
 		FlowerMenu.setNextSelection(null);
 
-		setStatus("Smelting in progress...");
-		int waitTime = 0;
-		int maxWait = 3600000; // 60 minutes — smelting takes ~55 min per load
-		while (waitTime < maxWait && active && !stop) {
-			GameUI.Progress p = gui.prog;
-			if (p != null) { waitForProgressBar(60000); }
-			IMeter.Meter stam = gui.getmeter("stam", 0);
-			if (stam != null && stam.a < STAMINA_THRESHOLD) { Actions.drinkTillFull(gui, 0.99, 0.99); }
-			try {
-				ResDrawable rd = smelter.getattr(ResDrawable.class);
-				if (rd != null && waitTime > 5000 && rd.sdt.checkrbuf(0) == 0) { setStatus("Smelting complete!"); break; }
-			} catch (Exception ignored) {}
-			Thread.sleep(2000); waitTime += 2000;
-			setStatus("Smelting... " + (waitTime / 60000) + "m " + ((waitTime % 60000) / 1000) + "s");
-		}
-		Thread.sleep(200);
-		if (doCollectOutput && active && !stop) { setStatus("Collecting output..."); collectOutputFromSmelter(smelter); }
+		// Mark this smelter as processed so we move to the next one
+		processedSmelters.add(smelter.id);
+		setStatus("Smelter lit! Moving to next...");
+		Thread.sleep(500);
 	}
 
-	/** Wait for a smelter inventory window to appear after right-clicking. */
-	private Inventory waitForSmelterWindow(int timeoutMs) throws InterruptedException {
+	/** Wait for a container window with the given name to appear. */
+	private Inventory waitForContainerWindow(String name, int timeoutMs) throws InterruptedException {
 		int waited = 0;
 		while (waited < timeoutMs) {
 			for (Inventory inv : gui.getAllInventories()) {
 				if (inv == gui.maininv) continue;
 				if (inv.parent instanceof Window) {
 					String cap = ((Window) inv.parent).cap;
-					if (cap != null && (cap.contains("Smelter") || cap.contains("smelter"))) return inv;
+					if (cap != null && cap.toLowerCase().contains(name.toLowerCase())) return inv;
 				}
 			}
 			Thread.sleep(100);
@@ -200,34 +245,99 @@ public class OreSmeltingBot extends BotBase {
 		return null;
 	}
 
-	/** Transfer matching ore items from player inventory to the open smelter window via shift-click. */
-	private int transferOreToSmelter() throws InterruptedException {
+	/**
+	 * Transfer items from player inventory to the currently open container.
+	 * @param ore true = transfer matching ore, false = transfer fuel
+	 * @return number of items transferred
+	 */
+	private int transferItemsToContainer(boolean ore) throws InterruptedException {
 		int loaded = 0;
-		List<WItem> ores = findAllOreInInventory();
-		for (WItem witem : ores) {
-			if (stop || !active) break;
+		int maxItems = ore ? 999 : fuelPerLoad;
+		for (int i = 0; i < maxItems && active && !stop; i++) {
+			WItem item = ore ? findOreInInventory() : findFuelInInventory();
+			if (item == null) break;
+			int beforeCount = countInventoryItems();
 			try {
-				witem.item.wdgmsg("transfer", Coord.z);
-				loaded++;
+				item.item.wdgmsg("transfer", Coord.z);
+			} catch (Exception ignored) { continue; }
+			// Wait for the item to actually leave the inventory
+			int waited = 0;
+			while (waited < 2000) {
 				Thread.sleep(50);
-			} catch (Exception ignored) {}
+				waited += 50;
+				if (countInventoryItems() < beforeCount) break;
+			}
+			if (countInventoryItems() < beforeCount) {
+				loaded++;
+			} else {
+				// Item didn't transfer — smelter might be full
+				break;
+			}
 		}
 		return loaded;
 	}
 
-	/** Transfer fuel items from player inventory to the open smelter window via shift-click. */
-	private int transferFuelToSmelter() throws InterruptedException {
-		int loaded = 0;
-		for (int i = 0; i < fuelPerLoad && active && !stop; i++) {
-			WItem fuel = findFuelInInventory();
-			if (fuel == null) break;
+	/** Count total items in player main inventory. */
+	private int countInventoryItems() {
+		try { return gui.maininv.getAllItems().size(); } catch (Exception e) { return 0; }
+	}
+
+	/** Grab items from a nearby stockpile. @param ore true=ore stockpile, false=fuel stockpile */
+	private boolean grabFromStockpile(boolean ore) throws InterruptedException {
+		Gob stockpile = findNearestMatchingStockpile(ore);
+		if (stockpile == null) return false;
+
+		setStatus("Walking to " + (ore ? "ore" : "fuel") + " stockpile...");
+		gui.map.pfLeftClick(stockpile.rc.floor().add(2, 0), null);
+		if (!Actions.waitPf(gui)) { Actions.unstuck(gui); return false; }
+
+		Gob player = gui.map.player();
+		if (player == null) return false;
+		if (new Coord2d(stockpile.rc.x, stockpile.rc.y).dist(new Coord2d(player.rc.x, player.rc.y)) > MAX_INTERACT_DIST) return false;
+
+		// Clear hand
+		if (gui.vhand != null) { gui.vhand.item.wdgmsg("drop", Coord.z); Actions.waitForEmptyHand(gui, 1000, ""); }
+
+		// Right-click stockpile to open it
+		Coord2d spPos = new Coord2d(stockpile.rc.x, stockpile.rc.y);
+		gui.map.wdgmsg("click", Coord.z, spPos.floor(posres), 3, 0, 0, (int) stockpile.id, spPos.floor(posres), 0, -1);
+		Inventory spInv = waitForContainerWindow("Stockpile", 5000);
+		if (spInv == null) { setStatus("Could not open stockpile"); return false; }
+
+		// Transfer items from stockpile to player inventory
+		setStatus("Grabbing from stockpile...");
+		int grabbed = 0;
+		for (WItem item : new ArrayList<>(spInv.getAllItems())) {
+			if (stop || !active) break;
+			if (gui.maininv.getFreeSpace() < 2) break;
 			try {
-				fuel.item.wdgmsg("transfer", Coord.z);
-				loaded++;
-				Thread.sleep(50);
+				item.item.wdgmsg("transfer", Coord.z);
+				grabbed++;
+				Thread.sleep(TRANSFER_DELAY);
 			} catch (Exception ignored) {}
 		}
-		return loaded;
+		setStatus("Grabbed " + grabbed + " items from stockpile");
+		Thread.sleep(200);
+		return grabbed > 0;
+	}
+
+	/** Find nearest ore or fuel stockpile. */
+	private Gob findNearestMatchingStockpile(boolean ore) {
+		return GobHelper.findNearest(gui, MAX_SEARCH_DIST, g -> {
+			try {
+				Resource res = g.getres();
+				if (res == null || !res.name.startsWith(STOCKPILE_PREFIX)) return false;
+				String spType = res.name.substring(STOCKPILE_PREFIX.length());
+				if (ore) {
+					return ALL_ORE_BASENAMES.contains(spType) && isOreEnabled(spType);
+				} else {
+					for (String fuelName : FUEL_STOCKPILE_NAMES) {
+						if (spType.equals(fuelName)) return true;
+					}
+					return false;
+				}
+			} catch (Loading | NullPointerException ignored) { return false; }
+		});
 	}
 
 	private void collectOutputFromSmelter(Gob smelter) throws InterruptedException {
@@ -238,30 +348,31 @@ public class OreSmeltingBot extends BotBase {
 			if (!Actions.waitPf(gui)) return;
 		}
 		gui.map.wdgmsg("click", Coord.z, smelter.rc.floor(posres), 3, 0, 0, (int) smelter.id, smelter.rc.floor(posres), 0, -1);
-		Thread.sleep(500);
-		List<Inventory> allInvs = gui.getAllInventories();
-		for (Inventory inv : allInvs) {
-			if (inv == gui.maininv) continue;
-			if (inv.parent instanceof Window) {
-				String cap = ((Window) inv.parent).cap;
-				if (cap != null && (cap.contains("Smelter") || cap.contains("smelter"))) {
-					for (WItem item : inv.getAllItems()) {
-						if (stop || !active) break;
-						try { item.item.wdgmsg("transfer", Coord.z); Thread.sleep(100); } catch (Exception ignored) {}
-					}
-				}
-			}
+		Inventory smelterInv = waitForContainerWindow("Smelter", 5000);
+		if (smelterInv == null) return;
+		for (WItem item : new ArrayList<>(smelterInv.getAllItems())) {
+			if (stop || !active) break;
+			try { item.item.wdgmsg("transfer", Coord.z); Thread.sleep(100); } catch (Exception ignored) {}
 		}
 		Thread.sleep(100);
 	}
 
-	private Gob findNearestSmelter() {
-		Gob closest = null; Gob player = gui.map.player(); if (player == null) return null;
+	/** Find nearest smelter that hasn't been processed yet. */
+	private Gob findNearestUnprocessedSmelter() {
+		Gob closest = null;
+		Gob player = gui.map.player();
+		if (player == null) return null;
 		Coord2d playerPos = new Coord2d(player.rc.x, player.rc.y);
+		double closestDist = Double.MAX_VALUE;
 		synchronized (gui.map.glob.oc) {
 			for (Gob gob : gui.map.glob.oc) {
-				try { Resource res = gob.getres(); if (res == null) continue;
-					if (res.name.equals(SMELTER_RES)) { double dist = gob.rc.dist(playerPos); if (dist > MAX_SEARCH_DIST) continue; if (closest == null || dist < closest.rc.dist(playerPos)) closest = gob; }
+				try {
+					Resource res = gob.getres();
+					if (res == null || !res.name.equals(SMELTER_RES)) continue;
+					if (processedSmelters.contains(gob.id)) continue;
+					double dist = gob.rc.dist(playerPos);
+					if (dist > MAX_SEARCH_DIST) continue;
+					if (dist < closestDist) { closestDist = dist; closest = gob; }
 				} catch (Loading | NullPointerException ignored) {}
 			}
 		}
@@ -271,7 +382,12 @@ public class OreSmeltingBot extends BotBase {
 	private int countSmelters() {
 		int count = 0;
 		synchronized (gui.map.glob.oc) {
-			for (Gob gob : gui.map.glob.oc) { try { Resource res = gob.getres(); if (res != null && res.name.equals(SMELTER_RES)) count++; } catch (Loading | NullPointerException ignored) {} }
+			for (Gob gob : gui.map.glob.oc) {
+				try {
+					Resource res = gob.getres();
+					if (res != null && res.name.equals(SMELTER_RES)) count++;
+				} catch (Loading | NullPointerException ignored) {}
+			}
 		}
 		return count;
 	}
@@ -281,14 +397,6 @@ public class OreSmeltingBot extends BotBase {
 			try { if (isOreEnabled(wi.item.resource().basename())) return wi; } catch (Loading | NullPointerException ignored) {}
 		}
 		return null;
-	}
-
-	private List<WItem> findAllOreInInventory() {
-		List<WItem> ores = new ArrayList<>();
-		for (WItem wi : InvHelper.getAllItemsExcludeBeltKeyring(gui)) {
-			try { if (isOreEnabled(wi.item.resource().basename())) ores.add(wi); } catch (Loading | NullPointerException ignored) {}
-		}
-		return ores;
 	}
 
 	private WItem findFuelInInventory() {
@@ -313,12 +421,6 @@ public class OreSmeltingBot extends BotBase {
 	}
 
 	private boolean hasAnyOreSelected() { return doCopperOre || doTinOre || doIronOre || doGoldOre || doSilverOre || doLeadOre; }
-
-	private boolean waitForHand(boolean occupied) throws InterruptedException {
-		int timeout = 0;
-		while (timeout < HAND_TIMEOUT) { if (occupied && gui.vhand != null) return true; if (!occupied && gui.vhand == null) return true; timeout += HAND_DELAY; Thread.sleep(HAND_DELAY); }
-		return false;
-	}
 
 	@Override protected String windowPrefKey() { return "wndc-oreSmeltingBotWindow"; }
 	@Override protected void onCleanup() { gui.oreSmeltingBot = null; }
