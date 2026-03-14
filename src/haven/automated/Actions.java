@@ -86,7 +86,7 @@ public class Actions {
                 moved = true;
             }
             if (time > 2000 && moved == false) {
-                System.out.println("TRYING UNSTUCK");
+                // Pathfinding timed out without movement — trigger unstuck
                 return false;
             } else if (time > 20000) {
                 return false;
@@ -96,8 +96,13 @@ public class Actions {
     }
 
     public static void waitProgBar(GameUI gui) throws InterruptedException {
+        int elapsed = 0;
         while (gui.prog != null && gui.prog.prog >= 0) {
             Thread.sleep(40);
+            elapsed += 40;
+            if (elapsed > 120000) { // 2 minute safety timeout
+                return;
+            }
         }
     }
 
