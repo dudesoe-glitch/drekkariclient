@@ -85,11 +85,11 @@ public class CombatDistanceTool extends BotBase {
     private final Label currentDistanceLabel;
     private TextEntry distanceEntry;
 
-    private String value;
-    private boolean autoRespace;
-    private boolean autoWeaponDetect;
-    private boolean autoReattack;
-    private long lastRespaceTime;
+    private volatile String value;
+    private volatile boolean autoRespace;
+    private volatile boolean autoWeaponDetect;
+    private volatile boolean autoReattack;
+    private volatile long lastRespaceTime;
 
     public void setValue(String value) {
         this.value = value;
@@ -281,14 +281,14 @@ public class CombatDistanceTool extends BotBase {
             Gob player = ui.gui.map.player();
             if (player != null && player.occupiedGobID != null) {
                 Gob vehicle = ui.sess.glob.oc.getgob(player.occupiedGobID);
-                if (vehicle != null && vehicle.getres() != null) {
-                    addedValue = vehicleDistance.getOrDefault(vehicle.getres().name, 0.0);
-                }
+                try {
+                    if (vehicle != null) { Resource vRes = vehicle.getres(); if (vRes != null) addedValue = vehicleDistance.getOrDefault(vRes.name, 0.0); }
+                } catch (Loading ignored) {}
             }
             Gob enemy = getEnemy();
-            if(enemy != null && enemy.getres() != null){
-                value = animalDistances.get(enemy.getres().name);
-            }
+            try {
+                if (enemy != null) { Resource eRes = enemy.getres(); if (eRes != null) value = animalDistances.get(eRes.name); }
+            } catch (Loading ignored) {}
             if(value != null && value > 0){
                 moveToDistance(value+addedValue);
             }
@@ -300,8 +300,9 @@ public class CombatDistanceTool extends BotBase {
         try {
             double distance = Double.parseDouble(value);
             Gob enemy = getEnemy();
-            if (enemy != null && gui.map.player() != null) {
-                double angle = enemy.rc.angle(gui.map.player().rc);
+            Gob pl = gui.map.player();
+            if (enemy != null && pl != null) {
+                double angle = enemy.rc.angle(pl.rc);
                 gui.map.wdgmsg("click", Coord.z, getNewCoord(enemy, distance, angle).floor(posres), 1, 0);
             } else {
                 gui.msg("No visible target.", Color.WHITE);
@@ -315,8 +316,9 @@ public class CombatDistanceTool extends BotBase {
     private void moveToDistance(double distance) {
         try {
             Gob enemy = getEnemy();
-            if (enemy != null && gui.map.player() != null) {
-                double angle = enemy.rc.angle(gui.map.player().rc);
+            Gob pl = gui.map.player();
+            if (enemy != null && pl != null) {
+                double angle = enemy.rc.angle(pl.rc);
                 gui.map.wdgmsg("click", Coord.z, getNewCoord(enemy, distance, angle).floor(posres), 1, 0);
             } else {
                 gui.msg("No visible target.", Color.WHITE);
@@ -339,10 +341,12 @@ public class CombatDistanceTool extends BotBase {
     }
 
     private double getDistance(long gobId) {
+        Gob pl = gui.map.player();
+        if (pl == null) return -1;
         synchronized (gui.map.glob.oc) {
             for (Gob gob : gui.map.glob.oc) {
-                if (gob.id == gobId && gui.map.player() != null) {
-                    return gob.rc.dist(gui.map.player().rc);
+                if (gob.id == gobId) {
+                    return gob.rc.dist(pl.rc);
                 }
             }
         }

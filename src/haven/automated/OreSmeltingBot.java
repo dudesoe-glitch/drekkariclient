@@ -18,7 +18,7 @@ public class OreSmeltingBot extends BotBase {
 	private volatile boolean doLeadOre;
 
 	private volatile boolean doCollectOutput;
-	private int fuelPerLoad;
+	private volatile int fuelPerLoad;
 
 	private static final String SMELTER_RES = "gfx/terobjs/smelter";
 
@@ -131,7 +131,7 @@ public class OreSmeltingBot extends BotBase {
 		if (!Actions.waitPf(gui)) { Actions.unstuck(gui); return; }
 		Gob player = gui.map.player();
 		if (player == null) return;
-		if (smelter.rc.dist(player.rc) > MAX_INTERACT_DIST) { setStatus("Too far from smelter, retrying..."); return; }
+		if (new Coord2d(smelter.rc.x, smelter.rc.y).dist(new Coord2d(player.rc.x, player.rc.y)) > MAX_INTERACT_DIST) { setStatus("Too far from smelter, retrying..."); return; }
 
 		setStatus("Loading ore...");
 		int oreLoaded = loadItemsIntoSmelter(smelter);
@@ -153,7 +153,7 @@ public class OreSmeltingBot extends BotBase {
 		int maxWait = 3600000; // 60 minutes — smelting takes ~55 min per load
 		while (waitTime < maxWait && active && !stop) {
 			if (gui.prog != null) { waitForProgressBar(60000); }
-			if (gui.getmeter("stam", 0).a < STAMINA_THRESHOLD) { Actions.drinkTillFull(gui, 0.99, 0.99); }
+			IMeter.Meter stam = gui.getmeter("stam", 0); if (stam != null && stam.a < STAMINA_THRESHOLD) { Actions.drinkTillFull(gui, 0.99, 0.99); }
 			try {
 				ResDrawable rd = smelter.getattr(ResDrawable.class);
 				if (rd != null && waitTime > 5000 && rd.sdt.checkrbuf(0) == 0) { setStatus("Smelting complete!"); break; }
@@ -219,7 +219,7 @@ public class OreSmeltingBot extends BotBase {
 	private void collectOutputFromSmelter(Gob smelter) throws InterruptedException {
 		Gob player = gui.map.player();
 		if (player == null) return;
-		if (smelter.rc.dist(player.rc) > MAX_INTERACT_DIST) {
+		if (new Coord2d(smelter.rc.x, smelter.rc.y).dist(new Coord2d(player.rc.x, player.rc.y)) > MAX_INTERACT_DIST) {
 			gui.map.pfLeftClick(smelter.rc.floor().add(2, 0), null);
 			if (!Actions.waitPf(gui)) return;
 		}
@@ -243,7 +243,7 @@ public class OreSmeltingBot extends BotBase {
 
 	private Gob findNearestSmelter() {
 		Gob closest = null; Gob player = gui.map.player(); if (player == null) return null;
-		Coord2d playerPos = player.rc;
+		Coord2d playerPos = new Coord2d(player.rc.x, player.rc.y);
 		synchronized (gui.map.glob.oc) {
 			for (Gob gob : gui.map.glob.oc) {
 				try { Resource res = gob.getres(); if (res == null) continue;

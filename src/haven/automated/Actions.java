@@ -101,7 +101,8 @@ public class Actions {
 
     public static void waitProgBar(GameUI gui) throws InterruptedException {
         int elapsed = 0;
-        while (gui.prog != null && gui.prog.prog >= 0) {
+        GameUI.Progress p;
+        while ((p = gui.prog) != null && p.prog >= 0) {
             Thread.sleep(40);
             elapsed += 40;
             if (elapsed > 120000) { // 2 minute safety timeout
@@ -113,19 +114,20 @@ public class Actions {
     public static void drinkTillFull(GameUI gui, double threshold, double stoplevel) throws InterruptedException {
         while (gui.drink(threshold)) {
             Thread.sleep(490);
+            GameUI.Progress p;
             do {
                 Thread.sleep(10);
                 IMeter.Meter stam = gui.getmeter("stam", 0);
-                if (stam.a >= stoplevel)
+                if (stam == null || stam.a >= stoplevel)
                     break;
-            } while (gui.prog != null && gui.prog.prog >= 0);
+            } while ((p = gui.prog) != null && p.prog >= 0);
         }
     }
 
     public static void unstuck(GameUI gui) throws InterruptedException {
         Gob player = gui.map.player();
         if (player == null) return;
-        Coord2d pc = player.rc;
+        Coord2d pc = new Coord2d(player.rc.x, player.rc.y);
         Random r = new Random();
         for (int i = 0; i < 5; i++) {
             int xAdd = r.nextInt(500) - 250;
@@ -202,8 +204,9 @@ public class Actions {
         synchronized (gui.map.glob.oc) {
             for (Gob gob : gui.map.glob.oc) {
                 try {
-                    if (gob.getres() == null) continue;
-                    String basename = gob.getres().basename();
+                    Resource res = gob.getres();
+                    if (res == null) continue;
+                    String basename = res.basename();
                     if (InteractWithNearestObject.smallGates.contains(basename) ||
                         InteractWithNearestObject.reinforcedGates.contains(basename)) {
                         double dist = gob.rc.dist(player.rc);
@@ -237,8 +240,9 @@ public class Actions {
         synchronized (gui.map.glob.oc) {
             for (Gob gob : gui.map.glob.oc) {
                 try {
-                    if (gob.getres() == null) continue;
-                    String name = gob.getres().name;
+                    Resource res = gob.getres();
+                    if (res == null) continue;
+                    String name = res.name;
                     // Ground items are in gfx/terobjs/items/
                     if (name.contains("gfx/terobjs/items/")) {
                         double dist = gob.rc.dist(player.rc);

@@ -11,7 +11,7 @@ import java.util.List;
 import static haven.OCache.posres;
 
 public class RoastingSpitBot extends BotBase {
-	private Gob fireplace = null;
+	private volatile Gob fireplace = null;
 	private final String[] spitroastableItems = {
 			"gfx/invobjs/rabbit-clean",
 			"gfx/invobjs/fish-",
@@ -25,7 +25,7 @@ public class RoastingSpitBot extends BotBase {
 	};
 	double maxDistance = 2 * 11;
 	public String roastingSpitOverlayName = "gfx/terobjs/roastspit";
-	private boolean passiveMode = false;
+	private volatile boolean passiveMode = false;
 	CheckBox passiveModeBox = null;
 
 	public RoastingSpitBot(GameUI gui) {

@@ -29,7 +29,7 @@ public class RefillWaterContainers implements Runnable {
                 Gob player = gui.map.player();
                 if (player == null)
                     return;
-                Coord2d plc = player.rc;
+                Coord2d plc = new Coord2d(player.rc.x, player.rc.y);
                 MCache mcache = gui.ui.sess.glob.map;
                 int t = mcache.gettile(plc.floor(MCache.tilesz));
                 Tiler tl = mcache.tiler(t);

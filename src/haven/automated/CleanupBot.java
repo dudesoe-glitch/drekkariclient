@@ -107,7 +107,7 @@ public class CleanupBot extends BotBase {
 		double closestDist = Double.MAX_VALUE;
 		Gob player = gui.map.player();
 		if (player == null) return null;
-		Coord2d plc = player.rc;
+		Coord2d plc = new Coord2d(player.rc.x, player.rc.y);
 		synchronized (gui.map.glob.oc) {
 			for (Gob gob : gui.map.glob.oc) {
 				try {

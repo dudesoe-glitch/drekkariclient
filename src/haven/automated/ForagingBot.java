@@ -79,7 +79,8 @@ public class ForagingBot extends BotBase {
 		if (stop) return;
 
 		setStatus("Walking to forageable...");
-		gui.map.pfLeftClick(herb.rc.floor().add(2, 0), null);
+		Coord2d herbPos = new Coord2d(herb.rc.x, herb.rc.y);
+		gui.map.pfLeftClick(herbPos.floor().add(2, 0), null);
 		if (!Actions.waitPf(gui)) {
 			Actions.unstuck(gui);
 			return;
@@ -88,7 +89,7 @@ public class ForagingBot extends BotBase {
 
 		player = gui.map.player();
 		if (player == null) { Thread.sleep(200); return; }
-		if (herb.rc.dist(player.rc) > 11 * 5) {
+		if (herbPos.dist(new Coord2d(player.rc.x, player.rc.y)) > 11 * 5) {
 			setStatus("Too far, retrying...");
 			return;
 		}
@@ -121,7 +122,7 @@ public class ForagingBot extends BotBase {
 		double closestDist = Double.MAX_VALUE;
 		Gob player = gui.map.player();
 		if (player == null) return null;
-		Coord2d playerPos = player.rc;
+		Coord2d playerPos = new Coord2d(player.rc.x, player.rc.y);
 
 		synchronized (gui.map.glob.oc) {
 			for (Gob gob : gui.map.glob.oc) {

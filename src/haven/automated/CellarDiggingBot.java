@@ -57,7 +57,7 @@ public class CellarDiggingBot extends BotBase {
 
 	private Gob findCellarGob() {
 		Gob found = null; Gob player = gui.map.player(); if (player == null) return null;
-		Coord2d playerPos = player.rc;
+		Coord2d playerPos = new Coord2d(player.rc.x, player.rc.y);
 		synchronized (gui.map.glob.oc) {
 			for (Gob g : gui.map.glob.oc) {
 				try { Resource r = g.getres(); if (r == null) continue;
@@ -98,7 +98,7 @@ public class CellarDiggingBot extends BotBase {
 	}
 
 	private Gob closestBumling() {
-		Gob best = null; Gob player = gui.map.player(); if (player == null) return null; Coord2d me = player.rc;
+		Gob best = null; Gob player = gui.map.player(); if (player == null) return null; Coord2d me = new Coord2d(player.rc.x, player.rc.y);
 		synchronized (gui.map.glob.oc) {
 			for (Gob g : gui.map.glob.oc) { try { Resource r = g.getres(); if (r == null || !r.name.contains("/bumlings/")) continue; double dist = g.rc.dist(me); if (dist > MAX_SEARCH_DIST) continue; if (best == null || dist < best.rc.dist(me)) best = g; } catch (Loading | NullPointerException ignored) {} }
 		}
@@ -106,7 +106,7 @@ public class CellarDiggingBot extends BotBase {
 	}
 
 	private boolean isMiningOrRunning() {
-		try { return gui.map.player().getPoses().contains("pickan") || (gui.map.pfthread != null && gui.map.pfthread.isAlive()) || (gui.prog != null && gui.prog.prog != -1); } catch (Exception ignored) {} return false;
+		try { Gob pl = gui.map.player(); Thread pf = gui.map.pfthread; GameUI.Progress p = gui.prog; return (pl != null && pl.getPoses().contains("pickan")) || (pf != null && pf.isAlive()) || (p != null && p.prog != -1); } catch (Exception ignored) {} return false;
 	}
 
 	private boolean bumlingExists(Gob b) {

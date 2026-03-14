@@ -11,8 +11,8 @@ public class FarmingBot extends BotBase {
 	private CheckBox harvestCheckBox;
 	private CheckBox replantCheckBox;
 	private CheckBox useBestSeedCheckBox;
-	private boolean frozenWarningShown = false;
-	private int plantFailCount = 0;
+	private volatile boolean frozenWarningShown = false;
+	private volatile int plantFailCount = 0;
 	private final Set<Long> blacklistedCrops = ConcurrentHashMap.newKeySet();
 
 	private static final String CROP_PREFIX = "gfx/terobjs/plants/";
@@ -288,7 +288,7 @@ public class FarmingBot extends BotBase {
 
 		Gob player = gui.map.player();
 		if (player == null) return;
-		if (cropPos.dist(player.rc) > 11 * 5) {
+		if (cropPos.dist(new Coord2d(player.rc.x, player.rc.y)) > 11 * 5) {
 			blacklistedCrops.add(crop.id);
 			setStatus("Too far from " + cropBaseName + ", skipping.");
 			return;
@@ -344,7 +344,7 @@ public class FarmingBot extends BotBase {
 		double closestDist = Double.MAX_VALUE;
 		Gob player = gui.map.player();
 		if (player == null) return null;
-		Coord2d playerPos = player.rc;
+		Coord2d playerPos = new Coord2d(player.rc.x, player.rc.y);
 
 		synchronized (gui.map.glob.oc) {
 			for (Gob gob : gui.map.glob.oc) {

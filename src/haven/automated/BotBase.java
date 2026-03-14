@@ -20,7 +20,7 @@ public abstract class BotBase extends Window implements Runnable {
 	protected volatile boolean active;
 	protected Button activeButton;
 	protected Label statusLabel;
-	protected Thread botThread;
+	protected volatile Thread botThread;
 
 	// Safety check flags — subclasses can disable in constructor
 	protected boolean checkHP = true;
@@ -183,12 +183,14 @@ public abstract class BotBase extends Window implements Runnable {
 		stop = true;
 		idlePlayer();
 		try {
-			if (ui != null && ui.gui != null && ui.gui.map != null && ui.gui.map.pfthread != null) {
-				ui.gui.map.pfthread.interrupt();
+			if (ui != null && ui.gui != null && ui.gui.map != null) {
+				Thread pf = ui.gui.map.pfthread;
+				if (pf != null) pf.interrupt();
 			}
 		} catch (Exception ignored) {}
-		if (botThread != null) {
-			botThread.interrupt();
+		Thread bt = botThread;
+		if (bt != null) {
+			bt.interrupt();
 			botThread = null;
 		}
 	}

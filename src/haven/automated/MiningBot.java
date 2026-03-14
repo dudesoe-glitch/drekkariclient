@@ -84,7 +84,8 @@ public class MiningBot extends BotBase {
 		}
 
 		// Pathfind if far from target
-		double dist = player.rc.dist(targetPos);
+		Coord2d playerPos = new Coord2d(player.rc.x, player.rc.y);
+		double dist = playerPos.dist(targetPos);
 		if (dist > 33) {
 			setStatus("Walking to target...");
 			gui.map.pfLeftClick(targetPos.floor(), null);

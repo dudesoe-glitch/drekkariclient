@@ -144,11 +144,13 @@ public class FishingBot extends BotBase {
         String poleSel = fishingPoleChoice.getSelected();
 
         Equipory eq = gui.getequipory();
+        if (eq == null) { deactivateWithMessage("Fishbot: Equipment window not open. Stopping.."); return; }
         int hand = -1;
         for (int slot : new int[]{6, 7}) {
             WItem it = eq.slots[slot];
             if (it != null && it.item != null) {
-                String name = it.item.getname();
+                String name;
+                try { name = it.item.getname(); } catch (Loading ignored) { continue; }
                 if (poleSel.equals(name)) {
                     hand = slot;
                     break;
@@ -209,7 +211,8 @@ public class FishingBot extends BotBase {
         List<WItem> candidates = new ArrayList<>();
         for (WItem it : items) {
             if (it == null || it.item == null) continue;
-            String name = it.item.getname();
+            String name;
+            try { name = it.item.getname(); } catch (Loading ignored) { continue; }
             if (name != null && allowedNames.contains(name)) {
                 candidates.add(it);
             }
@@ -225,7 +228,9 @@ public class FishingBot extends BotBase {
 
         chosen.item.wdgmsg("take", Coord.z);
 
-        WItem handItem = gui.getequipory().slots[hand];
+        Equipory eq2 = gui.getequipory();
+        if (eq2 == null) { deactivateWithMessage("Fishbot: Equipment window not open. Stopping.."); return; }
+        WItem handItem = eq2.slots[hand];
         if (handItem != null && handItem.item != null) {
             handItem.item.wdgmsg("itemact", 0);
             sleep(500);

@@ -14,7 +14,7 @@ import static haven.OCache.posres;
 
 public class AUtils {
 
-    public final static HashSet<String> potentialAggroTargets = new HashSet<String>() {{ // ND: Probably still missing dungeon ants, dungeon bees, dungeon beavers, dungeon bats?
+    private static final HashSet<String> _aggroTargets = new HashSet<String>() {{ // ND: Probably still missing dungeon ants, dungeon bees, dungeon beavers, dungeon bats?
         add("gfx/borka/body");
         add("gfx/kritter/adder/adder");
         add("gfx/kritter/ants/ants");
@@ -91,6 +91,7 @@ public class AUtils {
 
     }
     };
+    public static final Set<String> potentialAggroTargets = Collections.unmodifiableSet(_aggroTargets);
 
     public static HashMap<Long, Gob> getAllAttackableMap(GameUI gui) {
         HashMap<Long, Gob> gobs = new HashMap<>();
@@ -99,11 +100,13 @@ public class AUtils {
         }
         synchronized (gui.map.glob.oc) {
             for (Gob gob : gui.map.glob.oc) {
-                if (gob.getres() != null && gob.getres().name != null){
+                try {
+                Resource res = gob.getres();
+                if (res != null && res.name != null){
                     if (gob.id != gui.map.plgob) {
-                        if (potentialAggroTargets.contains(gob.getres().name)){
+                        if (potentialAggroTargets.contains(res.name)){
                             gobs.put(gob.id, gob);
-                        } else if (gob.getres().name.equals("gfx/kritter/cattle/cattle")) { // ND: Special case for Aurochs
+                        } else if (res.name.equals("gfx/kritter/cattle/cattle")) { // ND: Special case for Aurochs
                             for (GAttrib g : gob.attr.values()) {
                                 if (g instanceof Drawable) {
                                     if (g instanceof Composite) {
@@ -118,7 +121,7 @@ public class AUtils {
                                     }
                                 }
                             }
-                        } else if (gob.getres().name.equals("gfx/kritter/sheep/sheep")) { // ND: Special case for Mouflon
+                        } else if (res.name.equals("gfx/kritter/sheep/sheep")) { // ND: Special case for Mouflon
                             for (GAttrib g : gob.attr.values()) {
                                 if (g instanceof Drawable) {
                                     if (g instanceof Composite) {
@@ -137,6 +140,7 @@ public class AUtils {
 
                     }
                 }
+                } catch (Loading ignored) {}
             }
         }
         return gobs;
@@ -149,13 +153,16 @@ public class AUtils {
         }
         synchronized (gui.map.glob.oc) {
             for (Gob gob : gui.map.glob.oc) {
-                if (gob.getres() != null && gob.getres().name != null){
-                    if (gob.id != gui.map.plgob) {
-                        if (gob.getres().name.equals("gfx/borka/body")){
-                            gobs.put(gob.id, gob);
+                try {
+                    Resource res = gob.getres();
+                    if (res != null && res.name != null){
+                        if (gob.id != gui.map.plgob) {
+                            if (res.name.equals("gfx/borka/body")){
+                                gobs.put(gob.id, gob);
+                            }
                         }
                     }
-                }
+                } catch (Loading ignored) {}
             }
         }
         return gobs;
@@ -163,7 +170,9 @@ public class AUtils {
 
     public static void getGridHeightAvg(GameUI gui){
         try {
-            Coord playerCoord = gui.map.player().rc.floor(tilesz);
+            Gob player = gui.map.player();
+            if (player == null) return;
+            Coord playerCoord = player.rc.floor(tilesz);
             MCache.Grid grid = gui.ui.sess.glob.map.getgrid(playerCoord.div(cmaps));
             float wholeGridHeight = 0;
             float[] quarterHeights = new float[4];

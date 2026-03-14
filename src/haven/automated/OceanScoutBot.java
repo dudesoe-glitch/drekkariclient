@@ -11,7 +11,7 @@ import static haven.OCache.posres;
 public class OceanScoutBot extends BotBase {
 	private int checkClock;
 	private MCache mcache;
-	private int clockwiseDirection = 1;
+	private volatile int clockwiseDirection = 1;
 	private double ang = 0;
 	private double searchRadius = 5;
 	private ArrayList<Gob> nearbyGobs = new ArrayList<>();
@@ -146,9 +146,9 @@ public class OceanScoutBot extends BotBase {
 		return false;
 	}
 
-	private boolean isGobCollision(Coord t) { for (Gob gob : nearbyGobs) { try { if (gob != null && gob.getres() != null && Pathfinder.isInsideBoundBox(gob.rc.floor(), gob.a, gob.getres().name, t)) return true; } catch (Loading ignored) {} } return false; }
-	private boolean isDangerZone(Coord t) { for (Gob gob : nearbyGobs) { try { if (gob.getres() != null && (gob.getres().name.endsWith("/walrus") || gob.getres().name.endsWith("/orca")) && t.dist(gob.rc.floor()) < 11 * 14) return true; } catch (Loading ignored) {} } return false; }
-	private Coord2d isVeryDangerZone(Coord t) { for (Gob gob : nearbyGobs) { try { if (gob.getres() != null && (gob.getres().name.endsWith("/walrus") || gob.getres().name.endsWith("/orca")) && t.dist(gob.rc.floor()) < 11 * 11) return gob.rc; } catch (Loading ignored) {} } return null; }
+	private boolean isGobCollision(Coord t) { for (Gob gob : nearbyGobs) { try { Resource res = gob.getres(); if (gob != null && res != null && Pathfinder.isInsideBoundBox(gob.rc.floor(), gob.a, res.name, t)) return true; } catch (Loading ignored) {} } return false; }
+	private boolean isDangerZone(Coord t) { for (Gob gob : nearbyGobs) { try { Resource res = gob.getres(); if (res != null && (res.name.endsWith("/walrus") || res.name.endsWith("/orca")) && t.dist(gob.rc.floor()) < 11 * 14) return true; } catch (Loading ignored) {} } return false; }
+	private Coord2d isVeryDangerZone(Coord t) { for (Gob gob : nearbyGobs) { try { Resource res = gob.getres(); if (res != null && (res.name.endsWith("/walrus") || res.name.endsWith("/orca")) && t.dist(gob.rc.floor()) < 11 * 11) return new Coord2d(gob.rc.x, gob.rc.y); } catch (Loading ignored) {} } return null; }
 
 	private boolean isWater(Coord t) {
 		try { int dt = mcache.gettile(new Coord(t.x / 11, t.y / 11)); Resource res = mcache.tilesetr(dt); return res != null && res.name.equals("gfx/tiles/odeep"); } catch (Loading e) { return false; }

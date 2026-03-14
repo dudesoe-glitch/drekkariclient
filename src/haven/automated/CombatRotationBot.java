@@ -22,11 +22,11 @@ import static haven.OCache.posres;
 public class CombatRotationBot extends BotBase {
 	// Rotation steps: each is {slotIndex (0-9), repeatCount}. Synchronized for thread safety.
 	private final List<int[]> steps = Collections.synchronizedList(new ArrayList<>());
-	private int currentStep = 0;
-	private int currentRepeat = 0;
-	private int selectedStep = -1;
-	private boolean loopRotation = true;
-	private boolean waitForCooldowns = true;
+	private volatile int currentStep = 0;
+	private volatile int currentRepeat = 0;
+	private volatile int selectedStep = -1;
+	private volatile boolean loopRotation = true;
+	private volatile boolean waitForCooldowns = true;
 
 	// UI components
 	private final Label[] stepLabels;

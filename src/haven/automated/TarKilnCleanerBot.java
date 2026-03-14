@@ -46,8 +46,9 @@ public class TarKilnCleanerBot extends BotBase {
 			List<Gob> tarKilns = GobHelper.findByName(gui, "gfx/terobjs/tarkiln", 550.0);
 			Gob closest = null;
 			Gob player = gui.map.player(); if (player == null) return;
+			Coord2d playerPos = new Coord2d(player.rc.x, player.rc.y);
 			for (Gob tarKiln : tarKilns) {
-				if (closest == null || tarKiln.rc.dist(player.rc) < closest.rc.dist(player.rc)) {
+				if (closest == null || tarKiln.rc.dist(playerPos) < closest.rc.dist(playerPos)) {
 					ResDrawable resDrawable = tarKiln.getattr(ResDrawable.class);
 					if (resDrawable != null && (resDrawable.sdt.checkrbuf(0) == 10 || resDrawable.sdt.checkrbuf(0) == 42)) closest = tarKiln;
 				}

@@ -123,7 +123,9 @@ public class InvHelper {
     public static boolean isDrinkContainer(WItem item) {
         if (item == null) return false;
         try {
-            String resName = item.item.getres().name;
+            Resource res = item.item.getres();
+            if (res == null) return false;
+            String resName = res.name;
             String baseName = resName.substring(resName.lastIndexOf('/') + 1);
             return DRINK_CONTAINERS.contains(baseName);
         } catch (Loading ignored) {}

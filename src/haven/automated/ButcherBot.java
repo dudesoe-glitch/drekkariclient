@@ -148,8 +148,9 @@ public class ButcherBot extends BotBase {
 			}
 		} catch (Loading ignored) {}
 		setStatus("Walking to " + animalName);
+		Coord2d animalPos = new Coord2d(animal.rc.x, animal.rc.y);
 
-		gui.map.pfLeftClick(animal.rc.floor().add(2, 0), null);
+		gui.map.pfLeftClick(animalPos.floor().add(2, 0), null);
 		if (!Actions.waitPf(gui)) {
 			blacklisted.add(animal.id);
 			Actions.unstuck(gui);
@@ -159,7 +160,7 @@ public class ButcherBot extends BotBase {
 
 		Gob player = gui.map.player();
 		if (player == null) return;
-		if (animal.rc.dist(player.rc) > 11 * 5) {
+		if (animalPos.dist(new Coord2d(player.rc.x, player.rc.y)) > 11 * 5) {
 			blacklisted.add(animal.id);
 			setStatus("Too far, skipping " + animalName);
 			return;
@@ -179,8 +180,9 @@ public class ButcherBot extends BotBase {
 
 		setStatus("Butchering " + animalName);
 		FlowerMenu.setNextSelection(action);
-		gui.map.wdgmsg("click", Coord.z, animal.rc.floor(posres), 3, 0, 0,
-			(int) animal.id, animal.rc.floor(posres), 0, -1);
+		Coord2d clickPos = new Coord2d(animal.rc.x, animal.rc.y);
+		gui.map.wdgmsg("click", Coord.z, clickPos.floor(posres), 3, 0, 0,
+			(int) animal.id, clickPos.floor(posres), 0, -1);
 		Thread.sleep(50);
 		waitForProgressBar(30000);
 
@@ -199,7 +201,7 @@ public class ButcherBot extends BotBase {
 		double closestDist = Double.MAX_VALUE;
 		Gob player = gui.map.player();
 		if (player == null) return null;
-		Coord2d playerPos = player.rc;
+		Coord2d playerPos = new Coord2d(player.rc.x, player.rc.y);
 
 		synchronized (gui.map.glob.oc) {
 			for (Gob gob : gui.map.glob.oc) {

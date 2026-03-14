@@ -7,7 +7,7 @@ import java.util.*;
 import static haven.OCache.posres;
 
 public class ClayDiggingBot extends BotBase {
-	private final Set<Long> blacklisted = new HashSet<>();
+	private final Set<Long> blacklisted = java.util.concurrent.ConcurrentHashMap.newKeySet();
 
 	public ClayDiggingBot(GameUI gui) {
 		super(gui, UI.scale(220, 80), "Clay Digging Bot");
@@ -64,7 +64,8 @@ public class ClayDiggingBot extends BotBase {
 		}
 
 		setStatus("Walking to clay...");
-		gui.map.pfLeftClick(clay.rc.floor().add(2, 0), null);
+		Coord2d clayPos = new Coord2d(clay.rc.x, clay.rc.y);
+		gui.map.pfLeftClick(clayPos.floor().add(2, 0), null);
 		if (!Actions.waitPf(gui)) {
 			blacklisted.add(clay.id);
 			Actions.unstuck(gui);
@@ -74,7 +75,7 @@ public class ClayDiggingBot extends BotBase {
 
 		Gob player = gui.map.player();
 		if (player == null) return;
-		if (clay.rc.dist(player.rc) > 11 * 5) {
+		if (clayPos.dist(new Coord2d(player.rc.x, player.rc.y)) > 11 * 5) {
 			blacklisted.add(clay.id);
 			setStatus("Too far, skipping...");
 			return;
@@ -88,8 +89,9 @@ public class ClayDiggingBot extends BotBase {
 
 		setStatus("Digging clay...");
 		FlowerMenu.setNextSelection("Dig");
-		gui.map.wdgmsg("click", Coord.z, clay.rc.floor(posres), 3, 0, 0,
-			(int) clay.id, clay.rc.floor(posres), 0, -1);
+		Coord2d digPos = new Coord2d(clay.rc.x, clay.rc.y);
+		gui.map.wdgmsg("click", Coord.z, digPos.floor(posres), 3, 0, 0,
+			(int) clay.id, digPos.floor(posres), 0, -1);
 		Thread.sleep(50);
 		waitForProgressBar(30000);
 
@@ -109,7 +111,7 @@ public class ClayDiggingBot extends BotBase {
 		double closestDist = Double.MAX_VALUE;
 		Gob player = gui.map.player();
 		if (player == null) return null;
-		Coord2d playerPos = player.rc;
+		Coord2d playerPos = new Coord2d(player.rc.x, player.rc.y);
 
 		synchronized (gui.map.glob.oc) {
 			for (Gob gob : gui.map.glob.oc) {

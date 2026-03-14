@@ -3,7 +3,7 @@ package haven;
 import java.util.Objects;
 
 public class InventorySearchWindow extends Window {
-    public static String inventorySearchString = "";
+    public static volatile String inventorySearchString = "";
     private final GameUI gui;
 
     public InventorySearchWindow(GameUI gui) {

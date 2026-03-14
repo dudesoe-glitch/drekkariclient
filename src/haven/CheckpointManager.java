@@ -613,15 +613,21 @@ public class CheckpointManager extends Window implements Runnable {
     }
 
     private void tryToMove(Coord2d posres) {
-        gui.map.wdgmsg("click", Coord.z, checkpointList.items.get(0).coord.floor(posres), 1, 0);
-        if (checkpointList.listitems() == 1 && gui.map.player().rc.dist(checkpointList.items.get(checkpointList.listitems() - 1).coord) < 3) {
-            gui.map.wdgmsg("click", Coord.z, gui.map.player().rc.floor(posres), 1, 0);
-            gui.msg("Destination reached.", Color.WHITE);
-            checkpointList.deleteItem(checkpointList.items.get(0));
-        } else if (checkpointList.listitems() > 0 && gui.map.player().rc.dist(checkpointList.items.get(0).coord) < 3) {
-            checkpointList.deleteItem(checkpointList.items.get(0));
-            if (checkpointList.listitems() > 0) {
-                gui.map.wdgmsg("click", Coord.z, checkpointList.items.get(0).coord.floor(posres), 1, 0);
+        synchronized (checkpointList) {
+            if (checkpointList.listitems() == 0) return;
+            Gob player = gui.map.player();
+            if (player == null) return;
+            Coord2d playerPos = new Coord2d(player.rc.x, player.rc.y);
+            gui.map.wdgmsg("click", Coord.z, checkpointList.items.get(0).coord.floor(posres), 1, 0);
+            if (checkpointList.listitems() == 1 && playerPos.dist(checkpointList.items.get(checkpointList.listitems() - 1).coord) < 3) {
+                gui.map.wdgmsg("click", Coord.z, playerPos.floor(posres), 1, 0);
+                gui.msg("Destination reached.", Color.WHITE);
+                checkpointList.deleteItem(checkpointList.items.get(0));
+            } else if (checkpointList.listitems() > 0 && playerPos.dist(checkpointList.items.get(0).coord) < 3) {
+                checkpointList.deleteItem(checkpointList.items.get(0));
+                if (checkpointList.listitems() > 0) {
+                    gui.map.wdgmsg("click", Coord.z, checkpointList.items.get(0).coord.floor(posres), 1, 0);
+                }
             }
         }
     }

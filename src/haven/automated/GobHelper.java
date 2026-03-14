@@ -106,7 +106,9 @@ public class GobHelper {
 
             // Get max growth stage from mesh layers
             int maxStage = 0;
-            for (FastMesh.MeshRes layer : gob.getres().layers(FastMesh.MeshRes.class)) {
+            Resource gobRes = gob.getres();
+            if (gobRes == null) return false;
+            for (FastMesh.MeshRes layer : gobRes.layers(FastMesh.MeshRes.class)) {
                 if (layer.id / 10 > maxStage) {
                     maxStage = layer.id / 10;
                 }
@@ -143,7 +145,7 @@ public class GobHelper {
         if (gui == null || gui.map == null || gui.map.glob == null) return null;
         Gob player = gui.map.player();
         if (player == null) return null;
-        Coord2d playerPos = player.rc;
+        Coord2d playerPos = new Coord2d(player.rc.x, player.rc.y);
 
         Gob closest = null;
         double closestDist = Double.MAX_VALUE;
@@ -180,7 +182,7 @@ public class GobHelper {
         if (gui == null || gui.map == null || gui.map.glob == null) return result;
         Gob player = gui.map.player();
         if (player == null) return result;
-        Coord2d playerPos = player.rc;
+        Coord2d playerPos = new Coord2d(player.rc.x, player.rc.y);
 
         synchronized (gui.map.glob.oc) {
             for (Gob gob : gui.map.glob.oc) {
