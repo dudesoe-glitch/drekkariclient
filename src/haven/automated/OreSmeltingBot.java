@@ -284,66 +284,110 @@ public class OreSmeltingBot extends BotBase {
 		try { return gui.maininv.getAllItems().size(); } catch (Exception e) { return 0; }
 	}
 
-	/** Grab items from a nearby stockpile. @param ore true=ore stockpile, false=fuel stockpile */
+	/**
+	 * Grab items from a nearby stockpile.
+	 * Phase 1: Try name-matched stockpiles (e.g. stockpile-leadglance for lead ore).
+	 * Phase 2: Try any stockpile and check its contents (handles generic "ore" stockpiles).
+	 */
 	private boolean grabFromStockpile(boolean ore) throws InterruptedException {
-		Gob stockpile = findNearestMatchingStockpile(ore);
-		if (stockpile == null) return false;
+		// Phase 1: find by resource name
+		Gob stockpile = findStockpileByName(ore);
+		if (stockpile != null) {
+			int grabbed = openAndGrabFromStockpile(stockpile, ore);
+			if (grabbed > 0) return true;
+		}
 
-		setStatus("Walking to " + (ore ? "ore" : "fuel") + " stockpile...");
+		// Phase 2: find any stockpile and check contents
+		setStatus("Scanning stockpiles for " + (ore ? "ore" : "fuel") + "...");
+		List<Gob> allStockpiles = findAllNearbyStockpiles();
+		for (Gob sp : allStockpiles) {
+			if (stop || !active) break;
+			int grabbed = openAndGrabFromStockpile(sp, ore);
+			if (grabbed > 0) return true;
+		}
+		return false;
+	}
+
+	/** Walk to a stockpile, open it, and grab matching items. Returns count grabbed. */
+	private int openAndGrabFromStockpile(Gob stockpile, boolean ore) throws InterruptedException {
+		String spName = "stockpile";
+		try { Resource r = stockpile.getres(); if (r != null) spName = r.name.substring(r.name.lastIndexOf('/') + 1); } catch (Loading ignored) {}
+		setStatus("Walking to " + spName + "...");
 		gui.map.pfLeftClick(stockpile.rc.floor().add(2, 0), null);
-		if (!Actions.waitPf(gui)) { Actions.unstuck(gui); return false; }
+		if (!Actions.waitPf(gui)) { Actions.unstuck(gui); return 0; }
 
 		Gob player = gui.map.player();
-		if (player == null) return false;
-		if (new Coord2d(stockpile.rc.x, stockpile.rc.y).dist(new Coord2d(player.rc.x, player.rc.y)) > MAX_INTERACT_DIST) return false;
+		if (player == null) return 0;
+		if (new Coord2d(stockpile.rc.x, stockpile.rc.y).dist(new Coord2d(player.rc.x, player.rc.y)) > MAX_INTERACT_DIST) return 0;
 
-		// Clear hand
 		if (gui.vhand != null) { gui.vhand.item.wdgmsg("drop", Coord.z); Actions.waitForEmptyHand(gui, 1000, ""); }
 
 		// Right-click stockpile to open it
 		Coord2d spPos = new Coord2d(stockpile.rc.x, stockpile.rc.y);
 		gui.map.wdgmsg("click", Coord.z, spPos.floor(posres), 3, 0, 0, (int) stockpile.id, spPos.floor(posres), 0, -1);
 		Inventory spInv = waitForContainerWindow("Stockpile", 5000);
-		if (spInv == null) { setStatus("Could not open stockpile"); return false; }
+		if (spInv == null) return 0;
 
-		// Transfer items from stockpile to player inventory
-		setStatus("Grabbing from stockpile...");
+		// Check contents — only grab items that match what we need
+		setStatus("Checking stockpile contents...");
 		int grabbed = 0;
 		for (WItem item : new ArrayList<>(spInv.getAllItems())) {
 			if (stop || !active) break;
 			if (gui.maininv.getFreeSpace() < 2) break;
 			try {
-				item.item.wdgmsg("transfer", Coord.z);
-				grabbed++;
-				Thread.sleep(TRANSFER_DELAY);
-			} catch (Exception ignored) {}
+				boolean matches;
+				if (ore) {
+					matches = isOreEnabled(item.item.resource().basename());
+				} else {
+					String name = item.item.getname();
+					matches = false;
+					if (name != null) {
+						for (String fuelName : FUEL_NAMES) {
+							if (name.contains(fuelName)) { matches = true; break; }
+						}
+					}
+				}
+				if (matches) {
+					item.item.wdgmsg("transfer", Coord.z);
+					grabbed++;
+					Thread.sleep(TRANSFER_DELAY);
+				}
+			} catch (Loading ignored) {}
 		}
-		setStatus("Grabbed " + grabbed + " items from stockpile");
+		if (grabbed > 0) setStatus("Grabbed " + grabbed + " " + (ore ? "ore" : "fuel") + " from stockpile");
 		Thread.sleep(200);
-		return grabbed > 0;
+		return grabbed;
 	}
 
-	/** Find nearest ore or fuel stockpile. Matches by stockpile resource name suffix. */
-	private Gob findNearestMatchingStockpile(boolean ore) {
+	/** Find nearest stockpile by resource name matching. */
+	private Gob findStockpileByName(boolean ore) {
 		return GobHelper.findNearest(gui, MAX_SEARCH_DIST, g -> {
 			try {
 				Resource res = g.getres();
 				if (res == null || !res.name.startsWith(STOCKPILE_PREFIX)) return false;
 				String spType = res.name.substring(STOCKPILE_PREFIX.length());
 				if (ore) {
-					// Match exact ore basename or partial match (stockpile names may vary)
+					// Exact match: stockpile-leadglance, stockpile-chalcopyrite, etc.
 					if (ALL_ORE_BASENAMES.contains(spType) && isOreEnabled(spType)) return true;
-					// Fallback: check if any enabled ore basename is contained in the stockpile name
-					for (String oreName : ALL_ORE_BASENAMES) {
-						if (isOreEnabled(oreName) && spType.contains(oreName)) return true;
-					}
+					// Generic ore stockpile
+					if (spType.equals("ore")) return true;
 					return false;
 				} else {
 					for (String fuelName : FUEL_STOCKPILE_NAMES) {
-						if (spType.equals(fuelName) || spType.contains(fuelName)) return true;
+						if (spType.equals(fuelName)) return true;
 					}
 					return false;
 				}
+			} catch (Loading | NullPointerException ignored) { return false; }
+		});
+	}
+
+	/** Find all nearby stockpiles (any type). */
+	private List<Gob> findAllNearbyStockpiles() {
+		return GobHelper.findAll(gui, MAX_SEARCH_DIST, g -> {
+			try {
+				Resource res = g.getres();
+				return res != null && res.name.startsWith(STOCKPILE_PREFIX);
 			} catch (Loading | NullPointerException ignored) { return false; }
 		});
 	}
