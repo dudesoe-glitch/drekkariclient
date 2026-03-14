@@ -26,10 +26,10 @@ public class FishingBot extends BotBase {
 
     public FishingBot(GameUI gui) {
         super(gui, UI.scale(415, 190), "Fishing Bot");
-        checkHP = false;
-        checkEnergy = false;
-        checkStamina = false;
-        checkInventory = false;
+        checkHP = false; // Custom HP handling: deactivate after hearth (lose fishing position)
+        checkEnergy = true;
+        checkStamina = true;
+        checkInventory = true;
 
         Label fishingLabel = new Label("Choose Fishing Pole:") {
             {
@@ -156,7 +156,7 @@ public class FishingBot extends BotBase {
             }
         }
         if (hand == -1) {
-            deactivate("Fishbot: You need to wear " + poleSel + ". Stopping..");
+            deactivateWithMessage("Fishbot: You need to wear " + poleSel + ". Stopping..");
             return;
         }
 
@@ -216,7 +216,7 @@ public class FishingBot extends BotBase {
         }
 
         if (candidates.isEmpty()) {
-            deactivate("Fishbot: No matching " + typePlural + " found in inventory. Stopping..");
+            deactivateWithMessage("Fishbot: No matching " + typePlural + " found in inventory. Stopping..");
             return;
         }
 
@@ -230,30 +230,46 @@ public class FishingBot extends BotBase {
             handItem.item.wdgmsg("itemact", 0);
             sleep(500);
         } else {
-            deactivate("Fishbot: No fishing pole in hand slot: " + hand + " to attach the " + typeSingular + " to. Stopping..");
+            deactivateWithMessage("Fishbot: No fishing pole in hand slot: " + hand + " to attach the " + typeSingular + " to. Stopping..");
         }
     }
 
 
     @Override
+    protected boolean checkVitals() throws InterruptedException {
+        // Custom HP check — deactivate after hearthing since fishing position is lost
+        try {
+            java.util.List<IMeter.Meter> hpMeters = gui.getmeters("hp");
+            IMeter.Meter hpMeter = (hpMeters != null && hpMeters.size() > 1) ? hpMeters.get(1) : null;
+            if (hpMeter != null && hpMeter.a < HP_THRESHOLD) {
+                gui.act("travel", "hearth");
+                Thread.sleep(8000);
+                gui.errorsilent("Fishing Bot: Low HP — hearthed home, stopping.");
+                deactivate();
+                return false;
+            }
+        } catch (InterruptedException e) { throw e; }
+        catch (Exception ignored) {}
+        return super.checkVitals();
+    }
+
+    @Override
     public void run() {
         try {
             while (!stop) {
-                if (!checkVitalsLocal()) {
-                    sleep(1000);
+                if (!active) {
+                    Thread.sleep(200);
                     continue;
                 }
-                if (active) {
-                    if (gui.maininv.getFreeSpace() < 2) {
-                        deactivate("Fishing Bot: Full inventory! Stopping..");
-                    }
-                    prepareFishingPole();
+                if (!checkVitals()) {
+                    Thread.sleep(1000);
+                    continue;
                 }
-                sleep(500);
+                prepareFishingPole();
+                Thread.sleep(500);
             }
-        } catch (Exception e) {
-            if (e instanceof InterruptedException)
-                Thread.currentThread().interrupt();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
         }
     }
 
@@ -284,47 +300,6 @@ public class FishingBot extends BotBase {
         }
     }
 
-    private boolean checkVitalsLocal() {
-        try {
-            java.util.List<IMeter.Meter> hpMeters = gui.getmeters("hp");
-            IMeter.Meter hpMeter = (hpMeters != null && hpMeters.size() > 1) ? hpMeters.get(1) : null;
-            if (hpMeter == null) return true;
-            double hp = hpMeter.a;
-            if (hp < HP_THRESHOLD) {
-                gui.act("travel", "hearth");
-                try {
-                    Thread.sleep(8000);
-                } catch (InterruptedException ignored) {
-                    Thread.currentThread().interrupt();
-                    return false;
-                }
-                deactivate("Fishing Bot: HP IS " + hp + " .. PORTING HOME!");
-                return false;
-            }
-            IMeter.Meter nrjMeter = gui.getmeter("nrj", 0);
-            if (nrjMeter == null) return true;
-            double nrj = nrjMeter.a;
-            if (nrj < ENERGY_THRESHOLD) {
-                deactivate("Fishing Bot: Low on energy! Stopping..");
-                return false;
-            }
-            // Stamina check
-            IMeter.Meter stamMeter = gui.getmeter("stam", 0);
-            if (stamMeter != null && stamMeter.a < STAMINA_THRESHOLD) {
-                try {
-                    Actions.drinkTillFull(gui, 0.99, 0.99);
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                    return false;
-                }
-            }
-            return true;
-        } catch (Exception e) {
-            if (e instanceof InterruptedException) Thread.currentThread().interrupt();
-            return true;
-        }
-    }
-
     private Coord2d getFishingCoord() {
         Gob player = gui.map.player();
         if (player == null) {
@@ -348,7 +323,7 @@ public class FishingBot extends BotBase {
         }
 
         if (fishActionId == null) {
-            deactivate("Fishing Bot: Fish action ID not found! Uncheck 'Fishing' checkbox to only prepare pole.");
+            deactivateWithMessage("Fishing Bot: Fish action ID not found! Uncheck 'Fishing' checkbox to only prepare pole.");
             return;
         }
 
@@ -377,11 +352,9 @@ public class FishingBot extends BotBase {
         }
     }
 
-    public void deactivate(String message) {
-        gui.msg(message, Color.WHITE);
-        System.out.println(message);
-        active = false;
-        activeButton.change("Start");
+    private void deactivateWithMessage(String message) {
+        gui.errorsilent(message);
+        deactivate();
     }
 
     @Override

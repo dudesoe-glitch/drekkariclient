@@ -55,7 +55,8 @@ public class CleanupBot extends BotBase {
 				player = gui.map.player();
 				if (player == null) return;
 				if (gob.rc.dist(player.rc) < 11 * 5) {
-					Resource res = gob.getres();
+					Resource res;
+					try { res = gob.getres(); } catch (Loading l) { return; }
 					if (res == null) return;
 					Actions.clearhand(gui);
 					if ((res.name.contains("/trees/") && !res.name.endsWith("stump") && !res.name.endsWith("log") && !res.name.endsWith("oldtrunk")) || res.name.contains("/bushes/")) {

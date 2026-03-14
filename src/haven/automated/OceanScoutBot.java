@@ -40,36 +40,49 @@ public class OceanScoutBot extends BotBase {
 		pack();
 	}
 
+	/** Normalize a vector to unit length * scale, or return null if zero-length. */
+	private Coord2d safeNormalize(Coord2d vec, double scale) {
+		double len = vec.abs();
+		if (len < 0.001) return null;
+		return vec.div(len).mul(scale);
+	}
+
 	@Override
 	public void run() {
 		try {
 			while (!stop) {
 				if (!active) { Thread.sleep(200); continue; }
+				Gob pl = gui.map.player();
+				if (pl == null) { Thread.sleep(200); continue; }
+
 				if (successLocs > 20) {
-					Gob pl = gui.map.player(); if (pl == null) { Thread.sleep(200); continue; }
-					Coord2d groundTile = findRandomGroundTile();
-					Coord2d groundVector = groundTile.sub(pl.rc);
-					groundVector = groundVector.div(groundVector.abs()).mul(44);
-					gui.map.wdgmsg("click", Coord.z, pl.rc.add(groundVector).floor(posres), 1, 0);
+					Coord2d groundTile = findRandomGroundTile(pl);
+					if (groundTile != null) {
+						Coord2d dir = safeNormalize(groundTile.sub(pl.rc), 44);
+						if (dir != null)
+							gui.map.wdgmsg("click", Coord.z, pl.rc.add(dir).floor(posres), 1, 0);
+					}
 					Thread.sleep(300);
 				}
-				nearbyGobs = getNearbyGobs();
-				Coord loc = getNextLoc();
+				nearbyGobs = getNearbyGobs(pl);
+				Coord loc = getNextLoc(pl);
 				if (loc != null) {
 					ang -= clockwiseDirection * Math.PI / 2;
 					gui.map.wdgmsg("click", Coord.z, new Coord2d(loc.x, loc.y).floor(posres), 1, 0);
 				} else {
-					Gob pl2 = gui.map.player(); if (pl2 == null) { Thread.sleep(200); continue; }
-					Coord2d pcCoord = pl2.rc;
+					Coord2d pcCoord = new Coord2d(pl.rc.x, pl.rc.y);
 					Coord2d dangerMob = isVeryDangerZone(pcCoord.floor());
 					if (dangerMob != null) {
-						Coord2d addCoord = pcCoord.sub(dangerMob);
-						gui.map.wdgmsg("click", Coord.z, pcCoord.add(addCoord.div(addCoord.abs()).mul(11 * 2)).floor(posres), 1, 0);
+						Coord2d dir = safeNormalize(pcCoord.sub(dangerMob), 11 * 2);
+						if (dir != null)
+							gui.map.wdgmsg("click", Coord.z, pcCoord.add(dir).floor(posres), 1, 0);
 					} else {
-						Coord2d gocoord = findRandomWaterTile();
-						Coord2d groundVector = gocoord.sub(pl2.rc);
-						groundVector = groundVector.div(groundVector.abs()).mul(44);
-						gui.map.wdgmsg("click", Coord.z, pl2.rc.add(groundVector).floor(posres), 1, 0);
+						Coord2d waterTile = findRandomWaterTile(pl);
+						if (waterTile != null) {
+							Coord2d dir = safeNormalize(waterTile.sub(pl.rc), 44);
+							if (dir != null)
+								gui.map.wdgmsg("click", Coord.z, pl.rc.add(dir).floor(posres), 1, 0);
+						}
 					}
 					Thread.sleep(300);
 				}
@@ -79,22 +92,41 @@ public class OceanScoutBot extends BotBase {
 		} catch (InterruptedException e) { Thread.currentThread().interrupt(); }
 	}
 
-	private Coord2d findRandomGroundTile() { Coord2d bc = gui.map.player().rc; int r = 40 * 11; for (int i = 0; i < 1000; i++) { Coord2d rc = new Coord2d(random.nextInt(r * 2) - r, random.nextInt(r * 2) - r); if (!isWater(bc.add(rc).floor())) return bc.add(rc); } return bc; }
-	private Coord2d findRandomWaterTile() { Coord2d bc = gui.map.player().rc; int r = 30 * 11; for (int i = 0; i < 1000; i++) { Coord2d rc = new Coord2d(random.nextInt(r * 2) - r, random.nextInt(r * 2) - r); if (isWater(bc.add(rc).floor())) return bc.add(rc); } return bc; }
+	private Coord2d findRandomGroundTile(Gob player) {
+		Coord2d bc = new Coord2d(player.rc.x, player.rc.y);
+		int r = 40 * 11;
+		for (int i = 0; i < 1000; i++) {
+			Coord2d rc = new Coord2d(random.nextInt(r * 2) - r, random.nextInt(r * 2) - r);
+			if (!isWater(bc.add(rc).floor())) return bc.add(rc);
+		}
+		return bc;
+	}
 
-	private ArrayList<Gob> getNearbyGobs() {
+	private Coord2d findRandomWaterTile(Gob player) {
+		Coord2d bc = new Coord2d(player.rc.x, player.rc.y);
+		int r = 30 * 11;
+		for (int i = 0; i < 1000; i++) {
+			Coord2d rc = new Coord2d(random.nextInt(r * 2) - r, random.nextInt(r * 2) - r);
+			if (isWater(bc.add(rc).floor())) return bc.add(rc);
+		}
+		return bc;
+	}
+
+	private ArrayList<Gob> getNearbyGobs(Gob player) {
 		ArrayList<Gob> gobs = new ArrayList<>();
+		Coord2d plrc = new Coord2d(player.rc.x, player.rc.y);
 		synchronized (gui.map.glob.oc) {
 			for (Gob gob : gui.map.glob.oc) {
-				if (gui.map.player().rc.dist(gob.rc) < 3) continue;
-				if (gui.map.player().rc.dist(gob.rc) < 25 * 11 && gob.collisionBox != null && gob.collisionBox.fx != null) gobs.add(gob);
+				double dist = plrc.dist(gob.rc);
+				if (dist < 3) continue;
+				if (dist < 25 * 11 && gob.collisionBox != null && gob.collisionBox.fx != null) gobs.add(gob);
 			}
 		}
 		return gobs;
 	}
 
-	private Coord getNextLoc() {
-		Coord pc = gui.map.player().rc.floor();
+	private Coord getNextLoc(Gob player) {
+		Coord pc = new Coord2d(player.rc.x, player.rc.y).floor();
 		double curAng = ang;
 		while (clockwiseDirection == 1 ? ang <= curAng + 2 * Math.PI : ang >= curAng - 2 * Math.PI) {
 			boolean foundground = false;

@@ -28,7 +28,8 @@ public class CellarDiggingBot extends BotBase {
 			while (!stop) {
 				if (!checkVitals()) { sleep(200); continue; }
 				if (active) {
-					if (gui.getmeter("stam", 0).a < STAMINA_THRESHOLD) {
+					IMeter.Meter stamMeter = gui.getmeter("stam", 0);
+					if (stamMeter != null && stamMeter.a < STAMINA_THRESHOLD) {
 						try { Actions.drinkTillFull(gui, 0.99, 0.99); } catch (InterruptedException ignored) { Thread.currentThread().interrupt(); return; }
 						sleep(200); continue;
 					}

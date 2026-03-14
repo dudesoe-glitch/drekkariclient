@@ -17,9 +17,24 @@ public class TarKilnCleanerBot extends BotBase {
 
 		activeBox = new CheckBox("Active") {
 			{ a = active; }
-			public void set(boolean val) { active = val; a = val; phase = 1; }
+			public void set(boolean val) {
+				if (val) {
+					active = true;
+					a = true;
+					phase = 1;
+				} else {
+					deactivate();
+				}
+			}
 		};
 		add(activeBox, UI.scale(40, 15));
+	}
+
+	@Override
+	protected void deactivate() {
+		active = false;
+		activeBox.a = false;
+		phase = 1;
 	}
 
 	@Override
@@ -38,7 +53,7 @@ public class TarKilnCleanerBot extends BotBase {
 				}
 			}
 
-			if (closest == null) { active = false; activeBox.set(false); gui.errorsilent("No full tar kilns nearby."); return; }
+			if (closest == null) { gui.errorsilent("No full tar kilns nearby."); deactivate(); return; }
 
 			if (gui.prog == null) {
 				int[][] options = {{33, 0}, {-33, 0}, {0, 33}, {0, -33}};

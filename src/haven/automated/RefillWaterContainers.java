@@ -239,6 +239,7 @@ public class RefillWaterContainers implements Runnable {
             }
         }
         Map<WItem, Coord> beltItems = getBeltContainers();
+        if (belt == null && !beltItems.isEmpty()) return;
         for (Map.Entry<WItem, Coord> item : beltItems.entrySet()) {
             try {
                 item.getKey().item.wdgmsg("take", Coord.z);

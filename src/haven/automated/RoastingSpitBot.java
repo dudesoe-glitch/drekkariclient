@@ -106,36 +106,48 @@ public class RoastingSpitBot extends BotBase {
 		return foundSpitroastableItems;
 	}
 
-	public boolean readyToRoast() {
+	/**
+	 * Navigate the roasting spit overlay's render tree to find the item sprite description.
+	 * Returns the toString() of the item's tree slot (contains "raw" or "roast"), or null if
+	 * no item is on the spit or the render tree structure has changed.
+	 *
+	 * Render tree path: overlay.slots[0].children[0].children[2]
+	 * This is fragile and will need updating if the render pipeline changes.
+	 */
+	private String getSpitItemState() {
 		try {
-			if (fireplace != null && !fireplace.ols.isEmpty()) {
-				Optional<Gob.Overlay> foundOverlay = fireplace.ols.stream()
-						.filter(ol -> ol != null && ol.spr != null && ol.spr.res != null && roastingSpitOverlayName.equals(ol.spr.res.name))
-						.findFirst();
-				if (foundOverlay.isPresent()) {
-					Gob.Overlay gobOverlay = foundOverlay.get();
-					if(((RenderTree.TreeSlot)((ArrayList<?>) gobOverlay.slots).get(0)).children[0].children.length > 2 && ((RenderTree.TreeSlot)((ArrayList<?>) gobOverlay.slots).get(0)).children[0].children[2] != null)
-						return ((RenderTree.TreeSlot)((ArrayList<?>) gobOverlay.slots).get(0)).children[0].children[2].toString().contains("raw");
-				}
-			}
-		} catch (Exception ignored) {}
-		return false;
+			if (fireplace == null || fireplace.ols.isEmpty()) return null;
+			Optional<Gob.Overlay> foundOverlay = fireplace.ols.stream()
+					.filter(ol -> ol != null && ol.spr != null && ol.spr.res != null
+							&& roastingSpitOverlayName.equals(ol.spr.res.name))
+					.findFirst();
+			if (!foundOverlay.isPresent()) return null;
+			Gob.Overlay gobOverlay = foundOverlay.get();
+			if (!(gobOverlay.slots instanceof ArrayList)) return null;
+			ArrayList<?> slotList = (ArrayList<?>) gobOverlay.slots;
+			if (slotList.isEmpty()) return null;
+			Object slot0 = slotList.get(0);
+			if (!(slot0 instanceof RenderTree.TreeSlot)) return null;
+			RenderTree.TreeSlot treeSlot = (RenderTree.TreeSlot) slot0;
+			if (treeSlot.children == null || treeSlot.children.length == 0) return null;
+			RenderTree.TreeSlot child0 = treeSlot.children[0];
+			if (child0 == null || child0.children == null || child0.children.length <= 2) return null;
+			RenderTree.TreeSlot itemSlot = child0.children[2];
+			if (itemSlot == null) return null;
+			return itemSlot.toString();
+		} catch (Exception e) {
+			return null;
+		}
+	}
+
+	public boolean readyToRoast() {
+		String state = getSpitItemState();
+		return state != null && state.contains("raw");
 	}
 
 	public boolean isCooked() {
-		try {
-			if (fireplace != null && !fireplace.ols.isEmpty()) {
-				Optional<Gob.Overlay> foundOverlay = fireplace.ols.stream()
-						.filter(ol -> ol != null && ol.spr != null && ol.spr.res != null && roastingSpitOverlayName.equals(ol.spr.res.name))
-						.findFirst();
-				if (foundOverlay.isPresent()) {
-					Gob.Overlay gobOverlay = foundOverlay.get();
-					if(((RenderTree.TreeSlot)((ArrayList<?>) gobOverlay.slots).get(0)).children[0].children.length > 2 && ((RenderTree.TreeSlot)((ArrayList<?>) gobOverlay.slots).get(0)).children[0].children[2] != null)
-						return ((RenderTree.TreeSlot)((ArrayList<?>) gobOverlay.slots).get(0)).children[0].children[2].toString().contains("roast");
-				}
-			}
-		} catch (Exception ignored) {}
-		return false;
+		String state = getSpitItemState();
+		return state != null && state.contains("roast");
 	}
 
 	@Override

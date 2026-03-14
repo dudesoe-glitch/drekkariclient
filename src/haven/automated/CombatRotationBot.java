@@ -258,8 +258,7 @@ public class CombatRotationBot extends BotBase {
 					continue;
 				}
 
-				Fightsess fs = gui.fs;
-				if (fs == null) {
+				if (gui.fs == null) {
 					setStatus("No combat session");
 					Thread.sleep(300);
 					continue;
@@ -284,9 +283,10 @@ public class CombatRotationBot extends BotBase {
 
 				setStatus(name + " (" + (currentRepeat + 1) + "/" + repeats + ")");
 
-				// Wait for cooldown
-				if (waitForCooldowns && slot < fs.actions.length && fs.actions[slot] != null) {
-					double ct = fs.actions[slot].ct;
+				// Wait for cooldown — re-fetch fs in case combat state changed
+				Fightsess fsCD = gui.fs;
+				if (waitForCooldowns && fsCD != null && slot < fsCD.actions.length && fsCD.actions[slot] != null) {
+					double ct = fsCD.actions[slot].ct;
 					double now = Utils.rtime();
 					if (ct > now) {
 						long waitMs = (long) ((ct - now) * 1000) + 50;
@@ -296,7 +296,7 @@ public class CombatRotationBot extends BotBase {
 				}
 
 				// Execute the move
-				executeMove(fs, slot);
+				executeMove(slot);
 
 				currentRepeat++;
 				if (currentRepeat >= repeats) {
@@ -314,8 +314,10 @@ public class CombatRotationBot extends BotBase {
 		}
 	}
 
-	private void executeMove(Fightsess fs, int slot) {
-		if (slot >= fs.actions.length || fs.actions[slot] == null) return;
+	private void executeMove(int slot) {
+		// Fetch fresh combat session — it can change or end at any time
+		Fightsess fs = gui.fs;
+		if (fs == null || slot >= fs.actions.length || fs.actions[slot] == null) return;
 
 		// Get opponent position for targeted moves
 		Coord2d targetPos = null;
@@ -323,7 +325,7 @@ public class CombatRotationBot extends BotBase {
 			if (gui.fv != null && gui.fv.current != null) {
 				Gob enemy = gui.map.glob.oc.getgob(gui.fv.current.gobid);
 				if (enemy != null) {
-					targetPos = enemy.rc;
+					targetPos = new Coord2d(enemy.rc.x, enemy.rc.y);
 				}
 			}
 		} catch (Exception ignored) {}
@@ -335,11 +337,14 @@ public class CombatRotationBot extends BotBase {
 			fs.wdgmsg("use", slot, 1, 0);
 		}
 
-		// Brief hold, then release
+		// Brief hold, then release — re-fetch fs in case combat ended during sleep
 		try { Thread.sleep(60); } catch (InterruptedException e) {
 			Thread.currentThread().interrupt();
 		}
-		fs.wdgmsg("rel", slot);
+		Fightsess fs2 = gui.fs;
+		if (fs2 != null) {
+			fs2.wdgmsg("rel", slot);
+		}
 	}
 
 	// --- Persistence ---
