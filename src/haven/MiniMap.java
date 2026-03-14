@@ -1294,6 +1294,8 @@ public class MiniMap extends Widget {
 			ui.gui.map.pfthread.interrupt();
 		    }
 		}
+		// Use client pathfinder if explicitly enabled, otherwise send raw click
+		// to the server (the server handles long-distance walks natively)
 		boolean useMinimapPF = button == 1 && OptWnd.walkWithPathFinderCheckBox.a && (
 			(ui.modctrl && ui.modshift && !ui.modmeta && !ui.modsuper) ||
 			(OptWnd.pathfindOnMinimapCheckBox != null && OptWnd.pathfindOnMinimapCheckBox.a && !ui.modmeta)
