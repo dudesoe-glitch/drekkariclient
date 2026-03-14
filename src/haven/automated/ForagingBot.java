@@ -6,6 +6,8 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static haven.OCache.posres;
+import static haven.automated.AUtils.potentialAggroTargets;
+import static haven.automated.CombatDistanceTool.animalDistances;
 
 public class ForagingBot extends BotBase {
 	private CheckBox alsoPickGroundItemsCB;
@@ -14,6 +16,7 @@ public class ForagingBot extends BotBase {
 	private volatile boolean alsoPickGroundItems;
 	private volatile boolean wanderWhenEmpty;
 	private volatile String herbFilter = "";
+	private static final double DANGER_MARGIN = 1.5; // multiplier on aggro distance for safety
 	private final Set<Long> blacklisted = ConcurrentHashMap.newKeySet();
 	private Coord2d lastWanderPos;
 	private final Random random = new Random();
@@ -108,6 +111,14 @@ public class ForagingBot extends BotBase {
 			return;
 		}
 
+		// Safety: check if player is near danger before doing anything
+		Coord2d playerPos = new Coord2d(player.rc.x, player.rc.y);
+		if (isNearDanger(playerPos)) {
+			setStatus("Danger nearby! Pausing...");
+			Thread.sleep(2000);
+			return;
+		}
+
 		Gob herb = findNearestForageable();
 		if (herb == null) {
 			if (wanderWhenEmpty) {
@@ -126,8 +137,15 @@ public class ForagingBot extends BotBase {
 		}
 		if (stop) return;
 
-		setStatus("Walking to forageable...");
+		// Check if path to herb is safe (no nearby animals)
 		Coord2d herbPos = new Coord2d(herb.rc.x, herb.rc.y);
+		if (isNearDanger(herbPos)) {
+			blacklisted.add(herb.id);
+			setStatus("Skipping — dangerous animal nearby");
+			return;
+		}
+
+		setStatus("Walking to forageable...");
 		gui.map.pfLeftClick(herbPos.floor().add(PATHFIND_OFFSET, 0), null);
 		if (!Actions.waitPf(gui)) {
 			blacklisted.add(herb.id);
@@ -246,6 +264,9 @@ public class ForagingBot extends BotBase {
 						if (!matched) continue;
 					}
 
+					// Skip herbs near dangerous animals
+					if (isNearDanger(gob.rc)) continue;
+
 					double dist = gob.rc.dist(playerPos);
 					if (dist > MAX_SEARCH_DIST) continue;
 					if (dist < closestDist) {
@@ -256,6 +277,31 @@ public class ForagingBot extends BotBase {
 			}
 		}
 		return closest;
+	}
+
+	/**
+	 * Check if a position is dangerously close to an aggressive animal.
+	 * Uses CombatDistanceTool.animalDistances for known aggro ranges,
+	 * falls back to a default safe distance for unknown animals in potentialAggroTargets.
+	 */
+	private boolean isNearDanger(Coord2d pos) {
+		final double DEFAULT_AGGRO_DIST = 30.0;
+		synchronized (gui.map.glob.oc) {
+			for (Gob gob : gui.map.glob.oc) {
+				try {
+					Resource res = gob.getres();
+					if (res == null) continue;
+					if (!potentialAggroTargets.contains(res.name)) continue;
+					// Skip players — they're in potentialAggroTargets but aren't NPC threats
+					if (res.name.equals("gfx/borka/body")) continue;
+
+					double aggroDist = animalDistances.getOrDefault(res.name, DEFAULT_AGGRO_DIST);
+					double safeDist = aggroDist * DANGER_MARGIN;
+					if (pos.dist(gob.rc) < safeDist) return true;
+				} catch (Loading | NullPointerException ignored) {}
+			}
+		}
+		return false;
 	}
 
 	/** Parse comma-separated filter into trimmed lowercase terms. Returns null if empty/blank. */
