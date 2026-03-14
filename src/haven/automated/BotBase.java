@@ -70,7 +70,16 @@ public abstract class BotBase extends Window implements Runnable {
 					Thread.sleep(200);
 					continue;
 				}
-				tick();
+				try {
+					tick();
+				} catch (InterruptedException e) {
+					throw e; // propagate to outer catch
+				} catch (Exception e) {
+					// Don't let RuntimeException kill the thread — deactivate gracefully
+					gui.errorsilent(cap + ": Error — " + e.getMessage());
+					deactivate();
+					Thread.sleep(1000);
+				}
 			}
 		} catch (InterruptedException e) {
 			Thread.currentThread().interrupt();
@@ -228,7 +237,8 @@ public abstract class BotBase extends Window implements Runnable {
 	protected void waitForProgressBar(int timeout) throws InterruptedException {
 		int elapsed = 0;
 		int hz = 100;
-		while (gui.prog != null && gui.prog.prog != -1 && elapsed < timeout) {
+		GameUI.Progress p;
+		while ((p = gui.prog) != null && p.prog != -1 && elapsed < timeout) {
 			if (stop || !active) break;
 			elapsed += hz;
 			Thread.sleep(hz);

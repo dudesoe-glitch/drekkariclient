@@ -103,10 +103,27 @@ public class ForagingBot extends BotBase {
 				FlowerMenu.setNextSelection("Pick");
 			}
 		} catch (Loading ignored) {}
-		gui.map.wdgmsg("click", Coord.z, herb.rc.floor(posres), 3, 0, 0,
-			(int) herb.id, herb.rc.floor(posres), 0, -1);
-		Thread.sleep(50);
-		Actions.waitProgBar(gui);
+		Coord2d clickPos = new Coord2d(herb.rc.x, herb.rc.y);
+		gui.map.wdgmsg("click", Coord.z, clickPos.floor(posres), 3, 0, 0,
+			(int) herb.id, clickPos.floor(posres), 0, -1);
+
+		// Wait for the pick to complete: progress bar, gob disappearing, or item on cursor
+		long herbId = herb.id;
+		int waited = 0;
+		while (waited < 10000 && !stop && active) {
+			// Progress bar active — wait for it
+			GameUI.Progress p = gui.prog;
+			if (p != null && p.prog >= 0) {
+				Actions.waitProgBar(gui);
+				break;
+			}
+			// Herb gone — pick succeeded
+			if (gui.map.glob.oc.getgob(herbId) == null) break;
+			// Item appeared on cursor — pick succeeded
+			if (gui.vhand != null) break;
+			Thread.sleep(50);
+			waited += 50;
+		}
 		FlowerMenu.setNextSelection(null);
 		if (stop) return;
 
