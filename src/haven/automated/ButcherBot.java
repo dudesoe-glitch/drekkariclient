@@ -7,10 +7,11 @@ import java.util.*;
 import static haven.OCache.posres;
 
 public class ButcherBot extends BotBase {
-	private boolean doLargeGame;
-	private boolean doLivestock;
-	private boolean doPredators;
-	private boolean doSmallGame;
+	private volatile boolean doLargeGame;
+	private volatile boolean doLivestock;
+	private volatile boolean doPredators;
+	private volatile boolean doSmallGame;
+	private final Set<Long> blacklisted = new HashSet<>();
 
 	private static final Set<String> LARGE_GAME = new HashSet<>(Arrays.asList(
 		"gfx/kritter/boar/boar", "gfx/kritter/moose/moose", "gfx/kritter/reddeer/reddeer",
@@ -31,7 +32,8 @@ public class ButcherBot extends BotBase {
 		"gfx/kritter/bear/bear", "gfx/kritter/bear/polarbear", "gfx/kritter/wolf/wolf",
 		"gfx/kritter/lynx/lynx", "gfx/kritter/wolverine/wolverine", "gfx/kritter/adder/adder",
 		"gfx/kritter/caveangler/caveangler", "gfx/kritter/cavelouse/cavelouse",
-		"gfx/kritter/orca/orca", "gfx/kritter/nidbane/nidbane"
+		"gfx/kritter/orca/orca", "gfx/kritter/nidbane/nidbane",
+		"gfx/kritter/bat/bat", "gfx/kritter/caverat/caverat"
 	));
 
 	private static final Set<String> SMALL_GAME = new HashSet<>(Arrays.asList(
@@ -41,7 +43,15 @@ public class ButcherBot extends BotBase {
 		"gfx/kritter/goldeneagle/goldeneagle", "gfx/kritter/woodgrouse/woodgrouse-m",
 		"gfx/kritter/garefowl/garefowl", "gfx/kritter/goshawk/goshawk",
 		"gfx/kritter/crane/crane", "gfx/kritter/mallard/mallard",
-		"gfx/kritter/chasmconch/chasmconch", "gfx/kritter/ooze/greenooze"
+		"gfx/kritter/chasmconch/chasmconch", "gfx/kritter/ooze/greenooze",
+		"gfx/kritter/hedgehog/hedgehog", "gfx/kritter/rabbit/rabbit"
+	));
+
+	// Small animals use "Wring Its Neck" instead of "Butcher" (wiki: Hunting)
+	private static final Set<String> WRING_NECK_ANIMALS = new HashSet<>(Arrays.asList(
+		"gfx/kritter/chicken/chicken", "gfx/kritter/chicken/hen",
+		"gfx/kritter/chicken/rooster", "gfx/kritter/rabbit/rabbit",
+		"gfx/kritter/hedgehog/hedgehog"
 	));
 
 	public ButcherBot(GameUI gui) {
@@ -80,6 +90,7 @@ public class ButcherBot extends BotBase {
 			public void click() {
 				active = !active;
 				if (active) {
+					blacklisted.clear();
 					this.change("Stop");
 					statusLabel.settext("Running...");
 				} else {
@@ -108,50 +119,83 @@ public class ButcherBot extends BotBase {
 
 		Gob animal = findNearestKnockedAnimal();
 		if (animal == null) {
-			setStatus("No knocked animals found");
-			deactivate();
-			return;
+			if (!blacklisted.isEmpty()) {
+				blacklisted.clear();
+				animal = findNearestKnockedAnimal();
+			}
+			if (animal == null) {
+				setStatus("No knocked animals found");
+				deactivate();
+				return;
+			}
 		}
 
-		if (gui.vhand != null) {
-			gui.vhand.item.wdgmsg("drop", Coord.z);
+		// Capture vhand to local variable (TOCTOU fix)
+		WItem vh = gui.vhand;
+		if (vh != null) {
+			vh.item.wdgmsg("drop", Coord.z);
 			Actions.waitForEmptyHand(gui, 1000, "");
 		}
 
 		String animalName = "animal";
+		String resName = null;
 		try {
 			Resource res = animal.getres();
-			if (res != null) animalName = res.name.substring(res.name.lastIndexOf('/') + 1);
+			if (res != null) {
+				resName = res.name;
+				animalName = resName.substring(resName.lastIndexOf('/') + 1);
+			}
 		} catch (Loading ignored) {}
 		setStatus("Walking to " + animalName);
 
 		gui.map.pfLeftClick(animal.rc.floor().add(2, 0), null);
 		if (!Actions.waitPf(gui)) {
+			blacklisted.add(animal.id);
 			Actions.unstuck(gui);
 			return;
 		}
+		if (stop) return;
 
 		Gob player = gui.map.player();
 		if (player == null) return;
 		if (animal.rc.dist(player.rc) > 11 * 5) {
-			setStatus("Too far, retrying...");
+			blacklisted.add(animal.id);
+			setStatus("Too far, skipping " + animalName);
 			return;
 		}
 
+		// Verify animal still exists after pathfinding
+		if (gui.map.glob.oc.getgob(animal.id) == null) {
+			setStatus(animalName + " already gone");
+			return;
+		}
+
+		// Choose correct FlowerMenu option based on animal type
+		String action = "Butcher";
+		if (resName != null && WRING_NECK_ANIMALS.contains(resName)) {
+			action = "Wring its neck";
+		}
+
 		setStatus("Butchering " + animalName);
-		FlowerMenu.setNextSelection("Butcher");
+		FlowerMenu.setNextSelection(action);
 		gui.map.wdgmsg("click", Coord.z, animal.rc.floor(posres), 3, 0, 0,
 			(int) animal.id, animal.rc.floor(posres), 0, -1);
 		Thread.sleep(50);
 		waitForProgressBar(30000);
-		if (gui.vhand != null) {
-			gui.vhand.item.wdgmsg("drop", Coord.z);
+
+		// Clear stale FlowerMenu selection on failure
+		FlowerMenu.setNextSelection(null);
+
+		vh = gui.vhand;
+		if (vh != null) {
+			vh.item.wdgmsg("drop", Coord.z);
 			Actions.waitForEmptyHand(gui, 1000, "");
 		}
 	}
 
 	private Gob findNearestKnockedAnimal() {
 		Gob closest = null;
+		double closestDist = Double.MAX_VALUE;
 		Gob player = gui.map.player();
 		if (player == null) return null;
 		Coord2d playerPos = player.rc;
@@ -159,13 +203,16 @@ public class ButcherBot extends BotBase {
 		synchronized (gui.map.glob.oc) {
 			for (Gob gob : gui.map.glob.oc) {
 				try {
+					if (blacklisted.contains(gob.id)) continue;
 					Resource res = gob.getres();
 					if (res == null) continue;
 					if (!GobHelper.isKnocked(gob)) continue;
+					// Skip animals being carried by other players
+					if (gob.getPoses().contains("carried")) continue;
 					if (!isAnimalEnabled(res.name)) continue;
 					double dist = gob.rc.dist(playerPos);
 					if (dist > MAX_SEARCH_DIST) continue;
-					if (closest == null || dist < closest.rc.dist(playerPos)) closest = gob;
+					if (dist < closestDist) { closestDist = dist; closest = gob; }
 				} catch (Loading | NullPointerException ignored) {}
 			}
 		}

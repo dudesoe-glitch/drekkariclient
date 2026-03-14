@@ -257,13 +257,15 @@ public class CombatDistanceTool extends BotBase {
         try {
             Equipory equip = gui.getequipory();
             if (equip == null) return -1;
-            WItem leftHand = equip.slots[6];
-            if (leftHand == null) return -1;
-            String resName = leftHand.item.res.get().name;
-            // Match by partial name (resource path ends with weapon name)
-            for (Map.Entry<String, Double> entry : weaponDistances.entrySet()) {
-                if (resName.contains(entry.getKey())) {
-                    return entry.getValue();
+            // Check both hands — one-handed weapons can be in either slot
+            for (int slot : new int[]{6, 7}) {
+                WItem hand = equip.slots[slot];
+                if (hand == null) continue;
+                String resName = hand.item.res.get().name;
+                for (Map.Entry<String, Double> entry : weaponDistances.entrySet()) {
+                    if (resName.contains(entry.getKey())) {
+                        return entry.getValue();
+                    }
                 }
             }
         } catch (Exception ignored) {}
@@ -330,15 +332,8 @@ public class CombatDistanceTool extends BotBase {
     }
 
     private Gob getEnemy() {
-        if (gui.fv.current != null) {
-            long id = gui.fv.current.gobid;
-            synchronized (gui.map.glob.oc) {
-                for (Gob gob : gui.map.glob.oc) {
-                    if (gob.id == id) {
-                        return gob;
-                    }
-                }
-            }
+        if (gui.fv != null && gui.fv.current != null) {
+            return gui.map.glob.oc.getgob(gui.fv.current.gobid);
         }
         return null;
     }
