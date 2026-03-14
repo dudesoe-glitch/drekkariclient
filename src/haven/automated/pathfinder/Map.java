@@ -20,13 +20,13 @@ public class Map {
     public final static int origin = origintile * 11;
     public final static int sz = origin * 2;
     public static int plbbox = 3;
-    private static int way = plbbox + 2;
-    private static int clr = way + 1;
+    private static int way = plbbox + 3;  // +3 for wider corridors around obstacles
+    private static int clr = way + 2;     // +2 for more corner clearance
 
     public static void setPlayerBBox(int bbox) {
         plbbox = bbox;
-        way = plbbox + 2;
-        clr = way + 1;
+        way = plbbox + 3;
+        clr = way + 2;
     }
     private final static int concaveclr = 2;
     private final static int tomaxside = 33;
@@ -97,14 +97,15 @@ public class Map {
                 Coord cd = new Coord(gcx + tbbax - plbbox, gcy + tbbby + plbbox);
 
                 // calculate waypoints located on the angular bisector of the corner
-                int wax = ca.x - 1;
-                int way = ca.y - 1;
-                int wbx = cb.x + 1;
-                int wby = cb.y - 1;
-                int wcx = cc.x + 1;
-                int wcy = cc.y + 1;
-                int wdx = cd.x - 1;
-                int wdy = cd.y + 1;
+                // offset of 2 gives more clearance around rotated obstacles
+                int wax = ca.x - 2;
+                int way = ca.y - 2;
+                int wbx = cb.x + 2;
+                int wby = cb.y - 2;
+                int wcx = cc.x + 2;
+                int wcy = cc.y + 2;
+                int wdx = cd.x - 2;
+                int wdy = cd.y + 2;
 
                 // exclude tiles near map edges so we won't need to do bounds checks all over the place
                 if (wax - mapborder < 0 || way - mapborder < 0 || wax + mapborder >= sz || way + mapborder >= sz ||

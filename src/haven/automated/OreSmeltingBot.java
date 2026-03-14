@@ -133,27 +133,45 @@ public class OreSmeltingBot extends BotBase {
 		if (player == null) return;
 		if (new Coord2d(smelter.rc.x, smelter.rc.y).dist(new Coord2d(player.rc.x, player.rc.y)) > MAX_INTERACT_DIST) { setStatus("Too far from smelter, retrying..."); return; }
 
+		// Clear hand before interacting
+		if (gui.vhand != null) { gui.vhand.item.wdgmsg("drop", Coord.z); Actions.waitForEmptyHand(gui, 1000, ""); }
+
+		// Open smelter UI by right-clicking it
+		setStatus("Opening smelter...");
+		Coord2d smelterPos = new Coord2d(smelter.rc.x, smelter.rc.y);
+		gui.map.wdgmsg("click", Coord.z, smelterPos.floor(posres), 3, 0, 0, (int) smelter.id, smelterPos.floor(posres), 0, -1);
+
+		// Wait for smelter inventory window to open
+		Inventory smelterInv = waitForSmelterWindow(5000);
+		if (smelterInv == null) { setStatus("Could not open smelter"); return; }
+
+		// Load ore via shift-click (transfer)
 		setStatus("Loading ore...");
-		int oreLoaded = loadItemsIntoSmelter(smelter);
+		int oreLoaded = transferOreToSmelter();
 		if (oreLoaded == 0) { setStatus("Failed to load ore"); return; }
-		setStatus("Loaded " + oreLoaded + " ore"); Thread.sleep(50);
+		setStatus("Loaded " + oreLoaded + " ore"); Thread.sleep(200);
 
+		// Load fuel via shift-click (transfer)
 		setStatus("Loading fuel...");
-		int fuelLoaded = loadFuelIntoSmelter(smelter);
+		int fuelLoaded = transferFuelToSmelter();
 		if (fuelLoaded == 0) { setStatus("Failed to load fuel"); return; }
-		setStatus("Loaded " + fuelLoaded + " fuel"); Thread.sleep(50);
+		setStatus("Loaded " + fuelLoaded + " fuel"); Thread.sleep(200);
 
+		// Light smelter
 		setStatus("Lighting smelter...");
 		FlowerMenu.setNextSelection("Light");
-		gui.map.wdgmsg("click", Coord.z, smelter.rc.floor(posres), 3, 0, 0, (int) smelter.id, smelter.rc.floor(posres), 0, -1);
-		Thread.sleep(500);
+		gui.map.wdgmsg("click", Coord.z, smelterPos.floor(posres), 3, 0, 0, (int) smelter.id, smelterPos.floor(posres), 0, -1);
+		waitForProgressBar(5000);
+		FlowerMenu.setNextSelection(null);
 
 		setStatus("Smelting in progress...");
 		int waitTime = 0;
 		int maxWait = 3600000; // 60 minutes — smelting takes ~55 min per load
 		while (waitTime < maxWait && active && !stop) {
-			if (gui.prog != null) { waitForProgressBar(60000); }
-			IMeter.Meter stam = gui.getmeter("stam", 0); if (stam != null && stam.a < STAMINA_THRESHOLD) { Actions.drinkTillFull(gui, 0.99, 0.99); }
+			GameUI.Progress p = gui.prog;
+			if (p != null) { waitForProgressBar(60000); }
+			IMeter.Meter stam = gui.getmeter("stam", 0);
+			if (stam != null && stam.a < STAMINA_THRESHOLD) { Actions.drinkTillFull(gui, 0.99, 0.99); }
 			try {
 				ResDrawable rd = smelter.getattr(ResDrawable.class);
 				if (rd != null && waitTime > 5000 && rd.sdt.checkrbuf(0) == 0) { setStatus("Smelting complete!"); break; }
@@ -165,54 +183,50 @@ public class OreSmeltingBot extends BotBase {
 		if (doCollectOutput && active && !stop) { setStatus("Collecting output..."); collectOutputFromSmelter(smelter); }
 	}
 
-	private int loadItemsIntoSmelter(Gob smelter) throws InterruptedException {
+	/** Wait for a smelter inventory window to appear after right-clicking. */
+	private Inventory waitForSmelterWindow(int timeoutMs) throws InterruptedException {
+		int waited = 0;
+		while (waited < timeoutMs) {
+			for (Inventory inv : gui.getAllInventories()) {
+				if (inv == gui.maininv) continue;
+				if (inv.parent instanceof Window) {
+					String cap = ((Window) inv.parent).cap;
+					if (cap != null && (cap.contains("Smelter") || cap.contains("smelter"))) return inv;
+				}
+			}
+			Thread.sleep(100);
+			waited += 100;
+		}
+		return null;
+	}
+
+	/** Transfer matching ore items from player inventory to the open smelter window via shift-click. */
+	private int transferOreToSmelter() throws InterruptedException {
 		int loaded = 0;
-		List<WItem> items = findAllOreInInventory();
-		for (WItem witem : items) {
+		List<WItem> ores = findAllOreInInventory();
+		for (WItem witem : ores) {
 			if (stop || !active) break;
 			try {
-				GItem item = witem.item;
-				item.wdgmsg("take", new Coord(item.sz.x / 2, item.sz.y / 2));
-				if (!waitForHand(true)) continue;
-				if (gui.vhand == null) continue;
-				GItem handItem = gui.vhand.item;
-				gui.map.wdgmsg("itemact", Coord.z, smelter.rc.floor(posres), 1, 0, (int) smelter.id, smelter.rc.floor(posres), 0, -1);
-				Thread.sleep(300);
-				int timeout = 0;
-				while (timeout < HAND_TIMEOUT) {
-					WItem handNow = gui.vhand;
-					if (handNow == null) break;
-					else if (handNow.item != handItem) { handNow.item.wdgmsg("drop", Coord.z); Actions.waitForEmptyHand(gui, 1000, ""); break; }
-					timeout += HAND_DELAY; Thread.sleep(HAND_DELAY);
-				}
-				loaded++; Thread.sleep(100);
-			} catch (Loading ignored) {}
+				witem.item.wdgmsg("transfer", Coord.z);
+				loaded++;
+				Thread.sleep(50);
+			} catch (Exception ignored) {}
 		}
-		if (gui.vhand != null) { gui.vhand.item.wdgmsg("drop", Coord.z); Actions.waitForEmptyHand(gui, 1000, ""); }
 		return loaded;
 	}
 
-	private int loadFuelIntoSmelter(Gob smelter) throws InterruptedException {
-		WItem fuelWItem = findFuelInInventory();
-		if (fuelWItem == null) return 0;
-		GItem fuel = fuelWItem.item;
-		fuel.wdgmsg("take", new Coord(fuel.sz.x / 2, fuel.sz.y / 2));
-		if (!waitForHand(true)) return 0;
-		fuel = gui.vhand.item;
+	/** Transfer fuel items from player inventory to the open smelter window via shift-click. */
+	private int transferFuelToSmelter() throws InterruptedException {
 		int loaded = 0;
 		for (int i = 0; i < fuelPerLoad && active && !stop; i++) {
-			int modifier = (i < fuelPerLoad - 1) ? 1 : 0;
-			gui.map.wdgmsg("itemact", Coord.z, smelter.rc.floor(posres), modifier, 0, (int) smelter.id, smelter.rc.floor(posres), 0, -1);
-			int timeout = 0; boolean done = false;
-			while (timeout < HAND_TIMEOUT) {
-				WItem newFuel = gui.vhand;
-				if (newFuel != null && newFuel.item != fuel) { fuel = newFuel.item; loaded++; break; }
-				else if (newFuel == null) { loaded++; done = true; break; }
-				timeout += HAND_DELAY; Thread.sleep(HAND_DELAY);
-			}
-			if (timeout >= HAND_TIMEOUT || done) break;
+			WItem fuel = findFuelInInventory();
+			if (fuel == null) break;
+			try {
+				fuel.item.wdgmsg("transfer", Coord.z);
+				loaded++;
+				Thread.sleep(50);
+			} catch (Exception ignored) {}
 		}
-		if (gui.vhand != null) { gui.vhand.item.wdgmsg("drop", Coord.z); Actions.waitForEmptyHand(gui, 1000, ""); }
 		return loaded;
 	}
 

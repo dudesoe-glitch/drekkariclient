@@ -68,7 +68,7 @@ public class TarKilnCleanerBot extends BotBase {
 				}
 				Actions.rightClickShiftCtrl(gui, closest);
 				Thread.sleep(1000);
-				Actions.waitProgBar(gui);
+				waitForProgressBar(60000);
 			}
 		}
 		Thread.sleep(200);

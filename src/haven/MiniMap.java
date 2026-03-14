@@ -1294,20 +1294,19 @@ public class MiniMap extends Widget {
 			ui.gui.map.pfthread.interrupt();
 		    }
 		}
-		// Use client pathfinder for minimap ground clicks:
-		// - Always for distant clicks (>15 tiles) — avoids walls as terrain loads
-		// - When explicitly enabled via checkbox/modifiers for nearby clicks
+		// Use client pathfinder for all minimap ground left-clicks
+		// Server raw clicks are unreliable for long distances
 		boolean useMinimapPF = false;
 		if(button == 1) {
 			Gob player = (ui.gui != null && ui.gui.map != null) ? ui.gui.map.player() : null;
-			double dist = (player != null) ? clickWorldPos.dist(player.rc) : 0;
-			if(dist > 11 * 15) {
-				// Auto-pathfind for distant minimap clicks
+			if(player == null) return; // Can't navigate without player reference
+			if(OptWnd.walkWithPathFinderCheckBox.a) {
+				// Always pathfind for minimap ground clicks when pathfinder is enabled
 				useMinimapPF = true;
-			} else if(OptWnd.walkWithPathFinderCheckBox.a && (
-				(ui.modctrl && ui.modshift && !ui.modmeta && !ui.modsuper) ||
-				(OptWnd.pathfindOnMinimapCheckBox != null && OptWnd.pathfindOnMinimapCheckBox.a && !ui.modmeta))) {
-				useMinimapPF = true;
+			} else {
+				// Fallback: pathfind for distant clicks even if pathfinder is disabled
+				double dist = clickWorldPos.dist(player.rc);
+				if(dist > 11 * 15) useMinimapPF = true;
 			}
 		}
 		if(useMinimapPF) {

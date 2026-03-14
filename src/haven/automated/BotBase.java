@@ -233,11 +233,19 @@ public abstract class BotBase extends Window implements Runnable {
 
 	// --- Progress Bar ---
 
-	/** Wait for progress bar to complete, with timeout (ms). Breaks on stop/inactive. */
+	/** Wait for progress bar to appear (up to 2s), then wait for it to complete. Breaks on stop/inactive. */
 	protected void waitForProgressBar(int timeout) throws InterruptedException {
+		// Phase 1: Wait for progress bar to APPEAR (delay between action and bar)
+		int waited = 0;
+		GameUI.Progress p;
+		while ((p = gui.prog) == null && waited < 2000) {
+			if (stop || !active) return;
+			Thread.sleep(50);
+			waited += 50;
+		}
+		// Phase 2: Wait for progress bar to COMPLETE
 		int elapsed = 0;
 		int hz = 100;
-		GameUI.Progress p;
 		while ((p = gui.prog) != null && p.prog != -1 && elapsed < timeout) {
 			if (stop || !active) break;
 			elapsed += hz;

@@ -242,7 +242,7 @@ public class FarmingBot extends BotBase {
 
 			gui.map.wdgmsg("itemact", Coord.z, pos.floor(posres), 0);
 			Thread.sleep(50);
-			Actions.waitProgBar(gui);
+			waitForProgressBar(30000);
 			if (stop) return;
 
 			if (gui.vhand != null) {
@@ -319,8 +319,7 @@ public class FarmingBot extends BotBase {
 		setStatus("Harvesting " + cropBaseName + (scythe ? " (scythe)..." : "..."));
 		FlowerMenu.setNextSelection("Harvest");
 		gui.map.wdgmsg("click", Coord.z, cropPos.floor(posres), 3, 0, 0, (int) crop.id, cropPos.floor(posres), 0, -1);
-		Thread.sleep(50);
-		Actions.waitProgBar(gui);
+		waitForProgressBar(30000);
 
 		// Verify harvest succeeded by checking gob removal (with timeout)
 		List<Coord2d> harvested = findHarvestedPositions(snapshot);
