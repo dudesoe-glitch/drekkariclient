@@ -19,7 +19,7 @@ public class OceanScoutBot extends BotBase {
 	private int successLocs;
 
 	public OceanScoutBot(GameUI gui) {
-		super(gui, UI.scale(UI.scale(274, 96)), "Ocean Scouting Bot");
+		super(gui, UI.scale(274, 96), "Ocean Scouting Bot");
 		checkHP = false; checkEnergy = false; checkStamina = false; checkInventory = false;
 
 		checkClock = 0;

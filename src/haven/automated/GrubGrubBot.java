@@ -3,10 +3,10 @@ package haven.automated;
 import haven.*;
 
 public class GrubGrubBot extends BotBase {
-	public static boolean transferTicks = false;
+	public static volatile boolean transferTicks = false;
 
 	public GrubGrubBot(GameUI gui) {
-		super(gui, UI.scale(UI.scale(254, 96)), "Grub-Grub Bot");
+		super(gui, UI.scale(254, 96), "Grub-Grub Bot");
 		checkHP = false;
 		checkStamina = false;
 		checkInventory = false;
@@ -48,6 +48,7 @@ public class GrubGrubBot extends BotBase {
 						gui.errorsilent("Grub Grub Bot: Low on energy, stopping.");
 						GrubGrubBot.transferTicks = false;
 						active = false;
+						if (activeButton != null) activeButton.change("Start");
 						Thread.sleep(2000);
 						continue;
 					}
@@ -60,9 +61,9 @@ public class GrubGrubBot extends BotBase {
 						if (gui.makewnd.cap.equals("Grub-Grub"))
 							gui.makewnd.makeWidget.wdgmsg("make",0);
 						else
-							gui.ui.error("Grub Grub Bot: Crafting Window is not set to craft Grub-Grub!");
+							gui.errorsilent("Grub Grub Bot: Crafting Window is not set to craft Grub-Grub!");
 					} else {
-						gui.ui.error("Grub Grub Bot: Couldn't find Grub-Grub Crafting Window!");
+						gui.errorsilent("Grub Grub Bot: Couldn't find Grub-Grub Crafting Window!");
 					}
 				}
 				Thread.sleep(200);

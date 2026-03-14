@@ -71,11 +71,8 @@ public class CellarDiggingBot extends BotBase {
 		gui.map.pfLeftClick(cell.rc.floor().add(12, 0), null);
 		if (!Actions.waitPf(gui)) Actions.unstuck(gui);
 		Actions.clearhand(gui);
-		Actions.rightClickGobAndSelectOption(gui, cell, 0);
+		FlowerMenu.setNextSelection("Enter");
 		gui.map.wdgmsg("click", Coord.z, cell.rc.floor(posres), 3, 0, 0, (int) cell.id, cell.rc.floor(posres), 0, -1);
-		Gob p = gui.map.player(); if (p == null) return;
-		Coord playerCoord = p.rc.floor(posres);
-		gui.map.wdgmsg("click", Coord.z, playerCoord, 3, 0);
 	}
 
 	private void chipAllBoulders() throws InterruptedException {
@@ -84,15 +81,16 @@ public class CellarDiggingBot extends BotBase {
 
 	private void chipBoulderOnce(Gob bumling) throws InterruptedException {
 		if (!bumlingExists(bumling) || !active || stop) return;
-		if (bumling.rc.dist(gui.map.player().rc) > 11 * 5) { gui.map.pfLeftClick(bumling.rc.floor().add(10, 0), null); if (!Actions.waitPf(gui)) Actions.unstuck(gui); }
+		Gob player = gui.map.player();
+		if (player == null) return;
+		if (bumling.rc.dist(player.rc) > 11 * 5) { gui.map.pfLeftClick(bumling.rc.floor().add(10, 0), null); if (!Actions.waitPf(gui)) Actions.unstuck(gui); }
 		if (!bumlingExists(bumling) || !active || stop) return;
 		Actions.clearhand(gui);
-		Actions.rightClickGobAndSelectOption(gui, bumling, 0);
+		FlowerMenu.setNextSelection("Chip");
 		gui.map.wdgmsg("click", Coord.z, bumling.rc.floor(posres), 3, 0, 0, (int) bumling.id, bumling.rc.floor(posres), 0, -1);
 		int idleTicks = 0;
 		while (active && !stop && bumlingExists(bumling)) {
 			if (!checkVitals()) break;
-			if (gui.getmeter("stam", 0).a < STAMINA_THRESHOLD) { try { Actions.drinkTillFull(gui, 0.99, 0.99); } catch (InterruptedException ignored) { Thread.currentThread().interrupt(); return; } }
 			if (isMiningOrRunning()) idleTicks = 0; else { idleTicks++; if (idleTicks >= 3) break; }
 			sleep(100);
 		}

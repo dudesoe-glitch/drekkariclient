@@ -231,15 +231,15 @@ public class MiningSafetyAssistant extends BotBase {
                         for (Gob support : supports) {
                             String res = support.getres().name;
                             if (res.equals("gfx/terobjs/ladder") || res.equals("gfx/terobjs/minesupport")) {
-                                if (support.rc.dist(minedTile) <= 100) {
+                                if (support.rc.dist(minedTile) <= 99) {
                                     gobsInRange.add(support);
                                 }
                             } else if (res.equals("gfx/terobjs/column")) {
-                                if (support.rc.dist(minedTile) <= 125) {
+                                if (support.rc.dist(minedTile) <= 121) {
                                     gobsInRange.add(support);
                                 }
                             } else if (res.equals("gfx/terobjs/minebeam")) {
-                                if (support.rc.dist(minedTile) <= 150) {
+                                if (support.rc.dist(minedTile) <= 143) {
                                     gobsInRange.add(support);
                                 }
                             }
@@ -257,7 +257,7 @@ public class MiningSafetyAssistant extends BotBase {
                             looseRocks = new ArrayList<>(GobHelper.findByName(gui, "gfx/terobjs/looserock", -1));
                         }
                         for (Gob looseRock : looseRocks) {
-                            if (looseRock.rc.dist(minedTile) <= 125) {
+                            if (looseRock.rc.dist(minedTile) <= 121) {
                                 looseRock.highlight(Color.red);
                                 ui.root.wdgmsg("gk", 27);
                                 gui.errorsilent("Loose rock is too close to mine safely.");
@@ -271,7 +271,7 @@ public class MiningSafetyAssistant extends BotBase {
                         for (Gob support : supports) {
                             String res = support.getres().name;
                             if (res.equals("gfx/terobjs/ladder") || res.equals("gfx/terobjs/minesupport")) {
-                                if (support.rc.dist(minedTile) <= 100) {
+                                if (support.rc.dist(minedTile) <= 99) {
                                     if (support.getattr(GobHealth.class) != null) {
                                         if (support.getattr(GobHealth.class).hp <= 0.5 && stopMiningFiftyCheckBox.a) {
                                             ui.root.wdgmsg("gk", 27);
@@ -285,7 +285,7 @@ public class MiningSafetyAssistant extends BotBase {
                                     }
                                 }
                             } else if (res.equals("gfx/terobjs/column")) {
-                                if (support.rc.dist(minedTile) <= 125) {
+                                if (support.rc.dist(minedTile) <= 121) {
                                     if (support.getattr(GobHealth.class) != null) {
                                         if (support.getattr(GobHealth.class).hp <= 0.5 && stopMiningFiftyCheckBox.a) {
                                             ui.root.wdgmsg("gk", 27);
@@ -299,7 +299,7 @@ public class MiningSafetyAssistant extends BotBase {
                                     }
                                 }
                             } else if (res.equals("gfx/terobjs/minebeam")) {
-                                if (support.rc.dist(minedTile) <= 150) {
+                                if (support.rc.dist(minedTile) <= 143) {
                                     if (support.getattr(GobHealth.class) != null) {
                                         if (support.getattr(GobHealth.class).hp <= 0.5 && stopMiningFiftyCheckBox.a) {
                                             ui.root.wdgmsg("gk", 27);
@@ -345,15 +345,15 @@ public class MiningSafetyAssistant extends BotBase {
             for (Gob support : supportsStatic) {
                 String res = support.getres().name;
                 if (res.equals("gfx/terobjs/ladder") || res.equals("gfx/terobjs/minesupport")) {
-                    if (support.rc.dist(tile) <= 100) {
+                    if (support.rc.dist(tile) <= 99) {
                         inRange++;
                     }
                 } else if (res.equals("gfx/terobjs/column")) {
-                    if (support.rc.dist(tile) <= 125) {
+                    if (support.rc.dist(tile) <= 121) {
                         inRange++;
                     }
                 } else if (res.equals("gfx/terobjs/minebeam")) {
-                    if (support.rc.dist(tile) <= 150) {
+                    if (support.rc.dist(tile) <= 143) {
                         inRange++;
                     }
                 }

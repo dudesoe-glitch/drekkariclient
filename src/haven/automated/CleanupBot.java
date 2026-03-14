@@ -6,11 +6,11 @@ import static haven.OCache.posres;
 import static java.lang.Thread.sleep;
 
 public class CleanupBot extends BotBase {
-	private boolean chopBushes;
-	private boolean chopTrees;
-	private boolean chipRocks;
-	private boolean destroyStumps;
-	private boolean destroySoil;
+	private volatile boolean chopBushes;
+	private volatile boolean chopTrees;
+	private volatile boolean chipRocks;
+	private volatile boolean destroyStumps;
+	private volatile boolean destroySoil;
 
 	public CleanupBot(GameUI gui) {
 		super(gui, UI.scale(220, 105), "Cleanup Bot");
@@ -45,9 +45,11 @@ public class CleanupBot extends BotBase {
 	private void destroyGob(Gob gob) throws InterruptedException {
 		Gob player = gui.map.player();
 		if (player != null && gui.prog != null && (player.getPoses().contains("pickan") || player.getPoses().contains("treechop") || player.getPoses().contains("chopping") || player.getPoses().contains("shoveldig") || player.getPoses().contains("drinkan"))) {
-			waitWhileWorking(2000);
+			waitWhileWorking(30000);
 		} else {
 			if (gob != null) {
+				// Check gob still exists before walking to it
+				if (gui.map.glob.oc.getgob(gob.id) == null) return;
 				gui.map.pfLeftClick(gob.rc.floor().add(20, 0), null);
 				if (!Actions.waitPf(gui)) Actions.unstuck(gui);
 				player = gui.map.player();
@@ -56,19 +58,25 @@ public class CleanupBot extends BotBase {
 					Resource res = gob.getres();
 					if (res == null) return;
 					Actions.clearhand(gui);
-					if (res.name.contains("/trees/") && !res.name.endsWith("stump") && !res.name.endsWith("log") && !res.name.endsWith("oldtrunk") || res.name.contains("/bushes/")) {
-						Actions.rightClickGobAndSelectOption(gui, gob, 0);
+					if ((res.name.contains("/trees/") && !res.name.endsWith("stump") && !res.name.endsWith("log") && !res.name.endsWith("oldtrunk")) || res.name.contains("/bushes/")) {
+						FlowerMenu.setNextSelection("Chop");
 						gui.map.wdgmsg("click", Coord.z, gob.rc.floor(posres), 3, 0, 0, (int) gob.id, gob.rc.floor(posres), 0, -1);
-						waitWhileWorking(2000);
+						waitWhileWorking(30000);
+						// Log goes to cursor after tree chop — drop it on ground
+						WItem vh = gui.vhand;
+						if (vh != null) {
+							vh.item.wdgmsg("drop", Coord.z);
+							Actions.waitForEmptyHand(gui, 1000, "");
+						}
 					} else if (res.name.contains("/bumlings/")) {
-						Actions.rightClickGobAndSelectOption(gui, gob, 0);
+						FlowerMenu.setNextSelection("Chip");
 						gui.map.wdgmsg("click", Coord.z, gob.rc.floor(posres), 3, 0, 0, (int) gob.id, gob.rc.floor(posres), 0, -1);
-						waitWhileWorking(2000);
+						waitWhileWorking(30000);
 					} else if (res.name.endsWith("stump") || res.name.endsWith("/stockpile-soil")) {
 						gui.act("destroy");
 						gui.map.wdgmsg("click", Coord.z, gob.rc.floor(posres), 1, 0, 0, (int) gob.id, gob.rc.floor(posres), 0, -1);
 						gui.map.wdgmsg("click", Coord.z, Coord.z, 3, 0);
-						waitWhileWorking(2000);
+						waitWhileWorking(30000);
 					}
 				}
 			} else {
@@ -81,7 +89,7 @@ public class CleanupBot extends BotBase {
 	private void waitWhileWorking(int timeout) throws InterruptedException {
 		sleep(200);
 		int hz = 50; int time = 0;
-		while (gui.prog != null && gui.prog.prog != -1 && time < timeout && gui.getmeter("stam", 0).a > 0.40) { time += hz; sleep(hz); }
+		while (gui.prog != null && gui.prog.prog != -1 && time < timeout) { time += hz; sleep(hz); }
 	}
 
 	private void dropStones() {
@@ -95,6 +103,7 @@ public class CleanupBot extends BotBase {
 
 	private Gob findClosestGob() {
 		Gob closestGob = null;
+		double closestDist = Double.MAX_VALUE;
 		Gob player = gui.map.player();
 		if (player == null) return null;
 		Coord2d plc = player.rc;
@@ -109,7 +118,7 @@ public class CleanupBot extends BotBase {
 					if (selected) {
 						double dist = gob.rc.dist(plc);
 						if (dist > MAX_SEARCH_DIST) continue;
-						if (closestGob == null || dist < closestGob.rc.dist(plc)) closestGob = gob;
+						if (dist < closestDist) { closestDist = dist; closestGob = gob; }
 					}
 				} catch (Loading | NullPointerException ignored) {}
 			}

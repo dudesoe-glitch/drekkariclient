@@ -47,7 +47,8 @@ public class TarKilnCleanerBot extends BotBase {
 					gui.map.pfLeftClick(newCoord, null);
 					Thread.sleep(500);
 					Actions.waitPf(gui);
-					if (gui.map.player().rc.dist(new Coord2d(newCoord)) < 40) break;
+					Gob p2 = gui.map.player(); if (p2 == null) return;
+					if (p2.rc.dist(new Coord2d(newCoord)) < 40) break;
 				}
 				Actions.rightClickShiftCtrl(gui, closest);
 				Thread.sleep(1000);

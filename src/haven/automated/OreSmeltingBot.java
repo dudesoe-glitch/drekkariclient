@@ -10,15 +10,15 @@ import static haven.OCache.posres;
 public class OreSmeltingBot extends BotBase {
 	private Label smelterCountLabel;
 
-	private boolean doCopperOre;
-	private boolean doTinOre;
-	private boolean doIronOre;
-	private boolean doGoldOre;
-	private boolean doSilverOre;
-	private boolean doLeadOre;
-	private boolean doZincOre;
+	private volatile boolean doCopperOre;
+	private volatile boolean doTinOre;
+	private volatile boolean doIronOre;
+	private volatile boolean doGoldOre;
+	private volatile boolean doSilverOre;
+	private volatile boolean doLeadOre;
+	private volatile boolean doZincOre;
 
-	private boolean doCollectOutput;
+	private volatile boolean doCollectOutput;
 	private int fuelPerLoad;
 
 	private static final String SMELTER_RES = "gfx/terobjs/smelter";
@@ -49,7 +49,7 @@ public class OreSmeltingBot extends BotBase {
 		doLeadOre = Utils.getprefb("oreSmeltingBot_lead", false);
 		doZincOre = Utils.getprefb("oreSmeltingBot_zinc", false);
 		doCollectOutput = Utils.getprefb("oreSmeltingBot_collect", true);
-		fuelPerLoad = Utils.getprefi("oreSmeltingBot_fuelCount", 9);
+		fuelPerLoad = Utils.getprefi("oreSmeltingBot_fuelCount", 12);
 
 		int y = 10;
 		add(new CheckBox("Copper Ore") {{ a = doCopperOre; } public void set(boolean val) { doCopperOre = val; a = val; Utils.setprefb("oreSmeltingBot_copper", val); }}, UI.scale(10, y));
@@ -144,7 +144,7 @@ public class OreSmeltingBot extends BotBase {
 
 		setStatus("Smelting in progress...");
 		int waitTime = 0;
-		int maxWait = 300000;
+		int maxWait = 3600000; // 60 minutes — smelting takes ~55 min per load
 		while (waitTime < maxWait && active && !stop) {
 			if (gui.prog != null) { waitForProgressBar(60000); }
 			if (gui.getmeter("stam", 0).a < STAMINA_THRESHOLD) { Actions.drinkTillFull(gui, 0.99, 0.99); }

@@ -8,7 +8,7 @@ import static haven.OCache.posres;
 
 public class ForagingBot extends BotBase {
 	private CheckBox alsoPickGroundItemsCB;
-	private boolean alsoPickGroundItems;
+	private volatile boolean alsoPickGroundItems;
 
 	private static final Set<String> PICKABLE_ITEMS = new HashSet<>(Arrays.asList(
 		"adder", "arrow", "bat", "swan", "goshawk", "precioussnowflake",
@@ -60,6 +60,7 @@ public class ForagingBot extends BotBase {
 		if (gui.prog != null) {
 			setStatus("Working...");
 			Actions.waitProgBar(gui);
+			if (stop) return;
 			return;
 		}
 
@@ -70,10 +71,12 @@ public class ForagingBot extends BotBase {
 			return;
 		}
 
-		if (gui.vhand != null) {
-			gui.vhand.item.wdgmsg("drop", Coord.z);
+		WItem vh = gui.vhand;
+		if (vh != null) {
+			vh.item.wdgmsg("drop", Coord.z);
 			Actions.waitForEmptyHand(gui, 1000, "");
 		}
+		if (stop) return;
 
 		setStatus("Walking to forageable...");
 		gui.map.pfLeftClick(herb.rc.floor().add(2, 0), null);
@@ -81,6 +84,7 @@ public class ForagingBot extends BotBase {
 			Actions.unstuck(gui);
 			return;
 		}
+		if (stop) return;
 
 		player = gui.map.player();
 		if (player == null) { Thread.sleep(200); return; }
@@ -88,6 +92,8 @@ public class ForagingBot extends BotBase {
 			setStatus("Too far, retrying...");
 			return;
 		}
+
+		if (gui.map.glob.oc.getgob(herb.id) == null) return;
 
 		setStatus("Picking...");
 		try {
@@ -100,15 +106,19 @@ public class ForagingBot extends BotBase {
 			(int) herb.id, herb.rc.floor(posres), 0, -1);
 		Thread.sleep(50);
 		Actions.waitProgBar(gui);
+		FlowerMenu.setNextSelection(null);
+		if (stop) return;
 
-		if (gui.vhand != null) {
-			gui.vhand.item.wdgmsg("drop", Coord.z);
+		vh = gui.vhand;
+		if (vh != null) {
+			vh.item.wdgmsg("drop", Coord.z);
 			Actions.waitForEmptyHand(gui, 1000, "");
 		}
 	}
 
 	private Gob findNearestForageable() {
 		Gob closest = null;
+		double closestDist = Double.MAX_VALUE;
 		Gob player = gui.map.player();
 		if (player == null) return null;
 		Coord2d playerPos = player.rc;
@@ -123,7 +133,10 @@ public class ForagingBot extends BotBase {
 					if (!isHerb && !isPickable) continue;
 					double dist = gob.rc.dist(playerPos);
 					if (dist > MAX_SEARCH_DIST) continue;
-					if (closest == null || dist < closest.rc.dist(playerPos)) closest = gob;
+					if (dist < closestDist) {
+						closest = gob;
+						closestDist = dist;
+					}
 				} catch (Loading | NullPointerException ignored) {}
 			}
 		}

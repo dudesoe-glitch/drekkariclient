@@ -10,8 +10,8 @@ import static haven.OCache.posres;
 public class MiningBot extends BotBase {
 	private Label targetLabel;
 	private Coord2d targetPos;
-	public boolean settingTarget;
-	private boolean safeMining;
+	public volatile boolean settingTarget;
+	private volatile boolean safeMining;
 
 	public MiningBot(GameUI gui) {
 		super(gui, UI.scale(250, 150), "Mining Bot");
@@ -115,11 +115,11 @@ public class MiningBot extends BotBase {
 				if (r == null) continue;
 				String res = r.name;
 				double dist = support.rc.dist(pos);
-				if ((res.equals("gfx/terobjs/ladder") || res.equals("gfx/terobjs/minesupport")) && dist <= 100)
+				if ((res.equals("gfx/terobjs/ladder") || res.equals("gfx/terobjs/minesupport")) && dist <= 99)
 					return true;
-				if (res.equals("gfx/terobjs/column") && dist <= 125)
+				if (res.equals("gfx/terobjs/column") && dist <= 121)
 					return true;
-				if (res.equals("gfx/terobjs/minebeam") && dist <= 150)
+				if (res.equals("gfx/terobjs/minebeam") && dist <= 143)
 					return true;
 			} catch (Loading ignored) {}
 		}
@@ -127,7 +127,7 @@ public class MiningBot extends BotBase {
 	}
 
 	public void setTarget(Coord2d mc) {
-		targetPos = mc;
+		targetPos = new Coord2d(mc.x, mc.y);
 		settingTarget = false;
 		targetLabel.settext("Target: " + mc.floor().x + ", " + mc.floor().y);
 		statusLabel.settext("Target set");
