@@ -42,13 +42,20 @@ public class FarmingBot extends BotBase {
 	}};
 
 	// Crops replanted using the harvested item itself, not seeds
-	// Wiki: beetroot, leek, onions, garlic, kale are planted as the item
+	// Wiki: beetroot, leek, onions, garlic, kale, peas, peppercorn are planted as the item
 	private static final Map<String, String> CROP_TO_ITEM = new HashMap<String, String>() {{
 		put("beetroot", "gfx/invobjs/beet");
 		put("leek", "gfx/invobjs/leek");
 		put("onion", "gfx/invobjs/yellowonion");
 		put("yellowonion", "gfx/invobjs/yellowonion");
 		put("redonion", "gfx/invobjs/redonion");
+		put("peas", "gfx/invobjs/peapod");
+		put("pepper", "gfx/invobjs/peppercorn");
+		put("garlic", "gfx/invobjs/garlic");
+		put("greenkale", "gfx/invobjs/greenkale");
+		put("wildkale", "gfx/invobjs/wildkale");
+		put("wildonion", "gfx/invobjs/wildonion");
+		put("wildtuber", "gfx/invobjs/wildtuber");
 	}};
 
 	// Crops that regrow or cannot be replanted — do NOT replant

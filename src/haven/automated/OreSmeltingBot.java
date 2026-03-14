@@ -16,22 +16,29 @@ public class OreSmeltingBot extends BotBase {
 	private volatile boolean doGoldOre;
 	private volatile boolean doSilverOre;
 	private volatile boolean doLeadOre;
-	private volatile boolean doZincOre;
 
 	private volatile boolean doCollectOutput;
 	private int fuelPerLoad;
 
 	private static final String SMELTER_RES = "gfx/terobjs/smelter";
 
-	private static final Map<String, String> ORE_TYPES = new LinkedHashMap<String, String>() {{
-		put("Copper Ore", "oreSmeltingBot_copper");
-		put("Tin Ore", "oreSmeltingBot_tin");
-		put("Iron Ore", "oreSmeltingBot_iron");
-		put("Gold Ore", "oreSmeltingBot_gold");
-		put("Silver Ore", "oreSmeltingBot_silver");
-		put("Lead Ore", "oreSmeltingBot_lead");
-		put("Zinc Ore", "oreSmeltingBot_zinc");
-	}};
+	// Ore basenames grouped by output metal — matched via resource().basename()
+	private static final Set<String> COPPER_ORES = new HashSet<>(Arrays.asList(
+		"chalcopyrite", "malachite", "peacockore", "cuprite"
+	));
+	private static final Set<String> TIN_ORES = new HashSet<>(Arrays.asList("cassiterite"));
+	private static final Set<String> IRON_ORES = new HashSet<>(Arrays.asList(
+		"ilmenite", "limonite", "hematite", "magnetite"
+	));
+	private static final Set<String> GOLD_ORES = new HashSet<>(Arrays.asList(
+		"petzite", "sylvanite", "nagyagite"
+	));
+	private static final Set<String> SILVER_ORES = new HashSet<>(Arrays.asList(
+		"argentite", "hornsilver", "galena"
+	));
+	private static final Set<String> LEAD_ORES = new HashSet<>(Arrays.asList(
+		"leadglance", "galena"
+	));
 
 	private static final String[] FUEL_NAMES = {"Coal", "Black Coal", "Charcoal"};
 	private static final double MAX_INTERACT_DIST = 11 * 5;
@@ -47,21 +54,18 @@ public class OreSmeltingBot extends BotBase {
 		doGoldOre = Utils.getprefb("oreSmeltingBot_gold", false);
 		doSilverOre = Utils.getprefb("oreSmeltingBot_silver", false);
 		doLeadOre = Utils.getprefb("oreSmeltingBot_lead", false);
-		doZincOre = Utils.getprefb("oreSmeltingBot_zinc", false);
 		doCollectOutput = Utils.getprefb("oreSmeltingBot_collect", true);
 		fuelPerLoad = Utils.getprefi("oreSmeltingBot_fuelCount", 12);
 
 		int y = 10;
-		add(new CheckBox("Copper Ore") {{ a = doCopperOre; } public void set(boolean val) { doCopperOre = val; a = val; Utils.setprefb("oreSmeltingBot_copper", val); }}, UI.scale(10, y));
-		add(new CheckBox("Gold Ore") {{ a = doGoldOre; } public void set(boolean val) { doGoldOre = val; a = val; Utils.setprefb("oreSmeltingBot_gold", val); }}, UI.scale(130, y));
+		add(new CheckBox("Copper") {{ a = doCopperOre; } public void set(boolean val) { doCopperOre = val; a = val; Utils.setprefb("oreSmeltingBot_copper", val); }}, UI.scale(10, y));
+		add(new CheckBox("Gold") {{ a = doGoldOre; } public void set(boolean val) { doGoldOre = val; a = val; Utils.setprefb("oreSmeltingBot_gold", val); }}, UI.scale(130, y));
 		y += 20;
-		add(new CheckBox("Tin Ore") {{ a = doTinOre; } public void set(boolean val) { doTinOre = val; a = val; Utils.setprefb("oreSmeltingBot_tin", val); }}, UI.scale(10, y));
-		add(new CheckBox("Silver Ore") {{ a = doSilverOre; } public void set(boolean val) { doSilverOre = val; a = val; Utils.setprefb("oreSmeltingBot_silver", val); }}, UI.scale(130, y));
+		add(new CheckBox("Tin") {{ a = doTinOre; } public void set(boolean val) { doTinOre = val; a = val; Utils.setprefb("oreSmeltingBot_tin", val); }}, UI.scale(10, y));
+		add(new CheckBox("Silver") {{ a = doSilverOre; } public void set(boolean val) { doSilverOre = val; a = val; Utils.setprefb("oreSmeltingBot_silver", val); }}, UI.scale(130, y));
 		y += 20;
-		add(new CheckBox("Iron Ore") {{ a = doIronOre; } public void set(boolean val) { doIronOre = val; a = val; Utils.setprefb("oreSmeltingBot_iron", val); }}, UI.scale(10, y));
-		add(new CheckBox("Lead Ore") {{ a = doLeadOre; } public void set(boolean val) { doLeadOre = val; a = val; Utils.setprefb("oreSmeltingBot_lead", val); }}, UI.scale(130, y));
-		y += 20;
-		add(new CheckBox("Zinc Ore") {{ a = doZincOre; } public void set(boolean val) { doZincOre = val; a = val; Utils.setprefb("oreSmeltingBot_zinc", val); }}, UI.scale(10, y));
+		add(new CheckBox("Iron") {{ a = doIronOre; } public void set(boolean val) { doIronOre = val; a = val; Utils.setprefb("oreSmeltingBot_iron", val); }}, UI.scale(10, y));
+		add(new CheckBox("Lead") {{ a = doLeadOre; } public void set(boolean val) { doLeadOre = val; a = val; Utils.setprefb("oreSmeltingBot_lead", val); }}, UI.scale(130, y));
 		y += 25;
 		add(new CheckBox("Collect output bars") {{ a = doCollectOutput; } public void set(boolean val) { doCollectOutput = val; a = val; Utils.setprefb("oreSmeltingBot_collect", val); }}, UI.scale(10, y));
 		y += 25;
@@ -260,7 +264,7 @@ public class OreSmeltingBot extends BotBase {
 
 	private WItem findOreInInventory() {
 		for (WItem wi : InvHelper.getAllItemsExcludeBeltKeyring(gui)) {
-			try { if (isOreEnabled(wi.item.getname())) return wi; } catch (Loading ignored) {}
+			try { if (isOreEnabled(wi.item.resource().basename())) return wi; } catch (Loading | NullPointerException ignored) {}
 		}
 		return null;
 	}
@@ -268,7 +272,7 @@ public class OreSmeltingBot extends BotBase {
 	private List<WItem> findAllOreInInventory() {
 		List<WItem> ores = new ArrayList<>();
 		for (WItem wi : InvHelper.getAllItemsExcludeBeltKeyring(gui)) {
-			try { if (isOreEnabled(wi.item.getname())) ores.add(wi); } catch (Loading ignored) {}
+			try { if (isOreEnabled(wi.item.resource().basename())) ores.add(wi); } catch (Loading | NullPointerException ignored) {}
 		}
 		return ores;
 	}
@@ -283,19 +287,18 @@ public class OreSmeltingBot extends BotBase {
 		return null;
 	}
 
-	private boolean isOreEnabled(String n) {
-		if (n == null) return false;
-		if (doCopperOre && n.contains("Copper") && n.contains("Ore")) return true;
-		if (doTinOre && n.contains("Tin") && n.contains("Ore")) return true;
-		if (doIronOre && n.contains("Iron") && n.contains("Ore")) return true;
-		if (doGoldOre && n.contains("Gold") && n.contains("Ore")) return true;
-		if (doSilverOre && n.contains("Silver") && n.contains("Ore")) return true;
-		if (doLeadOre && n.contains("Lead") && n.contains("Ore")) return true;
-		if (doZincOre && n.contains("Zinc") && n.contains("Ore")) return true;
+	private boolean isOreEnabled(String basename) {
+		if (basename == null) return false;
+		if (doCopperOre && COPPER_ORES.contains(basename)) return true;
+		if (doTinOre && TIN_ORES.contains(basename)) return true;
+		if (doIronOre && IRON_ORES.contains(basename)) return true;
+		if (doGoldOre && GOLD_ORES.contains(basename)) return true;
+		if (doSilverOre && SILVER_ORES.contains(basename)) return true;
+		if (doLeadOre && LEAD_ORES.contains(basename)) return true;
 		return false;
 	}
 
-	private boolean hasAnyOreSelected() { return doCopperOre || doTinOre || doIronOre || doGoldOre || doSilverOre || doLeadOre || doZincOre; }
+	private boolean hasAnyOreSelected() { return doCopperOre || doTinOre || doIronOre || doGoldOre || doSilverOre || doLeadOre; }
 
 	private boolean waitForHand(boolean occupied) throws InterruptedException {
 		int timeout = 0;
