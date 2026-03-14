@@ -199,23 +199,19 @@ public class OreSmeltingBot extends BotBase {
 		// Clear hand before interacting
 		if (gui.vhand != null) { gui.vhand.item.wdgmsg("drop", Coord.z); Actions.waitForEmptyHand(gui, 1000, ""); }
 
-		// Open smelter UI by right-clicking it
-		setStatus("Opening smelter...");
 		Coord2d smelterPos = new Coord2d(smelter.rc.x, smelter.rc.y);
-		gui.map.wdgmsg("click", Coord.z, smelterPos.floor(posres), 3, 0, 0, (int) smelter.id, smelterPos.floor(posres), 0, -1);
 
-		Inventory smelterInv = waitForContainerWindow("Smelter", 5000);
-		if (smelterInv == null) { setStatus("Could not open smelter"); return; }
-
-		// Load ore via shift-click (transfer) — wait for each item to actually move
+		// Load ore: pick up from inventory → right-click smelter to deposit
 		setStatus("Loading ore...");
-		int oreLoaded = transferItemsToContainer(true);
+		int oreLoaded = loadItemsViaItemact(smelter, smelterPos, true);
+		if (oreLoaded == 0) { setStatus("Failed to load ore"); return; }
 		setStatus("Loaded " + oreLoaded + " ore");
 		Thread.sleep(200);
 
-		// Load fuel via shift-click (transfer)
+		// Load fuel: same pick up → right-click pattern
 		setStatus("Loading fuel...");
-		int fuelLoaded = transferItemsToContainer(false);
+		int fuelLoaded = loadItemsViaItemact(smelter, smelterPos, false);
+		if (fuelLoaded == 0) { setStatus("Failed to load fuel"); return; }
 		setStatus("Loaded " + fuelLoaded + " fuel");
 		Thread.sleep(200);
 
@@ -230,6 +226,68 @@ public class OreSmeltingBot extends BotBase {
 		processedSmelters.add(smelter.id);
 		setStatus("Smelter lit! Moving to next...");
 		Thread.sleep(500);
+	}
+
+	/**
+	 * Load items into smelter using the correct H&H interaction:
+	 * Left-click item in inventory (pick up to cursor) → Right-click smelter gob (deposit).
+	 * Uses shift modifier to keep cycling items from the same stack.
+	 * Per wiki: "left-clicking the coal and right-clicking the ore smelter"
+	 */
+	private int loadItemsViaItemact(Gob smelter, Coord2d smelterPos, boolean ore) throws InterruptedException {
+		int loaded = 0;
+		int maxItems = ore ? SMELTER_ORE_CAPACITY : fuelPerLoad;
+
+		for (int i = 0; i < maxItems && active && !stop; i++) {
+			// Find next matching item in inventory
+			WItem item = ore ? findOreInInventory() : findFuelInInventory();
+			if (item == null) break;
+
+			// Pick up item to cursor if hand is empty
+			if (gui.vhand == null) {
+				item.item.wdgmsg("take", new Coord(item.item.sz.x / 2, item.item.sz.y / 2));
+				int waited = 0;
+				while (gui.vhand == null && waited < 2000) { Thread.sleep(50); waited += 50; }
+				if (gui.vhand == null) break; // couldn't pick up
+			}
+
+			// Right-click smelter to deposit — use shift modifier to keep cycling
+			// modifier 1 = shift (keeps depositing from stack), 0 = last item
+			boolean moreAfterThis = (i < maxItems - 1) && ((ore ? findOreInInventory() : findFuelInInventory()) != null || i == 0);
+			int modifier = moreAfterThis ? MOD_SHIFT : 0;
+			gui.map.wdgmsg("itemact", Coord.z, smelterPos.floor(posres), modifier, 0,
+				(int) smelter.id, smelterPos.floor(posres), 0, -1);
+
+			// Wait for hand to change (item deposited, next item from stack appears, or hand empties)
+			GItem handBefore = gui.vhand != null ? gui.vhand.item : null;
+			int waited = 0;
+			boolean deposited = false;
+			while (waited < 3000) {
+				Thread.sleep(50);
+				waited += 50;
+				WItem handNow = gui.vhand;
+				if (handNow == null) { deposited = true; break; }
+				if (handNow.item != handBefore) { deposited = true; break; } // new item cycled in
+			}
+			if (deposited) {
+				loaded++;
+			} else {
+				// Smelter full or interaction failed — drop whatever is in hand
+				break;
+			}
+		}
+
+		// Clean up: drop any remaining item on cursor back to inventory
+		if (gui.vhand != null) {
+			gui.vhand.item.wdgmsg("drop", Coord.z);
+			Actions.waitForEmptyHand(gui, 1000, "");
+		}
+		return loaded;
+	}
+
+	/** Count total items in player main inventory. */
+	private int countInventoryItems() {
+		try { return gui.maininv.getAllItems().size(); } catch (Exception e) { return 0; }
 	}
 
 	/** Wait for a container window with the given name to appear. */
@@ -247,43 +305,6 @@ public class OreSmeltingBot extends BotBase {
 			waited += 100;
 		}
 		return null;
-	}
-
-	/**
-	 * Transfer items from player inventory to the currently open container.
-	 * @param ore true = transfer matching ore, false = transfer fuel
-	 * @return number of items transferred
-	 */
-	private int transferItemsToContainer(boolean ore) throws InterruptedException {
-		int loaded = 0;
-		int maxItems = ore ? SMELTER_ORE_CAPACITY : fuelPerLoad;
-		for (int i = 0; i < maxItems && active && !stop; i++) {
-			WItem item = ore ? findOreInInventory() : findFuelInInventory();
-			if (item == null) break;
-			int beforeCount = countInventoryItems();
-			try {
-				item.item.wdgmsg("transfer", Coord.z);
-			} catch (Exception ignored) { continue; }
-			// Wait for the item to actually leave the inventory
-			int waited = 0;
-			while (waited < 2000) {
-				Thread.sleep(50);
-				waited += 50;
-				if (countInventoryItems() < beforeCount) break;
-			}
-			if (countInventoryItems() < beforeCount) {
-				loaded++;
-			} else {
-				// Item didn't transfer — smelter might be full
-				break;
-			}
-		}
-		return loaded;
-	}
-
-	/** Count total items in player main inventory. */
-	private int countInventoryItems() {
-		try { return gui.maininv.getAllItems().size(); } catch (Exception e) { return 0; }
 	}
 
 	/**
