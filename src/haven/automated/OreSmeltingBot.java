@@ -135,39 +135,31 @@ public class OreSmeltingBot extends BotBase {
 		if (!checkVitals()) return;
 		GameUI.Progress p = gui.prog;
 		if (p != null) { setStatus("Working..."); waitForProgressBar(10000); return; }
-
-		Gob smelter = findNearestUnprocessedSmelter();
-		if (smelter == null) {
-			setStatus("No available smelters nearby (" + processedSmelters.size() + " done)");
-			smelterCountLabel.settext("");
-			deactivate();
-			return;
-		}
-		smelterCountLabel.settext("Smelters: " + countSmelters() + " total, " + processedSmelters.size() + " done");
 		if (gui.vhand != null) { gui.vhand.item.wdgmsg("drop", Coord.z); Actions.waitForEmptyHand(gui, 1000, ""); }
 
-		// Check if we have ore — if not, try stockpiles
+		// Step 1: Ensure we have ore — fetch from stockpiles if needed
 		if (findOreInInventory() == null) {
 			if (doGrabFromStockpiles) {
 				setStatus("Fetching ore from stockpile...");
 				if (!grabFromStockpile(true)) {
-					setStatus("No ore stockpiles found");
+					setStatus("No ore found in inventory or stockpiles");
 					deactivate();
 					return;
 				}
 			} else {
-				if (doCollectOutput) { setStatus("No ore. Collecting output..."); collectOutputFromSmelter(smelter); }
+				Gob smelter = findNearestUnprocessedSmelter();
+				if (smelter != null && doCollectOutput) { setStatus("No ore. Collecting output..."); collectOutputFromSmelter(smelter); }
 				else { setStatus("No ore in inventory"); deactivate(); }
 				return;
 			}
 		}
 
-		// Check if we have fuel — if not, try stockpiles
+		// Step 2: Ensure we have fuel — fetch from stockpiles if needed
 		if (findFuelInInventory() == null) {
 			if (doGrabFromStockpiles) {
 				setStatus("Fetching fuel from stockpile...");
 				if (!grabFromStockpile(false)) {
-					setStatus("No fuel stockpiles found");
+					setStatus("No fuel found in inventory or stockpiles");
 					deactivate();
 					return;
 				}
@@ -177,6 +169,16 @@ public class OreSmeltingBot extends BotBase {
 				return;
 			}
 		}
+
+		// Step 3: Find and process next smelter
+		Gob smelter = findNearestUnprocessedSmelter();
+		if (smelter == null) {
+			setStatus("No available smelters nearby (" + processedSmelters.size() + " done)");
+			smelterCountLabel.settext("");
+			deactivate();
+			return;
+		}
+		smelterCountLabel.settext("Smelters: " + countSmelters() + " total, " + processedSmelters.size() + " done");
 
 		processSmelter(smelter);
 	}
@@ -321,7 +323,7 @@ public class OreSmeltingBot extends BotBase {
 		return grabbed > 0;
 	}
 
-	/** Find nearest ore or fuel stockpile. */
+	/** Find nearest ore or fuel stockpile. Matches by stockpile resource name suffix. */
 	private Gob findNearestMatchingStockpile(boolean ore) {
 		return GobHelper.findNearest(gui, MAX_SEARCH_DIST, g -> {
 			try {
@@ -329,10 +331,16 @@ public class OreSmeltingBot extends BotBase {
 				if (res == null || !res.name.startsWith(STOCKPILE_PREFIX)) return false;
 				String spType = res.name.substring(STOCKPILE_PREFIX.length());
 				if (ore) {
-					return ALL_ORE_BASENAMES.contains(spType) && isOreEnabled(spType);
+					// Match exact ore basename or partial match (stockpile names may vary)
+					if (ALL_ORE_BASENAMES.contains(spType) && isOreEnabled(spType)) return true;
+					// Fallback: check if any enabled ore basename is contained in the stockpile name
+					for (String oreName : ALL_ORE_BASENAMES) {
+						if (isOreEnabled(oreName) && spType.contains(oreName)) return true;
+					}
+					return false;
 				} else {
 					for (String fuelName : FUEL_STOCKPILE_NAMES) {
-						if (spType.equals(fuelName)) return true;
+						if (spType.equals(fuelName) || spType.contains(fuelName)) return true;
 					}
 					return false;
 				}
