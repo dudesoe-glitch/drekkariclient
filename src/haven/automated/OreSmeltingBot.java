@@ -66,7 +66,9 @@ public class OreSmeltingBot extends BotBase {
 		add(new CheckBox("Collect output bars") {{ a = doCollectOutput; } public void set(boolean val) { doCollectOutput = val; a = val; Utils.setprefb("oreSmeltingBot_collect", val); }}, UI.scale(10, y));
 		y += 25;
 
-		add(new Label("Fuel per smelter:"), UI.scale(10, y));
+		Label fuelLabel = new Label("Fuel per smelter:");
+		fuelLabel.tooltip = RichText.render("Minimum 12 coal/charcoal per load (~11.6 consumed).\nMiner Credo may reduce to 9 (-25% fuel).", UI.scale(300));
+		add(fuelLabel, UI.scale(10, y));
 		TextEntry fuelEntry = new TextEntry(UI.scale(30), String.valueOf(fuelPerLoad)) {
 			@Override
 			public boolean keydown(KeyDownEvent ev) {
