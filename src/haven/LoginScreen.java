@@ -230,13 +230,8 @@ public class LoginScreen extends Widget {
 				super.wdgmsg(sender, msg, args);
 		}
 	};
-	Config.githubLatestVersion = "Loading...";
-	GitHubVersionFetcher.fetchLatestVersion("dudesoe-glitch", "drekkariclient", new GitHubVersionFetcher.VersionCallback() {
-		@Override
-		public void onVersionFetched(String version) {
-			Config.githubLatestVersion = version; // Update immediately upon response
-		}
-	});
+	// Version check disabled — we manage our own releases independently
+	Config.githubLatestVersion = Config.clientVersion;
 	GameUI.verifiedAccount = false;
 	GameUI.subscribedAccount = false;
 	GameUI.stopAllThemes();
