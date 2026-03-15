@@ -20,8 +20,12 @@ public class FarmingBot extends BotBase {
 	private static final int WINTER = 3;
 	private static final double SCYTHE_RADIUS = 40.0; // 2x3 tiles diagonal (~39.6 units) — wiki: "2x3 tiles in front of character"
 	private static final String SCYTHE_RES = "scythe";
-	private static final int HARVEST_VERIFY_TIMEOUT = 3000; // ms to wait for crop gob removal
+	private static final int HARVEST_VERIFY_TIMEOUT = 1500; // ms to wait for crop gob removal
 	private static final int HARVEST_VERIFY_INTERVAL = 50; // ms between checks
+	private static final double DIRECT_WALK_DIST = 55.0; // ~5 tiles — skip pathfinder, walk directly
+	private static final int DIRECT_WALK_TIMEOUT = 3000; // ms timeout for direct walk
+	private static final String MOUND_BED_RES = "gfx/terobjs/moundbed";
+	private static final double MOUND_BED_RADIUS = 225.0; // game units — from Gob.java radius overlay
 
 	// Crops that use seeds for replanting
 	private static final Map<String, String> CROP_TO_SEED = new HashMap<String, String>() {{
@@ -116,14 +120,62 @@ public class FarmingBot extends BotBase {
 	}
 
 	private void checkFrozenGround() {
-		if (!frozenWarningShown && isWinter()) {
-			frozenWarningShown = true;
-			gui.errorsilent("Warning: Ground is frozen in winter! Replanting disabled.");
-			replantCheckBox.a = false;
-		} else if (frozenWarningShown && !isWinter()) {
+		if (!isWinter()) {
 			frozenWarningShown = false;
 			plantFailCount = 0;
+			return;
 		}
+		// Winter — check if player is within mound bed range (warm zone)
+		if (isNearMoundBed()) {
+			if (frozenWarningShown) {
+				frozenWarningShown = false;
+				plantFailCount = 0;
+				replantCheckBox.a = true;
+				gui.ui.msg("Mound Bed nearby — replanting re-enabled.");
+			}
+			return;
+		}
+		if (!frozenWarningShown) {
+			frozenWarningShown = true;
+			gui.errorsilent("Ground is frozen! Replanting disabled (no Mound Bed nearby).");
+			replantCheckBox.a = false;
+		}
+	}
+
+	private List<Coord2d> findMoundBedPositions() {
+		List<Coord2d> beds = new ArrayList<>();
+		synchronized (gui.map.glob.oc) {
+			for (Gob gob : gui.map.glob.oc) {
+				try {
+					Resource res = gob.getres();
+					if (res != null && res.name.equals(MOUND_BED_RES)) {
+						beds.add(new Coord2d(gob.rc.x, gob.rc.y));
+					}
+				} catch (Loading | NullPointerException ignored) {}
+			}
+		}
+		return beds;
+	}
+
+	private boolean isNearMoundBed() {
+		Gob player = gui.map.player();
+		if (player == null) return false;
+		Coord2d playerPos = new Coord2d(player.rc.x, player.rc.y);
+		for (Coord2d bed : findMoundBedPositions()) {
+			if (playerPos.dist(bed) <= MOUND_BED_RADIUS) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private boolean isPositionInMoundBedRange(Coord2d pos, List<Coord2d> moundBeds) {
+		for (Coord2d bed : moundBeds) {
+			if (pos.dist(bed) <= MOUND_BED_RADIUS) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	@Override
@@ -142,21 +194,40 @@ public class FarmingBot extends BotBase {
 			return;
 		}
 
-		Gob crop = findMatureCrop();
-		if (crop != null) {
-			processHarvest(crop);
-		} else {
+		List<Gob> crops = findAllMatureCrops();
+		if (crops.isEmpty()) {
 			if (!blacklistedCrops.isEmpty()) {
-				// Clear blacklist and try once more before giving up
 				blacklistedCrops.clear();
-				crop = findMatureCrop();
-				if (crop != null) {
-					processHarvest(crop);
-					return;
-				}
+				crops = findAllMatureCrops();
 			}
-			setStatus("No mature crops found.");
-			deactivate();
+			if (crops.isEmpty()) {
+				setStatus("No mature crops found.");
+				deactivate();
+				return;
+			}
+		}
+
+		// Phase 1: Harvest all crops, collecting positions by crop type
+		// cropBaseName is captured BEFORE harvest (gob may despawn after)
+		LinkedHashMap<String, List<Coord2d>> harvestedByType = new LinkedHashMap<>();
+		for (Gob crop : crops) {
+			if (stop) return;
+			if (!checkVitals()) return;
+			String cropBaseName = getCropBaseName(crop);
+			if (cropBaseName == null) continue;
+			List<Coord2d> positions = harvestSingleCrop(crop);
+			if (positions != null && !positions.isEmpty()) {
+				harvestedByType.computeIfAbsent(cropBaseName, k -> new ArrayList<>()).addAll(positions);
+			}
+		}
+
+		// Phase 2: Replant all positions (all seeds now in inventory for best quality selection)
+		if (replantCheckBox.a && !harvestedByType.isEmpty()) {
+			for (Map.Entry<String, List<Coord2d>> entry : harvestedByType.entrySet()) {
+				if (stop) return;
+				if (!checkVitals()) return;
+				replantPositions(entry.getValue(), entry.getKey());
+			}
 		}
 	}
 
@@ -222,10 +293,17 @@ public class FarmingBot extends BotBase {
 			return;
 		}
 
+		boolean winter = isWinter();
+		List<Coord2d> moundBeds = winter ? findMoundBedPositions() : null;
 		int total = positions.size();
 		for (int i = 0; i < total; i++) {
 			if (stop) return;
 			Coord2d pos = positions.get(i);
+
+			// In winter, skip positions outside mound bed range
+			if (winter && !isPositionInMoundBedRange(pos, moundBeds)) {
+				continue;
+			}
 
 			WItem plantItem = findPlantItem(cropBaseName);
 			if (plantItem == null) {
@@ -235,7 +313,7 @@ public class FarmingBot extends BotBase {
 
 			setStatus("Replanting " + cropBaseName + " " + (i + 1) + "/" + total + "...");
 			plantItem.item.wdgmsg("take", Coord.z);
-			if (!Actions.waitForOccupiedHand(gui, 2000, "")) {
+			if (!Actions.waitForOccupiedHand(gui, 500, "")) {
 				return;
 			}
 			if (stop) return;
@@ -249,7 +327,7 @@ public class FarmingBot extends BotBase {
 				plantFailCount++;
 				// Transfer seed back to inventory instead of dropping on ground
 				gui.vhand.item.wdgmsg("transfer", Coord.z);
-				Actions.waitForEmptyHand(gui, 1000, "");
+				Actions.waitForEmptyHand(gui, 500, "");
 				if (plantFailCount >= 3) {
 					gui.errorsilent("Planting failed repeatedly. Ground may be frozen or tiles occupied.");
 					replantCheckBox.a = false;
@@ -262,42 +340,84 @@ public class FarmingBot extends BotBase {
 		}
 	}
 
-	private void processHarvest(Gob crop) throws InterruptedException {
-		if (crop == null) return;
+	private boolean waitForMovement(int timeout) throws InterruptedException {
+		Gob player = gui.map.player();
+		if (player == null) return false;
+		// Wait for movement to start
+		int waited = 0;
+		while (player.getv() <= 0 && waited < 500) {
+			Thread.sleep(30);
+			waited += 30;
+			player = gui.map.player();
+			if (player == null) return false;
+		}
+		// Wait for movement to finish
+		int elapsed = 0;
+		while (elapsed < timeout) {
+			player = gui.map.player();
+			if (player == null) return false;
+			if (player.getv() <= 0) return true;
+			Thread.sleep(30);
+			elapsed += 30;
+			if (stop) return false;
+		}
+		return true;
+	}
+
+	private String getCropBaseName(Gob crop) {
+		try {
+			Resource res = crop.getres();
+			if (res == null) return null;
+			return res.name.substring(res.name.lastIndexOf('/') + 1);
+		} catch (Loading | NullPointerException e) {
+			return null;
+		}
+	}
+
+	private List<Coord2d> harvestSingleCrop(Gob crop) throws InterruptedException {
+		if (crop == null) return null;
 
 		String cropRes;
 		try {
 			Resource res = crop.getres();
-			if (res == null) return;
+			if (res == null) return null;
 			cropRes = res.name;
 		} catch (Loading l) {
-			return;
+			return null;
 		}
 		String cropBaseName = cropRes.substring(cropRes.lastIndexOf('/') + 1);
-		// Defensive copy — Coord2d is mutable
 		Coord2d cropPos = new Coord2d(crop.rc.x, crop.rc.y);
 
 		setStatus("Walking to " + cropBaseName + "...");
-		gui.map.pfLeftClick(cropPos.floor().add(2, 0), null);
-		if (!Actions.waitPf(gui)) {
-			// Blacklist this crop to avoid retry loop on unreachable crops
-			blacklistedCrops.add(crop.id);
-			Actions.unstuck(gui);
-			return;
+		Gob player = gui.map.player();
+		if (player == null) return null;
+		Coord2d playerPos = new Coord2d(player.rc.x, player.rc.y);
+		if (cropPos.dist(playerPos) < DIRECT_WALK_DIST) {
+			gui.map.wdgmsg("click", Coord.z, cropPos.floor(posres), 1, 0);
+			if (!waitForMovement(DIRECT_WALK_TIMEOUT)) {
+				blacklistedCrops.add(crop.id);
+				return null;
+			}
+		} else {
+			gui.map.pfLeftClick(cropPos.floor().add(2, 0), null);
+			if (!Actions.waitPf(gui)) {
+				blacklistedCrops.add(crop.id);
+				Actions.unstuck(gui);
+				return null;
+			}
 		}
 
-		Gob player = gui.map.player();
-		if (player == null) return;
+		player = gui.map.player();
+		if (player == null) return null;
 		if (cropPos.dist(new Coord2d(player.rc.x, player.rc.y)) > 11 * 5) {
 			blacklistedCrops.add(crop.id);
 			setStatus("Too far from " + cropBaseName + ", skipping.");
-			return;
+			return null;
 		}
 
-		// Verify crop still exists (may have been harvested by another player)
 		if (gui.map.glob.oc.getgob(crop.id) == null) {
 			setStatus(cropBaseName + " already gone, moving on.");
-			return;
+			return null;
 		}
 
 		if (gui.vhand != null) {
@@ -305,7 +425,6 @@ public class FarmingBot extends BotBase {
 			Actions.waitForEmptyHand(gui, 1000, "");
 		}
 
-		// Snapshot before harvest
 		boolean scythe = isScytheEquipped();
 		LinkedHashMap<Long, Coord2d> snapshot;
 		if (scythe) {
@@ -315,35 +434,29 @@ public class FarmingBot extends BotBase {
 			snapshot.put(crop.id, new Coord2d(cropPos.x, cropPos.y));
 		}
 
-		// Harvest
 		setStatus("Harvesting " + cropBaseName + (scythe ? " (scythe)..." : "..."));
 		FlowerMenu.setNextSelection("Harvest");
 		gui.map.wdgmsg("click", Coord.z, cropPos.floor(posres), 3, 0, 0, (int) crop.id, cropPos.floor(posres), 0, -1);
 		waitForProgressBar(30000);
 
-		// Verify harvest succeeded by checking gob removal (with timeout)
 		List<Coord2d> harvested = findHarvestedPositions(snapshot);
 		if (harvested.isEmpty()) {
-			// Harvest failed — crop still there (another player got it, or FlowerMenu didn't appear)
-			// Clear any unconsumed FlowerMenu selection
 			FlowerMenu.setNextSelection(null);
 			blacklistedCrops.add(crop.id);
 			setStatus("Harvest failed for " + cropBaseName + ", skipping.");
-			return;
+			return null;
 		}
 
-		// Replant harvested positions
-		if (replantCheckBox.a && !NO_REPLANT_CROPS.contains(cropBaseName)) {
-			replantPositions(harvested, cropBaseName);
-		}
+		return harvested;
 	}
 
-	private Gob findMatureCrop() {
-		Gob closest = null;
-		double closestDist = Double.MAX_VALUE;
+	private List<Gob> findAllMatureCrops() {
+		List<Gob> crops = new ArrayList<>();
 		Gob player = gui.map.player();
-		if (player == null) return null;
+		if (player == null) return crops;
 		Coord2d playerPos = new Coord2d(player.rc.x, player.rc.y);
+		// Snapshot positions for safe sorting outside the sync block
+		Map<Long, Double> distMap = new HashMap<>();
 
 		synchronized (gui.map.glob.oc) {
 			for (Gob gob : gui.map.glob.oc) {
@@ -355,17 +468,19 @@ public class FarmingBot extends BotBase {
 					if (!Utils.isSpriteKind(gob, "GrowingPlant", "TrellisPlant")) continue;
 					if (!GobHelper.isMature(gob)) continue;
 
-					double dist = gob.rc.dist(playerPos);
+					double dist = new Coord2d(gob.rc.x, gob.rc.y).dist(playerPos);
 					if (dist > MAX_SEARCH_DIST) continue;
-					if (dist < closestDist) {
-						closestDist = dist;
-						closest = gob;
-					}
+					crops.add(gob);
+					distMap.put(gob.id, dist);
 				} catch (Loading | NullPointerException ignored) {
 				}
 			}
 		}
-		return closest;
+		// Sort by snapshotted distance — safe outside synchronized block
+		crops.sort((a, b) -> Double.compare(
+				distMap.getOrDefault(a.id, Double.MAX_VALUE),
+				distMap.getOrDefault(b.id, Double.MAX_VALUE)));
+		return crops;
 	}
 
 	/**
@@ -407,6 +522,7 @@ public class FarmingBot extends BotBase {
 		Set<GItem> seen = new HashSet<>();
 		List<WItem> found = new ArrayList<>();
 
+		if (gui.maininv == null) return null;
 		// Search main inventory via wmap (ConcurrentHashMap — thread-safe)
 		for (WItem wi : gui.maininv.wmap.values()) {
 			try {

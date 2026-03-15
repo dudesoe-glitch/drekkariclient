@@ -4,10 +4,10 @@ package haven.automated.pathfinder;
 import haven.*;
 import haven.automated.helpers.HitBoxes;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 import static haven.OCache.posres;
@@ -25,10 +25,11 @@ public class Pathfinder implements Runnable {
     private String action;
     public Coord mc;
     private int modflags;
+    private Coord clickMc; // Original click position for gob interactions (e.g., door on a house)
     private int interruptedRetries = 8;
     private static final int RESPONSE_TIMEOUT = 800;
     private long avgOverrun = 0;
-    public List<Coord2d> pathWaypoints = new ArrayList<>();
+    public final List<Coord2d> pathWaypoints = new CopyOnWriteArrayList<>();
 
     public Pathfinder(MapView mv, Coord dest, String action) {
         this.dest = dest;
@@ -48,6 +49,12 @@ public class Pathfinder implements Runnable {
         this.oc = mv.glob.oc;
         this.map = mv.glob.map;
         this.mv = mv;
+    }
+
+    public Pathfinder(MapView mv, Coord dest, Gob gob, Coord2d clickPos, int meshid, int clickb, int modflags, String action) {
+        this(mv, dest, gob, meshid, clickb, modflags, action);
+        if (clickPos != null)
+            this.clickMc = clickPos.floor(posres);
     }
 
     private final Set<PFListener> listeners = new CopyOnWriteArraySet<PFListener>();
@@ -88,13 +95,22 @@ public class Pathfinder implements Runnable {
     public void pathfind(Coord src) {
         long starttotal = System.nanoTime();
         Gob player = mv.player();
+        if (player == null) {
+            terminate = true;
+            return;
+        }
 
         // Adjust hitbox for mounted players (horses have larger collision)
-        if (player != null && player.occupiedGobID != null) {
-            Map.setPlayerBBox(4); // slightly wider hitbox for horse
+        // or players carrying objects (wider effective collision)
+        if (player.occupiedGobID != null) {
+            Map.setPlayerBBox(4); // slightly wider hitbox for horse/carry
         } else {
             Map.setPlayerBBox(3); // default player hitbox
         }
+
+        // Collect gob IDs that follow the player (carried objects, passengers)
+        // so we can skip their hitboxes during pathfinding
+        long plgobId = player.id;
 
         Map m = new Map(src, dest, map);
 
@@ -107,15 +123,22 @@ public class Pathfinder implements Runnable {
                     continue;
                 // Skip the horse/mount gob when player is mounted — otherwise
                 // the mount's hitbox blocks the player's own starting position
-                if (player != null && player.occupiedGobID != null && gob.id == player.occupiedGobID)
+                if (player.occupiedGobID != null && gob.id == player.occupiedGobID)
                     continue;
-                if (gob.getres() != null && isInsideBoundBox(gob.rc.floor(), gob.a, gob.getres().name, player.rc.floor())) {
-                    HitBoxes.CollisionBoxSecondary[] collisionBoxes = HitBoxes.collisionBoxMap.get(gob.getres().name);
+                // Skip gobs following the player (carried objects) — their hitbox
+                // is at the player's position and would block pathfinding
+                Moving moving = gob.getattr(Moving.class);
+                if (moving instanceof Following && ((Following) moving).tgt == plgobId)
+                    continue;
+                Resource gobRes = null;
+                try { gobRes = gob.getres(); } catch (Loading ignored) {}
+                if (gobRes != null && isInsideBoundBox(gob.rc.floor(), gob.a, gobRes.name, player.rc.floor())) {
+                    HitBoxes.CollisionBoxSecondary[] collisionBoxes = HitBoxes.collisionBoxMap.get(gobRes.name);
                     if (collisionBoxes != null) {
                         for (HitBoxes.CollisionBoxSecondary collisionBox : collisionBoxes) {
                             if (collisionBox.hitAble && collisionBox.coords.length > 2) {
                                 double minX = Double.MAX_VALUE, minY = Double.MAX_VALUE;
-                                double maxX = Double.MIN_VALUE, maxY = Double.MIN_VALUE;
+                                double maxX = -Double.MAX_VALUE, maxY = -Double.MAX_VALUE;
                                 for (Coord2d coord : collisionBox.coords) {
                                     minX = Math.min(minX, coord.x);
                                     minY = Math.min(minY, coord.y);
@@ -151,21 +174,25 @@ public class Pathfinder implements Runnable {
         }
 
         if (this.gob != null) {
-            HitBoxes.CollisionBoxSecondary[] collisionBoxes = HitBoxes.collisionBoxMap.get(this.gob.getres().name);
-            if (collisionBoxes != null) {
-                for (HitBoxes.CollisionBoxSecondary collisionBox : collisionBoxes) {
-                    if (collisionBox.hitAble && collisionBox.coords.length > 2) {
-                        double minX = Double.MAX_VALUE, minY = Double.MAX_VALUE;
-                        double maxX = Double.MIN_VALUE, maxY = Double.MIN_VALUE;
-                        for (Coord2d coord : collisionBox.coords) {
-                            minX = Math.min(minX, coord.x);
-                            minY = Math.min(minY, coord.y);
-                            maxX = Math.max(maxX, coord.x);
-                            maxY = Math.max(maxY, coord.y);
+            Resource targetRes = null;
+            try { targetRes = this.gob.getres(); } catch (Loading ignored) {}
+            if (targetRes != null) {
+                HitBoxes.CollisionBoxSecondary[] collisionBoxes = HitBoxes.collisionBoxMap.get(targetRes.name);
+                if (collisionBoxes != null) {
+                    for (HitBoxes.CollisionBoxSecondary collisionBox : collisionBoxes) {
+                        if (collisionBox.hitAble && collisionBox.coords.length > 2) {
+                            double minX = Double.MAX_VALUE, minY = Double.MAX_VALUE;
+                            double maxX = -Double.MAX_VALUE, maxY = -Double.MAX_VALUE;
+                            for (Coord2d coord : collisionBox.coords) {
+                                minX = Math.min(minX, coord.x);
+                                minY = Math.min(minY, coord.y);
+                                maxX = Math.max(maxX, coord.x);
+                                maxY = Math.max(maxY, coord.y);
+                            }
+                            Coord2d topLeft = new Coord2d(minX, minY);
+                            Coord2d bottomRight = new Coord2d(maxX, maxY);
+                            m.excludeGob(topLeft.floor(), bottomRight.floor(), this.gob);
                         }
-                        Coord2d topLeft = new Coord2d(minX, minY);
-                        Coord2d bottomRight = new Coord2d(maxX, maxY);
-                        m.excludeGob(topLeft.floor(), bottomRight.floor(), this.gob);
                     }
                 }
             }
@@ -182,10 +209,9 @@ public class Pathfinder implements Runnable {
         m.dbgdump();
 
         pathWaypoints.clear();
-        pathWaypoints.add(player.rc);
+        pathWaypoints.add(new Coord2d(player.rc.x, player.rc.y));
         for (Edge e : path) {
-            Coord2d waypoint = new Coord2d(src.x + e.dest.x - Map.origin, src.y + e.dest.y - Map.origin);
-            pathWaypoints.add(waypoint);
+            pathWaypoints.add(new Coord2d(src.x + e.dest.x - Map.origin, src.y + e.dest.y - Map.origin));
         }
 
         Iterator<Edge> it = path.iterator();
@@ -198,8 +224,10 @@ public class Pathfinder implements Runnable {
             if (action != null && isLastSegment)
                 mv.ui.gui.act(action);
 
-            if (gob != null && isLastSegment)
-                mv.wdgmsg("click", Coord.z, mc, clickb, modflags, 0, (int) gob.id, gob.rc.floor(posres), 0, meshid);
+            if (gob != null && isLastSegment) {
+                Coord finalMc = (clickMc != null) ? clickMc : mc;
+                mv.wdgmsg("click", Coord.z, finalMc, clickb, modflags, 0, (int) gob.id, gob.rc.floor(posres), 0, meshid);
+            }
             else
                 mv.wdgmsg("click", Coord.z, mc, 1, 0);
 
@@ -250,7 +278,7 @@ public class Pathfinder implements Runnable {
 
             if (pathWaypoints.size() > 1) {
                 pathWaypoints.remove(1);
-                pathWaypoints.set(0, player.rc);
+                pathWaypoints.set(0, new Coord2d(player.rc.x, player.rc.y));
             }
 
             if (moveinterupted) {

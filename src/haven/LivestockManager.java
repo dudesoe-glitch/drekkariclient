@@ -408,7 +408,7 @@ public class LivestockManager extends Window {
 			return;
 		}
 		// Right-click interaction: pathfind to animal and interact
-		gui.map.pfRightClick(gob, 0, 3, 0, null);
+		gui.map.pfRightClick(gob, new Coord2d(gob.rc.x, gob.rc.y), 0, 3, 0, null);
 	}
 
 	@Override

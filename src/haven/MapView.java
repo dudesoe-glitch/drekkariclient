@@ -2465,7 +2465,7 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
 						if (player != null && gob.rc.dist(player.rc) > 33) {
 							int meshid = (args.length > 8) ? (Integer) args[8] : -1;
 							int mflags = (Integer) args[3];
-							pfRightClick(gob, meshid, clickb, mflags, null);
+							pfRightClick(gob, mc, meshid, clickb, mflags, null);
 							return;
 						}
 					}
@@ -3326,12 +3326,12 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
 		}
 	}
 
-	public void pfRightClick(Gob gob, int meshid, int clickb, int modflags, String action) {
+	public void pfRightClick(Gob gob, Coord2d clickPos, int meshid, int clickb, int modflags, String action) {
 		Gob player = player();
 		if (player == null)
 			return;
 		if (gob.rc.dist(player.rc) > 11 * MAX_TILE_RANGE) {
-			pfLeftClick(gob.rc.floor(), null);
+			pfLeftClick(clickPos.floor(), null);
 			return;
 		}
 		synchronized (Pathfinder.class) {
@@ -3343,13 +3343,14 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
 					wdgmsg("gk", 27);
 			}
 
+			Coord dest = clickPos.floor();
 			Coord src = player.rc.floor();
-			int gcx = haven.automated.pathfinder.Map.origin - (src.x - gob.rc.floor().x);
-			int gcy = haven.automated.pathfinder.Map.origin - (src.y - gob.rc.floor().y);
+			int gcx = haven.automated.pathfinder.Map.origin - (src.x - dest.x);
+			int gcy = haven.automated.pathfinder.Map.origin - (src.y - dest.y);
 			if (gcx < 0 || gcx >= haven.automated.pathfinder.Map.sz || gcy < 0 || gcy >= haven.automated.pathfinder.Map.sz)
 				return;
 
-			pf = new Pathfinder(this, new Coord(gcx, gcy), gob, meshid, clickb, modflags, action);
+			pf = new Pathfinder(this, new Coord(gcx, gcy), gob, clickPos, meshid, clickb, modflags, action);
 			pf.addListener(this);
 			pfthread = new Thread(pf, "Pathfinder");
 			pfthread.start();
