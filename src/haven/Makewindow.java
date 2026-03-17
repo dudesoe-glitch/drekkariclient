@@ -185,8 +185,23 @@ public class Makewindow extends Widget {
 		    if (Thread.currentThread().isInterrupted())
 			break;
 		    wdgmsg("make", 0);
+		    // Wait for progress bar to appear (up to 2s)
+		    int waitForAppear = 0;
+		    while (ui.gui.prog == null && waitForAppear < 2000) {
+			Thread.sleep(50);
+			waitForAppear += 50;
+		    }
+		    // Wait for progress bar to complete
+		    GameUI.Progress p;
+		    int elapsed = 0;
+		    while ((p = ui.gui.prog) != null && p.prog >= 0) {
+			Thread.sleep(50);
+			elapsed += 50;
+			if (elapsed > 60000) break; // 1 minute safety timeout per craft
+		    }
+		    // Small delay after completion before next craft
 		    if (i < n - 1)
-			Thread.sleep(650);
+			Thread.sleep(300);
 		}
 	    } catch (InterruptedException e) {
 		Thread.currentThread().interrupt();
