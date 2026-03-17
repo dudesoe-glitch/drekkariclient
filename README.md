@@ -1,6 +1,6 @@
 # Drekkari Client
 
-A custom Haven & Hearth client built on top of the official vanilla client, with extensive automation, quality-of-life features, and UI improvements.
+A custom Haven & Hearth client built on top of the official vanilla client, with extensive automation, quality-of-life features, and UI improvements. Undergoing rigorous testing and work rn, everything works fine but the bots, still going vicious testing and figuring out a way to make them work.
 
 ## Building & Running
 
