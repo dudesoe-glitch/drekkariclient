@@ -544,6 +544,17 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 	makewnd = add(new CraftWindow(), Utils.getprefc("wndc-makewnd", new Coord(400, 200)));
 	makewnd.hide();
 
+	add(new GameStateCache(this));
+
+	// Load extensions via system property (e.g., -Dhaven.ext=com.example.MyExtension)
+	String ext = System.getProperty("haven.ext");
+	if (ext != null) {
+		for (String cls : ext.split(",")) {
+			try { Class.forName(cls.trim()).getMethod("init", GameUI.class).invoke(null, this); }
+			catch (Exception ignored) {}
+		}
+	}
+
 	questObjectivesWindow = add(new QuestObjectivesWindow(), Utils.getprefc("wndc-questObjectivesWindow", UI.unscale(new Coord(400, 200))));
 	questObjectivesWindow.hide();
 

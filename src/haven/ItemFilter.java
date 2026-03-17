@@ -54,7 +54,7 @@ public class ItemFilter {
 	private static final Pattern TYPE_FILTER = Pattern.compile("type:(\\w+)");
 	private static final Pattern ENERGY_FILTER = Pattern.compile("energy\\s*([><=!]+)\\s*([\\d.]+)");
 	private static final Pattern HUNGER_FILTER = Pattern.compile("hunger\\s*([><=!]+)\\s*([\\d.]+)");
-	private static final Pattern TXT_FILTER = Pattern.compile("txt:([\\w\\s]+?)(?=\\s+(?:q\\b|fep\\b|armor\\b|lp\\b|lph\\b|has:|wear\\b|type:|energy\\b|hunger\\b|txt:|eff:|!)|$)");
+	private static final Pattern TXT_FILTER = Pattern.compile("txt:([\\w\\s\\-'.]+?)(?=\\s+(?:q[><=!:]|fep[><=!:]|armor[><=!:]|lp[><=!h]|has:|wear[><=!]|type:|energy[><=!]|hunger[><=!]|txt:|eff:|!)|$)");
 	private static final Pattern EFF_FILTER = Pattern.compile("eff:(\\w+)");
 
 	// All patterns for stripping from remaining text
@@ -282,8 +282,11 @@ public class ItemFilter {
 		String name;
 		try {
 			name = item.getname().toLowerCase();
+		} catch (Loading e) {
+			return false; // Item not loaded yet — skip rather than match on resource path
 		} catch (Exception e) {
-			name = item.resname().toLowerCase();
+			try { name = item.resname().toLowerCase(); }
+			catch (Exception e2) { return false; }
 		}
 		for (Predicate p : predicates) {
 			if (!p.test(item, name)) return false;
