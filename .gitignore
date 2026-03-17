@@ -14,17 +14,3 @@ steam_appid.txt
 steamicon.png
 workshop-client.properties
 /docs/plans/
-
-# Claude Code project files — NEVER commit these
-/.claude/
-CLAUDE.md
-HANDOFF.md
-SKILLS.md
-STANDARDS.md
-MASTER_PLAN.md
-launch-claude.bat
-/Diary/
-/docs/
-
-# User-specific runtime data
-/image_cache/
