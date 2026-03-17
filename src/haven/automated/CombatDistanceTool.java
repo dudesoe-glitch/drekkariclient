@@ -237,11 +237,10 @@ public class CombatDistanceTool extends BotBase {
                         }
 
                         // Auto-respace: continuously maintain set distance
-                        if (autoRespace && System.currentTimeMillis() - lastRespaceTime > 600) {
+                        if (autoRespace && System.currentTimeMillis() - lastRespaceTime > 200) {
                             try {
                                 double targetDist = Double.parseDouble(value);
-                                // Tighter threshold for responsive repositioning
-                                if (dist > 0 && Math.abs(dist - targetDist) > 1.5) {
+                                if (dist > 0 && Math.abs(dist - targetDist) > 1.0) {
                                     moveToDistance(targetDist);
                                     lastRespaceTime = System.currentTimeMillis();
                                 }
@@ -265,7 +264,7 @@ public class CombatDistanceTool extends BotBase {
                     }
                 } catch (Exception ignored) {}
 
-                Thread.sleep(500);
+                Thread.sleep(150);
             }
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
