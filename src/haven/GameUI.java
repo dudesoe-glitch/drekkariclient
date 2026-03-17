@@ -1778,8 +1778,14 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 		} catch (NumberFormatException e) {
 			meterFullness = 0.75f;
 		}
-		if (getmeter("stam", 0).a < meterFullness) {
-			if(System.currentTimeMillis() > lastAutoDrinkTime + 1000 || System.currentTimeMillis() > lastAutoDrinkTime + 3500){
+		double stam = getmeter("stam", 0).a;
+		if (stam < meterFullness) {
+			// If critically low (< 20%), drink immediately even if action in progress
+			// Otherwise defer until progress bar completes to avoid interrupting actions
+			boolean critical = stam < 0.20;
+			if (!critical && prog != null) {
+				// Action in progress and stamina not critical — defer drinking
+			} else if(System.currentTimeMillis() > lastAutoDrinkTime + 1000 || System.currentTimeMillis() > lastAutoDrinkTime + 3500){
 				lastAutoDrinkTime = System.currentTimeMillis();
 				wdgmsg("act", "drink");
 			}
