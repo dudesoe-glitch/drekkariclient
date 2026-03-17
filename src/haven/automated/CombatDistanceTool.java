@@ -209,11 +209,29 @@ public class CombatDistanceTool extends BotBase {
                             currentDistanceLabel.settext("Current dist: " + result + " units.");
                         }
 
-                        // Auto-detect weapon distance
+                        // Auto-detect weapon distance and combine with enemy size
                         if (autoWeaponDetect) {
                             double weaponDist = detectWeaponDistance();
                             if (weaponDist > 0) {
-                                value = String.valueOf(weaponDist);
+                                // Combine weapon range with enemy hitbox for optimal positioning
+                                // animalDistances = pre-calibrated total distance per enemy type (includes hitbox)
+                                // weaponDistances = weapon reach in world units
+                                // Use the larger of: weapon reach or animal-specific distance
+                                Gob enemy = getEnemy();
+                                double enemyDist = 0;
+                                if (enemy != null) {
+                                    try {
+                                        Resource eRes = enemy.getres();
+                                        if (eRes != null) {
+                                            Double ad = animalDistances.get(eRes.name);
+                                            if (ad != null) enemyDist = ad;
+                                        }
+                                    } catch (Loading ignored) {}
+                                }
+                                // If we have an animal-specific distance, use it if larger than weapon range
+                                // Otherwise use weapon range (for unknown enemies or PvP)
+                                double optimalDist = Math.max(weaponDist, enemyDist);
+                                value = String.valueOf(optimalDist);
                                 distanceEntry.settext(value);
                             }
                         }
@@ -222,7 +240,8 @@ public class CombatDistanceTool extends BotBase {
                         if (autoRespace && System.currentTimeMillis() - lastRespaceTime > 600) {
                             try {
                                 double targetDist = Double.parseDouble(value);
-                                if (dist > 0 && Math.abs(dist - targetDist) > 3.0) {
+                                // Tighter threshold for responsive repositioning
+                                if (dist > 0 && Math.abs(dist - targetDist) > 1.5) {
                                     moveToDistance(targetDist);
                                     lastRespaceTime = System.currentTimeMillis();
                                 }
