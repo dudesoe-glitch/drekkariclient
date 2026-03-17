@@ -203,6 +203,7 @@ public class OptWnd extends Window {
 	public static CheckBox dragWindowsInWhenResizingCheckBox;
 	public static CheckBox showHoverInventoriesWhenHoldingShiftCheckBox;
 	public static CheckBox showQuickSlotsCheckBox;
+	public static CheckBox showEquipProxyCheckBox;
 	public static CheckBox leftHandQuickSlotCheckBox, rightHandQuickSlotCheckBox, leftPouchQuickSlotCheckBox, rightPouchQuickSlotCheckBox,
 			beltQuickSlotCheckBox, backpackQuickSlotCheckBox, shouldersQuickSlotCheckBox, capeQuickSlotCheckBox;
 	public static CheckBox showStudyReportHistoryCheckBox;

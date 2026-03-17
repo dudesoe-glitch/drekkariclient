@@ -44,12 +44,15 @@ public class FarmingBot extends BotBase {
 		put("pepper", "gfx/invobjs/seed-pepper");
 		put("tea", "gfx/invobjs/seed-tea");
 		put("cucumber", "gfx/invobjs/seed-cucumber");
+		put("hops", "gfx/invobjs/seed-hops");
 	}};
 
 	// Crops replanted using the harvested item itself, not seeds
-	// Wiki: beetroot, leek, onions, garlic, kale, peas, peppercorn are planted as the item
+	// KEY = gob base name (from gfx/terobjs/plants/<name>), VALUE = inventory resource name
+	// NOTE: gob name is "beet" not "beetroot" — key must match getCropBaseName() output
 	private static final Map<String, String> CROP_TO_ITEM = new HashMap<String, String>() {{
-		put("beetroot", "gfx/invobjs/beet");
+		put("beet", "gfx/invobjs/beet");
+		put("turnip", "gfx/invobjs/turnip");
 		put("leek", "gfx/invobjs/leek");
 		put("onion", "gfx/invobjs/yellowonion");
 		put("yellowonion", "gfx/invobjs/yellowonion");

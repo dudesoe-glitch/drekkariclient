@@ -90,6 +90,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 	public QuestObjectivesWindow questObjectivesWindow = null;
 	public TileHighlight.TileHighlightCFG tileHighlight;
 	public QuickSlotsWdg quickslots;
+	public EquipProxy equipProxy;
 	private double lastmsgsfx = 0;
 	public static final Text.Foundry actBarKeybindsFoundry = new Text.Foundry(Text.sans.deriveFont(java.awt.Font.BOLD), 12);
 	public ActionBar actionBar1 = null, actionBar2 = null, actionBar3 = null, actionBar4 = null, actionBar5 = null, actionBar6 = null, currentActionBar = null;
@@ -524,6 +525,9 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 	if (!OptWnd.showQuickSlotsCheckBox.a) {
 		quickslots.hide();
 	}
+	equipProxy = add(new EquipProxy(0, 21, 1, 17, 22, 18, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 19, 20, 12, 13, 14, 15),
+		Utils.getprefc("wndc-equipProxy", UI.scale(new Coord(10, 200))));
+	equipProxy.hide();
 	actionBar1.c = Utils.getprefc("wndc-actionBar1", UI.unscale(new Coord(0, 500)));
 	actionBar1.raise();
 	actionBar2.c = Utils.getprefc("wndc-actionBar2", UI.unscale(new Coord(0, 540)));

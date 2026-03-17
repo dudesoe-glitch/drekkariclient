@@ -140,6 +140,16 @@ class OptWndInterfaceSettingsPanel {
 		}, leftColumn.pos("ur").adds(9, 0));
 
 
+		leftColumn = panel.add(OptWnd.showEquipProxyCheckBox = new CheckBox("Enable Equipment Proxy Widget"){
+			{a = (Utils.getprefb("showEquipProxy", false));}
+			public void changed(boolean val) {
+				Utils.setprefb("showEquipProxy", val);
+				if (ui != null && ui.gui != null && ui.gui.equipProxy != null){
+					ui.gui.equipProxy.show(val);
+				}
+			}
+		}, leftColumn.pos("bl").adds(0, 12).xs(0));
+
 		leftColumn = panel.add(OptWnd.showStudyReportHistoryCheckBox = new CheckBox("Show Study Report History"){
 			{a = (Utils.getprefb("showStudyReportHistory", true));}
 			public void set(boolean val) {

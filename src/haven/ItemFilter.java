@@ -31,6 +31,10 @@ import java.util.regex.Pattern;
  * - "has:water"       — container contains specified substance
  * - "wear>50"         — durability remaining % greater than 50
  * - "type:food"       — item type (food/armor/curio/tool/seed/container/material/weapon)
+ * - "energy>50"       — food energy % greater than 50
+ * - "hunger>5"        — food hunger value greater than 5
+ * - "txt:some text"   — search tooltip text (AdHoc, Pagina, item name)
+ * - "eff:poison"      — food effect name contains "poison"
  * - "!name"           — exclude items matching name (negation)
  * - Combine with space: "turnip q>10 fep>5" — all conditions must match (AND)
  * - Combine with |: "turnip | carrot" — any group can match (OR)
@@ -48,11 +52,16 @@ public class ItemFilter {
 	private static final Pattern HAS_FILTER = Pattern.compile("has:(\\w+)");
 	private static final Pattern WEAR_FILTER = Pattern.compile("wear\\s*([><=!]+)\\s*([\\d.]+)");
 	private static final Pattern TYPE_FILTER = Pattern.compile("type:(\\w+)");
+	private static final Pattern ENERGY_FILTER = Pattern.compile("energy\\s*([><=!]+)\\s*([\\d.]+)");
+	private static final Pattern HUNGER_FILTER = Pattern.compile("hunger\\s*([><=!]+)\\s*([\\d.]+)");
+	private static final Pattern TXT_FILTER = Pattern.compile("txt:([\\w\\s]+?)(?=\\s+(?:q\\b|fep\\b|armor\\b|lp\\b|lph\\b|has:|wear\\b|type:|energy\\b|hunger\\b|txt:|eff:|!)|$)");
+	private static final Pattern EFF_FILTER = Pattern.compile("eff:(\\w+)");
 
 	// All patterns for stripping from remaining text
 	private static final Pattern[] ALL_PATTERNS = {
 		QUALITY_RANGE, QUALITY_CMP, FEP_TYPE, FEP_TOTAL,
-		ARMOR_TYPE, ARMOR_TOTAL, LP_FILTER, LPH_FILTER, HAS_FILTER, WEAR_FILTER, TYPE_FILTER
+		ARMOR_TYPE, ARMOR_TOTAL, LP_FILTER, LPH_FILTER, HAS_FILTER, WEAR_FILTER, TYPE_FILTER,
+		ENERGY_FILTER, HUNGER_FILTER, TXT_FILTER, EFF_FILTER
 	};
 
 	private final List<Predicate> predicates;
@@ -209,6 +218,40 @@ public class ItemFilter {
 			});
 		}
 		remaining = TYPE_FILTER.matcher(remaining).replaceAll("").trim();
+
+		// Energy filter: energy>50
+		m = ENERGY_FILTER.matcher(remaining);
+		while (m.find()) {
+			String op = m.group(1);
+			double val = Double.parseDouble(m.group(2));
+			predicates.add((item, name) -> compare(getEnergy(item), op, val));
+		}
+		remaining = ENERGY_FILTER.matcher(remaining).replaceAll("").trim();
+
+		// Hunger filter: hunger>5
+		m = HUNGER_FILTER.matcher(remaining);
+		while (m.find()) {
+			String op = m.group(1);
+			double val = Double.parseDouble(m.group(2));
+			predicates.add((item, name) -> compare(getHunger(item), op, val));
+		}
+		remaining = HUNGER_FILTER.matcher(remaining).replaceAll("").trim();
+
+		// Tooltip text search: txt:some text
+		m = TXT_FILTER.matcher(remaining);
+		while (m.find()) {
+			String searchText = m.group(1).trim().toLowerCase();
+			predicates.add((item, name) -> hasTooltipText(item, searchText));
+		}
+		remaining = TXT_FILTER.matcher(remaining).replaceAll("").trim();
+
+		// Food effect filter: eff:poison
+		m = EFF_FILTER.matcher(remaining);
+		while (m.find()) {
+			String effectName = m.group(1).toLowerCase();
+			predicates.add((item, name) -> hasFoodEffect(item, effectName));
+		}
+		remaining = EFF_FILTER.matcher(remaining).replaceAll("").trim();
 
 		// Remaining text is a name filter (fuzzy match), supports ! prefix for negation
 		if (!remaining.isEmpty()) {
@@ -376,6 +419,88 @@ public class ItemFilter {
 			return wear != null ? wear.percentage : 100;
 		} catch (Loading e) {
 			return 100;
+		}
+	}
+
+	private static double getEnergy(GItem item) {
+		try {
+			FoodInfo food = ItemInfo.find(FoodInfo.class, item.info());
+			return food != null ? food.end * 100 : 0;
+		} catch (Loading e) {
+			return 0;
+		}
+	}
+
+	private static double getHunger(GItem item) {
+		try {
+			FoodInfo food = ItemInfo.find(FoodInfo.class, item.info());
+			return food != null ? food.glut : 0;
+		} catch (Loading e) {
+			return 0;
+		}
+	}
+
+	private static boolean hasTooltipText(GItem item, String searchText) {
+		try {
+			// Check item name
+			try {
+				String name = item.getname();
+				if (name != null && name.toLowerCase().contains(searchText))
+					return true;
+			} catch (Exception ignored) {}
+
+			// Check resource name
+			String resname = item.resname();
+			if (resname != null && resname.toLowerCase().contains(searchText))
+				return true;
+
+			// Check tooltip text from ItemInfo
+			for (ItemInfo inf : item.info()) {
+				if (inf instanceof ItemInfo.AdHoc) {
+					String text = ((ItemInfo.AdHoc) inf).str.text;
+					if (text != null && text.toLowerCase().contains(searchText))
+						return true;
+				}
+				if (inf instanceof ItemInfo.Pagina) {
+					// Pagina stores rich text — check the raw string
+					try {
+						java.lang.reflect.Field textField = ItemInfo.Pagina.class.getDeclaredField("text");
+						textField.setAccessible(true);
+						String text = (String) textField.get(inf);
+						if (text != null && text.toLowerCase().contains(searchText))
+							return true;
+					} catch (Exception ignored) {}
+				}
+			}
+			return false;
+		} catch (Loading e) {
+			return false;
+		}
+	}
+
+	private static boolean hasFoodEffect(GItem item, String effectName) {
+		try {
+			FoodInfo food = ItemInfo.find(FoodInfo.class, item.info());
+			if (food == null || food.efs == null) return false;
+			for (FoodInfo.Effect ef : food.efs) {
+				if (ef.info != null) {
+					for (ItemInfo inf : ef.info) {
+						if (inf instanceof ItemInfo.AdHoc) {
+							String text = ((ItemInfo.AdHoc) inf).str.text;
+							if (text != null && text.toLowerCase().contains(effectName))
+								return true;
+						}
+						if (inf instanceof ItemInfo.Name) {
+							String text = ((ItemInfo.Name) inf).str.text;
+							if (text != null && text.toLowerCase().contains(effectName))
+								return true;
+						}
+					}
+				}
+			}
+			return false;
+		} catch (Loading e) {
+			return false;
 		}
 	}
 }
