@@ -14,7 +14,8 @@ public class InvHelper {
 
     /** Known drink container resource base names. */
     private static final Set<String> DRINK_CONTAINERS = new HashSet<>(Arrays.asList(
-        "bucket", "flask", "waterskin", "waterflask", "kuksa", "tankard", "mug", "cup"
+        "bucket", "flask", "waterskin", "waterflask", "kuksa", "tankard", "mug", "cup",
+        "glassjug", "glassjug-full", "birchsap"
     ));
 
     /** Find the first item in inventory matching the exact resource name. */

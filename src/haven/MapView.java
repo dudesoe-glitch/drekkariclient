@@ -74,6 +74,10 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
 	public Pathfinder pf;
 	public Thread pfthread;
 	Coord pfFinalDest;
+	private Coord pfLastHopPos;      // track player position between long-distance hops
+	private int pfStuckCount = 0;    // consecutive hops with no progress
+	private static final int PF_MAX_STUCK_HOPS = 3; // abort after this many stuck hops
+	private static final double PF_MIN_HOP_PROGRESS = 5.0; // minimum distance per hop to count as progress
 	private static final int MAX_TILE_RANGE = 40;
 	private AreaSelectCallback areaSelectCallback;
 	public boolean areaSelect = false;
@@ -3228,11 +3232,28 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
 		if (pfFinalDest != null) {
 			Gob player = player();
 			if (player != null) {
-				double dist = pfFinalDest.dist(player.rc.floor());
+				Coord playerPos = player.rc.floor();
+				double dist = pfFinalDest.dist(playerPos);
 				if (dist > 11 * 5) {
+					// Check for stuck: did we make progress since last hop?
+					if (pfLastHopPos != null) {
+						double hopDist = pfLastHopPos.dist(playerPos);
+						if (hopDist < PF_MIN_HOP_PROGRESS) {
+							pfStuckCount++;
+							if (pfStuckCount >= PF_MAX_STUCK_HOPS) {
+								// Stuck — abort long-distance pathfinding
+								pfFinalDest = null;
+								pfLastHopPos = null;
+								pfStuckCount = 0;
+								return;
+							}
+						} else {
+							pfStuckCount = 0; // making progress, reset
+						}
+					}
+					pfLastHopPos = playerPos;
+
 					// Not close enough — schedule next hop after brief delay
-					// Continue even if pathfinder terminated (destination was out of map bounds)
-					// The pathfinder still moved the player closer before terminating
 					Coord dest = pfFinalDest;
 					new Thread(() -> {
 						try { Thread.sleep(200); } catch (InterruptedException e) { Thread.currentThread().interrupt(); return; }
@@ -3240,9 +3261,13 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
 					}, "PF-LongDistance").start();
 				} else {
 					pfFinalDest = null;
+					pfLastHopPos = null;
+					pfStuckCount = 0;
 				}
 			} else {
 				pfFinalDest = null;
+				pfLastHopPos = null;
+				pfStuckCount = 0;
 			}
 		}
 	}
@@ -3285,6 +3310,8 @@ public class MapView extends PView implements DTarget, Console.Directory, PFList
 
 	public void pfLongDistance(Coord finalDest) {
 		this.pfFinalDest = finalDest;
+		this.pfLastHopPos = null;
+		this.pfStuckCount = 0;
 		pfLeftClick(finalDest, null);
 	}
 

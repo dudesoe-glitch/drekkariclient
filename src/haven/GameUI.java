@@ -119,6 +119,11 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 	public static boolean subscribedAccount = false;
 	public QuestHelper questhelper;
 	public static Map<Long,String> gobIdToKinName = new ConcurrentHashMap<>();
+
+	// Extension key handlers — extensions register via addExtKeyHandler() to receive key events
+	private static final java.util.concurrent.CopyOnWriteArrayList<java.util.function.Predicate<Widget.GlobKeyEvent>> extKeyHandlers = new java.util.concurrent.CopyOnWriteArrayList<>();
+	public static void addExtKeyHandler(java.util.function.Predicate<Widget.GlobKeyEvent> h) { extKeyHandlers.add(h); }
+	public static void removeExtKeyHandler(java.util.function.Predicate<Widget.GlobKeyEvent> h) { extKeyHandlers.remove(h); }
 	public static boolean showUI = true;
 	public static long leaderTargetPing = -1;
 	public MiniStudy miniStudy;
@@ -2112,6 +2117,10 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 	public static KeyBinding kb_pickupNearest = KeyBinding.get("pickupNearestKB", KeyMatch.nil);
 
     public boolean globtype(GlobKeyEvent ev) {
+	// Extension key handlers (datamining, etc.)
+	for (java.util.function.Predicate<Widget.GlobKeyEvent> h : extKeyHandlers) {
+	    try { if (h.test(ev)) return true; } catch (Exception ignored) {}
+	}
 	if(ev.c == ':') {
 	    entercmd();
 	    return(true);
@@ -3470,6 +3479,18 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 				}
 			} catch (Loading | NullPointerException ignored) {}
 		}
+		// Check pouch slots (19=Left Pouch, 20=Right Pouch) for drink containers
+		for (int i = 19; i <= 20; i++) {
+			try {
+				Equipory eq = getequipory();
+				if (eq == null || eq.slots[i] == null) continue;
+				String bn = eq.slots[i].item.res.get().basename();
+				if (bn.startsWith("glassjug") || bn.startsWith("waterskin") || bn.startsWith("waterflask")
+						|| bn.startsWith("kuksa") || bn.startsWith("flask") || bn.startsWith("bucket")) {
+					containers.add(eq.slots[i]);
+				}
+			} catch (Loading | NullPointerException ignored) {}
+		}
 		Collections.reverse(containers);
 		WItem teacontainer = null;
 		WItem watercontainer = null;
@@ -3489,6 +3510,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 		if (teacontainer == null && watercontainer == null) {
 			return false;
 		}
+		Coord savedLcc = ui.lcc;
 		ui.lcc = Coord.z;
 		boolean energyHigh = nrj != null && nrj.a >= 0.90;
 		if (fv != null && fv.current != null) {
@@ -3497,6 +3519,7 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 			} else if (!energyHigh && teacontainer != null) {
 				Actions.clickWItemAndSelectOption(this, teacontainer, 0);
 			} else {
+				ui.lcc = savedLcc;
 				return false;
 			}
 		} else {
@@ -3507,9 +3530,11 @@ public class GameUI extends ConsoleHost implements Console.Directory, UI.Notice.
 			} else if (!energyHigh && teacontainer != null) {
 				Actions.clickWItemAndSelectOption(this, teacontainer, 0);
 			} else {
+				ui.lcc = savedLcc;
 				return false;
 			}
 		}
+		ui.lcc = savedLcc;
 		return true;
 	}
 

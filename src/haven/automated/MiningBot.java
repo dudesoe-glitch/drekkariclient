@@ -80,6 +80,8 @@ public class MiningBot extends BotBase {
 				gui.vhand.item.wdgmsg("drop", Coord.z);
 				Actions.waitForEmptyHand(gui, 1000, "");
 			}
+			// Auto-pickup nearby cavedust (curiosity dropped by mining)
+			tryPickupCavedust();
 			return;
 		}
 
@@ -108,6 +110,23 @@ public class MiningBot extends BotBase {
 		}
 	}
 
+	private static final String CAVEDUST_RES = "gfx/terobjs/items/cavedust";
+	private static final double CAVEDUST_PICKUP_RANGE = 22.0;
+
+	private void tryPickupCavedust() throws InterruptedException {
+		if (stop || !active) return;
+		Gob dust = GobHelper.findNearest(gui, CAVEDUST_PICKUP_RANGE, g -> {
+			String name = GobHelper.getResName(g);
+			return name != null && name.equals(CAVEDUST_RES);
+		});
+		if (dust != null && gui.vhand == null) {
+			Coord2d pos = new Coord2d(dust.rc.x, dust.rc.y);
+			gui.map.wdgmsg("click", Coord.z, pos.floor(posres), 3, 0, 0,
+				(int) dust.id, pos.floor(posres), 0, -1);
+			Thread.sleep(500);
+		}
+	}
+
 	private boolean isInSupportRange(Coord2d pos) {
 		List<Gob> supports = GobHelper.findAllSupports(gui);
 		for (Gob support : supports) {
@@ -121,6 +140,8 @@ public class MiningBot extends BotBase {
 				if (res.equals("gfx/terobjs/column") && dist <= 121)
 					return true;
 				if (res.equals("gfx/terobjs/minebeam") && dist <= 143)
+					return true;
+				if ((res.equals("gfx/terobjs/map/naturalminesupport") || res.equals("gfx/terobjs/stonepillar")) && dist <= 99)
 					return true;
 			} catch (Loading ignored) {}
 		}

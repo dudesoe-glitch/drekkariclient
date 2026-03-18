@@ -46,6 +46,15 @@ public class HitBoxes {
                 new Coord(-4, -2), new Coord(5, 2), new Coord(5, -2), new Coord(-4, 2))});
         collisionBoxMap.put("gfx/kritter/sheep/sheep", new CollisionBoxSecondary[]{new CollisionBoxSecondary(
                 new Coord(-4, -2), new Coord(5, 2), new Coord(5, -2), new Coord(-4, 2))});
+
+        // Buildings — timberhouse is ~6x6 tiles centered on gob position
+        collisionBoxMap.put("gfx/terobjs/arch/timberhouse", new CollisionBoxSecondary[]{new CollisionBoxSecondary(
+                new Coord(-33, -33), new Coord(33, 33), new Coord(33, -33), new Coord(-33, 33))});
+        // Walls — each segment is roughly 1 tile long, thin
+        collisionBoxMap.put("gfx/terobjs/arch/hwall", new CollisionBoxSecondary[]{new CollisionBoxSecondary(
+                new Coord(-6, -2), new Coord(6, 2), new Coord(6, -2), new Coord(-6, 2))});
+        // Doors should be passable
+        collisionBoxMap.put("gfx/terobjs/arch/timberhouse-door", new CollisionBoxSecondary[]{new CollisionBoxSecondary(false)});
     }
 
 

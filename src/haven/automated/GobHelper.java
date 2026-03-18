@@ -277,7 +277,8 @@ public class GobHelper {
     public static List<Gob> findAllSupports(GameUI gui) {
         Set<String> supportTypes = new HashSet<>(Arrays.asList(
             "gfx/terobjs/ladder", "gfx/terobjs/minesupport",
-            "gfx/terobjs/column", "gfx/terobjs/minebeam"
+            "gfx/terobjs/column", "gfx/terobjs/minebeam",
+            "gfx/terobjs/map/naturalminesupport", "gfx/terobjs/stonepillar"
         ));
         return findAll(gui, -1, g -> {
             String name = getResName(g);

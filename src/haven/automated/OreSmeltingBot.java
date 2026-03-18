@@ -45,6 +45,8 @@ public class OreSmeltingBot extends BotBase {
 	private static final Set<String> LEAD_ORES = new HashSet<>(Arrays.asList(
 		"leadglance", "galena"
 	));
+	private static final Set<String> MERCURY_ORES = new HashSet<>(Arrays.asList("cinnabar"));
+	private static final Set<String> METIRON_ORES = new HashSet<>(Arrays.asList("meteorite"));
 
 	// All ore basenames combined for stockpile matching
 	private static final Set<String> ALL_ORE_BASENAMES = new HashSet<>();
@@ -55,6 +57,8 @@ public class OreSmeltingBot extends BotBase {
 		ALL_ORE_BASENAMES.addAll(GOLD_ORES);
 		ALL_ORE_BASENAMES.addAll(SILVER_ORES);
 		ALL_ORE_BASENAMES.addAll(LEAD_ORES);
+		ALL_ORE_BASENAMES.addAll(MERCURY_ORES);
+		ALL_ORE_BASENAMES.addAll(METIRON_ORES);
 	}
 
 	private static final String[] FUEL_NAMES = {"Coal", "Black Coal", "Charcoal"};
@@ -407,6 +411,8 @@ public class OreSmeltingBot extends BotBase {
 		});
 	}
 
+	private static final String SLAG_RES = "gfx/invobjs/slag";
+
 	private void collectOutputFromSmelter(Gob smelter) throws InterruptedException {
 		Gob player = gui.map.player();
 		if (player == null) return;
@@ -422,6 +428,22 @@ public class OreSmeltingBot extends BotBase {
 			try { item.item.wdgmsg("transfer", Coord.z); Thread.sleep(100); } catch (Exception ignored) {}
 		}
 		Thread.sleep(100);
+		// Auto-drop slag from player inventory to free space
+		disposeSlag();
+	}
+
+	private void disposeSlag() throws InterruptedException {
+		if (gui.maininv == null) return;
+		for (Map.Entry<GItem, WItem> entry : new ArrayList<>(gui.maininv.wmap.entrySet())) {
+			if (stop || !active) break;
+			try {
+				Resource res = entry.getKey().getres();
+				if (res != null && res.name.equals(SLAG_RES)) {
+					entry.getKey().wdgmsg("drop", Coord.z);
+					Thread.sleep(80);
+				}
+			} catch (Loading ignored) {}
+		}
 	}
 
 	/** Find nearest smelter that hasn't been processed yet. */
